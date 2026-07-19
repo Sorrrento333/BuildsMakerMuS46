@@ -3,7 +3,7 @@
 ## Prioridad inmediata
 
 1. Resolver con el propietario la capacidad de proteger `main`: mantener el
-   repositorio privado y habilitar GitHub Pro, o hacerlo público. No cambiar
+   repositorio privado y habilitar GitHub Pro o hacerlo público. No cambiar
    visibilidad ni contratar un plan por inferencia. Mientras tanto, usar ramas
    cortas, PR y los checks `build-and-test`/`wpf-publication-smoke` como controles
    operativos manuales.
