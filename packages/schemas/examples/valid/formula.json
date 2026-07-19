@@ -1,0 +1,14 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "formula-synthetic-001",
+  "version": "0.1.0",
+  "rulesetId": "ruleset-synthetic",
+  "status": "DRAFT",
+  "confidence": "UNVERIFIED",
+  "inputs": [{ "id": "input-a", "dataType": "INTEGER", "unit": "synthetic-unit" }],
+  "output": { "id": "output-a", "dataType": "INTEGER", "unit": "synthetic-unit" },
+  "strategy": { "kind": "EXPRESSION", "definition": "input-a" },
+  "rounding": { "mode": "NONE", "stage": "No arithmetic in synthetic fixture" },
+  "evidenceRefs": [],
+  "testCaseRefs": []
+}

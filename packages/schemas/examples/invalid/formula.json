@@ -1,0 +1,14 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "formula-synthetic-001",
+  "version": "one",
+  "rulesetId": "ruleset-synthetic",
+  "status": "PUBLISHED",
+  "confidence": "VERIFIED",
+  "inputs": [],
+  "output": { "id": "output-a", "dataType": "INTEGER", "unit": "unit" },
+  "strategy": { "kind": "EXPRESSION", "definition": "0" },
+  "rounding": { "mode": "UNKNOWN", "stage": "invalid fixture" },
+  "evidenceRefs": [],
+  "testCaseRefs": []
+}

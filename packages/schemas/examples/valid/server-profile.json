@@ -1,0 +1,8 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "profile-synthetic",
+  "version": "0.1.0",
+  "displayName": "Synthetic profile",
+  "baseRuleset": { "id": "ruleset-synthetic", "versionRange": ">=0.1.0 <1.0.0" },
+  "overrides": [{ "path": "/synthetic/value", "value": 1, "reason": "Exercises the override contract", "author": "test-fixture", "evidenceRefs": [] }]
+}

@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.mu46.local/v1/formula.schema.json",
+  "title": "FormulaDefinition",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "id", "version", "rulesetId", "status", "confidence", "inputs", "output", "strategy", "rounding", "evidenceRefs", "testCaseRefs"],
+  "properties": {
+    "schemaVersion": { "const": "1.0.0" },
+    "id": { "$ref": "#/$defs/id" },
+    "version": { "$ref": "#/$defs/semver" },
+    "rulesetId": { "$ref": "#/$defs/id" },
+    "status": { "enum": ["DRAFT", "REVIEWED", "PUBLISHED", "DEPRECATED"] },
+    "confidence": { "$ref": "#/$defs/confidence" },
+    "purpose": { "type": "string", "minLength": 1 },
+    "inputs": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/quantity" } },
+    "output": { "$ref": "#/$defs/quantity" },
+    "strategy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "definition"],
+      "properties": {
+        "kind": { "enum": ["EXPRESSION", "ALGORITHM"] },
+        "definition": { "type": "string", "minLength": 1 },
+        "dependencyFormulaIds": { "type": "array", "items": { "$ref": "#/$defs/id" }, "uniqueItems": true }
+      }
+    },
+    "modifierOrder": { "type": "array", "items": { "enum": ["flat_before", "percent_additive", "percent_multiplicative", "flat_after", "override", "cap", "floor", "chance"] } },
+    "rounding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode", "stage"],
+      "properties": {
+        "mode": { "enum": ["NONE", "FLOOR", "CEILING", "TRUNCATE", "HALF_UP", "HALF_EVEN"] },
+        "stage": { "type": "string", "minLength": 1 },
+        "decimalPlaces": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "constraints": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "evidenceRefs": { "type": "array", "items": { "$ref": "#/$defs/id" }, "uniqueItems": true },
+    "conflictIds": { "type": "array", "items": { "$ref": "#/$defs/id" }, "uniqueItems": true },
+    "testCaseRefs": { "type": "array", "items": { "$ref": "#/$defs/id" }, "uniqueItems": true }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "status": { "const": "PUBLISHED" } }, "required": ["status"] },
+      "then": { "properties": { "evidenceRefs": { "minItems": 1 }, "testCaseRefs": { "minItems": 1 } } }
+    }
+  ],
+  "$defs": {
+    "id": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
+    "semver": { "type": "string", "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)$" },
+    "confidence": { "enum": ["UNVERIFIED", "PARTIAL", "VERIFIED", "DISPUTED", "DEPRECATED"] },
+    "quantity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "dataType", "unit"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "dataType": { "enum": ["INTEGER", "DECIMAL", "BOOLEAN"] },
+        "unit": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}

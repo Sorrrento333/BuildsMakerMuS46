@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.mu46.local/v1/evidence.schema.json",
+  "title": "EvidenceRecord",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "id", "source", "consultedOn", "scope", "extractedText", "interpretation", "confidence", "reviewStatus"],
+  "properties": {
+    "schemaVersion": { "const": "1.0.0" },
+    "id": { "$ref": "#/$defs/id" },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["url", "title", "publisher", "usageTerms"],
+      "properties": {
+        "url": { "type": "string", "format": "uri" },
+        "title": { "type": "string", "minLength": 1 },
+        "author": { "type": "string", "minLength": 1 },
+        "publisher": { "type": "string", "minLength": 1 },
+        "usageTerms": { "type": "string", "minLength": 1 },
+        "snapshotHash": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" }
+      }
+    },
+    "consultedOn": { "type": "string", "format": "date" },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["gameVersion", "versionConfidence"],
+      "properties": {
+        "gameVersion": { "type": "string", "minLength": 1 },
+        "versionConfidence": { "enum": ["EXPLICIT", "INFERRED", "UNKNOWN"] },
+        "serverType": { "enum": ["REFERENCE", "PRIVATE", "UNKNOWN"] },
+        "notes": { "type": "string" }
+      }
+    },
+    "extractedText": { "type": "string", "minLength": 1 },
+    "interpretation": { "type": "string", "minLength": 1 },
+    "transformation": { "type": "string" },
+    "confidence": { "$ref": "#/$defs/confidence" },
+    "reviewStatus": { "enum": ["PENDING", "REVIEWED", "REJECTED"] },
+    "reviewers": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+    "conflictIds": { "type": "array", "items": { "$ref": "#/$defs/id" }, "uniqueItems": true },
+    "notes": { "type": "string" }
+  },
+  "$defs": {
+    "id": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
+    "confidence": { "enum": ["UNVERIFIED", "PARTIAL", "VERIFIED", "DISPUTED", "DEPRECATED"] }
+  }
+}

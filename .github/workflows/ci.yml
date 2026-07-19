@@ -1,0 +1,54 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up .NET 10
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 10.0.x
+          cache: true
+          cache-dependency-path: '**/packages.lock.json'
+
+      - name: Restore
+        run: dotnet restore MUOnline.BuildPlanner.slnx --locked-mode
+
+      - name: Build
+        run: dotnet build MUOnline.BuildPlanner.slnx --configuration Release --no-restore
+
+      - name: Test
+        run: dotnet test --solution MUOnline.BuildPlanner.slnx --configuration Release --no-build
+
+  wpf-publication-smoke:
+    runs-on: windows-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up .NET 10
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 10.0.x
+          cache: true
+          cache-dependency-path: '**/packages.lock.json'
+
+      - name: Restore locked dependencies
+        run: dotnet restore MUOnline.BuildPlanner.slnx --locked-mode
+
+      - name: Audit direct and transitive dependencies
+        run: dotnet list MUOnline.BuildPlanner.slnx package --vulnerable --include-transitive --no-restore
+
+      - name: Run published WPF smoke test
+        shell: powershell
+        run: ./tools/smoke-tests/Test-WpfPublishedArtifact.ps1

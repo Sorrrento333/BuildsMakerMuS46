@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.mu46.local/v1/server-profile.schema.json",
+  "title": "ServerProfile",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "id", "version", "displayName", "baseRuleset", "overrides"],
+  "properties": {
+    "schemaVersion": { "const": "1.0.0" },
+    "id": { "$ref": "#/$defs/id" },
+    "version": { "$ref": "#/$defs/semver" },
+    "displayName": { "type": "string", "minLength": 1 },
+    "baseRuleset": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "versionRange"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "versionRange": { "type": "string", "minLength": 1 }
+      }
+    },
+    "extendsProfileId": { "$ref": "#/$defs/id" },
+    "overrides": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "value", "reason", "author", "evidenceRefs"],
+        "properties": {
+          "path": { "type": "string", "pattern": "^/", "minLength": 2 },
+          "value": {},
+          "reason": { "type": "string", "minLength": 1 },
+          "author": { "type": "string", "minLength": 1 },
+          "evidenceRefs": { "type": "array", "items": { "$ref": "#/$defs/id" }, "uniqueItems": true }
+        }
+      }
+    },
+    "notes": { "type": "string" }
+  },
+  "$defs": {
+    "id": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
+    "semver": { "type": "string", "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)$" }
+  }
+}

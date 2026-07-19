@@ -1,0 +1,10 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "class-synthetic",
+  "rulesetId": "ruleset-synthetic",
+  "displayName": "Synthetic class",
+  "confidence": "UNVERIFIED",
+  "stats": { "stat-synthetic": { "baseValue": 0, "evidenceRefs": ["evidence-synthetic-001"] } },
+  "evolutions": [{ "id": "evolution-synthetic", "displayName": "Synthetic evolution", "stage": 0, "evidenceRefs": ["evidence-synthetic-001"] }],
+  "evidenceRefs": ["evidence-synthetic-001"]
+}

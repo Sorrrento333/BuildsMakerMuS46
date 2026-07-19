@@ -1,0 +1,8 @@
+{
+  "schemaVersion": "2.0.0",
+  "id": "profile-synthetic",
+  "version": "0.1",
+  "displayName": "Synthetic profile",
+  "baseRuleset": { "id": "ruleset-synthetic" },
+  "overrides": [{ "path": "synthetic/value", "value": 1 }]
+}

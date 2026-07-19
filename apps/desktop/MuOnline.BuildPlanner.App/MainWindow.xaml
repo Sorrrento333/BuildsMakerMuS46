@@ -1,0 +1,21 @@
+<Window x:Class="MuOnline.BuildPlanner.App.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="MU Online Build Planner"
+        Width="720"
+        Height="420"
+        MinWidth="480"
+        MinHeight="300"
+        WindowStartupLocation="CenterScreen">
+    <Grid Margin="32">
+        <StackPanel VerticalAlignment="Center">
+            <TextBlock FontSize="28"
+                       FontWeight="SemiBold"
+                       Text="MU Online Build Planner" />
+            <TextBlock Margin="0,16,0,0"
+                       FontSize="16"
+                       TextWrapping="Wrap"
+                       Text="La base técnica WPF está instalada. Los flujos de producto permanecen pendientes de datos y reglas verificadas." />
+        </StackPanel>
+    </Grid>
+</Window>

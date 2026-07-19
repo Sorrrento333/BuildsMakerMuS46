@@ -1,0 +1,13 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "build-synthetic",
+  "ruleset": { "id": "ruleset-synthetic", "version": "0.1" },
+  "dataset": { "version": "synthetic-001", "hash": "not-a-hash" },
+  "engineVersion": "0.1.0",
+  "characterClassId": "class-synthetic",
+  "evolutionId": "evolution-synthetic",
+  "level": 0,
+  "stats": {},
+  "questIds": [],
+  "resetCount": -1
+}
