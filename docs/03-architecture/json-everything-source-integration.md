@@ -42,6 +42,10 @@ dos veces los diez fixtures más la prueba de formatos `uri`/`date`. También
 contrasta el inventario generado con el SPDX revisado y rechaza
 `OSMFEULA.txt` en la salida runtime.
 
+Los checkouts fijan `core.autocrlf=false` y `core.eol=lf`, y la compilación
+deshabilita símbolos/PDB. De este modo los hashes revisados no dependen de la
+configuración Git ni de los checksums de fin de línea del runner.
+
 Después del build normal,
 `tools/validators/Test-JsonEverythingSourceIntegration.ps1` comprueba el lock
 del validador, los tres hashes, publica la herramienta y exige el aviso MIT,

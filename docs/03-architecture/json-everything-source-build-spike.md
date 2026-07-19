@@ -25,7 +25,8 @@ posterior sí reemplazó el grafo restaurado y se documenta en
 
 El árbol de `JsonPointer` y `Json.More` no presenta diferencias entre ambos
 commits. La licencia fuente MIT revisada tiene SHA-256
-`6cd9d0817126af9072b953257ead45e9ea253a3656bdd227173d9969b48ec041`.
+`baebca0309090f4eca1b7a82c836cc91e48b2b92139c2280fb0ff69af922c2ae`
+con checkout LF explícito.
 La ejecución demostrada usa SDK .NET `10.0.301` y `net10.0`.
 
 ## Implementación reproducible
@@ -52,9 +53,9 @@ binarios NuGet de Json Everything para esa ejecución.
 
 - dos compilaciones en rutas independientes: 0 advertencias, 0 errores;
 - hashes idénticos entre ambas rutas:
-  - `Json.More.dll`: `bdbcfa86b2ce39e3320d8078849f0a50af52c6c4284e6afd23a3eb50a50ae828`;
-  - `JsonPointer.Net.dll`: `7c1b3c50569da7a9801b652a5b8e5e59b9b4c9413ccf431c10168e3984560247`;
-  - `JsonSchema.Net.dll`: `fb720f91a4971c0b54b20c8fe45d5679bd3c6c8774dcd91c7322526f2a7de923`;
+  - `Json.More.dll`: `450646267cc10ad4cbf33f1f568787874675642055376d12bed01a8d1044739e`;
+  - `JsonPointer.Net.dll`: `8f7be030e432b255f81812ec7b774c6827fdc06c0a6833313f6f653b82a550f5`;
+  - `JsonSchema.Net.dll`: `1f2dc6dfad8d76594c7e7107d13b4cad54a135e45dcd8f677c803ed169b4be55`;
 - dos ejecuciones consecutivas: 10/10 fixtures cada una;
 - prueba aislada de `uri`/`date`: rechazada como se esperaba;
 - auditoría de NuGet: ningún paquete vulnerable para `JsonSchema` en los

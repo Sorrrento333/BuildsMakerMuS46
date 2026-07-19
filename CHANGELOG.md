@@ -204,6 +204,9 @@
 
 ### Fixed
 
+- El pipeline reproducible de Json Everything fuerza checkouts LF y elimina
+  símbolos/PDB de los DLL auditados. Así los hashes ya no dependen de
+  `core.autocrlf` ni de checksums de fuentes propios del sistema operativo.
 - Se fija `eol=lf` para archivos de texto mediante `.gitattributes`, evitando
   que checkouts con `core.autocrlf` invaliden los hashes de `MANIFEST.sha256`.
 - El validador usa un registro de schemas aislado por ejecución y reutiliza cada

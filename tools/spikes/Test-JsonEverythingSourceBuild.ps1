@@ -52,6 +52,13 @@ function Copy-ReviewedLocks {
     }
 }
 
+function Set-ReproducibleCheckoutConfiguration {
+    param([string]$SourceRepositoryRoot)
+
+    Invoke-Checked git @("config", "core.autocrlf", "false") $SourceRepositoryRoot
+    Invoke-Checked git @("config", "core.eol", "lf") $SourceRepositoryRoot
+}
+
 $actualSdkVersion = (& dotnet --version).Trim()
 if ($ExpectedSdkVersion -ne $provenanceInput.sdkVersion) {
     throw "Expected SDK parameter differs from the reviewed provenance input."
@@ -72,6 +79,7 @@ if (Test-Path -LiteralPath $artifactRoot) {
 New-Item -ItemType Directory -Path $artifactRoot | Out-Null
 
 Invoke-Checked git @("clone", "--filter=blob:none", "--no-checkout", $repositoryUrl, $sourceRoot) $RepositoryRoot
+Set-ReproducibleCheckoutConfiguration $sourceRoot
 Invoke-Checked git @("checkout", "--detach", $sourceCommit) $sourceRoot
 Invoke-Checked git @("fetch", "--depth", "1", "origin", $transitiveCommit) $sourceRoot
 Copy-ReviewedLocks $sourceRoot
@@ -102,7 +110,9 @@ $commonBuildProperties = @(
     "-p:TreatWarningsAsErrors=false",
     "-p:AnalysisLevel=none",
     "-p:ContinuousIntegrationBuild=true",
-    "-p:Deterministic=true"
+    "-p:Deterministic=true",
+    "-p:DebugType=None",
+    "-p:DebugSymbols=false"
 )
 Invoke-Checked dotnet (@("restore", $projectPath, "--locked-mode") + $restoreProperties) $sourceRoot
 $firstBuildProperties = $commonBuildProperties + @("-p:PathMap=$sourceRoot=/_/json-everything")
@@ -121,6 +131,7 @@ foreach ($entry in $assemblySources.GetEnumerator()) {
 }
 
 Invoke-Checked git @("clone", "--filter=blob:none", "--no-checkout", $repositoryUrl, $repeatSourceRoot) $artifactRoot
+Set-ReproducibleCheckoutConfiguration $repeatSourceRoot
 Invoke-Checked git @("checkout", "--detach", $sourceCommit) $repeatSourceRoot
 Copy-ReviewedLocks $repeatSourceRoot
 $repeatProjectPath = Join-Path $repeatSourceRoot "src/JsonSchema/JsonSchema.csproj"
