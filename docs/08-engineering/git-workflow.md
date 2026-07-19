@@ -15,15 +15,15 @@ Ejemplo: `feat(engine): add traceable stat budget calculation`.
 UTC). El historial del bootstrap se conservó al renombrar
 `chore/bootstrap-repository`; no hubo rebase ni reescritura.
 
-La API de GitHub rechazó branch protection con estado `403`: el repositorio es
-privado y el plan actual requiere GitHub Pro o visibilidad pública para activar
-esa función. Hasta que el propietario decida una de esas opciones, estas reglas
-se aplican operativamente aunque GitHub no pueda imponerlas:
+El propietario hizo público el repositorio el 2026-07-19. A partir de esa
+decisión, branch protection quedó activa y verificada en `main` con:
 
-- trabajar en ramas cortas y abrir PR antes de integrar;
-- exigir resultados correctos de `build-and-test` y `wpf-publication-smoke`;
-- no usar force-push ni borrar `main`;
-- no cambiar visibilidad ni plan sin decisión explícita del propietario.
+- PR obligatorio, también para administradores;
+- checks estrictos `build-and-test` y `wpf-publication-smoke`;
+- historial lineal y resolución de conversaciones;
+- descarte de revisiones obsoletas, con cero aprobaciones obligatorias mientras
+  el repositorio conserve un único propietario;
+- force-push y borrado de `main` deshabilitados.
 
 Los archivos de texto se normalizan a LF mediante `.gitattributes`; esta regla
 mantiene reproducibles los hashes de `MANIFEST.sha256` entre plataformas.

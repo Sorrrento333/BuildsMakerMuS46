@@ -77,6 +77,11 @@
 
 ### Changed
 
+- Por decisión del propietario, el repositorio pasa a visibilidad pública.
+  `main` queda protegido con PR obligatorio para administradores, checks
+  estrictos `build-and-test` y `wpf-publication-smoke`, historial lineal,
+  resolución de conversaciones y bloqueo de force-push/borrado. La licencia
+  sigue pendiente y la visibilidad no se presenta como permiso de reutilización.
 - La rama predeterminada remota `chore/bootstrap-repository` se renombró a
   `main` conservando el commit `3935d9b`, y el tracking local quedó normalizado.
   GitHub rechazó activar branch protection con `403` porque el repositorio

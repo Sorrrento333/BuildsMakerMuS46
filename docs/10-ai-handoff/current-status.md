@@ -106,8 +106,6 @@
 ## Decisiones abiertas
 
 - Licencia.
-- Mantener el repositorio privado y habilitar GitHub Pro o hacerlo público,
-  para poder imponer branch protection en `main`.
 
 ## Verificación más reciente — 2026-07-18
 
@@ -166,12 +164,15 @@
 - Repositorio remoto inicializado mediante el commit raíz `2e886c3`. La rama
   temporal `chore/bootstrap-repository` se renombró a `main` sin reescribir el
   historial; `main` es ahora la rama predeterminada y el tracking local/remoto
-  apunta a `3935d9b`.
-- La protección de `main` no pudo activarse: la API de GitHub respondió `403`
-  (`Upgrade to GitHub Pro or make this repository public to enable this
-  feature`) porque el repositorio es privado y el plan actual no ofrece branch
-  protection. No se cambió la visibilidad ni el plan. Hasta resolverlo, ramas
-  cortas, PR y checks se aplican como política operativa no forzada por GitHub.
+  apunta a `648989c` antes de este cierre documental.
+- El propietario hizo público el repositorio el 2026-07-19. Branch protection
+  quedó activa en `main`: PR obligatorio con administradores incluidos, checks
+  estrictos `build-and-test` y `wpf-publication-smoke`, historial lineal,
+  resolución de conversaciones y bloqueo de force-push/borrado. Se mantienen
+  cero aprobaciones obligatorias mientras exista un único propietario.
+- La licencia continúa sin decidir. La visibilidad pública no se interpreta
+  como permiso de reutilización; `LICENSE.md` registra el límite y una release
+  queda bloqueada hasta documentar la elección mediante ADR.
 - `.gitattributes` fija LF para texto después de comprobar que un checkout con
   `core.autocrlf` invalidaba hashes del manifiesto; la verificación vuelve a ser
   reproducible sin cambiar el contenido documental.
