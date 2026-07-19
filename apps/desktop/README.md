@@ -38,4 +38,12 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass `
 Verificación local del 2026-07-18: PASS en `win-x64`, SQLite `3.53.3`, 407
 archivos y 148.339.336 bytes publicados. La ejecución inicial aplicó una
 migración sintética; la ejecución desde los binarios de reemplazo reconoció la
-migración y conservó el valor restaurado. El runner limpio de CI sigue pendiente.
+migración y conservó el valor restaurado.
+
+Verificación remota del 2026-07-19 UTC: PASS en GitHub Actions, run
+`29666817493`, sobre Microsoft Windows Server 2025 (`windows-2025-vs2026`) y SDK
+.NET `10.0.302`. La auditoría directa/transitiva no encontró paquetes
+vulnerables en los cinco proyectos. El smoke cargó SQLite `3.53.3` y publicó 407
+archivos/148.442.430 bytes; ambas fases superaron las mismas aserciones de
+migración, integridad, backup/restore y persistencia externa. No se infiere
+soporte para ningún RID adicional.

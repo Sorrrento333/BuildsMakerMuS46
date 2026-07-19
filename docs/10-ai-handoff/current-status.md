@@ -66,7 +66,8 @@
   round-trip tras reapertura, backup/restore con integridad `ok` y conservación
   de la base externa al ejecutar desde binarios reemplazados.
 - Workflow CI ampliado con un job Windows dedicado a auditoría de dependencias y
-  smoke publicado. Su primera ejecución en un runner limpio todavía no se observó.
+  smoke publicado. La primera ejecución remota quedó aprobada en GitHub Actions
+  (`run 29666817493`, 2026-07-19 UTC): ambos jobs terminaron correctamente.
 - `RES-0001` abierto para clases, evoluciones, stats, puntos por nivel y Marlon.
 - Trece evidencias registradas en `RES-0001`; dos guías oficiales de Webzen
   produjeron diez claims atómicos de familias/evoluciones, y registros técnicos
@@ -153,8 +154,17 @@
   offline, SQLite integrado, actualización y persistencia de datos de usuario.
 - Publicación WPF integrada: PASS local en `win-x64`, 407 archivos y
   148.339.336 bytes. Los dos reportes JSON confirman SQLite `3.53.3`, integridad
-  `ok`, 1 migración aplicada/1 reconocida y datos fuera de los binarios. Falta
-  observar el job nuevo en un runner Windows limpio.
+  `ok`, 1 migración aplicada/1 reconocida y datos fuera de los binarios.
+- Publicación WPF en runner limpio: PASS en Microsoft Windows Server 2025,
+  imagen `windows-2025-vs2026`, runner `2.335.1` y SDK .NET `10.0.302`. El job
+  auditó los cinco proyectos sin paquetes vulnerables en los orígenes
+  consultados y el smoke publicó 407 archivos/148.442.430 bytes con SQLite
+  `3.53.3`; las dos fases y sus reportes superaron todas las aserciones del
+  script. Sólo `win-x64` queda demostrado; no se amplían RIDs.
+- Repositorio remoto inicializado mediante el commit raíz `2e886c3` en
+  `chore/bootstrap-repository`. Como el remoto estaba vacío, GitHub adoptó esa
+  rama temporal como predeterminada; aún falta establecer y proteger `main`
+  conforme a `docs/08-engineering/git-workflow.md`.
 
 ## Decisión del propietario — 2026-07-18
 
@@ -170,4 +180,5 @@
   versión.
 - ADR-0004 aceptado: la primera UI/distribución será WPF .NET 10 autocontenida
   para `win-x64`. El soporte efectivo queda condicionado al smoke test de
-  publicación integrado; no se aprueban otros RIDs por inferencia.
+  publicación integrado. El smoke local y el runner limpio ya lo demuestran para
+  `win-x64`; no se aprueban otros RIDs por inferencia.

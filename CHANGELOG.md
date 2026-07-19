@@ -77,12 +77,21 @@
 
 ### Changed
 
+- Primera ejecución remota de CI aprobada en GitHub Actions (`run 29666817493`):
+  14/14 pruebas en Linux y smoke WPF en Microsoft Windows Server 2025 con SDK
+  .NET `10.0.302`, SQLite `3.53.3`, 407 archivos y 148.442.430 bytes. La auditoría
+  de los cinco proyectos no encontró paquetes vulnerables y ambas fases del
+  smoke pasaron; el alcance permanece limitado a `win-x64`.
+- El repositorio remoto quedó inicializado con el commit raíz `2e886c3` en la
+  rama temporal `chore/bootstrap-repository`; queda pendiente renombrarla a
+  `main` y aplicar la protección exigida por el flujo Git.
 - La solución incorpora la shell WPF y su lock file. El smoke local `win-x64`
   pasó con SQLite `3.53.3`, 407 archivos y 148.339.336 bytes publicados; la
-  primera ejecución del job remoto de CI permanece pendiente.
+  primera ejecución del job remoto de CI también quedó aprobada.
 - Por decisión del propietario del 2026-07-18, WPF .NET 10 autocontenido y
   `win-x64` quedan seleccionados para la primera UI/distribución mediante
-  ADR-0004; SQLite integrado y actualización siguen pendientes del smoke test.
+  ADR-0004; SQLite integrado y persistencia ante reemplazo de binarios quedaron
+  validados por el smoke local y remoto.
 - Por decisión del propietario, Webzen pasa a ser la fuente prioritaria para
   información de MU Online y se elimina el requisito de contemporaneidad; se
   mantienen provenance, clasificación por versión, confianza y contraste.

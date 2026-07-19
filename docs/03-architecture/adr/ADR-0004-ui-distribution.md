@@ -159,12 +159,20 @@ Resultado observado con SDK `10.0.301` y red restringida por el entorno:
 - 407 archivos publicados y 148.339.336 bytes (141,47 MiB).
 
 La solución restauró en modo bloqueado, compiló Release sin advertencias y pasó
-14/14 pruebas existentes. El job Windows de CI quedó definido con auditoría
-explícita de dependencias, pero su primera ejecución en un runner limpio sigue
-pendiente. La consulta explícita local de
+14/14 pruebas existentes. La consulta explícita local de
 vulnerabilidades a NuGet no se repitió porque la política del entorno rechazó
 enviar el grafo al servicio externo; el proyecto WPF no añade paquetes y su lock
 file conserva el grafo Data previamente auditado.
+
+La primera ejecución remota se completó después en GitHub Actions (`run
+29666817493`, 2026-07-19 UTC). El job `wpf-publication-smoke` pasó en Microsoft
+Windows Server 2025, imagen `windows-2025-vs2026`, runner `2.335.1` y SDK .NET
+`10.0.302`. La auditoría directa y transitiva informó cero paquetes vulnerables
+para los cinco proyectos en los orígenes consultados. El artefacto `win-x64`
+cargó SQLite `3.53.3` y produjo 407 archivos/148.442.430 bytes; las fases
+`initialize` y `verify-update` superaron las aserciones de ambos reportes. El job
+Linux `build-and-test` del mismo run también pasó las 14 pruebas. Esta evidencia
+demuestra sólo `win-x64` y no autoriza otros RIDs.
 
 ## Pruebas requeridas si se elige PWA en su lugar
 
