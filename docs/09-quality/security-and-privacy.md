@@ -7,5 +7,7 @@
 - Verificar integridad de snapshots.
 - Dependencias con escaneo de vulnerabilidades.
 - Builds privadas/locales por defecto.
+- No solicitar, almacenar ni transmitir nombres de cuenta, contraseñas, tokens
+  o credenciales de MU Online; la herramienta no requiere iniciar sesión.
 - Telemetría desactivada por defecto y con consentimiento explícito.
 - Backups y exportación disponibles antes de migraciones destructivas.

@@ -20,6 +20,39 @@ $replacementPublishDirectory = Join-Path $runRoot "publish-replacement"
 $dataDirectory = Join-Path $runRoot "user-data"
 $initialReportPath = Join-Path $runRoot "initialize-report.json"
 $replacementReportPath = Join-Path $runRoot "verify-update-report.json"
+$requiredLegalFiles = @(
+    "LICENSE.md",
+    "NOTICE",
+    "THIRD-PARTY-NOTICES.md",
+    "licenses\Microsoft.Data.Sqlite-MIT.txt",
+    "licenses\SQLitePCLRaw-Apache-2.0.txt",
+    "licenses\dotnet-runtime\LICENSE.txt",
+    "licenses\dotnet-runtime\THIRD-PARTY-NOTICES.txt",
+    "licenses\windowsdesktop-runtime\LICENSE.txt",
+    "licenses\aspnetcore-runtime\LICENSE.txt",
+    "licenses\aspnetcore-runtime\THIRD-PARTY-NOTICES.txt"
+)
+
+function Assert-PublishedLegalFiles {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$PublishDirectory,
+
+        [Parameter(Mandatory = $true)]
+        [string]$Phase
+    )
+
+    foreach ($relativePath in $requiredLegalFiles) {
+        $publishedPath = Join-Path $PublishDirectory $relativePath
+        if (-not (Test-Path -LiteralPath $publishedPath -PathType Leaf)) {
+            throw "The $Phase publication is missing required legal file '$relativePath'."
+        }
+
+        if ((Get-Item -LiteralPath $publishedPath).Length -eq 0) {
+            throw "The $Phase publication contains an empty legal file '$relativePath'."
+        }
+    }
+}
 
 New-Item -ItemType Directory -Path $initialPublishDirectory -Force | Out-Null
 New-Item -ItemType Directory -Path $replacementPublishDirectory -Force | Out-Null
@@ -34,6 +67,10 @@ New-Item -ItemType Directory -Path $dataDirectory -Force | Out-Null
 if ($LASTEXITCODE -ne 0) {
     throw "The WPF self-contained publication failed with exit code $LASTEXITCODE."
 }
+
+Assert-PublishedLegalFiles `
+    -PublishDirectory $initialPublishDirectory `
+    -Phase "initial"
 
 $initialExecutable = Join-Path $initialPublishDirectory "MuOnline.BuildPlanner.App.exe"
 if (-not (Test-Path -LiteralPath $initialExecutable)) {
@@ -60,6 +97,22 @@ Copy-Item -Path (Join-Path $initialPublishDirectory "*") `
     -Destination $replacementPublishDirectory `
     -Recurse `
     -Force
+
+Assert-PublishedLegalFiles `
+    -PublishDirectory $replacementPublishDirectory `
+    -Phase "replacement"
+
+foreach ($relativePath in $requiredLegalFiles) {
+    $initialLegalHash = (Get-FileHash `
+        -LiteralPath (Join-Path $initialPublishDirectory $relativePath) `
+        -Algorithm SHA256).Hash
+    $replacementLegalHash = (Get-FileHash `
+        -LiteralPath (Join-Path $replacementPublishDirectory $relativePath) `
+        -Algorithm SHA256).Hash
+    if ($initialLegalHash -cne $replacementLegalHash) {
+        throw "Legal file '$relativePath' changed during the simulated update."
+    }
+}
 
 $replacementExecutable = Join-Path $replacementPublishDirectory "MuOnline.BuildPlanner.App.exe"
 $replacementArguments = @(
@@ -111,4 +164,5 @@ Write-Output "RID: $Runtime"
 Write-Output "SQLite: $($initialReport.SqliteVersion)"
 Write-Output "Published files: $($publishedFiles.Count)"
 Write-Output "Published bytes: $publishedBytes"
+Write-Output "Verified legal files: $($requiredLegalFiles.Count)"
 Write-Output "Artifacts: $runRoot"

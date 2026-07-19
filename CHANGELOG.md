@@ -4,6 +4,39 @@
 
 ### Added
 
+- `EVD-0014`–`EVD-0018` en `RES-0001` para las seis matrices de stats base,
+  stats distribuibles, puntos por nivel, Hero Status/Marlon, contraste oficial
+  de Webzen y confirmación del propietario.
+- Matriz candidata `STR/AGI/VIT/ENE[/CMD]`, fórmulas de puntos acumulados y seis
+  casos numéricos de investigación, sin promover fixtures productivos.
+- `DSP-0002` para Energy inicial de Magic Gladiator: 26 en MU Online Fanz y la
+  decisión del propietario frente a 16 en la guía actual de Webzen.
+- Integración reproducible de Json Everything en el build normal del validador:
+  commits, SDK `10.0.301`, locks fuente, SPDX, provenance, hashes y licencia MIT
+  son entradas versionadas; los DLL se generan bajo `artifacts/` y no se guardan
+  en Git.
+- Control CI de publicación del validador que exige hashes revisados, aviso MIT,
+  referencias directas y ausencia de `OSMFEULA.txt` y metadatos de los paquetes
+  NuGet publicados.
+- Spike reproducible de compilación propia de Json Everything desde los commits
+  fuente MIT fijados: dos rutas independientes producen hashes idénticos,
+  generan SBOM/provenance/locks, pasan dos veces 10/10 fixtures y rechazan una
+  prueba aislada de formatos inválidos, sin cambiar todavía el grafo normal.
+- Evaluación reproducible de Json Everything para el validador: registra el
+  `OSMFEULA.txt` idéntico de los tres paquetes, su hash, commits fuente, alcance
+  real y comparación entre binario NuGet, compilación propia MIT y Corvus.
+- Copia normalizada a LF de `OSMFEULA.txt` bajo `legal/tooling/json-everything`
+  para que las condiciones observadas no dependan de la caché local de NuGet.
+- ADR-0005, aceptado por el propietario, que licencia el material original del
+  proyecto bajo Apache License 2.0 y separa expresamente marcas, evidencias y
+  contenido de terceros.
+- Texto oficial Apache-2.0 en `LICENSE.md`, atribución y límites en `NOTICE`, e
+  inventario inicial de dependencias en `THIRD-PARTY-NOTICES.md`.
+- Reglas operativas para licenciar contribuciones y exigir licencia, avisos e
+  inspección del artefacto antes de una distribución.
+- Empaquetado legal de la publicación WPF con avisos del proyecto,
+  Microsoft.Data.Sqlite, SQLitePCLRaw y runtime packs autocontenidos; el smoke
+  verifica diez archivos no vacíos y sus hashes tras el reemplazo simulado.
 - Proyecto WPF mínimo `MuOnline.BuildPlanner.App` para .NET 10 y `win-x64`, con
   ventana técnica sin datos del juego y referencia unidireccional hacia Data.
 - Modo headless y script de smoke de publicación que verifican SQLite nativo,
@@ -77,11 +110,42 @@
 
 ### Changed
 
+- `DSP-0002` queda resuelto por decisión explícita del propietario: el proyecto
+  adopta `ENE 26` para Magic Gladiator (`26/26/26/26`). El valor 16 de Webzen se
+  conserva como divergencia documental de otra versión no demostrada, sin
+  bloquear el valor elegido ni promover el conjunto completo a `VERIFIED`.
+- `CLM-0002`, `CLM-0003`, `CLM-0005` y `CLM-0006` pasan de no investigados a
+  `PARTIAL`; los seis claims de `RES-0001` tienen ahora cobertura candidata y
+  ninguno está todavía `VERIFIED`.
+- Por decisión del propietario del 2026-07-19, MU Online Fanz continúa como
+  fuente inicial prioritaria y se autorizan fuentes adicionales para extracción,
+  contraste y resolución de conflictos con clasificación individual de versión.
+- El validador dejó de referenciar `JsonSchema.Net` desde NuGet. Su lock normal
+  sólo resuelve `Humanizer.Core 3.0.10`; `JsonSchema.Net.dll`,
+  `JsonPointer.Net.dll` y `Json.More.dll` proceden de la compilación fuente
+  fijada y pasan localmente 14/14 pruebas y la inspección de publicación.
+- CI fija el SDK `.NET 10.0.301` para reproducir los hashes del pipeline fuente;
+  la verificación del workflow actualizado en runner limpio queda pendiente.
+- Los binarios NuGet de Json Everything quedan limitados al desarrollo interno
+  histórico y ya no se resuelven en el grafo normal. La compilación propia desde
+  los commits MIT fijados es la ruta integrada; Corvus queda como contingencia.
+- El proyecto WPF obtiene los avisos de .NET/Windows Desktop/ASP.NET desde los
+  runtime packs exactos resueltos por MSBuild, evitando acoplar la distribución
+  a la versión instalada localmente.
+- La licencia deja de ser una decisión abierta. Una release sigue condicionada
+  a empaquetar y probar los avisos de los binarios realmente distribuidos; la
+  familia Json Everything usada por el validador declara MIT para el código
+  fuente pero incorpora `OSMFEULA.txt` para determinados usos de sus binarios.
+- Por aclaración del propietario, `NOTICE` usa atribución colectiva a los
+  contribuidores sin atribución personal adicional. La aplicación queda
+  definida como herramienta de apoyo sin autenticación, cuentas ni credenciales
+  de MU Online.
 - Por decisión del propietario, el repositorio pasa a visibilidad pública.
   `main` queda protegido con PR obligatorio para administradores, checks
   estrictos `build-and-test` y `wpf-publication-smoke`, historial lineal,
-  resolución de conversaciones y bloqueo de force-push/borrado. La licencia
-  sigue pendiente y la visibilidad no se presenta como permiso de reutilización.
+  resolución de conversaciones y bloqueo de force-push/borrado. En ese momento
+  la licencia seguía pendiente; ADR-0005 la resuelve posteriormente sin tratar
+  la visibilidad como permiso sobre material de terceros.
 - La rama predeterminada remota `chore/bootstrap-repository` se renombró a
   `main` conservando el commit `3935d9b`, y el tracking local quedó normalizado.
   GitHub rechazó activar branch protection con `403` porque el repositorio

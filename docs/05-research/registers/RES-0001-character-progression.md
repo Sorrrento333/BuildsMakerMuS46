@@ -18,20 +18,24 @@ claims:
     evidence: [EVD-0001, EVD-0002, EVD-0005, EVD-0006, EVD-0007, EVD-0008, EVD-0009, EVD-0011, EVD-0012]
   - id: CLM-0002
     statement: "Las estadísticas iniciales de cada clase están identificadas."
-    evidence: []
+    status: PARTIAL
+    evidence: [EVD-0014, EVD-0016, EVD-0017, EVD-0018]
   - id: CLM-0003
     statement: "Las estadísticas disponibles para distribuir en cada clase están identificadas."
-    evidence: []
+    status: PARTIAL
+    evidence: [EVD-0014, EVD-0016, EVD-0017, EVD-0018]
   - id: CLM-0004
     statement: "La cadena de evoluciones de cada clase está identificada."
     status: PARTIAL
     evidence: [EVD-0002, EVD-0003, EVD-0004, EVD-0005, EVD-0006, EVD-0007, EVD-0008, EVD-0009, EVD-0011, EVD-0012, EVD-0013]
   - id: CLM-0005
     statement: "Los puntos otorgados por nivel para cada clase y etapa están identificados."
-    evidence: []
+    status: PARTIAL
+    evidence: [EVD-0014, EVD-0015, EVD-0016, EVD-0017]
   - id: CLM-0006
     statement: "La disponibilidad y el efecto de Marlon para cada clase y etapa están identificados."
-    evidence: []
+    status: PARTIAL
+    evidence: [EVD-0015, EVD-0017]
 conflicts:
   - id: DSP-0001
     statement: "MU Online Fanz nombra Dark Wizard → Soul Wizard en la página de segunda clase, aunque sus páginas de tercera y cuarta clase sitúan Soul Master → Grand Master → Soul Wizard."
@@ -39,10 +43,17 @@ conflicts:
     scope: "Páginas actuales y primeras capturas disponibles de 2023; aplicabilidad a Season 4 no demostrada."
     impact: "Impide usar EVD-0011 como evidencia de la etapa posterior a Dark Wizard; EVD-0012/EVD-0013 aclaran el orden actual, pero no la frontera histórica de Season 4."
     status: OPEN
+  - id: DSP-0002
+    statement: "La guía actual de Webzen publica Energy 16 para Magic Gladiator, mientras MU Online Fanz y la decisión del propietario fijan Energy 26."
+    evidence: [EVD-0014, EVD-0016, EVD-0017, EVD-0018]
+    scope: "Stats iniciales de Magic Gladiator; Webzen muestra referencias a renovaciones Season 16/18 y ninguna fuente externa demuestra todavía el valor histórico de Season 4."
+    impact: "La divergencia se conserva como diferencia documental y de versión, pero no altera el valor adoptado por el proyecto: ENE 26. La aplicabilidad histórica del conjunto a Season 4 continúa evaluándose separadamente."
+    status: RESOLVED
+    resolution: OWNER_DECISION
 test_plan: "Contrastar cada celda factual con dos evidencias independientes o con una prueba reproducible aprobada; verificar explícitamente temporada, etapa, límites y condiciones antes de promoverla."
-conclusion: "Investigación abierta para Season 4 global/inglés. La cadena candidata del mago para el alcance objetivo es Dark Wizard → Soul Master → Grand Master; el propietario clasifica Grand Master como la evolución incorporada en Season 4, obtenida al completar la serie de quests de tercera clase culminada a nivel 400. Soul Wizard queda clasificado como evolución posterior. MU Online Fanz confirma la estructura actual de tercera/cuarta clase, pero no demuestra la frontera histórica de Season 4. Todos los claims continúan PARTIAL. No hay stats, puntos ni reglas de Marlon autorizados para implementación."
-reviewed_by: []
-last_reviewed_at: "2026-07-18"
+conclusion: "Investigación abierta para Season 4 global/inglés. Las seis matrices de stats iniciales, stats distribuibles, puntos por nivel y reglas de Marlon quedaron identificadas como candidatas y aprobadas por el propietario, pero permanecen PARTIAL por falta de atribución histórica directa a Season 4. DSP-0002 se resolvió por decisión explícita: Magic Gladiator usa Energy 26; el 16 de la guía actual de Webzen se conserva sólo como divergencia documental de otra versión no demostrada. No se autoriza todavía publicar fixtures ni reglas productivas."
+reviewed_by: ["project-owner"]
+last_reviewed_at: "2026-07-19"
 ```
 
 ## Evidencias capturadas
@@ -284,7 +295,7 @@ last_reviewed_at: "2026-07-18"
 - Búsqueda negativa: el índice consultado no devolvió capturas de rutas que
   contuvieran segunda clase entre 2012 y 2022. Esto sólo demuestra ausencia en
   el índice consultado, no que nunca hubiera existido otra página.
-- Procedencia/versión: fuente obligatoria definida por el propietario, pero la
+- Procedencia/versión: fuente inicial prioritaria definida por el propietario, pero la
   página y su primera captura disponible son actuales/posteriores y mezclan
   clases ajenas a Season 4. No demuestra aplicabilidad histórica.
 - Confianza y uso permitido: `PARTIAL`; contraste nominal actual. No habilita
@@ -315,7 +326,7 @@ last_reviewed_at: "2026-07-18"
 - Búsqueda negativa: el índice consultado no devolvió capturas de rutas que
   contuvieran tercera clase entre 2012 y 2022. Esto sólo demuestra ausencia en
   el índice consultado, no que nunca hubiera existido otra página.
-- Procedencia/versión: fuente obligatoria definida por el propietario, pero la
+- Procedencia/versión: fuente inicial prioritaria definida por el propietario, pero la
   página y su primera captura disponible son actuales/posteriores y mezclan
   clases ajenas a Season 4. No demuestra aplicabilidad histórica.
 - Confianza y uso permitido: `PARTIAL`; contraste nominal actual. No habilita
@@ -343,7 +354,138 @@ last_reviewed_at: "2026-07-18"
   introdujo ni demuestra por sí misma que Season 4 terminara en Grand Master.
 - Snapshot/hash: no capturado; sólo referencia y paráfrasis.
 
+### EVD-0014 — MU Online Fanz, guías actuales de las seis clases objetivo
+
+- URLs canónicas:
+  - https://muonlinefanz.com/guide/characters/dw/
+  - https://muonlinefanz.com/guide/characters/dk/
+  - https://muonlinefanz.com/guide/characters/elf/
+  - https://muonlinefanz.com/guide/characters/sum/
+  - https://muonlinefanz.com/guide/characters/mg/
+  - https://muonlinefanz.com/guide/characters/dl/
+- Título/editor: guías de Dark Wizard, Dark Knight, Fairy Elf, Summoner, Magic
+  Gladiator y Dark Lord, MU Online Fanz.
+- Consulta: 2026-07-19.
+- Datos extraídos, en orden `STR/AGI/VIT/ENE[/CMD]`: DW `18/18/15/30`; DK
+  `28/20/25/10`; ELF `22/25/20/15`; SUM `21/21/18/23`; MG `26/26/26/26`; DL
+  `26/20/20/15/25`.
+- Stats distribuibles: las seis clases exponen Strength, Agility, Stamina y
+  Energy; Dark Lord añade Command. `Stamina` se normaliza como `VIT` sólo en la
+  representación abreviada del proyecto.
+- Puntos: DW, DK, ELF y SUM publican 5 por nivel y 6 después de Hero Status; MG
+  y DL publican 7 por nivel.
+- Versión y límite: las páginas son actuales, contienen evoluciones y sistemas
+  posteriores a Season 4 y no declaran que estos valores sean invariantes entre
+  versiones. La coincidencia de cifras no demuestra por sí sola el corte
+  histórico objetivo.
+- Tipo/independencia: fuente prioritaria del proyecto; las seis URLs pertenecen
+  al mismo editor y cuentan como una sola línea editorial.
+- Confianza y uso permitido: `PARTIAL`; matriz candidata, no fixture productivo.
+- Snapshot/hash: no capturado; sólo URLs, extracción atómica y paráfrasis.
+
+### EVD-0015 — MU Online Fanz, Hero Status y Marlon
+
+- URL canónica: https://muonlinefanz.com/guide/quests/hero-status/
+- Título/editor: `Hero Status Quest`, MU Online Fanz.
+- Consulta: 2026-07-19.
+- Dato extraído: exige segunda clase, permite iniciar desde nivel 220 y, al
+  completar Ring of Honor, añade un punto por nivel. Para personajes por encima
+  de 220 declara un punto adicional por cada nivel pasado de 220.
+- Aplicabilidad por clase: la página ofrece la quest a Blade Knight, Soul
+  Master, Muse Elf y Bloody Summoner; excluye expresamente Magic Gladiator y
+  Dark Lord. Las demás clases posteriores listadas por la página quedan fuera
+  de este registro.
+- Transformación candidata: para una clase elegible con Hero Status completado,
+  el extra retroactivo se representa como `max(0, level - 220)`. No se confunde
+  alcanzar nivel 220 con completar la quest.
+- Versión y límite: página actual, actualizada en 2025 con etiqueta de build
+  2023; no declara Season 4. La estructura coincide con la decisión del
+  propietario, pero la frontera histórica permanece sin evidencia directa.
+- Confianza y uso permitido: `PARTIAL`; habilita casos de prueba de investigación,
+  no una fórmula productiva.
+- Snapshot/hash: no capturado; sólo referencia y paráfrasis.
+
+### EVD-0016 — Webzen, guías oficiales actuales de stats iniciales
+
+- URLs canónicas:
+  - https://muonline.webzen.com/th/gameinfo/guide/detail/6
+  - https://muonline.webzen.com/en/gameinfo/guide/detail/105
+  - https://muonline.webzen.com/en/gameinfo/guide/detail/283
+  - https://muonline.webzen.com/es/gameinfo/guide/detail/90
+  - https://muonline.webzen.com/en/gameinfo/guide/detail/243
+  - https://muonline.webzen.com/es/gameinfo/guide/detail/347
+- Título/editor: guías oficiales de Dark Wizard, Dark Knight, Fairy Elf,
+  Summoner, Magic Gladiator y Dark Lord, Webzen.
+- Consulta: 2026-07-19.
+- Coincidencias: DW `18/18/15/30`, DK `28/20/25/10`, ELF `22/25/20/15`, SUM
+  `21/21/18/23` y DL `26/20/20/15/25`; también publica 5 puntos para las cuatro
+  clases base y 7 para MG/DL.
+- Conflicto: la página actual de MG publica `26/26/26/16`, frente a Energy 26 en
+  EVD-0014 y EVD-0017. Se abre `DSP-0002`; no se corrige ninguna fuente.
+- Versión y procedencia: Webzen es el editor oficial, pero varias páginas
+  enlazan renovaciones Season 14–19 y no atribuyen las tablas a Season 4. Las
+  seis páginas son una sola línea editorial y se usan como contraste autorizado.
+- Confianza y uso permitido: `PARTIAL`; corrobora cinco filas y abre una
+  divergencia, sin demostrar invariancia histórica.
+- Snapshot/hash: no capturado; sólo URLs, extracción y paráfrasis.
+
+### EVD-0017 — Confirmación y decisión del propietario
+
+- Fecha: 2026-07-19.
+- Dato confirmado, en orden `STR/AGI/VIT/ENE[/CMD]`: DW `18/18/15/30`; DK
+  `28/20/25/10`; ELF `22/25/20/15`; SUM `21/21/18/23`; MG `26/26/26/26`; DL
+  `26/20/20/15/25`.
+- Regla confirmada: DW, DK, ELF y SUM obtienen 5 puntos por nivel y, después de
+  completar Marlon/Hero Status desde nivel 220, pasan a 6. MG y DL obtienen 7
+  por nivel desde el inicio y no realizan Marlon.
+- Decisión de fuentes: se autoriza consultar y registrar fuentes adicionales a
+  MU Online Fanz para extracción, contraste y resolución de conflictos. Toda
+  fuente conserva provenance, versión y confianza propias.
+- Clasificación declarada: el propietario considera invariantes estos valores
+  entre versiones. La declaración selecciona la matriz candidata del ruleset,
+  pero no convierte en `VERIFIED` una celda con conflicto documental ni sustituye
+  la evidencia histórica exigida por el proyecto.
+- Tipo/independencia: decisión de alcance y contenido del propietario; no cuenta
+  como segunda fuente externa independiente.
+- Confianza y uso permitido: `APPROVED` como matriz candidata; publicación
+  productiva todavía bloqueada por los gates de evidencia y pruebas.
+
+### EVD-0018 — Resolución explícita de Energy de Magic Gladiator
+
+- Fecha: 2026-07-19.
+- Decisión: el propietario reafirma que el stat inicial de Magic Gladiator es
+  `ENE 26`, por lo que su fila adoptada queda `26/26/26/26` en orden
+  `STR/AGI/VIT/ENE`.
+- Tratamiento del contraste: el `ENE 16` publicado por la guía actual de Webzen
+  permanece registrado como dato de esa fuente y no se reescribe; no se adopta
+  para el ruleset objetivo porque la propia página referencia renovaciones
+  posteriores y no demuestra que esa cifra corresponda a Season 4.
+- Resolución: `DSP-0002` queda `RESOLVED` mediante `OWNER_DECISION`. Esta resolución fija el valor
+  del proyecto, pero no convierte por sí sola los claims completos en
+  `VERIFIED` ni demuestra que toda la matriz sea invariante entre versiones.
+- Tipo/independencia: decisión de contenido del propietario; no cuenta como
+  fuente externa independiente.
+- Confianza y uso permitido: `APPROVED` para seleccionar `ENE 26`; la promoción
+  productiva conjunta continúa sujeta a los gates de versión, schemas y pruebas.
+
 ## Bitácora de investigación
+
+### 2026-07-19 — Stats iniciales, puntos por nivel, Marlon y fuentes adicionales
+
+- El propietario confirmó la matriz final de EVD-0017 y aclaró que MG/DL ganan
+  7 puntos por nivel desde el inicio y no realizan Marlon.
+- MU Online Fanz coincide con las seis filas y las reglas de puntos/Marlon. Sus
+  páginas actuales no declaran Season 4 y contienen contenido posterior.
+- Webzen coincide en cinco filas y publica Energy 16 para MG; se conserva
+  `DSP-0002` frente al valor 26 seleccionado para el candidato Season 4.
+- Se autoriza usar fuentes externas adicionales, sin eliminar los requisitos de
+  provenance, versión, confianza, conflicto y contraste.
+- Decisión: promover `CLM-0002`, `CLM-0003`, `CLM-0005` y `CLM-0006` de no
+  investigados a `PARTIAL`; sustituir `NOT_RESEARCHED` por valores candidatos en
+  la matriz; mantener bloqueados fixtures y reglas productivas.
+- Resolución posterior: el propietario volvió a fijar explícitamente `ENE 26`
+  para Magic Gladiator. `DSP-0002` se cierra por decisión de proyecto sin ocultar
+  que Webzen publica 16 en una guía actual de aplicabilidad histórica no probada.
 
 ### 2026-07-18 — Aclaración del propietario sobre la cadena del mago
 
@@ -401,10 +543,10 @@ last_reviewed_at: "2026-07-18"
 - Decisión: mantener `CLM-0001`, `CLM-0004` y todos los claims atómicos en
   `PARTIAL`; EVD-0005/EVD-0008/EVD-0009 no cuentan como tres líneas técnicas
   independientes demostradas. No diseñar fixtures ni publicar cadenas.
-- Directiva posterior del propietario: toda nueva información factual del juego
-  debe extraerse de MU Online Fanz. La consulta preliminar muestra páginas
-  actuales con clases posteriores y etiquetas de build 2023/2025; no se les
-  atribuye Season 4 sin una revisión de versión específica.
+- Directiva entonces vigente del propietario: toda nueva información factual
+  debía extraerse de MU Online Fanz. La decisión del 2026-07-19 amplió después
+  las fuentes permitidas; sigue prohibido atribuir una página a Season 4 sin una
+  revisión de versión específica.
 
 ### 2026-07-18 — Contraste técnico independiente por claim
 
@@ -522,17 +664,45 @@ EVD-0006 y EVD-0007 no cuentan como dos editores independientes.
 
 El contraste aumenta la cobertura nominal, pero no resuelve el requisito de
 versión. EVD-0011/EVD-0012 son páginas del mismo editor, no dos evidencias
-independientes, y su historial visible no alcanza Season 4. No habilitan
-promoción.
+independientes, y su historial visible no alcanza Season 4. No habilitan por sí
+solas promoción.
+
+### Matriz candidata de stats, puntos y Marlon
+
+- Orden normalizado: `STR`, `AGI`, `VIT`, `ENE`, más `CMD` sólo para Dark Lord.
+- `VIT` representa el campo `Stamina` de MU Online Fanz/Webzen; no altera el
+  valor extraído.
+- Fórmulas candidatas de puntos acumulados desde un personaje creado en nivel 1:
+  - MG/DL: `7 × (level - 1)`.
+  - DW/DK/ELF/SUM sin Hero Status: `5 × (level - 1)`.
+  - DW/DK/ELF/SUM con Hero Status completado:
+    `5 × (level - 1) + max(0, level - 220)`.
+- La fórmula separa alcanzar nivel 220 de completar la quest y modela la
+  retroactividad declarada por EVD-0015. No incluye puntos de quests diferentes,
+  resets, frutas, perfiles privados ni puntos ya distribuidos.
 
 | Clase / ID provisional | Stats iniciales | Stats disponibles | Evolución | Puntos por nivel | Marlon | Evidencias independientes | Conflictos | Confianza |
 |---|---|---|---|---|---|---:|---|---|
-| Dark Knight (`dark-knight`, provisional) | NOT_RESEARCHED | NOT_RESEARCHED | Dark Knight → Blade Knight → Blade Master | NOT_RESEARCHED | NOT_RESEARCHED | Webzen (`EVD-0006`, `EVD-0007`, mismo editor) + publicaciones comunitarias con independencia no demostrada | Ninguno registrado | PARTIAL |
-| Dark Wizard (`dark-wizard`, provisional) | NOT_RESEARCHED | NOT_RESEARCHED | Dark Wizard → Soul Master → Grand Master | NOT_RESEARCHED | NOT_RESEARCHED | Webzen (`EVD-0006`, `EVD-0007`, mismo editor) + publicaciones comunitarias con independencia no demostrada | Ninguno registrado | PARTIAL |
-| Fairy Elf (`fairy-elf`, provisional) | NOT_RESEARCHED | NOT_RESEARCHED | Fairy Elf → Muse Elf → High Elf | NOT_RESEARCHED | NOT_RESEARCHED | Webzen alterna `Elf`/`Fairy Elf`; contrastes comunitarios sin procedencia demostrada | Diferencia nominal abierta, sin propuestas incompatibles | PARTIAL |
-| Magic Gladiator (`magic-gladiator`, provisional) | NOT_RESEARCHED | NOT_RESEARCHED | Magic Gladiator → Duel Master | NOT_RESEARCHED | NOT_RESEARCHED | Webzen (`EVD-0006`, `EVD-0007`, mismo editor) + publicaciones comunitarias con independencia no demostrada | Ninguno registrado | PARTIAL |
-| Dark Lord (`dark-lord`, provisional) | NOT_RESEARCHED | NOT_RESEARCHED | Dark Lord → Lord Emperor | NOT_RESEARCHED | NOT_RESEARCHED | Webzen (`EVD-0006`, `EVD-0007`, mismo editor) + publicaciones comunitarias con independencia no demostrada | Ninguno registrado | PARTIAL |
-| Summoner (`summoner`, provisional) | NOT_RESEARCHED | NOT_RESEARCHED | Summoner → Bloody Summoner → Dimension Master | NOT_RESEARCHED | NOT_RESEARCHED | Sólo `EVD-0007` aporta la asociación oficial completa; contrastes comunitarios sin independencia demostrada | EVD-0006 omite Summoner de su tabla | PARTIAL |
+| Dark Knight (`dark-knight`, provisional) | `28/20/25/10` | `STR/AGI/VIT/ENE` | Dark Knight → Blade Knight → Blade Master | 5; 6 tras Hero Status | Desde 220, segunda clase; extra retroactivo al completar | Fanz EVD-0014/15 + Webzen EVD-0016 + decisión EVD-0017 | Ninguno numérico | PARTIAL |
+| Dark Wizard (`dark-wizard`, provisional) | `18/18/15/30` | `STR/AGI/VIT/ENE` | Dark Wizard → Soul Master → Grand Master | 5; 6 tras Hero Status | Desde 220, segunda clase; extra retroactivo al completar | Fanz EVD-0014/15 + Webzen EVD-0016 + decisión EVD-0017 | Ninguno numérico | PARTIAL |
+| Fairy Elf (`fairy-elf`, provisional) | `22/25/20/15` | `STR/AGI/VIT/ENE` | Fairy Elf → Muse Elf → High Elf | 5; 6 tras Hero Status | Desde 220, segunda clase; extra retroactivo al completar | Fanz EVD-0014/15 + Webzen EVD-0016 + decisión EVD-0017 | Diferencia nominal `Elf`/`Fairy Elf` fuera de la cifra | PARTIAL |
+| Magic Gladiator (`magic-gladiator`, provisional) | `26/26/26/26` | `STR/AGI/VIT/ENE` | Magic Gladiator → Duel Master | 7 desde el inicio | No realiza | Fanz EVD-0014 + Webzen EVD-0016 + decisiones EVD-0017/18 | `DSP-0002` resuelto: se adopta ENE 26; Webzen actual publica 16 | PARTIAL |
+| Dark Lord (`dark-lord`, provisional) | `26/20/20/15/25` | `STR/AGI/VIT/ENE/CMD` | Dark Lord → Lord Emperor | 7 desde el inicio | No realiza | Fanz EVD-0014 + Webzen EVD-0016 + decisión EVD-0017 | Ninguno numérico | PARTIAL |
+| Summoner (`summoner`, provisional) | `21/21/18/23` | `STR/AGI/VIT/ENE` | Summoner → Bloody Summoner → Dimension Master | 5; 6 tras Hero Status | Desde 220, segunda clase; extra retroactivo al completar | Fanz EVD-0014/15 + Webzen EVD-0016 + decisión EVD-0017 | EVD-0006 omite Summoner de su tabla de evoluciones | PARTIAL |
+
+### Casos de prueba de investigación para puntos
+
+| Caso | Entrada | Resultado candidato |
+|---|---|---:|
+| Clase estándar creada | nivel 1, sin Hero Status | 0 puntos ganados por nivel |
+| Clase estándar antes de Marlon | nivel 220, sin Hero Status | `5 × 219 = 1095` |
+| Hero Status completado en 220 | nivel 220 | 1095 |
+| Primer nivel posterior | nivel 221, Hero Status completado | `1100 + 1 = 1101` |
+| Retroactividad | nivel 230, Hero Status completado | `1145 + 10 = 1155` |
+| MG/DL | nivel 220 | `7 × 219 = 1533` |
+
+Estos resultados prueban únicamente la transformación documentada; no son
+casos de referencia productivos mientras los claims permanezcan `PARTIAL`.
 
 EVD-0004 contrasta los nombres de tercera clase desde una fuente oficial
 posterior, pero no se suma al conteo por carecer de atribución a Season 4.
@@ -556,24 +726,23 @@ posterior, pero no se suma al conteo por carecer de atribución a Season 4.
    promoverlo al ruleset `mu-s4-global-reference`.
 3. Capturar documentación oficial de Webzen cuando sea legalmente accesible,
    sin descartar páginas por su fecha de publicación.
-4. Mantener cerrada como negativa la auditoría histórica de MU Online Fanz hasta
-   que exista una marca de Season 4 o una captura anterior verificable.
-5. Separar stats iniciales, stats distribuibles, puntos por nivel y Marlon en
-   claims atómicos por clase y etapa.
-6. Registrar cualquier diferencia de versión o implementación como conflicto.
-7. Diseñar casos reproducibles para los claims que puedan observarse en un
-   entorno controlado.
-8. Solicitar revisión antes de promover datos o derivar fórmulas.
+4. Buscar evidencia histórica permitida para aplicar a Season 4 las matrices de
+   EVD-0014/EVD-0017, conservando la resolución de MG registrada en EVD-0018.
+5. Mantener cerrada como negativa la auditoría histórica de las rutas de quests
+   de Fanz hasta que exista una marca de Season 4 o captura anterior verificable.
+6. Convertir los casos de investigación en fixtures sólo después de promover
+   los claims y fijar IDs no provisionales.
+7. Registrar cualquier diferencia de versión o implementación como conflicto.
+8. Solicitar revisión antes de promover datos o derivar fórmulas productivas.
 
 ## Estado de evidencia
 
-- Evidencias registradas: 13 (tres líneas oficiales de Webzen sobre nombres, un
-  locator oficial de cliente, una guía histórica espejada, dos implementaciones
-  privadas Season 4, tres registros técnicos comunitarios y dos páginas de MU
-  Online Fanz auditadas históricamente, más la página de cuarta clase usada para
-  clasificar el orden actual de Soul Wizard; alcance de versión incompleto).
+- Evidencias registradas: 18 (las 13 anteriores, un conjunto de seis guías de
+  clase de Fanz, la guía Hero Status, un conjunto oficial de seis guías Webzen y
+  dos confirmaciones/decisiones del propietario).
 - Claims verificados: 0 de 6.
-- Claims parciales: 2 de 6 (`CLM-0001`, `CLM-0004`).
-- Conflictos registrados: 1 abierto (`DSP-0001`, inconsistencia nominal interna
-  de MU Online Fanz sin aplicabilidad demostrada a Season 4).
+- Claims parciales: 6 de 6.
+- Conflictos registrados: 2; `DSP-0001` permanece abierto por la inconsistencia
+  nominal de evolución y `DSP-0002` está resuelto por decisión del propietario
+  a favor de Energy 26 para Magic Gladiator.
 - Datos o fórmulas incorporados al producto: ninguno.

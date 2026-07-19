@@ -5,6 +5,9 @@ Repositorio inicial para una enciclopedia técnica y calculadora de personajes d
 ## Objetivo
 Construir una aplicación trazable, configurable y verificable que permita consultar mecánicas, personajes, habilidades, ítems y fórmulas; distribuir estadísticas; calcular resultados; comparar builds; y adaptar reglas a servidores privados mediante perfiles.
 
+Es una herramienta local de apoyo para jugadores. No requiere cuentas de MU
+Online, autenticación ni credenciales del juego.
+
 ## Principios
 1. Ningún dato técnico se presenta como hecho sin fuente o prueba registrada.
 2. Se distingue siempre entre comportamiento estándar, implementación observada y configuración personalizada.
@@ -24,3 +27,16 @@ Construir una aplicación trazable, configurable y verificable que permita consu
 
 ## Estado
 La documentación de diseño v1.0 está lista. No se considera verificada todavía ninguna fórmula concreta de MU Online; la primera fase operativa es la investigación controlada y la construcción del registro de evidencias.
+
+## Licencia
+
+El material original del proyecto se distribuye bajo
+[Apache License 2.0](LICENSE.md), conforme a
+[ADR-0005](docs/03-architecture/adr/ADR-0005-apache-2-license.md). `NOTICE`
+delimita marcas y contenido externo, y `THIRD-PARTY-NOTICES.md` registra
+dependencias y controles de atribución. La licencia del proyecto no concede
+derechos sobre MU Online, marcas de Webzen ni material perteneciente a las
+fuentes investigadas.
+
+La atribución del proyecto es colectiva a sus contribuidores; no se reserva una
+atribución personal adicional para el propietario inicial.

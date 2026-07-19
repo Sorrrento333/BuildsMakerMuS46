@@ -1,6 +1,6 @@
 # Contexto obligatorio para IA
 
-Estás trabajando en una enciclopedia técnica y calculadora de builds de MU Online Season 4 global/inglesa. No debes inventar mecánicas ni mezclar temporadas. Investiga y contrasta antes de agregar datos. Por decisión del propietario del 2026-07-18, toda nueva información factual del juego se extrae de MU Online Fanz. Verifica siempre que el dato corresponda a Season 4; si el sitio no permite demostrarlo, registra el límite y no completes el dato desde otra fuente sin una nueva decisión.
+Estás trabajando en una enciclopedia técnica y calculadora de builds de MU Online Season 4 global/inglesa. No debes inventar mecánicas ni mezclar temporadas. Investiga y contrasta antes de agregar datos. MU Online Fanz es la fuente inicial prioritaria por decisión del propietario del 2026-07-18. Desde el 2026-07-19 también están autorizadas fuentes adicionales para extracción, contraste y resolución de conflictos. Verifica siempre que cada dato corresponda a Season 4; si las fuentes no permiten demostrarlo, registra el límite como `PARTIAL` y no lo promociones por inferencia.
 
 ## Modo de trabajo
 1. Leer README, reglas, estado y siguientes acciones.

@@ -26,7 +26,15 @@ sintético. Verifica:
 - escritura, cierre, reapertura y lectura;
 - backup, mutación y restauración con `integrity_check = ok`;
 - datos y backup fuera de la carpeta de binarios;
-- reapertura de la misma base desde una copia reemplazada del artefacto.
+- reapertura de la misma base desde una copia reemplazada del artefacto;
+- presencia, contenido no vacío e identidad SHA-256 de los diez archivos legales
+  requeridos antes y después del reemplazo.
+
+La publicación incorpora `LICENSE.md`, `NOTICE`, `THIRD-PARTY-NOTICES.md`, los
+textos de Microsoft.Data.Sqlite y SQLitePCLRaw, y las licencias/avisos de los
+runtime packs .NET, Windows Desktop y ASP.NET resueltos por la restauración. Los
+avisos de runtime se toman del paquete exacto seleccionado; no se fijan a la
+versión instalada en una máquina concreta.
 
 Los reportes JSON y binarios quedan bajo `artifacts/`, ignorado por Git.
 
@@ -47,3 +55,8 @@ vulnerables en los cinco proyectos. El smoke cargó SQLite `3.53.3` y publicó 4
 archivos/148.442.430 bytes; ambas fases superaron las mismas aserciones de
 migración, integridad, backup/restore y persistencia externa. No se infiere
 soporte para ningún RID adicional.
+
+Verificación local del 2026-07-19 después de incorporar avisos: PASS con SDK
+`10.0.301`, runtime packs `10.0.9`, SQLite `3.53.3`, 417 archivos y 148.506.472
+bytes. Se comprobaron diez archivos legales en ambas publicaciones y sus hashes
+permanecieron idénticos durante la actualización simulada.

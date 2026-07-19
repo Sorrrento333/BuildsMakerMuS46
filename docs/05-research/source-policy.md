@@ -1,23 +1,26 @@
 # Política de fuentes
 
-## Fuente obligatoria para datos del juego
+## Fuentes para datos del juego
 
 - Por decisión expresa del propietario del 2026-07-18, toda nueva información
-  factual del juego requerida por el proyecto se extrae de
+  factual del juego requerida por el proyecto comienza su investigación en
   `https://muonlinefanz.com/`.
-- La preferencia de fuente no sustituye el control de versión, la trazabilidad
+- Por decisión posterior del propietario del 2026-07-19, se autoriza extraer y
+  contrastar información desde fuentes adicionales cuando Fanz no demuestre la
+  versión, exista un conflicto o se necesite una línea independiente. Cada
+  fuente adicional conserva su propia evaluación de versión y confianza.
+- La prioridad de Fanz no sustituye el control de versión, la trazabilidad
   ni el contraste. Una página actual, sin temporada declarada o que mezcle
   clases posteriores no demuestra por sí sola Season 4 global/inglés.
-- Si MU Online Fanz no permite demostrar la versión objetivo, se registra el
-  resultado negativo o `PARTIAL`; no se completa el dato desde otro sitio sin
-  una nueva decisión del propietario.
+- Si ninguna fuente permite demostrar la versión objetivo, se registra el
+  resultado negativo o `PARTIAL`; la coincidencia entre páginas actuales no se
+  transforma por inferencia en evidencia histórica.
 
 ## Fuentes de contexto, procedencia y contraste
 
-- Webzen es la fuente preferente para datos y mecánicas de MU Online por ser el
-  creador/editor oficial del juego, pero desde la decisión anterior se usa para
-  delimitar versiones, auditar procedencia y contrastar, no como fuente de
-  extracción de nuevos datos factuales del juego.
+- Webzen es la fuente oficial preferente para delimitar versiones, auditar
+  procedencia, extraer datos autorizados y contrastar, sin asumir que una guía
+  actual describe Season 4.
 - No se exige que una página de Webzen haya sido publicada durante la vigencia
   de Season 4. Puede ser actual, posterior o archivada.
 - La autoridad del editor no elimina el control de versión: cada extracción

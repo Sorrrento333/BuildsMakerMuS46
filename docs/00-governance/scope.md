@@ -15,6 +15,8 @@
 - Automatización del cliente, bots o cheats.
 - Edición de memoria del juego.
 - Emulación del servidor.
+- Autenticación contra MU Online, acceso a cuentas o recolección de credenciales
+  del juego.
 - Marketplace o economía en tiempo real.
 - Soporte de todas las temporadas en la primera versión.
 

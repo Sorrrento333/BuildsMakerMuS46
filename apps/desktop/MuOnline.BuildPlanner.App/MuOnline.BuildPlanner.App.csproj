@@ -10,4 +10,46 @@
   <ItemGroup>
     <ProjectReference Include="../../../packages/data-access/MuOnline.BuildPlanner.Data/MuOnline.BuildPlanner.Data.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="../../../LICENSE.md"
+             Link="LICENSE.md"
+             CopyToPublishDirectory="PreserveNewest" />
+    <Content Include="../../../NOTICE"
+             Link="NOTICE"
+             CopyToPublishDirectory="PreserveNewest" />
+    <Content Include="../../../THIRD-PARTY-NOTICES.md"
+             Link="THIRD-PARTY-NOTICES.md"
+             CopyToPublishDirectory="PreserveNewest" />
+    <Content Include="../../../legal/runtime/Microsoft.Data.Sqlite-MIT.txt"
+             Link="licenses/Microsoft.Data.Sqlite-MIT.txt"
+             CopyToPublishDirectory="PreserveNewest" />
+    <Content Include="../../../LICENSE.md"
+             Link="licenses/SQLitePCLRaw-Apache-2.0.txt"
+             CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <Target Name="IncludeResolvedRuntimeLegalFiles"
+          BeforeTargets="ComputeFilesToPublish"
+          DependsOnTargets="ResolveFrameworkReferences"
+          Condition="'$(SelfContained)' == 'true'">
+    <ItemGroup>
+      <_NetCoreRuntimePack Include="@(ResolvedRuntimePack)"
+                           Condition="'%(FrameworkName)' == 'Microsoft.NETCore.App'" />
+      <_WindowsDesktopRuntimePack Include="@(ResolvedRuntimePack)"
+                                  Condition="'%(FrameworkName)' == 'Microsoft.WindowsDesktop.App'" />
+      <_AspNetCoreRuntimePack Include="@(ResolvedRuntimePack)"
+                              Condition="'%(FrameworkName)' == 'Microsoft.AspNetCore.App'" />
+
+      <ResolvedFileToPublish Include="%(_NetCoreRuntimePack.PackageDirectory)/LICENSE.TXT"
+                             RelativePath="licenses/dotnet-runtime/LICENSE.txt" />
+      <ResolvedFileToPublish Include="%(_NetCoreRuntimePack.PackageDirectory)/THIRD-PARTY-NOTICES.TXT"
+                             RelativePath="licenses/dotnet-runtime/THIRD-PARTY-NOTICES.txt" />
+      <ResolvedFileToPublish Include="%(_WindowsDesktopRuntimePack.PackageDirectory)/LICENSE"
+                             RelativePath="licenses/windowsdesktop-runtime/LICENSE.txt" />
+      <ResolvedFileToPublish Include="%(_AspNetCoreRuntimePack.PackageDirectory)/LICENSE.txt"
+                             RelativePath="licenses/aspnetcore-runtime/LICENSE.txt" />
+      <ResolvedFileToPublish Include="%(_AspNetCoreRuntimePack.PackageDirectory)/THIRD-PARTY-NOTICES.TXT"
+                             RelativePath="licenses/aspnetcore-runtime/THIRD-PARTY-NOTICES.txt" />
+    </ItemGroup>
+  </Target>
 </Project>

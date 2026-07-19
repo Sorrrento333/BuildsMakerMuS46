@@ -1,0 +1,23 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "MU-BuildPlanner-JsonEverything-source-build-input",
+  "documentNamespace": "https://mu-build-planner.invalid/spdx/8f112c415735af9519a5b478447ad8239fa18642-10.0.301-input",
+  "creationInfo": {
+    "created": "2026-07-19T00:00:00Z",
+    "creators": ["Tool: Test-JsonEverythingSourceBuild.ps1"]
+  },
+  "packages": [
+    { "SPDXID": "SPDXRef-JsonSchema-Net", "name": "JsonSchema.Net", "versionInfo": "9.2.2", "downloadLocation": "https://github.com/json-everything/json-everything.git@8f112c415735af9519a5b478447ad8239fa18642", "licenseConcluded": "MIT", "licenseDeclared": "MIT", "copyrightText": "NOASSERTION" },
+    { "SPDXID": "SPDXRef-JsonPointer-Net", "name": "JsonPointer.Net", "versionInfo": "7.0.1", "downloadLocation": "https://github.com/json-everything/json-everything.git@8b8ab34027de5ad9f4ed50808b8e4889ca69cf4d", "licenseConcluded": "MIT", "licenseDeclared": "MIT", "copyrightText": "NOASSERTION" },
+    { "SPDXID": "SPDXRef-Json-More-Net", "name": "Json.More.Net", "versionInfo": "3.0.1", "downloadLocation": "https://github.com/json-everything/json-everything.git@8b8ab34027de5ad9f4ed50808b8e4889ca69cf4d", "licenseConcluded": "MIT", "licenseDeclared": "MIT", "copyrightText": "NOASSERTION" },
+    { "SPDXID": "SPDXRef-NuGet-Microsoft.Build.Tasks.Git-10.0.201", "name": "Microsoft.Build.Tasks.Git", "versionInfo": "10.0.201", "downloadLocation": "https://www.nuget.org/packages/Microsoft.Build.Tasks.Git/10.0.201", "licenseConcluded": "NOASSERTION", "licenseDeclared": "NOASSERTION", "copyrightText": "NOASSERTION" },
+    { "SPDXID": "SPDXRef-NuGet-Microsoft.NET.ILLink.Tasks-10.0.9", "name": "Microsoft.NET.ILLink.Tasks", "versionInfo": "10.0.9", "downloadLocation": "https://www.nuget.org/packages/Microsoft.NET.ILLink.Tasks/10.0.9", "licenseConcluded": "NOASSERTION", "licenseDeclared": "NOASSERTION", "copyrightText": "NOASSERTION" },
+    { "SPDXID": "SPDXRef-NuGet-Microsoft.SourceLink.Common-10.0.201", "name": "Microsoft.SourceLink.Common", "versionInfo": "10.0.201", "downloadLocation": "https://www.nuget.org/packages/Microsoft.SourceLink.Common/10.0.201", "licenseConcluded": "NOASSERTION", "licenseDeclared": "NOASSERTION", "copyrightText": "NOASSERTION" },
+    { "SPDXID": "SPDXRef-NuGet-Microsoft.SourceLink.GitHub-10.0.201", "name": "Microsoft.SourceLink.GitHub", "versionInfo": "10.0.201", "downloadLocation": "https://www.nuget.org/packages/Microsoft.SourceLink.GitHub/10.0.201", "licenseConcluded": "NOASSERTION", "licenseDeclared": "NOASSERTION", "copyrightText": "NOASSERTION" },
+    { "SPDXID": "SPDXRef-NuGet-PolySharp-1.15.0", "name": "PolySharp", "versionInfo": "1.15.0", "downloadLocation": "https://www.nuget.org/packages/PolySharp/1.15.0", "licenseConcluded": "NOASSERTION", "licenseDeclared": "NOASSERTION", "copyrightText": "NOASSERTION" },
+    { "SPDXID": "SPDXRef-NuGet-System.IO.Hashing-10.0.5", "name": "System.IO.Hashing", "versionInfo": "10.0.5", "downloadLocation": "https://www.nuget.org/packages/System.IO.Hashing/10.0.5", "licenseConcluded": "NOASSERTION", "licenseDeclared": "NOASSERTION", "copyrightText": "NOASSERTION" },
+    { "SPDXID": "SPDXRef-NuGet-Humanizer.Core-3.0.10", "name": "Humanizer.Core", "versionInfo": "3.0.10", "downloadLocation": "https://www.nuget.org/packages/Humanizer.Core/3.0.10", "licenseConcluded": "MIT", "licenseDeclared": "MIT", "copyrightText": "NOASSERTION" }
+  ]
+}

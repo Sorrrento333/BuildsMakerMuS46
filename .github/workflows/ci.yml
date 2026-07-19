@@ -17,9 +17,13 @@ jobs:
       - name: Set up .NET 10
         uses: actions/setup-dotnet@v5
         with:
-          dotnet-version: 10.0.x
+          dotnet-version: 10.0.301
           cache: true
           cache-dependency-path: '**/packages.lock.json'
+
+      - name: Build and verify Json Everything from pinned MIT source
+        shell: pwsh
+        run: ./tools/spikes/Test-JsonEverythingSourceBuild.ps1
 
       - name: Restore
         run: dotnet restore MUOnline.BuildPlanner.slnx --locked-mode
@@ -30,6 +34,10 @@ jobs:
       - name: Test
         run: dotnet test --solution MUOnline.BuildPlanner.slnx --configuration Release --no-build
 
+      - name: Inspect source-built validator publication
+        shell: pwsh
+        run: ./tools/validators/Test-JsonEverythingSourceIntegration.ps1
+
   wpf-publication-smoke:
     runs-on: windows-latest
     steps:
@@ -39,7 +47,7 @@ jobs:
       - name: Set up .NET 10
         uses: actions/setup-dotnet@v5
         with:
-          dotnet-version: 10.0.x
+          dotnet-version: 10.0.301
           cache: true
           cache-dependency-path: '**/packages.lock.json'
 

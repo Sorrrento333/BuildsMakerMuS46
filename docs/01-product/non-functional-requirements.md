@@ -8,5 +8,6 @@
 - NFR-006 Auditabilidad: trazas y provenance disponibles.
 - NFR-007 Accesibilidad: navegación por teclado y contraste adecuado.
 - NFR-008 Seguridad: archivos importados validados, sin ejecución de código.
-- NFR-009 Privacidad: builds locales por defecto.
+- NFR-009 Privacidad: builds locales por defecto; la aplicación no solicita,
+  almacena ni transmite cuentas o credenciales de MU Online.
 - NFR-010 Resiliencia: datos inválidos no deben corromper repositorio ni sesión.

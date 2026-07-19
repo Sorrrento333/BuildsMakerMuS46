@@ -36,10 +36,10 @@ el número exacto de `main` dejan de ser dimensiones requeridas o bloqueantes.
 5. Cada fórmula necesita ID, versión, entradas, orden, redondeo, evidencia y
    pruebas reproducibles.
 6. Las variantes privadas pertenecen a perfiles de servidor.
-7. Por decisión posterior del propietario, toda nueva información factual del
-   juego se extrae de MU Online Fanz. Webzen se conserva para delimitar versión,
-   procedencia y contraste. Ninguna fuente queda exenta de demostrar Season 4;
-   no se exige identificar episodio o `main`.
+7. MU Online Fanz es la fuente inicial prioritaria. Por decisión posterior del
+   propietario del 2026-07-19, se permiten fuentes adicionales para extracción,
+   contraste y resolución de conflictos. Ninguna fuente queda exenta de
+   demostrar Season 4; no se exige identificar episodio o `main`.
 
 ## Evidencia de alcance ya disponible
 

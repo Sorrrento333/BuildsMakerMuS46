@@ -1,0 +1,14 @@
+{
+  "sdkVersion": "10.0.301",
+  "targetFramework": "net10.0",
+  "repository": "https://github.com/json-everything/json-everything.git",
+  "sourceCommit": "8f112c415735af9519a5b478447ad8239fa18642",
+  "transitivePackageCommit": "8b8ab34027de5ad9f4ed50808b8e4889ca69cf4d",
+  "sourceLicense": "MIT",
+  "sourceLicenseSha256": "6cd9d0817126af9072b953257ead45e9ea253a3656bdd227173d9969b48ec041",
+  "assemblies": {
+    "Json.More.dll": "bdbcfa86b2ce39e3320d8078849f0a50af52c6c4284e6afd23a3eb50a50ae828",
+    "JsonPointer.Net.dll": "7c1b3c50569da7a9801b652a5b8e5e59b9b4c9413ccf431c10168e3984560247",
+    "JsonSchema.Net.dll": "fb720f91a4971c0b54b20c8fe45d5679bd3c6c8774dcd91c7322526f2a7de923"
+  }
+}

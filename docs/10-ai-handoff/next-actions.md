@@ -2,30 +2,47 @@
 
 ## Prioridad inmediata
 
-1. Resolver con el propietario la licencia del repositorio público y registrar
-   la decisión mediante ADR: MIT, Apache-2.0 o propietaria. No inferir permisos
-   por la visibilidad pública ni publicar una release antes de esa decisión.
-2. Mantener bloqueado el diseño de fixtures de personajes: `CLM-0001` y
-   `CLM-0004` continúan `PARTIAL`, y `DSP-0001` permanece abierto.
-3. No iniciar stats, puntos por nivel ni Marlon hasta disponer de evidencia de
-   MU Online Fanz aplicable a Season 4 o una nueva decisión del propietario.
+1. Publicar la integración pendiente en una rama y exigir una ejecución limpia
+   de GitHub Actions. `build-and-test` debe compilar Json Everything desde fuente,
+   pasar restore bloqueado, build, 14/14 pruebas e inspección; el smoke WPF debe
+   continuar aprobado.
+2. Investigar evidencia histórica autorizada para aplicar a Season 4 la matriz
+   candidata de `RES-0001`. `DSP-0002` ya no bloquea esta búsqueda: el propietario
+   resolvió el valor de MG a favor de Energy 26.
+3. Mantener bloqueados los fixtures productivos de personajes. Los seis claims
+   están `PARTIAL`; los casos numéricos añadidos son pruebas de investigación,
+   no contratos del ruleset.
+4. No iniciar fórmulas derivadas de HP, Mana, AG, SD, daño o defensa hasta que
+   sus entradas, redondeos y aplicabilidad a Season 4 tengan evidencia propia.
 
 ## Última tarea cerrada
 
-El propietario hizo público el repositorio. La API confirmó `visibility: public`
-y permitió completar branch protection en `main`.
+Se registraron como candidatos trazables los stats iniciales/distribuibles,
+puntos por nivel y reglas de Marlon para las seis clases objetivo. `RES-0001`
+contiene ahora 18 evidencias, 6/6 claims `PARTIAL`, un conflicto abierto y uno
+resuelto por decisión del propietario.
 
-La protección exige PR incluso a administradores, checks estrictos
-`build-and-test` y `wpf-publication-smoke`, historial lineal y resolución de
-conversaciones; force-push y borrado están deshabilitados. No se incorporaron
-datos ni fórmulas de MU Online.
+Matriz confirmada por el propietario en orden `STR/AGI/VIT/ENE[/CMD]`: DW
+`18/18/15/30`, DK `28/20/25/10`, ELF `22/25/20/15`, SUM `21/21/18/23`, MG
+`26/26/26/26` y DL `26/20/20/15/25`. DW/DK/ELF/SUM ganan 5 puntos por nivel y
+6 tras Hero Status desde 220; MG/DL ganan 7 desde el inicio y no realizan
+Marlon.
+
+MU Online Fanz coincide con la matriz y las reglas. Webzen coincide en cinco
+filas, pero publica Energy 16 para MG en una guía actual con renovaciones
+posteriores; `DSP-0002` conserva la divergencia como antecedente, pero quedó
+resuelto a favor de Energy 26 por decisión explícita del propietario. Ningún
+dato se promovió a `VERIFIED` ni se incorporó al producto.
+
+La política de fuentes quedó ampliada por decisión del propietario: Fanz es la
+fuente inicial prioritaria y pueden usarse fuentes adicionales para extracción,
+contraste y resolución de conflictos, siempre con provenance y versión.
 
 ## Primera acción concreta
 
-El propietario debe elegir **MIT**, **Apache-2.0** o **licencia propietaria**.
-Después, crear y aprobar el ADR de licencia, sustituir el marcador actual de
-`LICENSE.md` por el texto correspondiente y revisar atribuciones antes de una
-release.
-
-No completar stats ni implementar la fórmula de puntos hasta aprobar los claims
-de clases/evoluciones.
+Crear/publicar la rama con los cambios acumulados y observar los checks
+requeridos del PR. Después registrar en `current-status.md` el ID del run,
+imagen, SDK, hashes y resultado de `build-and-test` y
+`wpf-publication-smoke`. Si ambos pasan, la siguiente investigación concreta es
+localizar una fuente o artefacto histórico que atribuya a Season 4 la matriz de
+stats y reglas de progresión; Energy 26 para MG ya es la decisión adoptada.

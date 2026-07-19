@@ -3,8 +3,31 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>net10.0</TargetFramework>
     <RootNamespace>MuOnline.SchemaValidator</RootNamespace>
+    <JsonEverythingAssemblyDirectory>$(MSBuildThisFileDirectory)../../../artifacts/json-everything-source-build/output</JsonEverythingAssemblyDirectory>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="JsonSchema.Net" />
+    <PackageReference Include="Humanizer.Core" />
+    <Reference Include="Json.More">
+      <HintPath>$(JsonEverythingAssemblyDirectory)/Json.More.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="JsonPointer.Net">
+      <HintPath>$(JsonEverythingAssemblyDirectory)/JsonPointer.Net.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="JsonSchema.Net">
+      <HintPath>$(JsonEverythingAssemblyDirectory)/JsonSchema.Net.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <None Include="$(JsonEverythingAssemblyDirectory)/JsonEverything-MIT.txt"
+          Link="legal/JsonEverything-MIT.txt"
+          CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
+  <Target Name="EnsureVerifiedJsonEverythingSourceBuild" BeforeTargets="ResolveAssemblyReferences">
+    <Error Condition="!Exists('$(JsonEverythingAssemblyDirectory)/Json.More.dll') Or
+                      !Exists('$(JsonEverythingAssemblyDirectory)/JsonPointer.Net.dll') Or
+                      !Exists('$(JsonEverythingAssemblyDirectory)/JsonSchema.Net.dll') Or
+                      !Exists('$(JsonEverythingAssemblyDirectory)/JsonEverything-MIT.txt')"
+           Text="Verified Json Everything source-build artifacts are missing. Run tools/spikes/Test-JsonEverythingSourceBuild.ps1 from the repository root." />
+  </Target>
 </Project>
