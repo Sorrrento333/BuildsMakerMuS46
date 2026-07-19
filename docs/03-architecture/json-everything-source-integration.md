@@ -1,6 +1,6 @@
 # Integración de Json Everything compilado desde fuente
 
-- Estado: completada localmente; verificación remota pendiente.
+- Estado: completada y verificada localmente y en GitHub Actions.
 - Fecha de corte: 2026-07-19.
 - Alcance: `MuOnline.SchemaValidator` y sus pruebas; WPF continúa fuera.
 - Fuente: commit fijado del repositorio oficial
@@ -70,8 +70,12 @@ La ejecución del 2026-07-19 aprobó:
 - publicación con los tres DLL, `Humanizer.dll` y `JsonEverything-MIT.txt`, sin
   `OSMFEULA.txt` ni metadatos de los paquetes publicados.
 
-La verificación en un runner limpio queda pendiente hasta que el cambio se
-publique en una rama y GitHub Actions ejecute el workflow actualizado.
+La primera ejecución remota, `run 29697684666`, expuso que los hashes iniciales
+dependían del checkout CRLF de Windows. Tras fijar LF y eliminar símbolos/PDB,
+el `run 29697921106` sobre el commit `d0626d2` aprobó `build-and-test` y
+`wpf-publication-smoke`. El workflow fijó SDK `10.0.301`; sus selectores fueron
+`ubuntu-latest` y `windows-latest`. La API pública consultada no expuso la
+versión interna exacta de esas imágenes, por lo que no se infiere.
 
 ## Límite
 

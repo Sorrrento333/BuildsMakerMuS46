@@ -154,8 +154,16 @@
   DLL, 2 × 10/10 fixtures, prueba de formatos y SPDX contrastado: PASS.
 - Integración del validador: lock con sólo `Humanizer.Core 3.0.10`, tres DLL
   clasificados como referencias directas, aviso MIT presente y ausencia de
-  `OSMFEULA.txt`/`.nuspec` publicados en la salida: PASS local. GitHub Actions
-  actualizado pero todavía no ejecutado remotamente para este cambio.
+  `OSMFEULA.txt`/`.nuspec` publicados en la salida: PASS local y remoto.
+- GitHub Actions `run 29697921106`, commit `d0626d2`: `build-and-test` y
+  `wpf-publication-smoke` terminaron `success` con SDK fijado `10.0.301`. Los
+  selectores del workflow fueron `ubuntu-latest` y `windows-latest`; la API
+  pública sólo identificó los runners `1000000027` y `1000000026`, no la versión
+  interna de imagen. Los hashes remotos revisados fueron `450646267c…` para
+  Json.More, `8f7be030e4…` para JsonPointer y `1f2dc6dfad…` para JsonSchema.
+- El run previo `29697684666` falló en el build fuente porque el hash de licencia
+  procedía de un checkout CRLF. La corrección fuerza LF y deshabilita PDB/símbolos;
+  dos builds locales independientes y el run remoto posterior coinciden.
 - Dependencias: los cinco proyectos restauran con lock files. El proyecto WPF no
   añade paquetes y conserva el grafo Data previamente auditado. La restauración
   bloqueada se repitió con acceso a NuGet y fue aprobada; el lock del validador

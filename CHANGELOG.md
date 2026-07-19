@@ -207,6 +207,9 @@
 - El pipeline reproducible de Json Everything fuerza checkouts LF y elimina
   símbolos/PDB de los DLL auditados. Así los hashes ya no dependen de
   `core.autocrlf` ni de checksums de fuentes propios del sistema operativo.
+- GitHub Actions `run 29697921106` confirma la corrección en los jobs
+  `build-and-test` y `wpf-publication-smoke`; el run anterior `29697684666`
+  queda trazado como detección del defecto CRLF.
 - Se fija `eol=lf` para archivos de texto mediante `.gitattributes`, evitando
   que checkouts con `core.autocrlf` invaliden los hashes de `MANIFEST.sha256`.
 - El validador usa un registro de schemas aislado por ejecución y reutiliza cada
