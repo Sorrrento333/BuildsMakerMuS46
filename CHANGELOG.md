@@ -135,6 +135,8 @@
 
 ### Fixed
 
+- Se fija `eol=lf` para archivos de texto mediante `.gitattributes`, evitando
+  que checkouts con `core.autocrlf` invaliden los hashes de `MANIFEST.sha256`.
 - El validador usa un registro de schemas aislado por ejecución y reutiliza cada
   contrato entre sus fixtures válido e inválido, evitando colisiones de `$id`.
 - El proyecto de pruebas importa xUnit explícitamente y `dotnet test` selecciona

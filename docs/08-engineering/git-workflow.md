@@ -24,3 +24,6 @@ se aplican operativamente aunque GitHub no pueda imponerlas:
 - exigir resultados correctos de `build-and-test` y `wpf-publication-smoke`;
 - no usar force-push ni borrar `main`;
 - no cambiar visibilidad ni plan sin decisión explícita del propietario.
+
+Los archivos de texto se normalizan a LF mediante `.gitattributes`; esta regla
+mantiene reproducibles los hashes de `MANIFEST.sha256` entre plataformas.

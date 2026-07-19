@@ -106,7 +106,7 @@
 ## Decisiones abiertas
 
 - Licencia.
-- Mantener el repositorio privado y habilitar GitHub Pro, o hacerlo público,
+- Mantener el repositorio privado y habilitar GitHub Pro o hacerlo público,
   para poder imponer branch protection en `main`.
 
 ## Verificación más reciente — 2026-07-18
@@ -172,6 +172,9 @@
   feature`) porque el repositorio es privado y el plan actual no ofrece branch
   protection. No se cambió la visibilidad ni el plan. Hasta resolverlo, ramas
   cortas, PR y checks se aplican como política operativa no forzada por GitHub.
+- `.gitattributes` fija LF para texto después de comprobar que un checkout con
+  `core.autocrlf` invalidaba hashes del manifiesto; la verificación vuelve a ser
+  reproducible sin cambiar el contenido documental.
 
 ## Decisión del propietario — 2026-07-18
 
