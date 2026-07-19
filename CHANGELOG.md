@@ -77,14 +77,17 @@
 
 ### Changed
 
+- La rama predeterminada remota `chore/bootstrap-repository` se renombró a
+  `main` conservando el commit `3935d9b`, y el tracking local quedó normalizado.
+  GitHub rechazó activar branch protection con `403` porque el repositorio
+  privado requiere GitHub Pro o visibilidad pública; no se cambió ninguna de
+  esas opciones y el flujo de ramas/PR/checks queda como control operativo.
 - Primera ejecución remota de CI aprobada en GitHub Actions (`run 29666817493`):
   14/14 pruebas en Linux y smoke WPF en Microsoft Windows Server 2025 con SDK
   .NET `10.0.302`, SQLite `3.53.3`, 407 archivos y 148.442.430 bytes. La auditoría
   de los cinco proyectos no encontró paquetes vulnerables y ambas fases del
   smoke pasaron; el alcance permanece limitado a `win-x64`.
-- El repositorio remoto quedó inicializado con el commit raíz `2e886c3` en la
-  rama temporal `chore/bootstrap-repository`; queda pendiente renombrarla a
-  `main` y aplicar la protección exigida por el flujo Git.
+- El repositorio remoto quedó inicializado con el commit raíz `2e886c3`.
 - La solución incorpora la shell WPF y su lock file. El smoke local `win-x64`
   pasó con SQLite `3.53.3`, 407 archivos y 148.339.336 bytes publicados; la
   primera ejecución del job remoto de CI también quedó aprobada.

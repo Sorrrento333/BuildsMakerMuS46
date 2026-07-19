@@ -106,6 +106,8 @@
 ## Decisiones abiertas
 
 - Licencia.
+- Mantener el repositorio privado y habilitar GitHub Pro, o hacerlo público,
+  para poder imponer branch protection en `main`.
 
 ## Verificación más reciente — 2026-07-18
 
@@ -161,10 +163,15 @@
   consultados y el smoke publicó 407 archivos/148.442.430 bytes con SQLite
   `3.53.3`; las dos fases y sus reportes superaron todas las aserciones del
   script. Sólo `win-x64` queda demostrado; no se amplían RIDs.
-- Repositorio remoto inicializado mediante el commit raíz `2e886c3` en
-  `chore/bootstrap-repository`. Como el remoto estaba vacío, GitHub adoptó esa
-  rama temporal como predeterminada; aún falta establecer y proteger `main`
-  conforme a `docs/08-engineering/git-workflow.md`.
+- Repositorio remoto inicializado mediante el commit raíz `2e886c3`. La rama
+  temporal `chore/bootstrap-repository` se renombró a `main` sin reescribir el
+  historial; `main` es ahora la rama predeterminada y el tracking local/remoto
+  apunta a `3935d9b`.
+- La protección de `main` no pudo activarse: la API de GitHub respondió `403`
+  (`Upgrade to GitHub Pro or make this repository public to enable this
+  feature`) porque el repositorio es privado y el plan actual no ofrece branch
+  protection. No se cambió la visibilidad ni el plan. Hasta resolverlo, ramas
+  cortas, PR y checks se aplican como política operativa no forzada por GitHub.
 
 ## Decisión del propietario — 2026-07-18
 

@@ -2,11 +2,11 @@
 
 ## Prioridad inmediata
 
-1. Normalizar el bootstrap Git: renombrar la rama predeterminada remota
-   `chore/bootstrap-repository` a `main`, activar su protección y conservar desde
-   entonces ramas cortas y PR obligatoria para código, schemas y datos. No
-   reescribir el commit raíz validado ni ampliar el alcance técnico durante esta
-   operación administrativa.
+1. Resolver con el propietario la capacidad de proteger `main`: mantener el
+   repositorio privado y habilitar GitHub Pro, o hacerlo público. No cambiar
+   visibilidad ni contratar un plan por inferencia. Mientras tanto, usar ramas
+   cortas, PR y los checks `build-and-test`/`wpf-publication-smoke` como controles
+   operativos manuales.
 2. Mantener bloqueado el diseño de fixtures de personajes: `CLM-0001` y
    `CLM-0004` continúan `PARTIAL`, y `DSP-0001` permanece abierto.
 3. No iniciar stats, puntos por nivel ni Marlon hasta disponer de evidencia de
@@ -14,23 +14,23 @@
 
 ## Última tarea cerrada
 
-Se publicó el commit raíz `2e886c3` en `chore/bootstrap-repository` para ejecutar
-por primera vez el workflow remoto. El run `29666817493` terminó correctamente:
-`build-and-test` pasó 14/14 pruebas en Linux y `wpf-publication-smoke` pasó en
-Microsoft Windows Server 2025 con SDK .NET `10.0.302`.
+La rama predeterminada remota `chore/bootstrap-repository` se renombró a `main`
+sin rebase ni reescritura; la rama local y su tracking quedaron alineados con el
+mismo commit `3935d9b`.
 
-La auditoría no encontró paquetes vulnerables en ninguno de los cinco proyectos.
-El artefacto autocontenido `win-x64` cargó SQLite `3.53.3`, publicó 407 archivos
-y 148.442.430 bytes, y ambas fases del smoke validaron migración, reapertura,
-backup/restore, integridad y persistencia externa. No se incorporaron datos ni
-fórmulas de MU Online ni se habilitaron RIDs adicionales.
+Se intentó configurar PR obligatorio, checks estrictos `build-and-test` y
+`wpf-publication-smoke`, historial lineal y bloqueo de force-push/borrado. GitHub
+rechazó la operación con `403` porque branch protection para este repositorio
+privado requiere GitHub Pro o visibilidad pública. No se alteró ninguno de esos
+dos estados y no se incorporaron datos ni fórmulas de MU Online.
 
 ## Primera acción concreta
 
-En la configuración del repositorio GitHub, renombrar la rama predeterminada
-`chore/bootstrap-repository` a `main` y activar protección que exija PR y los dos
-checks de CI. Después, actualizar el tracking local sin rebase ni reescritura y
-registrar la política efectiva en el handoff.
+El propietario debe elegir entre: **(A)** conservar el repositorio privado y
+habilitar GitHub Pro, o **(B)** hacerlo público. Tras esa decisión, activar en
+`main` PR obligatorio, checks estrictos `build-and-test` y
+`wpf-publication-smoke`, historial lineal, resolución de conversaciones y bloqueo
+de force-push/borrado.
 
 No completar stats ni implementar la fórmula de puntos hasta aprobar los claims
 de clases/evoluciones.
