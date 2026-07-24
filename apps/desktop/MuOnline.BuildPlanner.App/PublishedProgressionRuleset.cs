@@ -1,5 +1,6 @@
 using System.IO;
 using MuOnline.BuildPlanner.Application.Progression;
+using MuOnline.BuildPlanner.Application.Stats;
 
 namespace MuOnline.BuildPlanner.App;
 
@@ -17,5 +18,8 @@ internal static class PublishedProgressionRuleset
     public static ProgressionRulesetCatalog Catalog => CatalogValue.Value;
 
     public static CalculateProgressionPointBudgetUseCase CreateUseCase() =>
+        new(Catalog);
+
+    public static CalculateStatDistributionUseCase CreateStatDistributionUseCase() =>
         new(Catalog);
 }

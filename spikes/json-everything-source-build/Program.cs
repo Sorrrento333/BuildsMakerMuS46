@@ -8,7 +8,7 @@ if (args.Length != 1)
 }
 
 var repositoryRoot = Path.GetFullPath(args[0]);
-const int expectedFixtureCount = 14;
+const int expectedFixtureCount = 16;
 
 for (var run = 1; run <= 2; run++)
 {

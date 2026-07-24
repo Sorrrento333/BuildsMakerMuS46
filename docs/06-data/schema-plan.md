@@ -9,6 +9,7 @@ La versión `1.0.0` de los primeros contratos está en `packages/schemas/v1`:
 - `character-class.schema.json`
 - `progression-rule.schema.json`
 - `stat-distribution.schema.json`
+- `build-draft.schema.json`
 - `server-profile.schema.json`
 - `build.schema.json`
 
@@ -30,6 +31,15 @@ catálogo de clases y se declaran como invariantes semánticas en
 `docs/04-domain/stat-distribution-contract.md`; no se simulan con datos del
 juego dentro del schema.
 
+El contrato de borrador `1.0.0` conserva metadata exacto del ruleset, dataset y
+motor, las entradas de progresión y un `StatDistribution` completo compuesto
+mediante `$ref`. Se mantiene separado de `build.schema.json`: el borrador actual
+no inventa resets ni trata asignaciones como stats finales. Sus totales
+calculados son una caché que Application recalcula y contrasta al cargar. Data
+persiste payload y metadata atómicamente mediante la migración
+`1/create_build_drafts`, según
+`docs/06-data/build-draft-persistence-contract.md`.
+
 Los primeros registros canónicos viven en
 `packages/rulesets/mu-s4-global-reference/v1`: seis definiciones de clase y dos
 reglas de progresión `VERIFIED`. El validador integral comprueba los ocho
@@ -44,7 +54,7 @@ La validación integral está implementada en .NET 10 bajo
 `tools/validators/MuOnline.SchemaValidator`, con `JsonSchema.Net 9.2.2`
 compilado reproduciblemente desde fuente MIT, validación de formatos y un
 registro de schemas aislado por ejecución. Las
-pruebas verifican que los siete fixtures válidos sean aceptados, los siete
+pruebas verifican que los ocho fixtures válidos sean aceptados, los ocho
 inválidos sean rechazados, que los ocho registros canónicos sean válidos y que
 los diez casos de progresión coincidan con su resultado esperado, además de que
 las dos reglas resuelvan exactamente sus siete casos positivos y de que el

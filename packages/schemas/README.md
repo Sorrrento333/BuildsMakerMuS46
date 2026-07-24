@@ -35,8 +35,8 @@ Los locks, SPDX, provenance y hashes revisados viven en
 `spikes/json-everything-source-build/`. El diseño, la integración y sus límites
 están en `docs/03-architecture/json-everything-source-integration.md`.
 
-El comando valida los siete contratos `1.0.0`, acepta los siete fixtures de
-`examples/valid`, rechaza los siete de `examples/invalid` y devuelve un código
+El comando valida los ocho contratos `1.0.0`, acepta los ocho fixtures de
+`examples/valid`, rechaza los ocho de `examples/invalid` y devuelve un código
 distinto de cero si alguna expectativa no se cumple. También valida contra
 `character-class.schema.json` y `progression-rule.schema.json` los ocho
 registros canónicos de `packages/rulesets/mu-s4-global-reference/v1`; estos
@@ -73,7 +73,18 @@ asignaciones y su coincidencia exacta con los stats declarados por la clase son
 invariantes del dominio documentadas en
 `docs/04-domain/stat-distribution-contract.md`. Por ello `command` sólo será
 admitido cuando exista en la definición canónica de la clase y no mediante una
-lista de clases duplicada en el contrato.
+lista de clases duplicada en el contrato. `StatDistributionCalculator` aplica
+ya estas invariantes semánticas sobre el presupuesto productivo; el schema
+continúa siendo el contrato serializable independiente.
+
+`build-draft.schema.json` compone el contrato de distribución mediante `$ref` y
+conserva identidad, metadata exacto de ruleset/dataset/motor y las entradas de
+progresión. Las entradas y asignaciones son datos del usuario; los totales y la
+referencia de regla se guardan sólo como caché que Application deberá recalcular
+y comparar al cargar. No sustituye a `build.schema.json`, que representa una
+build más completa con resets y otros campos aún fuera del flujo actual. El
+límite y sus invariantes están en
+`docs/06-data/build-draft-persistence-contract.md`.
 
 Los binarios NuGet publicados de Json Everything ya no forman parte del grafo
 normal. El validador consume referencias directas a los DLL autocompilados y su

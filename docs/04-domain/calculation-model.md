@@ -45,10 +45,11 @@ estable. Los controles factuales existentes fijan
 
 `JsonProgressionRulesetSnapshotReader` materializa las definiciones anteriores
 desde los directorios `character-classes` y `progression-rules` de un snapshot
-que ya pasó JSON Schema. El adaptador no sustituye ese gate estructural: añade
-un cierre semántico productivo para exigir un solo `rulesetId`, IDs únicos,
-referencias bidireccionales clase/regla coherentes y estado `PUBLISHED` en todas
-las reglas cargadas.
+que ya pasó JSON Schema. La definición de clase incluye los IDs de las claves
+de `stats`, sin copiar valores base al motor. El adaptador no sustituye ese gate
+estructural: añade un cierre semántico productivo para exigir un solo
+`rulesetId`, IDs únicos, referencias bidireccionales clase/regla coherentes y
+estado `PUBLISHED` en todas las reglas cargadas.
 
 `CalculateProgressionPointBudgetUseCase` recibe el catálogo materializado y
 delega la solicitud al cálculo puro. Application no conoce WPF, SQLite ni los
@@ -64,17 +65,46 @@ El resultado visible incluye total, regla/version y cada aporte de la traza.
 
 El checkbox de Hero Status obtiene el ID de quest y su elegibilidad desde la
 regla publicada; XAML y C# no duplican puntos, niveles, IDs de clases/evoluciones
-ni fórmulas. La UI no introduce resets, puntos gastados, distribución de stats
-ni atributos derivados.
+ni fórmulas.
 
-## Siguiente contrato: distribución de stats
+## Segunda vertical del motor: distribución de stats
 
-El contrato estructural `stat-distribution.schema.json` `1.0.0` y sus fixtures
-sintéticos ya están definidos. Conserva presupuesto ganado, asignaciones,
-gasto, remanente y la referencia a la regla que originó el presupuesto. Las
-invariantes, límites, errores estables y casos mínimos para la futura operación
-pura viven en `stat-distribution-contract.md`.
+`StatDistributionCalculator` consume un `ProgressionPointBudgetResult`, la
+definición de su clase y un mapa no confiable de asignaciones. No recalcula
+progresión: comprueba que ruleset, clase y referencia de regla coincidan, exige
+exactamente los stats declarados por la clase y deriva `spentPoints` y
+`remainingPoints` con operaciones comprobadas de 64 bits.
 
-No existe todavía implementación productiva de esta operación. En particular,
-el contrato no calcula resets ni atributos derivados y no incorpora nuevos
-valores factuales del juego.
+La operación es estática y pura. Devuelve la referencia completa al origen del
+presupuesto, las asignaciones normalizadas y errores tipados para negativos,
+stats ajenos u omitidos, exceso, overflow y origen incoherente. Diez pruebas
+sintéticas cubren los seis casos mínimos, las tres variantes de origen y el
+overflow; no duplican ninguna lista factual de clases o stats.
+
+Application materializa los IDs requeridos y
+`CalculateStatDistributionUseCase` resuelve la definición por la clase y el
+ruleset del presupuesto. Su API no acepta una clase alternativa ni recalcula
+progresión: construye la solicitud de Domain y delega en el motor. Una
+resolución ausente o ambigua produce `budget-source-mismatch`, y los demás
+códigos tipados se propagan sin traducción.
+
+Cuatro pruebas de integración leen una copia temporal del snapshot, atraviesan
+catálogo → caso de uso → motor para distribuciones sintéticas parcial y exacta,
+demuestran fallo cerrado ante un ruleset de origen incoherente y confirman la
+propagación de `allocation-negative`.
+
+## Superficie WPF de distribución
+
+`MainWindow` conserva el último `ProgressionPointBudgetResult` calculado y lo
+entrega, junto con las asignaciones, a
+`CalculateStatDistributionUseCase`. Los controles se generan en orden ordinal
+desde `CharacterProgressionDefinition.StatIds`; la UI no contiene una lista
+factual de stats ni acepta una definición de clase alternativa.
+
+Un cambio de clase, evolución, nivel o Hero Status invalida el presupuesto
+conservado. La pantalla muestra `SpentPoints`, `RemainingPoints` y las
+asignaciones resultantes. Los seis códigos tipados se traducen a una explicación
+visible sin ocultar su identificador estable. El smoke publicado ejecuta además
+una asignación sintética de un punto sobre los IDs materializados y verifica el
+resultado antes y después del reemplazo del artefacto. Persistencia, resets y
+atributos derivados permanecen fuera de esta vertical.

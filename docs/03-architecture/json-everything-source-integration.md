@@ -59,7 +59,7 @@ pipeline fuente y luego restore bloqueado, build, pruebas e inspección de
 publicación. El job WPF no adquiere esta dependencia y mantiene su verificación
 separada.
 
-El harness enlazado al validador ejecuta los siete contratos actuales: 14/14
+El harness enlazado al validador ejecuta los ocho contratos actuales: 16/16
 fixtures en cada una de dos rutas fuente independientes, más la prueba explícita
 de formatos.
 

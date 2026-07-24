@@ -4,6 +4,66 @@
 
 ### Added
 
+- Migración SQLite hacia adelante `1/create_build_drafts` y
+  `SqliteBuildDraftRepository` como implementación Data de
+  `IBuildDraftRepository`. Cada alta/reemplazo confirma payload JSON y metadata
+  en una sola fila/transacción inmediata; la carga permanece como `SELECT` sin
+  mutaciones.
+- Traducción del agotamiento de `SqliteWriteContentionPolicy` al código estable
+  `build-draft-write-conflict`, sin filtrar tipos SQLite hacia Application.
+- Seis pruebas de integración Data con archivos temporales para payload y
+  metadata exactos, reemplazo por ID, rollback ante fallo sintético, reapertura,
+  ausencia sin mutaciones y conflicto de escritura tipado. No agregan datos ni
+  fórmulas de MU Online.
+- Modelo serializable `BuildDraft` en Application alineado campo por campo con
+  el schema `1.0.0`, contexto runtime explícito para ruleset, dataset/hash y
+  motor, y seis códigos de error estables `build-draft-*`.
+- Puerto `IBuildDraftRepository` sin tipos SQLite y casos de uso de guardado y
+  carga. La carga recalcula progresión y distribución desde las entradas y
+  asignaciones, compara toda la caché y falla cerrada ante identidad,
+  dependencia o resultado divergente.
+- Siete pruebas sintéticas de Application con repositorio en memoria para
+  alta/carga, reemplazo por ID, ausencia, identidad incoherente, dependencia no
+  disponible, caché alterada y round-trip JSON exacto. Data, migraciones y WPF
+  permanecen fuera de esta vertical.
+- Contrato JSON Schema 2020-12 `build-draft.schema.json` `1.0.0` para identidad
+  estable, metadata exacto de ruleset/dataset/motor, entradas de progresión y
+  un `StatDistribution` compuesto mediante `$ref`.
+- Fixtures sintéticos válido/inválido de borrador. El inválido conserva válido
+  el envoltorio y falla por la distribución referenciada, demostrando que el
+  validador resuelve el contrato compartido.
+- Especificación previa a persistencia para autoridad de campos, revalidación al
+  cargar, errores estables, límite Application/Data, transacción atómica y
+  casos mínimos, sin crear puertos, tablas ni migraciones.
+- Flujo WPF de distribución de stats: conserva el
+  `ProgressionPointBudgetResult` calculado, genera los inputs desde los
+  `StatIds` materializados e invoca `CalculateStatDistributionUseCase` sin
+  recalcular progresión ni duplicar nombres o valores del juego.
+- Resultado visible con puntos gastados, restantes y asignaciones por ID, más
+  traducción en español de los seis errores tipados sin ocultar su código
+  estable. Los cambios de identidad, nivel o Hero Status invalidan el
+  presupuesto anterior.
+- Gate del artefacto publicado para una distribución sintética de un punto
+  derivada del snapshot empaquetado. Ambas fases verifican gasto, remanente y
+  conjunto de stats sin agregar fixtures factuales ni persistencia.
+- Caso de uso `CalculateStatDistributionUseCase` en Application: recibe el
+  presupuesto existente y las asignaciones, resuelve una única definición de
+  clase del mismo ruleset y delega en el motor sin aceptar clases alternativas
+  ni recalcular progresión.
+- Cuatro pruebas de integración recorren copia temporal del snapshot → catálogo
+  → caso de uso → motor para distribuciones sintéticas parcial/exacta, fallo
+  cerrado `budget-source-mismatch` ante origen incoherente y propagación del
+  código `allocation-negative` producido por el motor.
+- Operación pura `StatDistributionCalculator` en Calculation Engine para
+  validar asignaciones no confiables y derivar puntos gastados/remanentes desde
+  el presupuesto de progresión, con suma y resta comprobadas de 64 bits.
+- Tipos de solicitud/resultado, excepción y seis códigos de error estables en
+  Domain para negativos, stats ajenos u omitidos, exceso de presupuesto,
+  overflow y divergencias de origen.
+- Diez pruebas sintéticas de distribución cubren los seis casos mínimos del
+  contrato, las divergencias de ruleset/clase/regla y overflow; una prueba de
+  integración adicional confirma que Application materializa los IDs de stats
+  directamente desde el snapshot.
 - Contrato JSON Schema 2020-12 `stat-distribution.schema.json` `1.0.0` para
   conservar presupuesto ganado, referencia de progresión, asignaciones por
   stat, puntos gastados y remanente, más fixtures sintéticos válido/inválido.
@@ -176,6 +236,12 @@
 
 ### Changed
 
+- El validador integral, la prueba de contrato, la comprobación PowerShell y el
+  harness de compilación fuente cubren ahora 8 schemas y 16 fixtures; el
+  harness autocompilado aprueba dos ejecuciones 16/16 y la prueba de formatos.
+- `ProgressionPointBudgetResult` conserva ahora `CharacterClassId`, y
+  `CharacterProgressionDefinition` los IDs de stats del snapshot, para validar
+  la procedencia y disponibilidad sin duplicar datos factuales.
 - `MuOnline.BuildPlanner.App` referencia Application de forma unidireccional y
   su lock registra sólo las nuevas dependencias internas de proyecto.
 - Las reglas `progression-five-per-level-hero-status` y
@@ -295,9 +361,9 @@
 - `global.json` fija exactamente el SDK `10.0.301` con `rollForward: disable` y
   CI declara la versión como cadena. Así un SDK `10.0.302` preinstalado en el
   runner no reemplaza al SDK revisado durante el build reproducible.
-- El harness de compilación fuente valida ahora los 14 fixtures de los siete
-  contratos actuales en cada ejecución, en lugar de conservar el inventario
-  anterior de diez fixtures.
+- El harness de compilación fuente valida ahora los 16 fixtures de los ocho
+  contratos actuales en cada ejecución, en lugar de conservar inventarios
+  anteriores.
 - El pipeline reproducible de Json Everything fuerza checkouts LF y elimina
   símbolos/PDB de los DLL auditados. Así los hashes ya no dependen de
   `core.autocrlf` ni de checksums de fuentes propios del sistema operativo.

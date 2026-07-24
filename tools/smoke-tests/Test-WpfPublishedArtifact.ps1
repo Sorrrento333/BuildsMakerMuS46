@@ -200,6 +200,17 @@ if ($initialReport.ApprovedProgressionCaseCount -ne 7 -or
     $replacementReport.RejectedProgressionCaseCount -ne 3) {
     throw "The published ruleset did not reproduce all 7 approved cases and 3 rejections."
 }
+if (-not $initialReport.SyntheticStatDistributionVerified -or
+    -not $replacementReport.SyntheticStatDistributionVerified -or
+    $initialReport.SyntheticStatDistributionStatCount -le 0 -or
+    $replacementReport.SyntheticStatDistributionStatCount -ne
+        $initialReport.SyntheticStatDistributionStatCount -or
+    $initialReport.SyntheticStatDistributionSpentPoints -ne 1 -or
+    $replacementReport.SyntheticStatDistributionSpentPoints -ne 1 -or
+    $replacementReport.SyntheticStatDistributionRemainingPoints -ne
+        $initialReport.SyntheticStatDistributionRemainingPoints) {
+    throw "The published snapshot did not preserve the synthetic stat distribution."
+}
 
 $initialRulesetRoot = Join-Path $initialPublishDirectory $publishedRulesetRelativePath
 $replacementRulesetRoot = Join-Path $replacementPublishDirectory $publishedRulesetRelativePath
@@ -242,5 +253,6 @@ Write-Output "Published files: $($publishedFiles.Count)"
 Write-Output "Published bytes: $publishedBytes"
 Write-Output "Verified legal files: $($requiredLegalFiles.Count)"
 Write-Output "Progression cases: $($initialReport.ApprovedProgressionCaseCount) approved, $($initialReport.RejectedProgressionCaseCount) rejected"
+Write-Output "Synthetic stat distribution: $($initialReport.SyntheticStatDistributionStatCount) stats, $($initialReport.SyntheticStatDistributionSpentPoints) spent"
 Write-Output "Ruleset files: $($initialRulesetFiles.Count)"
 Write-Output "Artifacts: $runRoot"

@@ -55,7 +55,7 @@ public sealed class SchemaContractValidatorTests
     {
         var results = SchemaContractValidator.ValidateRepository(FindRepositoryRoot());
 
-        Assert.Equal(14, results.Count);
+        Assert.Equal(16, results.Count);
         Assert.Collection(
             results,
             result => AssertResult(result, "evidence", "valid", expectedValidity: true),
@@ -68,6 +68,8 @@ public sealed class SchemaContractValidatorTests
             result => AssertResult(result, "progression-rule", "invalid", expectedValidity: false),
             result => AssertResult(result, "stat-distribution", "valid", expectedValidity: true),
             result => AssertResult(result, "stat-distribution", "invalid", expectedValidity: false),
+            result => AssertResult(result, "build-draft", "valid", expectedValidity: true),
+            result => AssertResult(result, "build-draft", "invalid", expectedValidity: false),
             result => AssertResult(result, "server-profile", "valid", expectedValidity: true),
             result => AssertResult(result, "server-profile", "invalid", expectedValidity: false),
             result => AssertResult(result, "build", "valid", expectedValidity: true),

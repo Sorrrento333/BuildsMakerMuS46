@@ -64,6 +64,21 @@ Application debe seleccionar los tiempos según el flujo de usuario, mantener
 las operaciones cortas e idempotentes y presentar el error final. No debe abrir
 una transacción antes de llamar a la política ni asumir escrituras paralelas.
 
+## Repositorio de borradores
+
+`SqliteBuildDraftMigrations.All` contiene la migración hacia adelante
+`1/create_build_drafts`. La tabla guarda por `id` el payload JSON completo y
+columnas explícitas para schema, ruleset, dataset/hash y motor. El llamador debe
+aplicar el catálogo con `SqliteMigrationRunner` antes de usar el repositorio.
+
+`SqliteBuildDraftRepository` implementa el puerto de Application sin exponer
+SQLite hacia esa capa. Cada guardado ejecuta un `UPSERT` completo dentro de
+`SqliteWriteContentionPolicy`; metadata y payload se confirman o revierten
+juntos. El agotamiento de contención se traduce a
+`build-draft-write-conflict`. La carga realiza únicamente un `SELECT` y entrega
+el payload a Application, que conserva la responsabilidad exclusiva de
+revalidarlo.
+
 ## Uso mínimo
 
 ```csharp
@@ -116,4 +131,6 @@ desactivado. Cubren base nueva, reapertura, reejecución, alteración de hash,
 rollback por fallo, backup consistente, restauración de schema/ledger/datos y
 protección del último backup válido ante una candidata corrupta. También cubren
 timeout acotado ante un segundo escritor, error tipado, reintento después de
-liberar el bloqueo y commit único de la operación.
+liberar el bloqueo y commit único de la operación. Para borradores cubren
+alta/carga, reemplazo por ID, metadata y payload exactos, rollback, reapertura,
+lectura ausente sin mutaciones y traducción estable de contención.

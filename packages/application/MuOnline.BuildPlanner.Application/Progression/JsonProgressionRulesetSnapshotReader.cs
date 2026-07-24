@@ -141,6 +141,10 @@ public sealed class JsonProgressionRulesetSnapshotReader : IProgressionRulesetSn
             new CharacterProgressionDefinition(
                 id,
                 RequiredString(element, "rulesetId"),
+                element.GetProperty("stats")
+                    .EnumerateObject()
+                    .Select(stat => stat.Name)
+                    .ToHashSet(StringComparer.Ordinal),
                 evolutions
                     .Select(evolution => evolution.Id)
                     .ToHashSet(StringComparer.Ordinal),

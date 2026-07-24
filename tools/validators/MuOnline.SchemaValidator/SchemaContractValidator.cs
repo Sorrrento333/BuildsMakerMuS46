@@ -30,6 +30,7 @@ public static class SchemaContractValidator
         "character-class",
         "progression-rule",
         "stat-distribution",
+        "build-draft",
         "server-profile",
         "build",
     ];

@@ -25,6 +25,7 @@ public sealed class ProgressionPointBudgetCalculatorTests
         var result = calculator.Calculate(ToRequest(referenceCase));
 
         Assert.Equal(referenceCase.ExpectedEarnedPoints, result.EarnedPoints);
+        Assert.Equal(referenceCase.ClassId, result.CharacterClassId);
         Assert.Equal(referenceCase.ProgressionRuleId, result.ProgressionRuleId);
         Assert.Equal(
             referenceCase.ExpectedEarnedPoints,

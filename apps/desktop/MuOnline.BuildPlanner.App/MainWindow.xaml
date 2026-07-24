@@ -3,13 +3,16 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="MU Online Build Planner"
         Width="720"
-        Height="640"
+        Height="780"
         MinWidth="640"
-        MinHeight="560"
+        MinHeight="640"
         WindowStartupLocation="CenterScreen">
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <Grid Margin="32">
             <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
@@ -67,12 +70,15 @@
                      Margin="0,12,0,0"
                      MinHeight="30"
                      VerticalContentAlignment="Center"
+                     TextChanged="ProgressionInputChanged"
                      Text="1" />
 
             <CheckBox x:Name="HeroStatusCheckBox"
                       Grid.Row="5"
                       Grid.Column="1"
                       Margin="0,16,0,0"
+                      Checked="ProgressionInputChanged"
+                      Unchecked="ProgressionInputChanged"
                       Content="Hero Status / Marlon completado" />
 
             <Button Grid.Row="6"
@@ -94,6 +100,36 @@
                      TextWrapping="Wrap"
                      VerticalScrollBarVisibility="Auto"
                      AutomationProperties.Name="Resultado y traza" />
+
+            <GroupBox Grid.Row="8"
+                      Grid.ColumnSpan="2"
+                      Margin="0,24,0,0"
+                      Header="Distribución de puntos ganados">
+                <StackPanel x:Name="StatsAllocationPanel"
+                            Margin="12" />
+            </GroupBox>
+
+            <Button x:Name="DistributeStatsButton"
+                    Grid.Row="9"
+                    Grid.Column="1"
+                    Width="160"
+                    Margin="0,16,0,0"
+                    Padding="12,6"
+                    HorizontalAlignment="Left"
+                    IsEnabled="False"
+                    Click="DistributeStatsButtonClick"
+                    Content="Distribuir stats" />
+
+            <TextBox x:Name="DistributionResultTextBox"
+                     Grid.Row="10"
+                     Grid.ColumnSpan="2"
+                     Margin="0,16,0,0"
+                     Padding="12"
+                     MinHeight="96"
+                     IsReadOnly="True"
+                     TextWrapping="Wrap"
+                     VerticalScrollBarVisibility="Auto"
+                     AutomationProperties.Name="Resultado de distribución" />
         </Grid>
     </ScrollViewer>
 </Window>

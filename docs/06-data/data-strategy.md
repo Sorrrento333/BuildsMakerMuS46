@@ -26,8 +26,9 @@ La primera infraestructura productiva vive en
 El runner aplica migraciones SQL inmutables en transacciones individuales y
 mantiene `schema_migrations` con versión, nombre, SHA-256 y fecha UTC. Rechaza
 una migración aplicada si su nombre o hash deja de coincidir con el catálogo.
-Los únicos scripts ejecutados hasta ahora son fixtures sintéticos de pruebas;
-todavía no existe un schema factual de MU Online ni almacenamiento de usuario.
+La primera migración productiva crea `build_drafts` para datos de usuario; no
+contiene un schema factual de MU Online. Los scripts anteriores continúan
+siendo fixtures sintéticos de pruebas.
 
 `SqliteBackupService` crea backups online mediante una copia candidata, exige
 `PRAGMA integrity_check = ok` antes de reemplazar un backup anterior y verifica
@@ -41,6 +42,21 @@ inmediata, aplica un timeout positivo explícito por intento y reintenta sólo l
 errores SQLite de contención. Application configura el límite y la demora,
 mantiene las escrituras cortas e idempotentes y decide cómo comunicar el
 agotamiento; Data devuelve un error tipado y no presupone escritores paralelos.
+
+## Primera persistencia de usuario
+
+`build-draft.schema.json` `1.0.0` y
+`docs/06-data/build-draft-persistence-contract.md` gobiernan la primera tabla de
+usuario. El borrador conserva metadata exacto, entradas de progresión,
+asignaciones y una copia verificable del resultado. Los valores calculados no
+son autoridad: Application los recalcula al cargar.
+
+`IBuildDraftRepository` vive en Application y
+`SqliteBuildDraftRepository` lo implementa en Data sin filtrar tipos del
+proveedor hacia el puerto. La migración `1/create_build_drafts` almacena por
+`id` el payload JSON completo y columnas de schema, ruleset, dataset/hash y
+motor en una sola fila. Guardar usa reemplazo atómico dentro de
+`SqliteWriteContentionPolicy`; cargar ejecuta una lectura sin mutaciones.
 
 ## Separación
 Datos canónicos, traducciones, evidencia y assets se almacenan por separado para evitar duplicación.

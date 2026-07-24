@@ -82,7 +82,7 @@ public sealed class ProgressionPointBudgetCalculator
         var completedQuestIds = request.CompletedQuestIds.ToHashSet(StringComparer.Ordinal);
         if (completedQuestIds.Count == 0)
         {
-            return CreateResult(rule, levelPoints, contributions);
+            return CreateResult(characterClass, rule, levelPoints, contributions);
         }
 
         var questBonus = rule.QuestBonus;
@@ -121,15 +121,21 @@ public sealed class ProgressionPointBudgetCalculator
             questBonus.AdditionalPointsPerLevel,
             questPoints));
 
-        return CreateResult(rule, checked(levelPoints + questPoints), contributions);
+        return CreateResult(
+            characterClass,
+            rule,
+            checked(levelPoints + questPoints),
+            contributions);
     }
 
     private static ProgressionPointBudgetResult CreateResult(
+        CharacterProgressionDefinition characterClass,
         ProgressionRuleDefinition rule,
         long earnedPoints,
         IReadOnlyList<ProgressionPointContribution> contributions) =>
         new(
             rule.RulesetId,
+            characterClass.Id,
             rule.Id,
             rule.Version,
             earnedPoints,

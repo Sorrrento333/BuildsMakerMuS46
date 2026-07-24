@@ -17,11 +17,11 @@
 - Spikes equivalentes de TypeScript/Node.js 24 y C#/.NET 10 para cálculo
   sintético trazable, SQLite y ejecución offline.
 - C#/.NET 10 seleccionado para el núcleo y la aplicación inicial (ADR-0002).
-- Siete schemas JSON 2020-12 `1.0.0`: evidencia, fórmula, clase de personaje,
-  progresión, distribución de stats, perfil de servidor y build, con catorce
-  fixtures sintéticos.
+- Ocho schemas JSON 2020-12 `1.0.0`: evidencia, fórmula, clase de personaje,
+  progresión, distribución de stats, borrador de build, perfil de servidor y
+  build, con dieciséis fixtures sintéticos.
 - Solución mínima .NET 10, validador integral con `JsonSchema.Net 9.2.2`, dos
-  pruebas de contrato y CI básico, ampliado a siete schemas y catorce fixtures.
+  pruebas de contrato y CI básico, ampliado a ocho schemas y dieciséis fixtures.
 - Evaluación de Json Everything completada. Las copias de `OSMFEULA.txt` de
   `JsonSchema.Net 9.2.2`, `JsonPointer.Net 7.0.1` y `Json.More.Net 3.0.1` son
   idénticas y quedaron preservadas con provenance y hash. Los binarios NuGet se
@@ -188,12 +188,79 @@
   `command` sólo está disponible si la clase lo declara. Se documentaron seis
   casos sintéticos y códigos estables para negativos, stats ajenos/omitidos,
   exceso, overflow y origen de presupuesto incoherente.
+- Segunda vertical productiva de Domain/Calculation Engine implementada.
+  `StatDistributionCalculator` consume el presupuesto ya calculado, la
+  definición de clase y asignaciones no confiables; valida origen y conjunto
+  exacto de stats, suma con control de overflow y deriva gasto y remanente.
+- El presupuesto conserva ahora `CharacterClassId` y la definición de clase los
+  IDs de sus stats. Application materializa esos IDs directamente desde las
+  claves del snapshot, sin duplicar valores base ni incorporar datos nuevos.
+- Diez pruebas sintéticas cubren distribución parcial/exacta, los cuatro
+  negativos mínimos, las tres variantes de origen incoherente y overflow. Una
+  prueba de integración adicional contrasta los IDs materializados con los JSON
+  canónicos.
+- `CalculateStatDistributionUseCase` integra la distribución en Application.
+  Recibe el presupuesto existente y las asignaciones, resuelve una única clase
+  del mismo ruleset desde el catálogo y delega en el motor sin recalcular
+  progresión ni aceptar una definición alternativa.
+- Cuatro pruebas de integración adicionales recorren una copia temporal del
+  snapshot hasta el motor para distribuciones sintéticas parcial/exacta y
+  `budget-source-mismatch` ante un ruleset de origen incoherente, y confirman la
+  propagación de `allocation-negative`. No se añadieron datos ni fórmulas del
+  juego.
+- El flujo WPF conserva el presupuesto de progresión calculado y genera los
+  inputs de asignación exclusivamente desde los `StatIds` de la clase
+  materializada. Cambiar clase, evolución, nivel o Hero Status invalida ese
+  presupuesto antes de permitir una distribución.
+- La pantalla delega en `CalculateStatDistributionUseCase` y muestra puntos
+  gastados, restantes y asignaciones por ID. Los seis códigos tipados tienen
+  explicación visible en español sin ocultar el identificador estable.
+- El smoke WPF publicado verifica en ambas fases una distribución sintética de
+  un punto sobre el conjunto de stats obtenido del snapshot. No incorpora un
+  fixture factual, persistencia ni valores nuevos del juego.
+- Contrato `build-draft.schema.json` `1.0.0` definido antes de la primera
+  persistencia de usuario. Conserva identidad, metadata exacto de
+  ruleset/dataset/motor, entradas de progresión y el resultado de distribución
+  compuesto mediante `$ref`.
+- La especificación clasifica las entradas y asignaciones como autoridad del
+  usuario y los totales calculados como caché obligatoriamente revalidada. Fija
+  invariantes de recarga, seis errores estables propuestos, reemplazo atómico
+  por ID y el límite futuro Application/Data.
+- Dos fixtures sintéticos prueban el contrato. El inválido mantiene válido el
+  envoltorio y es rechazado por el `StatDistribution` referenciado. La tabla y
+  migración productivas se incorporaron después de este gate estructural.
+- Modelo `BuildDraft` materializado en Application con nombres JSON explícitos
+  y estructura alineada con los contratos `build-draft` y `stat-distribution`
+  `1.0.0`. `BuildDraftRuntimeContext` recibe explícitamente catálogo,
+  ruleset/version, dataset/version/hash y motor/version; no los deriva de rutas,
+  fechas o ensamblados.
+- Puerto `IBuildDraftRepository` y casos de uso de guardado/carga implementados
+  sin referencias a Data, SQLite o WPF. El guardado calcula la caché completa;
+  la carga exige identidades y dependencias exactas, recalcula progresión y
+  distribución y compara regla, presupuesto, asignaciones, gasto y remanente
+  antes de devolver el resultado recalculado.
+- Siete pruebas sintéticas de Application cubren alta/carga, reemplazo por ID,
+  ausencia, identidad incoherente, dependencia no disponible, caché alterada y
+  round-trip JSON con los nombres del schema. Los seis errores estables
+  `build-draft-*` ya están definidos.
+- Primera persistencia productiva de usuario implementada en Data.
+  `SqliteBuildDraftMigrations.All` crea `build_drafts` mediante la migración
+  hacia adelante `1/create_build_drafts`; cada fila conserva payload JSON y
+  metadata exacto de schema, ruleset, dataset/hash y motor.
+- `SqliteBuildDraftRepository` implementa `IBuildDraftRepository` con reemplazo
+  atómico por ID dentro de `SqliteWriteContentionPolicy`. El agotamiento se
+  traduce a `build-draft-write-conflict`; la carga usa sólo `SELECT` y deja toda
+  revalidación en Application.
+- Seis pruebas Data sintéticas demuestran alta/carga con payload exacto,
+  metadata, reemplazo único, rollback completo, reapertura, ausencia sin
+  mutaciones y traducción tipada de contención. No se añadieron datos ni
+  fórmulas del juego.
 - Alcance anterior retirado y documentación migrada a Season 4 global/inglesa.
 
 ## No iniciado
 
-- Implementación productiva de puntos gastados y distribución de stats; el
-  contrato y sus fixtures estructurales ya existen.
+- Integración WPF de guardado/carga de borradores, composición del repositorio,
+  ubicación externa de la base y extensión del smoke publicado.
 - Schemas restantes (`ruleset`, quests, resets, ítems, skills, escenarios y
   trazas); el validador integral/CI ya cubre el contrato de progresión.
 - Persistencia de builds, resto del motor de cálculo y flujos de UI posteriores
@@ -204,10 +271,10 @@
 - Ninguna decisión inmediata de arquitectura o gobierno. El canal público de
   actualización y firma continúa como decisión posterior de distribución.
 
-## Verificación más reciente — 2026-07-23
+## Verificación más reciente — 2026-07-24
 
-- Schemas: 7/7 contratos y 14/14 fixtures estructuralmente legibles.
-- Validador integral: 7/7 fixtures válidos aceptados, 7/7 inválidos rechazados
+- Schemas: 8/8 contratos y 16/16 fixtures estructuralmente legibles.
+- Validador integral: 8/8 fixtures válidos aceptados, 8/8 inválidos rechazados
   y 8/8 registros canónicos válidos. Ejecuta además 7/7 casos factuales y
   rechaza 3/3 controles semánticos. Sus 6/6 pruebas .NET aprueban también la
   ejecución repetida, los IDs estables, la retroactividad, la elegibilidad y
@@ -215,24 +282,37 @@
 - Solución .NET 10 de diez proyectos: restauración bloqueada y build Release
   aprobados con 0 advertencias y 0 errores; CLI del validador y formato
   verificados.
-- Persistencia SQLite: 12/12 pruebas de integración aprobadas en `win-x64`;
-  junto con 6/6 pruebas del validador, 12/12 del motor y 12/12 de Application,
-  la solución ejecuta 42/42 pruebas correctamente.
+- Persistencia SQLite: 18/18 pruebas de integración aprobadas en `win-x64`;
+  junto con 6/6 pruebas del validador, 22/22 del motor y 24/24 de Application,
+  la solución ejecuta 70/70 pruebas correctamente. Los seis casos nuevos
+  cubren la migración y el repositorio de borradores con payload/metadata,
+  reemplazo, rollback, reapertura, lectura pura y contención tipada.
 - Motor de puntos: 7/7 casos positivos canónicos, 3/3 rechazos semánticos y
   2/2 controles de traza/publicación aprobados. Domain y Calculation Engine no
   incorporan paquetes externos ni referencias a Data, WPF o serialización.
+- Distribución de stats: 2/2 resultados sintéticos y 8/8 controles de error
+  aprobados; incluyen negativos, conjunto exacto de stats, exceso, tres
+  divergencias de origen y overflow. El resultado copia clase, ruleset,
+  regla/version y presupuesto sin recalcular progresión.
 - Application: 7/7 casos positivos y 3/3 rechazos reproducidos por el camino
   archivo → adaptador → caso de uso → motor; 2/2 alteraciones de snapshot
-  rechazadas antes del cálculo. El proyecto no incorpora paquetes externos ni
-  referencia Data o WPF.
+  rechazadas antes del cálculo y 1/1 control confirma los IDs de stats
+  materializados. La distribución añade 2/2 resultados sintéticos, 1/1 rechazo
+  de origen y 1/1 propagación tipada por el camino copia temporal → catálogo →
+  caso de uso → motor. Los borradores añaden 7/7 controles sintéticos para
+  serialización, guardado/reemplazo, carga con recálculo y fallos cerrados por
+  ausencia, identidad, dependencia o caché. El proyecto no incorpora paquetes
+  externos ni referencia Data o WPF.
 - WPF/Application: el build copia 18 JSON canónicos a una ruta estable tanto en
   salida normal como publicada. El flujo de ventana obtiene clase/evolución y
-  Hero Status desde el catálogo/regla, y muestra el total junto con la traza.
-  App referencia Application; Domain, Calculation Engine y Application no
-  incorporan referencias inversas.
+  Hero Status desde el catálogo/regla, muestra el total junto con la traza y
+  conserva ese presupuesto para distribuir sobre controles derivados de
+  `StatIds`. Muestra gasto/remanente y errores tipados; App referencia
+  Application y las capas internas no incorporan referencias inversas.
 - Json Everything fuente: 2 compilaciones independientes con SDK `10.0.301`,
   restore bloqueado de los tres proyectos fuente, hashes esperados para 3/3
-  DLL, 2 × 14/14 fixtures, prueba de formatos y SPDX contrastado: PASS.
+  DLL y SPDX contrastado. El harness actualizado ejecuta 2 × 16/16 fixtures y
+  rechaza formatos inválidos: PASS.
 - Integración del validador: lock con sólo `Humanizer.Core 3.0.10`, tres DLL
   clasificados como referencias directas, aviso MIT presente y ausencia de
   `OSMFEULA.txt`/`.nuspec` publicados en la salida: PASS local y remoto.
@@ -247,7 +327,8 @@
   dos builds locales independientes y el run remoto posterior coinciden.
 - Dependencias: los diez proyectos restauran con lock files. Application no
   añade paquetes y su proyecto de pruebas reutiliza las versiones centrales ya
-  fijadas. El proyecto WPF conserva el grafo Data previamente auditado. La
+  fijadas. Data referencia Application para implementar su puerto sin crear una
+  referencia inversa; WPF conserva ambas dependencias de composición. La
   restauración bloqueada se repitió con acceso a NuGet y fue aprobada; el lock
   del validador resuelve únicamente `Humanizer.Core 3.0.10`, mientras los tres
   DLL Json Everything se compilan desde fuente fijada. La auditoría directa y
@@ -297,10 +378,11 @@
   148.339.336 bytes. Los dos reportes JSON confirman SQLite `3.53.3`, integridad
   `ok`, 1 migración aplicada/1 reconocida y datos fuera de los binarios.
 - Publicación WPF con avisos: PASS local más reciente en `win-x64` con SDK
-  `10.0.301`, SQLite `3.53.3`, 441 archivos y 148.644.801 bytes después de
-  integrar Application. Los diez archivos legales y los 18 JSON del ruleset
-  estuvieron presentes y conservaron sus hashes entre ambas carpetas; el modo
-  headless reprodujo 7/7 casos positivos y 3/3 rechazos en ambas fases.
+  `10.0.301`, SQLite `3.53.3`, 441 archivos y 148.672.301 bytes después de
+  integrar la distribución WPF. Los diez archivos legales y los 18 JSON del
+  ruleset estuvieron presentes y conservaron sus hashes entre ambas carpetas;
+  el modo headless reprodujo 7/7 casos positivos, 3/3 rechazos y una
+  distribución sintética sobre cinco stats con un punto gastado en ambas fases.
 - Publicación WPF en runner limpio: PASS en Microsoft Windows Server 2025,
   imagen `windows-2025-vs2026`, runner `2.335.1` y SDK .NET `10.0.302`. El job
   auditó los cinco proyectos sin paquetes vulnerables en los orígenes
@@ -344,7 +426,7 @@
   hash y los commits declarados por los paquetes. Los 10 fixtures actuales pasan
   con la API evaluada, pero los binarios NuGet publicados fueron retirados. La
   compilación propia MIT integrada demuestra hashes idénticos entre dos rutas
-  fuente, 2 × 14/14 fixtures, formatos, SBOM, locks, auditoría y publicación
+  fuente, 2 × 16/16 fixtures, formatos, SBOM, locks, auditoría y publicación
   inspeccionada. Corvus 4.6.7 se conserva como contingencia sin asumir paridad.
 
 ## Decisión del propietario — 2026-07-18

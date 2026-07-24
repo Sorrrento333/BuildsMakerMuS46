@@ -1,0 +1,35 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "build-draft-synthetic",
+  "ruleset": {
+    "id": "ruleset-synthetic",
+    "version": "1.0.0"
+  },
+  "dataset": {
+    "version": "synthetic-001",
+    "hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "engineVersion": "0.1.0",
+  "progressionInputs": {
+    "characterClassId": "class-synthetic",
+    "evolutionId": "evolution-synthetic",
+    "level": 3,
+    "completedQuestIds": []
+  },
+  "statDistribution": {
+    "schemaVersion": "1.0.0",
+    "rulesetId": "ruleset-synthetic",
+    "characterClassId": "class-synthetic",
+    "progressionRule": {
+      "id": "progression-synthetic",
+      "version": "1.0.0"
+    },
+    "earnedPoints": 10,
+    "allocations": {
+      "stat-alpha": 4,
+      "stat-beta": 3
+    },
+    "spentPoints": 7,
+    "remainingPoints": 3
+  }
+}

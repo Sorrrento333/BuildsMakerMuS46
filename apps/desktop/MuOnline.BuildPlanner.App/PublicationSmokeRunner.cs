@@ -3,8 +3,10 @@ using System.IO;
 using System.Text.Json;
 using Microsoft.Data.Sqlite;
 using MuOnline.BuildPlanner.Application.Progression;
+using MuOnline.BuildPlanner.Application.Stats;
 using MuOnline.BuildPlanner.Data;
 using MuOnline.BuildPlanner.Domain.Progression;
+using MuOnline.BuildPlanner.Domain.Stats;
 
 namespace MuOnline.BuildPlanner.App;
 
@@ -144,6 +146,14 @@ internal static class PublicationSmokeRunner
             RulesetSnapshotPath: PublishedProgressionRuleset.SnapshotRoot,
             ApprovedProgressionCaseCount: progressionVerification.ApprovedCaseCount,
             RejectedProgressionCaseCount: progressionVerification.RejectedCaseCount,
+            SyntheticStatDistributionVerified:
+                progressionVerification.SyntheticDistribution.Verified,
+            SyntheticStatDistributionStatCount:
+                progressionVerification.SyntheticDistribution.StatCount,
+            SyntheticStatDistributionSpentPoints:
+                progressionVerification.SyntheticDistribution.SpentPoints,
+            SyntheticStatDistributionRemainingPoints:
+                progressionVerification.SyntheticDistribution.RemainingPoints,
             AppliedMigrationCount: migrationResult.AppliedCount,
             AlreadyAppliedMigrationCount: migrationResult.AlreadyAppliedCount,
             ErrorType: null,
@@ -190,10 +200,53 @@ internal static class PublicationSmokeRunner
                 $"'{referenceCase.ExpectedErrorCode}'.");
         }
 
+        var syntheticDistribution = VerifySyntheticStatDistribution(
+            catalog,
+            useCase,
+            approvedCases);
+
         return new ProgressionVerificationResult(
             catalog.RulesetId,
             approvedCases.Length,
-            rejectedCases.Length);
+            rejectedCases.Length,
+            syntheticDistribution);
+    }
+
+    private static SyntheticStatDistributionVerification VerifySyntheticStatDistribution(
+        ProgressionRulesetCatalog catalog,
+        CalculateProgressionPointBudgetUseCase progressionUseCase,
+        IReadOnlyCollection<PublishedProgressionReferenceCase> approvedCases)
+    {
+        var sourceCase = approvedCases.First(item => item.ExpectedEarnedPoints > 0);
+        var budget = progressionUseCase.Execute(sourceCase.ToRequest());
+        var characterClass = catalog.Classes.Single(
+            item => item.Id == budget.CharacterClassId);
+        var statIds = characterClass.StatIds
+            .Order(StringComparer.Ordinal)
+            .ToArray();
+        var allocations = statIds.ToDictionary(
+            statId => statId,
+            _ => 0L,
+            StringComparer.Ordinal);
+        allocations[statIds[0]] = 1;
+
+        var result = new CalculateStatDistributionUseCase(catalog).Execute(
+            budget,
+            allocations);
+        if (result.SpentPoints != 1 ||
+            result.RemainingPoints != budget.EarnedPoints - 1 ||
+            !result.Allocations.Keys.ToHashSet(StringComparer.Ordinal)
+                .SetEquals(characterClass.StatIds))
+        {
+            throw new InvalidOperationException(
+                "The published snapshot did not reproduce the synthetic stat distribution.");
+        }
+
+        return new SyntheticStatDistributionVerification(
+            Verified: true,
+            StatCount: statIds.Length,
+            SpentPoints: result.SpentPoints,
+            RemainingPoints: result.RemainingPoints);
     }
 
     private static PublishedProgressionReferenceCase[] LoadReferenceCases(string directory)
@@ -317,7 +370,14 @@ internal static class PublicationSmokeRunner
     private sealed record ProgressionVerificationResult(
         string RulesetId,
         int ApprovedCaseCount,
-        int RejectedCaseCount);
+        int RejectedCaseCount,
+        SyntheticStatDistributionVerification SyntheticDistribution);
+
+    private sealed record SyntheticStatDistributionVerification(
+        bool Verified,
+        int StatCount,
+        long SpentPoints,
+        long RemainingPoints);
 
     private sealed record PublishedProgressionReferenceCase(
         string Id,

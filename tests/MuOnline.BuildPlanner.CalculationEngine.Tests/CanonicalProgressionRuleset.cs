@@ -60,6 +60,10 @@ internal sealed record CanonicalProgressionRuleset(
         new(
             RequiredString(element, "id"),
             RequiredString(element, "rulesetId"),
+            element.GetProperty("stats")
+                .EnumerateObject()
+                .Select(stat => stat.Name)
+                .ToHashSet(StringComparer.Ordinal),
             element.GetProperty("evolutions")
                 .EnumerateArray()
                 .Select(evolution => RequiredString(evolution, "id"))

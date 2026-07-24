@@ -7,4 +7,7 @@
     <PackageReference Include="Microsoft.Data.Sqlite" />
     <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../application/MuOnline.BuildPlanner.Application/MuOnline.BuildPlanner.Application.csproj" />
+  </ItemGroup>
 </Project>

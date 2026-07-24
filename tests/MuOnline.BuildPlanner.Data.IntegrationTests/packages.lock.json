@@ -177,12 +177,29 @@
           "xunit.v3.runner.common": "[3.2.2]"
         }
       },
+      "muonline.buildplanner.application": {
+        "type": "Project",
+        "dependencies": {
+          "MuOnline.BuildPlanner.CalculationEngine": "[1.0.0, )",
+          "MuOnline.BuildPlanner.Domain": "[1.0.0, )"
+        }
+      },
+      "muonline.buildplanner.calculationengine": {
+        "type": "Project",
+        "dependencies": {
+          "MuOnline.BuildPlanner.Domain": "[1.0.0, )"
+        }
+      },
       "muonline.buildplanner.data": {
         "type": "Project",
         "dependencies": {
           "Microsoft.Data.Sqlite": "[10.0.10, )",
+          "MuOnline.BuildPlanner.Application": "[1.0.0, )",
           "SQLitePCLRaw.bundle_e_sqlite3": "[2.1.12, )"
         }
+      },
+      "muonline.buildplanner.domain": {
+        "type": "Project"
       },
       "Microsoft.Data.Sqlite": {
         "type": "CentralTransitive",

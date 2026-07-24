@@ -11,5 +11,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="../../packages/data-access/MuOnline.BuildPlanner.Data/MuOnline.BuildPlanner.Data.csproj" />
+    <ProjectReference Include="../../packages/application/MuOnline.BuildPlanner.Application/MuOnline.BuildPlanner.Application.csproj" />
   </ItemGroup>
 </Project>

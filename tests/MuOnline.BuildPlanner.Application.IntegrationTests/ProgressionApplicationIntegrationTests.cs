@@ -40,6 +40,7 @@ public sealed class ProgressionApplicationIntegrationTests
         var result = useCase.Execute(ToRequest(referenceCase));
 
         Assert.Equal(referenceCase.ExpectedEarnedPoints, result.EarnedPoints);
+        Assert.Equal(referenceCase.ClassId, result.CharacterClassId);
         Assert.Equal(referenceCase.ProgressionRuleId, result.ProgressionRuleId);
         Assert.Equal(
             referenceCase.ExpectedEarnedPoints,
@@ -57,6 +58,32 @@ public sealed class ProgressionApplicationIntegrationTests
             () => useCase.Execute(ToRequest(referenceCase)));
 
         Assert.Equal(referenceCase.ExpectedErrorCode, exception.Code);
+    }
+
+    [Fact]
+    public void ReaderMaterializesStatIdsWithoutDuplicatingCanonicalValues()
+    {
+        var catalog = new JsonProgressionRulesetSnapshotReader().Read(
+            CanonicalSnapshotRoot);
+        var characterClassDirectory = Path.Combine(
+            CanonicalSnapshotRoot,
+            "character-classes");
+
+        foreach (var path in Directory.GetFiles(characterClassDirectory, "*.json"))
+        {
+            using var document = JsonDocument.Parse(File.ReadAllText(path));
+            var element = document.RootElement;
+            var classId = RequiredString(element, "id");
+            var expectedStatIds = element.GetProperty("stats")
+                .EnumerateObject()
+                .Select(stat => stat.Name)
+                .ToHashSet(StringComparer.Ordinal);
+            var characterClass = Assert.Single(
+                catalog.Classes,
+                item => item.Id == classId);
+
+            Assert.True(characterClass.StatIds.SetEquals(expectedStatIds));
+        }
     }
 
     [Fact]

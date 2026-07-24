@@ -21,6 +21,7 @@ public sealed record ProgressionPointContribution(
 
 public sealed record ProgressionPointBudgetResult(
     string RulesetId,
+    string CharacterClassId,
     string ProgressionRuleId,
     string ProgressionRuleVersion,
     long EarnedPoints,

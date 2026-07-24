@@ -10,13 +10,14 @@ daño ni defensa.
 El contrato es independiente de una clase concreta. Los fixtures son
 exclusivamente sintéticos y no agregan datos ni fórmulas de MU Online.
 
-## Entradas de la futura operación
+## Entradas de la operación
 
-- `ProgressionPointBudgetResult`, sin recalcular ni alterar `EarnedPoints`.
+- `ProgressionPointBudgetResult`, sin recalcular ni alterar `EarnedPoints`; el
+  resultado conserva también `CharacterClassId` para validar su origen.
 - La definición canónica de la clase del mismo `rulesetId`.
 - Un mapa de asignaciones solicitadas, indexado por ID de stat.
 
-La operación deberá rechazar un presupuesto cuya clase, ruleset o referencia de
+La operación rechaza un presupuesto cuya clase, ruleset o referencia de
 regla no coincidan con el catálogo cargado. Esta comprobación no puede
 expresarse sólo con JSON Schema y queda como gate semántico obligatorio.
 
@@ -52,7 +53,7 @@ actual. La suma y la resta deberán ejecutarse con control de overflow.
 JSON Schema impone forma, IDs, versiones y rangos escalares. Las igualdades,
 sumas y referencias al catálogo requieren la futura validación de dominio.
 
-## Errores estables previstos
+## Errores estables
 
 | Código | Condición |
 |---|---|
@@ -66,7 +67,7 @@ sumas y referencias al catálogo requieren la futura validación de dominio.
 `spentPoints` y `remainingPoints` son salidas calculadas, no valores confiados
 al llamador de la futura operación.
 
-## Casos sintéticos para la implementación posterior
+## Casos sintéticos de la implementación
 
 | Caso | Presupuesto | Asignaciones | Resultado |
 |---|---:|---|---|
@@ -78,5 +79,42 @@ al llamador de la futura operación.
 | Stat omitido | 10 | falta `stat-beta` | `stat-allocation-missing` |
 
 Los ejemplos JSON válido e inválido cubren el gate estructural. La tabla fija
-la cobertura semántica mínima, pero no se convierte en casos factuales del
-ruleset ni autoriza todavía código productivo.
+la cobertura semántica mínima de `StatDistributionCalculator`; la suite añade
+controles separados para las tres variantes de `budget-source-mismatch` y para
+`allocation-overflow`. Todos estos casos son sintéticos, no se convierten en
+casos factuales del ruleset y no requieren investigación del juego.
+
+## Implementación productiva
+
+Domain expone `StatDistributionRequest`, `StatDistributionResult`, los seis
+códigos estables y `StatDistributionException`. Calculation Engine implementa
+la operación estática y pura: valida el origen del presupuesto, exige el
+conjunto exacto de stats de `CharacterProgressionDefinition`, suma con
+`checked`, deriva gasto y remanente y devuelve las asignaciones normalizadas en
+orden ordinal.
+
+`CharacterProgressionDefinition` conserva únicamente los IDs de las claves de
+`stats`; no materializa ni usa los valores base para gastar presupuesto.
+Application lee esos IDs desde el snapshot y expone
+`CalculateStatDistributionUseCase`. El llamador entrega sólo el
+`ProgressionPointBudgetResult` existente y las asignaciones: el caso de uso
+resuelve por `CharacterClassId` y `RulesetId` una única definición del catálogo,
+construye `StatDistributionRequest` y delega sin mutar ni recalcular el
+presupuesto. Si no existe exactamente una coincidencia, falla con
+`budget-source-mismatch`; los demás códigos tipados se propagan desde el motor.
+
+## Integración WPF y gate de publicación
+
+La pantalla obtiene los IDs de asignación desde la misma definición de clase
+que materializa Application y conserva el presupuesto ya calculado. No
+recalcula progresión al distribuir ni codifica nombres, valores base o límites
+de stats. Un cambio en cualquier entrada de progresión invalida el presupuesto
+para impedir que se reutilice con una identidad distinta.
+
+La salida visible presenta `SpentPoints`, `RemainingPoints` y las asignaciones.
+Cada `StatDistributionException` mantiene su código estable entre paréntesis y
+añade una explicación en español. El smoke de publicación selecciona desde el
+snapshot un caso de progresión con presupuesto positivo, genera el mapa completo
+desde `StatIds`, asigna sintéticamente un punto y exige gasto uno, remanente
+coherente y conjunto exacto de stats en las fases inicial y de reemplazo. No se
+añade un caso factual ni se persiste la distribución.

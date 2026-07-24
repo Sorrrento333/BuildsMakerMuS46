@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.mu46.local/v1/build-draft.schema.json",
+  "title": "BuildDraft",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "id",
+    "ruleset",
+    "dataset",
+    "engineVersion",
+    "progressionInputs",
+    "statDistribution"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "1.0.0" },
+    "id": { "$ref": "#/$defs/id" },
+    "ruleset": { "$ref": "#/$defs/versionedRef" },
+    "dataset": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["version", "hash"],
+      "properties": {
+        "version": { "type": "string", "minLength": 1 },
+        "hash": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        }
+      }
+    },
+    "engineVersion": { "$ref": "#/$defs/semver" },
+    "progressionInputs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "characterClassId",
+        "evolutionId",
+        "level",
+        "completedQuestIds"
+      ],
+      "properties": {
+        "characterClassId": { "$ref": "#/$defs/id" },
+        "evolutionId": { "$ref": "#/$defs/id" },
+        "level": { "type": "integer", "minimum": 1 },
+        "completedQuestIds": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/id" },
+          "uniqueItems": true
+        }
+      }
+    },
+    "statDistribution": {
+      "$ref": "https://schemas.mu46.local/v1/stat-distribution.schema.json"
+    }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+    },
+    "semver": {
+      "type": "string",
+      "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)$"
+    },
+    "versionedRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "version"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "version": { "$ref": "#/$defs/semver" }
+      }
+    }
+  }
+}

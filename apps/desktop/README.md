@@ -4,7 +4,10 @@ Primera superficie aprobada por ADR-0004. El proyecto es una base técnica WPF
 para .NET 10. Su primer flujo funcional calcula el presupuesto de puntos por
 nivel y Hero Status a través de Application: clase, evolución, nivel y quest se
 seleccionan desde el snapshot canónico publicado; la UI no contiene valores ni
-fórmulas duplicados.
+fórmulas duplicados. La pantalla conserva ese presupuesto y permite distribuirlo
+mediante `CalculateStatDistributionUseCase`. Los inputs se generan desde los IDs
+de stats de la clase materializada; el resultado muestra puntos gastados,
+restantes y cualquier código de error estable con una explicación visible.
 
 ## Publicación inicial
 
@@ -35,6 +38,9 @@ dotnet publish apps/desktop/MuOnline.BuildPlanner.App/MuOnline.BuildPlanner.App.
   `rulesets/mu-s4-global-reference/v1` dentro de ambas publicaciones;
 - carga del snapshot por el adaptador productivo y reproducción de sus siete
   casos positivos y tres rechazos canónicos en ambas fases.
+- distribución sintética de un punto sobre los stats materializados desde el
+  snapshot, con gasto, remanente y conjunto de asignaciones verificados en ambas
+  fases, sin agregar un fixture factual.
 
 La publicación incorpora `LICENSE.md`, `NOTICE`, `THIRD-PARTY-NOTICES.md`, los
 textos de Microsoft.Data.Sqlite y SQLitePCLRaw, y las licencias/avisos de los
@@ -71,3 +77,9 @@ Verificación local del 2026-07-23 después de incorporar el flujo de progresió
 PASS en `win-x64`, SQLite `3.53.3`, 441 archivos y 148.644.801 bytes. El
 artefacto incluyó 18 JSON del snapshot y reprodujo 7/7 casos positivos y 3/3
 rechazos antes y después del reemplazo simulado.
+
+Verificación local del 2026-07-24 después de incorporar la distribución WPF:
+PASS en `win-x64`, SQLite `3.53.3`, 441 archivos y 148.672.301 bytes. Ambas
+fases conservaron los 18 JSON, reprodujeron 7/7 casos positivos y 3/3 rechazos
+de progresión, y verificaron una distribución sintética sobre los cinco stats
+materializados de la clase elegida por el smoke, con un punto gastado.

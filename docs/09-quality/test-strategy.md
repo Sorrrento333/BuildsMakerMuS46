@@ -52,11 +52,44 @@ Application → motor. Debe localizar las cuatro carpetas requeridas, reproducir
 7/7 casos positivos y 3/3 rechazos desde los propios JSON, y repetir el gate
 desde una copia de reemplazo. También compara SHA-256 de todos los archivos del
 ruleset entre ambas carpetas para detectar pérdida o mutación del contenido.
+Sobre un presupuesto positivo ya reproducido, genera todas las asignaciones
+desde los `StatIds` materializados, aplica una asignación sintética de un punto
+y verifica gasto, remanente y conjunto exacto en ambas fases. Este control no
+publica un fixture factual de distribución.
 
-El contrato de distribución de stats comienza con fixtures estructurales
-sintéticos. La siguiente suite de dominio deberá cubrir como mínimo distribución
-parcial y exacta, valores negativos, stat no disponible, stat omitido y gasto
-superior al presupuesto. La disponibilidad se resolverá contra las claves de
-`stats` de la clase cargada; no se duplicará una lista factual de clases o stats
-en las pruebas. Los casos sintéticos no se enlazan desde reglas publicadas ni
+El contrato de distribución de stats conserva fixtures estructurales
+sintéticos. La suite productiva cubre distribución parcial y exacta, valores
+negativos, stat no disponible, stat omitido, gasto superior al presupuesto,
+overflow y las divergencias de ruleset, clase y regla del presupuesto. La
+disponibilidad se resuelve contra los IDs de `stats` de la definición cargada;
+no se duplica una lista factual de clases o stats en esas pruebas. Una prueba de
+integración adicional compara la materialización de esos IDs con las claves del
+propio snapshot. Los casos sintéticos no se enlazan desde reglas publicadas ni
 requieren un registro de investigación.
+
+La suite de Application añade el camino copia temporal del snapshot → catálogo
+→ `CalculateStatDistributionUseCase` → motor. Dos casos sintéticos comprueban
+distribución parcial y exacta sin duplicar nombres de stats, y un tercero altera
+el ruleset del presupuesto para exigir `budget-source-mismatch`. Un cuarto
+provoca `allocation-negative` en el motor y exige que Application conserve el
+mismo código tipado. El caso de uso recibe el presupuesto existente y las
+asignaciones; las pruebas no recalculan progresión ni aportan valores factuales
+nuevos.
+
+El contrato de borrador conserva un gate estructural separado de la
+persistencia. Su fixture válido debe resolver el `$ref` real hacia
+`stat-distribution.schema.json`; el inválido mantiene válido el envoltorio y
+falla sólo por la distribución referenciada. Así el rechazo demuestra la
+composición entre contratos. Los dos son sintéticos.
+
+La suite de Application usa un catálogo y un repositorio en memoria sintéticos.
+Debe cubrir alta/carga con recálculo, reemplazo por ID, ausencia, identidad
+incoherente, metadata exacto no disponible, caché alterada y round-trip JSON con
+los nombres de propiedad del schema. No usa clases, fórmulas ni valores de MU
+Online.
+
+La suite Data aplica la migración productiva sobre archivos SQLite temporales.
+Cubre payload y metadata exactos, reemplazo atómico por ID, rollback completo
+ante un trigger sintético, reapertura, ausencia sin mutaciones y traducción del
+agotamiento de contención a `build-draft-write-conflict`. Ningún caso añade
+datos o fórmulas del juego.
