@@ -86,7 +86,7 @@
   NuGet publicados.
 - Spike reproducible de compilación propia de Json Everything desde los commits
   fuente MIT fijados: dos rutas independientes producen hashes idénticos,
-  generan SBOM/provenance/locks, pasan dos veces 10/10 fixtures y rechazan una
+  generan SBOM/provenance/locks, pasan dos veces 14/14 fixtures y rechazan una
   prueba aislada de formatos inválidos, sin cambiar todavía el grafo normal.
 - Evaluación reproducible de Json Everything para el validador: registra el
   `OSMFEULA.txt` idéntico de los tres paquetes, su hash, commits fuente, alcance
@@ -292,6 +292,12 @@
 
 ### Fixed
 
+- `global.json` fija exactamente el SDK `10.0.301` con `rollForward: disable` y
+  CI declara la versión como cadena. Así un SDK `10.0.302` preinstalado en el
+  runner no reemplaza al SDK revisado durante el build reproducible.
+- El harness de compilación fuente valida ahora los 14 fixtures de los siete
+  contratos actuales en cada ejecución, en lugar de conservar el inventario
+  anterior de diez fixtures.
 - El pipeline reproducible de Json Everything fuerza checkouts LF y elimina
   símbolos/PDB de los DLL auditados. Así los hashes ya no dependen de
   `core.autocrlf` ni de checksums de fuentes propios del sistema operativo.

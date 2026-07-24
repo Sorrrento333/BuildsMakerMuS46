@@ -17,6 +17,7 @@ $artifactRoot = Join-Path $RepositoryRoot "artifacts/json-everything-source-buil
 $sourceRoot = Join-Path $artifactRoot "source"
 $repeatSourceRoot = Join-Path $artifactRoot "source-repeat"
 $firstHashes = @{}
+$expectedFixtureCount = 14
 
 function Invoke-Checked {
     param([string]$FilePath, [string[]]$Arguments, [string]$WorkingDirectory)
@@ -272,7 +273,7 @@ $provenance = [ordered]@{
     assemblies = $firstHashes
     independentSourceDirectories = 2
     contractRuns = 2
-    fixturesPerRun = 10
+    fixturesPerRun = $expectedFixtureCount
     formatProbe = "PASS"
 }
 $provenance | ConvertTo-Json -Depth 6 | Set-Content -LiteralPath (Join-Path $artifactRoot "provenance.json") -Encoding utf8
@@ -283,5 +284,5 @@ if (Get-ChildItem -LiteralPath $outputRoot -Recurse -File | Where-Object { $_.Na
 
 Write-Output "PASS: reproducible Json Everything source build."
 Write-Output "PASS: 3/3 assembly hashes matched across two independent source paths."
-Write-Output "PASS: 2 x 10/10 fixtures and explicit format probe."
+Write-Output "PASS: 2 x $expectedFixtureCount/$expectedFixtureCount fixtures and explicit format probe."
 Write-Output "Artifacts: $artifactRoot"

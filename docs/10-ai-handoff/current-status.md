@@ -232,7 +232,7 @@
   incorporan referencias inversas.
 - Json Everything fuente: 2 compilaciones independientes con SDK `10.0.301`,
   restore bloqueado de los tres proyectos fuente, hashes esperados para 3/3
-  DLL, 2 × 10/10 fixtures, prueba de formatos y SPDX contrastado: PASS.
+  DLL, 2 × 14/14 fixtures, prueba de formatos y SPDX contrastado: PASS.
 - Integración del validador: lock con sólo `Humanizer.Core 3.0.10`, tres DLL
   clasificados como referencias directas, aviso MIT presente y ausencia de
   `OSMFEULA.txt`/`.nuspec` publicados en la salida: PASS local y remoto.
@@ -344,7 +344,7 @@
   hash y los commits declarados por los paquetes. Los 10 fixtures actuales pasan
   con la API evaluada, pero los binarios NuGet publicados fueron retirados. La
   compilación propia MIT integrada demuestra hashes idénticos entre dos rutas
-  fuente, 2 × 10/10 fixtures, formatos, SBOM, locks, auditoría y publicación
+  fuente, 2 × 14/14 fixtures, formatos, SBOM, locks, auditoría y publicación
   inspeccionada. Corvus 4.6.7 se conserva como contingencia sin asumir paridad.
 
 ## Decisión del propietario — 2026-07-18

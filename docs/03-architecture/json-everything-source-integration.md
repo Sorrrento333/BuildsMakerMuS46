@@ -52,9 +52,16 @@ del validador, los tres hashes, publica la herramienta y exige el aviso MIT,
 las referencias directas y la ausencia de `OSMFEULA.txt` y `.nuspec` de los
 paquetes publicados.
 
-CI fija el SDK `10.0.301`, ejecuta primero el pipeline fuente y luego restore
-bloqueado, build, 14 pruebas y la inspección de publicación. El job WPF no
-adquiere esta dependencia y mantiene su verificación separada.
+CI instala el SDK `10.0.301` y `global.json` lo selecciona exactamente con
+`rollForward: disable`; no basta con instalarlo mientras un `latestFeature`
+pueda preferir otro SDK ya presente en el runner. Después ejecuta primero el
+pipeline fuente y luego restore bloqueado, build, pruebas e inspección de
+publicación. El job WPF no adquiere esta dependencia y mantiene su verificación
+separada.
+
+El harness enlazado al validador ejecuta los siete contratos actuales: 14/14
+fixtures en cada una de dos rutas fuente independientes, más la prueba explícita
+de formatos.
 
 ## Verificación local
 

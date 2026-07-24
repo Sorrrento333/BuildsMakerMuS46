@@ -8,16 +8,20 @@ if (args.Length != 1)
 }
 
 var repositoryRoot = Path.GetFullPath(args[0]);
+const int expectedFixtureCount = 14;
 
 for (var run = 1; run <= 2; run++)
 {
     var results = SchemaContractValidator.ValidateRepository(repositoryRoot);
-    if (results.Count != 10 || results.Any(result => !result.MatchesExpectation))
+    if (results.Count != expectedFixtureCount ||
+        results.Any(result => !result.MatchesExpectation))
     {
         throw new InvalidOperationException($"Contract run {run} failed.");
     }
 
-    Console.WriteLine($"PASS: source-built contract run {run}: 10/10 fixtures.");
+    Console.WriteLine(
+        $"PASS: source-built contract run {run}: " +
+        $"{expectedFixtureCount}/{expectedFixtureCount} fixtures.");
 }
 
 var evidenceSchemaPath = Path.Combine(
