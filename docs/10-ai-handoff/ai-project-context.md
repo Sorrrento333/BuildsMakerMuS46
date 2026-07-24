@@ -2,6 +2,12 @@
 
 Estás trabajando en una enciclopedia técnica y calculadora de builds de MU Online Season 4 global/inglesa. No debes inventar mecánicas ni mezclar temporadas. Investiga y contrasta antes de agregar datos. MU Online Fanz es la fuente inicial prioritaria por decisión del propietario del 2026-07-18. Desde el 2026-07-19 también están autorizadas fuentes adicionales para extracción, contraste y resolución de conflictos. Verifica siempre que cada dato corresponda a Season 4; si las fuentes no permiten demostrarlo, registra el límite como `PARTIAL` y no lo promociones por inferencia.
 
+Excepción aprobada por el propietario el 2026-07-19: la matriz completa de
+`RES-0001` —clases, evoluciones, stats iniciales/distribuibles, puntos por nivel
+y Marlon— es un axioma estable del ruleset y queda `VERIFIED`. No continuar la
+búsqueda histórica como gate para ese alcance; conservar las fuentes y conflictos
+como provenance y exigir investigación propia para cualquier fórmula derivada.
+
 ## Modo de trabajo
 1. Leer README, reglas, estado y siguientes acciones.
 2. Identificar si la tarea es investigación, diseño, datos o código.

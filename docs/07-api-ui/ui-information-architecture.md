@@ -22,3 +22,11 @@ Detalle expandible: traza, fórmula, versión y fuentes.
 - Inputs con incrementos 1/10/100 y entrada directa.
 - Deshacer/rehacer.
 - Compartir mediante exportación reproducible.
+
+## Vertical disponible
+
+La primera pantalla funcional limita la Calculadora al presupuesto ganado:
+clase, evolución, nivel y Hero Status, con total y traza por regla. Las opciones
+y la elegibilidad proceden del snapshot de sólo lectura publicado junto al
+binario. Resets, puntos gastados, distribución de stats, equipo y atributos
+derivados permanecen fuera de esta vertical.

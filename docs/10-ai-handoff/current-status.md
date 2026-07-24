@@ -17,10 +17,11 @@
 - Spikes equivalentes de TypeScript/Node.js 24 y C#/.NET 10 para cálculo
   sintético trazable, SQLite y ejecución offline.
 - C#/.NET 10 seleccionado para el núcleo y la aplicación inicial (ADR-0002).
-- Cinco schemas JSON 2020-12 `1.0.0`: evidencia, fórmula, clase de personaje,
-  perfil de servidor y build, con diez fixtures sintéticos.
+- Siete schemas JSON 2020-12 `1.0.0`: evidencia, fórmula, clase de personaje,
+  progresión, distribución de stats, perfil de servidor y build, con catorce
+  fixtures sintéticos.
 - Solución mínima .NET 10, validador integral con `JsonSchema.Net 9.2.2`, dos
-  pruebas de contrato y CI básico para los cinco schemas y sus diez fixtures.
+  pruebas de contrato y CI básico, ampliado a siete schemas y catorce fixtures.
 - Evaluación de Json Everything completada. Las copias de `OSMFEULA.txt` de
   `JsonSchema.Net 9.2.2`, `JsonPointer.Net 7.0.1` y `Json.More.Net 3.0.1` son
   idénticas y quedaron preservadas con provenance y hash. Los binarios NuGet se
@@ -88,10 +89,10 @@
 - Workflow CI ampliado con un job Windows dedicado a auditoría de dependencias y
   smoke publicado. La primera ejecución remota quedó aprobada en GitHub Actions
   (`run 29666817493`, 2026-07-19 UTC): ambos jobs terminaron correctamente.
-- `RES-0001` abierto para clases, evoluciones, stats, puntos por nivel y Marlon.
-- Dieciocho evidencias registradas en `RES-0001`. Los seis claims están
-  `PARTIAL`: clases/evoluciones, stats iniciales/distribuibles, puntos por nivel
-  y Marlon tienen matrices candidatas, pero ningún dato fue publicado al producto.
+- `RES-0001` cerrado para clases, evoluciones, stats, puntos por nivel y Marlon.
+- Veintiuna evidencias registradas en `RES-0001`. Los seis claims están
+  `VERIFIED` por axioma explícito del propietario y quedan habilitados para
+  contratos y reglas productivas. Aún no se publicaron datos al producto.
 - MU Online Fanz continúa como fuente inicial prioritaria. Por autorización del
   propietario del 2026-07-19 pueden usarse otras fuentes para extracción,
   contraste y resolución de conflictos; cada hallazgo conserva versión,
@@ -104,51 +105,131 @@
   por el propietario: Webzen y fuentes adicionales pueden aportar datos, sin
   eximir ninguna celda de demostrar aplicabilidad a Season 4.
 - Auditoría histórica completada para las páginas de segunda y tercera clase de
-  MU Online Fanz. Las primeras capturas disponibles son de marzo de 2023, ya
-  mezclan clases posteriores y abren `DSP-0001` por `Soul Wizard` frente a
-  `Soul Master`; EVD-0011/EVD-0012 permanecen `PARTIAL`.
+  MU Online Fanz. Las primeras capturas disponibles son de marzo de 2023 y
+  mezclan clases posteriores. `DSP-0001` queda resuelto por decisión del
+  propietario a favor de Soul Master para Season 4.
 - El propietario aclaró que la cadena del mago en Season 4 termina en Dark
   Wizard → Soul Master → Grand Master; Grand Master se incorporó en esa
   temporada y se obtiene tras la serie de quests de tercera clase culminada a
   nivel 400. Soul Wizard es posterior. EVD-0012/EVD-0013 confirman la estructura
-  actual, pero no la frontera histórica; la clasificación sigue `PARTIAL`.
+  actual, pero no la frontera histórica de las páginas individuales.
 - Stats candidatos confirmados en orden `STR/AGI/VIT/ENE[/CMD]`: DW
   `18/18/15/30`, DK `28/20/25/10`, ELF `22/25/20/15`, SUM `21/21/18/23`, MG
   `26/26/26/26` y DL `26/20/20/15/25`. `VIT` normaliza `Stamina`; sólo DL posee
   `CMD`.
 - DW/DK/ELF/SUM ganan 5 puntos por nivel y 6 tras completar Hero Status/Marlon
   desde nivel 220, con extra retroactivo por niveles posteriores a 220. MG/DL
-  ganan 7 desde el inicio y no realizan Marlon. Son reglas candidatas `PARTIAL`.
+  ganan 7 desde el inicio y no realizan Marlon. EVD-0021 las fija como reglas
+  `VERIFIED` del ruleset.
 - `DSP-0002` quedó resuelto por decisión explícita del propietario: el proyecto
   adopta Energy 26 para MG. La guía actual de Webzen que publica 16 permanece
   trazada como divergencia documental de aplicabilidad histórica no demostrada.
+- `EVD-0019` demuestra que la matriz completa ya aparece en transcripciones
+  atribuidas a actualizaciones Season 1/3 de 2005/2007; `EVD-0020` añade seis
+  guías fechadas en 2010 y su auditoría CDX. Ninguna línea conserva un original
+  de Webzen ni un snapshot contemporáneo: las primeras capturas de GuiasMU son
+  de septiembre de 2020. EVD-0021 retira esa búsqueda como gate y conserva el
+  resultado sólo como provenance.
+- `EVD-0021` registra la decisión del propietario de tratar la matriz completa
+  como invariante desde los inicios del juego. `RES-0001` queda cerrado con 6/6
+  claims `VERIFIED`, ambos conflictos resueltos y permiso para implementar.
+- Contrato `progression-rule.schema.json` `1.0.0` incorporado con puntos por
+  nivel, primer nivel premiado y bonus opcional de quest con elegibilidad y
+  retroactividad explícitas; sus fixtures sintéticos válido/inválido pasan el
+  validador integral.
+- IDs definitivos fijados para las seis clases, dieciséis evoluciones, dos reglas
+  de progresión y la referencia a Hero Status. Los ocho registros canónicos
+  viven en `packages/rulesets/mu-s4-global-reference/v1`, usan
+  `confidence: VERIFIED` y trazan EVD-0021, evidencias de contraste y conflictos
+  aplicables por campo.
+- El validador integral y su CLI comprueban los seis registros de clase contra
+  `character-class.schema.json` y las dos reglas contra
+  `progression-rule.schema.json`. Una prueba de contrato fija además el conjunto
+  de ocho IDs para detectar renombres accidentales.
+- Siete casos de referencia factuales y versionados cubren clase estándar en
+  niveles 1/220 sin Hero Status, 220/221/230 con Hero Status, y MG/DL en nivel
+  220. El validador reproduce 0/1095/1095/1101/1155/1533 puntos y tres controles
+  negativos prueban segunda clase y exclusión de Magic Gladiator/Dark Lord.
+- Las dos reglas están `PUBLISHED`. La regla estándar enlaza sus cinco casos y
+  la regla de MG/DL enlaza sus dos casos; el validador exige resolución dentro
+  del mismo ruleset y regla, cobertura completa y exclusión de los tres
+  controles negativos.
+- Primera vertical productiva de Domain/Calculation Engine implementada. La
+  operación pura recibe clase, evolución, nivel y quests; resuelve exactamente
+  una regla `PUBLISHED`, valida elegibilidad y devuelve el total con una traza
+  separada de puntos por nivel y Hero Status.
+- Doce pruebas del motor materializan los registros JSON canónicos y reproducen
+  7/7 casos positivos y 3/3 rechazos con códigos estables. Fijan además la
+  descomposición 1145+10 del caso estándar de nivel 230 y prueban que una regla
+  `REVIEWED` no puede ejecutarse.
+- Capa Application y adaptador productivo de progresión implementados. El
+  lector materializa exclusivamente clases y reglas desde el snapshot JSON,
+  exige un único ruleset, IDs/referencias coherentes y reglas `PUBLISHED`, y
+  entrega el catálogo al primer caso de uso sin depender de WPF ni SQLite.
+- Doce pruebas de integración de Application reproducen desde archivos los 7/7
+  casos positivos y 3/3 rechazos canónicos. Dos copias temporales alteradas
+  demuestran fallo cerrado ante una regla `REVIEWED` y una referencia de regla
+  inexistente, sin duplicar valores del juego en código.
+- La shell WPF referencia Application de forma unidireccional y empaqueta el
+  snapshot completo en `rulesets/mu-s4-global-reference/v1`. La ejecución
+  resuelve esa ruta desde los binarios publicados, no desde el repositorio.
+- Primer flujo funcional disponible: clase y evolución materializadas con sus
+  nombres canónicos, nivel y Hero Status como entradas; total, regla/version y
+  aportes como salida trazable. La elegibilidad y el ID de quest proceden de la
+  regla publicada, sin constantes factuales duplicadas en XAML/C#.
+- El smoke WPF publicado carga el snapshot con Application y reproduce 7/7
+  casos positivos y 3/3 rechazos en las fases inicial/reemplazo. También exige
+  las cuatro carpetas de contenido y conserva SHA-256 idéntico para sus 18 JSON.
+- Contrato estructural de distribución de stats `1.0.0` definido antes del
+  código productivo. Registra presupuesto ganado, regla de origen, asignaciones,
+  puntos gastados y restantes con contadores no negativos de 64 bits.
+- Las invariantes semánticas fijan asignaciones exactamente para los stats de
+  la clase canónica, sumas consistentes y gasto dentro del presupuesto.
+  `command` sólo está disponible si la clase lo declara. Se documentaron seis
+  casos sintéticos y códigos estables para negativos, stats ajenos/omitidos,
+  exceso, overflow y origen de presupuesto incoherente.
 - Alcance anterior retirado y documentación migrada a Season 4 global/inglesa.
 
 ## No iniciado
 
-- Núcleo de dominio y aplicación productiva; los componentes actuales son el
-  validador de schemas, Data y una shell WPF técnica sin flujos de producto.
-- Promoción a `VERIFIED` e implementación productiva de stats, puntos por nivel
-  y Marlon; la investigación candidata está registrada pero sigue bloqueada.
-- Schemas restantes y validador JSON Schema integral/CI.
-- Dataset, motor de cálculo y UI funcional.
+- Implementación productiva de puntos gastados y distribución de stats; el
+  contrato y sus fixtures estructurales ya existen.
+- Schemas restantes (`ruleset`, quests, resets, ítems, skills, escenarios y
+  trazas); el validador integral/CI ya cubre el contrato de progresión.
+- Persistencia de builds, resto del motor de cálculo y flujos de UI posteriores
+  al presupuesto ganado.
 
 ## Decisiones abiertas
 
 - Ninguna decisión inmediata de arquitectura o gobierno. El canal público de
   actualización y firma continúa como decisión posterior de distribución.
 
-## Verificación más reciente — 2026-07-19
+## Verificación más reciente — 2026-07-23
 
-- Schemas: 5/5 contratos y 10/10 fixtures estructuralmente legibles.
-- Validador integral: 5/5 fixtures válidos aceptados y 5/5 inválidos
-  rechazados; 2/2 pruebas .NET aprobadas, incluida ejecución repetida en el
-  mismo proceso.
-- Solución .NET 10 de cinco proyectos: restauración bloqueada y build Release aprobados con 0
-  advertencias y 0 errores; CLI del validador y formato verificados.
+- Schemas: 7/7 contratos y 14/14 fixtures estructuralmente legibles.
+- Validador integral: 7/7 fixtures válidos aceptados, 7/7 inválidos rechazados
+  y 8/8 registros canónicos válidos. Ejecuta además 7/7 casos factuales y
+  rechaza 3/3 controles semánticos. Sus 6/6 pruebas .NET aprueban también la
+  ejecución repetida, los IDs estables, la retroactividad, la elegibilidad y
+  los enlaces exactos 5+2 de las reglas publicadas.
+- Solución .NET 10 de diez proyectos: restauración bloqueada y build Release
+  aprobados con 0 advertencias y 0 errores; CLI del validador y formato
+  verificados.
 - Persistencia SQLite: 12/12 pruebas de integración aprobadas en `win-x64`;
-  junto con las 2 pruebas de schemas, la solución ejecuta 14/14 pruebas
-  correctamente.
+  junto con 6/6 pruebas del validador, 12/12 del motor y 12/12 de Application,
+  la solución ejecuta 42/42 pruebas correctamente.
+- Motor de puntos: 7/7 casos positivos canónicos, 3/3 rechazos semánticos y
+  2/2 controles de traza/publicación aprobados. Domain y Calculation Engine no
+  incorporan paquetes externos ni referencias a Data, WPF o serialización.
+- Application: 7/7 casos positivos y 3/3 rechazos reproducidos por el camino
+  archivo → adaptador → caso de uso → motor; 2/2 alteraciones de snapshot
+  rechazadas antes del cálculo. El proyecto no incorpora paquetes externos ni
+  referencia Data o WPF.
+- WPF/Application: el build copia 18 JSON canónicos a una ruta estable tanto en
+  salida normal como publicada. El flujo de ventana obtiene clase/evolución y
+  Hero Status desde el catálogo/regla, y muestra el total junto con la traza.
+  App referencia Application; Domain, Calculation Engine y Application no
+  incorporan referencias inversas.
 - Json Everything fuente: 2 compilaciones independientes con SDK `10.0.301`,
   restore bloqueado de los tres proyectos fuente, hashes esperados para 3/3
   DLL, 2 × 10/10 fixtures, prueba de formatos y SPDX contrastado: PASS.
@@ -164,24 +245,31 @@
 - El run previo `29697684666` falló en el build fuente porque el hash de licencia
   procedía de un checkout CRLF. La corrección fuerza LF y deshabilita PDB/símbolos;
   dos builds locales independientes y el run remoto posterior coinciden.
-- Dependencias: los cinco proyectos restauran con lock files. El proyecto WPF no
-  añade paquetes y conserva el grafo Data previamente auditado. La restauración
-  bloqueada se repitió con acceso a NuGet y fue aprobada; el lock del validador
-  resuelve únicamente `Humanizer.Core 3.0.10`, mientras los tres DLL Json
-  Everything se compilan desde fuente fijada. La auditoría directa y transitiva
-  no encontró paquetes vulnerables en ninguno de los cinco proyectos según los
-  orígenes consultados.
+- Dependencias: los diez proyectos restauran con lock files. Application no
+  añade paquetes y su proyecto de pruebas reutiliza las versiones centrales ya
+  fijadas. El proyecto WPF conserva el grafo Data previamente auditado. La
+  restauración bloqueada se repitió con acceso a NuGet y fue aprobada; el lock
+  del validador resuelve únicamente `Humanizer.Core 3.0.10`, mientras los tres
+  DLL Json Everything se compilan desde fuente fijada. La auditoría directa y
+  transitiva registrada para el grafo anterior no encontró paquetes vulnerables
+  según los orígenes consultados.
 - Spike C#: 4/4 comprobaciones aprobadas con .NET SDK 10.0.301.
 - Node.js y `pwsh` no están disponibles en el `PATH`; la prueba de schemas se
   ejecuta con Windows PowerShell.
-- No se incorporaron datos ni fórmulas factuales al producto.
+- Se incorporaron sólo los datos factuales autorizados por EVD-0021: seis clases
+  y dos reglas de progresión canónicas publicadas con siete referencias
+  ejecutables. No se incorporaron HP, Mana, AG, SD, daño, defensa ni fórmulas
+  derivadas.
 - Licencia: texto Apache-2.0 contrastado con la publicación oficial; ADR-0005,
   `NOTICE` e inventario de terceros incorporados. La auditoría leyó metadatos
   `.nuspec` de todas las dependencias restauradas y el acuerdo incluido por la
   familia Json Everything.
-- Investigación documental: 18 evidencias registradas; 6/6 claims principales
-  `PARTIAL`, 0 `VERIFIED`, un conflicto abierto y uno resuelto. EVD-0014–EVD-0018
-  trazan stats, puntos, Marlon, contraste oficial y decisiones del propietario.
+- Investigación documental: 21 evidencias registradas; 6/6 claims principales
+  `VERIFIED`, 0 `PARTIAL` y dos conflictos resueltos. EVD-0014–EVD-0018
+  trazan stats, puntos, Marlon, contraste oficial y decisiones del propietario;
+  EVD-0019/EVD-0020 trazan la presencia anterior de la matriz candidata y la
+  búsqueda negativa de un original o snapshot contemporáneo; EVD-0021 fija la
+  matriz como axioma del ruleset y cierra la investigación.
 - Contraste técnico: 2 registros comunitarios nuevos y matriz completa para
   `WZ-CLM-001`–`WZ-CLM-010`; la auditoría concluyó que su independencia y
   procedencia global/inglesa no son demostrables con los artefactos disponibles.
@@ -189,12 +277,12 @@
   un mirror archivado que lo clasifica como cliente inglés Season 4 de 456.77
   MB; no se recuperó el binario ni un checksum del editor.
 - MU Online Fanz: no hay capturas indexadas de rutas de segunda/tercera clase
-  entre 2012 y 2022. Las primeras capturas de 2023 ya mezclan clases posteriores
-  y no declaran Season 4; `DSP-0001` queda abierto y los fixtures bloqueados.
+  entre 2012 y 2022. Las primeras capturas de 2023 mezclan clases posteriores;
+  EVD-0021 resuelve `DSP-0001` y retira este límite como bloqueo productivo.
 - Cadena candidata del mago para Season 4: Dark Wizard → Soul Master → Grand
   Master. La obtención candidata de Grand Master requiere culminar a nivel 400
   la serie de quests de tercera clase. Soul Wizard queda excluido por
-  clasificación del propietario; falta evidencia histórica de Season 4.
+  clasificación del propietario y queda aprobada para Season 4 por EVD-0021.
 - SQLite productivo: comparación documental de tres opciones y smoke test
   aislado con SDK `10.0.301`. El grafo recomendado fijado restauró sin
   advertencias, completó el round-trip transaccional en `win-x64` y pasó la
@@ -209,11 +297,10 @@
   148.339.336 bytes. Los dos reportes JSON confirman SQLite `3.53.3`, integridad
   `ok`, 1 migración aplicada/1 reconocida y datos fuera de los binarios.
 - Publicación WPF con avisos: PASS local más reciente en `win-x64` con SDK
-  `10.0.301`, runtime packs `10.0.9`, SQLite `3.53.3`, 417 archivos y
-  148.507.425 bytes. Los diez archivos legales requeridos estuvieron presentes,
-  no vacíos y conservaron sus hashes entre ambas carpetas de publicación. Una
-  inspección adicional no encontró ensamblados Json Everything ni
-  `OSMFEULA.txt` en el artefacto.
+  `10.0.301`, SQLite `3.53.3`, 441 archivos y 148.644.801 bytes después de
+  integrar Application. Los diez archivos legales y los 18 JSON del ruleset
+  estuvieron presentes y conservaron sus hashes entre ambas carpetas; el modo
+  headless reprodujo 7/7 casos positivos y 3/3 rechazos en ambas fases.
 - Publicación WPF en runner limpio: PASS en Microsoft Windows Server 2025,
   imagen `windows-2025-vs2026`, runner `2.335.1` y SDK .NET `10.0.302`. El job
   auditó los cinco proyectos sin paquetes vulnerables en los orígenes
@@ -291,5 +378,7 @@
 - Se confirma que MG/DL ganan 7 puntos por nivel desde el inicio y no realizan
   Marlon; DW/DK/ELF/SUM ganan 5 y pasan a 6 tras completar Hero Status desde 220.
 - El propietario clasifica estos valores como invariantes entre versiones y
-  resuelve `DSP-0002` a favor de Energy 26 para MG. El proyecto conserva
-  `PARTIAL` hasta cerrar la evidencia histórica del conjunto.
+  resuelve `DSP-0002` a favor de Energy 26 para MG.
+- Decisión posterior: dejar de exigir comprobación histórica adicional para la
+  matriz de `RES-0001`, promover sus seis claims a `VERIFIED` como axiomas del
+  ruleset y continuar con la implementación productiva.

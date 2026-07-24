@@ -1,0 +1,43 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "class-magic-gladiator",
+  "rulesetId": "mu-s4-global-reference",
+  "displayName": "Magic Gladiator",
+  "confidence": "VERIFIED",
+  "stats": {
+    "strength": {
+      "baseValue": 26,
+      "evidenceRefs": ["evd-0014", "evd-0016", "evd-0017", "evd-0019", "evd-0020", "evd-0021"]
+    },
+    "agility": {
+      "baseValue": 26,
+      "evidenceRefs": ["evd-0014", "evd-0016", "evd-0017", "evd-0019", "evd-0020", "evd-0021"]
+    },
+    "vitality": {
+      "baseValue": 26,
+      "evidenceRefs": ["evd-0014", "evd-0016", "evd-0017", "evd-0019", "evd-0020", "evd-0021"]
+    },
+    "energy": {
+      "baseValue": 26,
+      "evidenceRefs": ["evd-0014", "evd-0016", "evd-0017", "evd-0018", "evd-0019", "evd-0020", "evd-0021"]
+    }
+  },
+  "evolutions": [
+    {
+      "id": "evolution-magic-gladiator",
+      "displayName": "Magic Gladiator",
+      "stage": 0,
+      "evidenceRefs": ["evd-0001", "evd-0005", "evd-0006", "evd-0007", "evd-0021"]
+    },
+    {
+      "id": "evolution-duel-master",
+      "displayName": "Duel Master",
+      "stage": 2,
+      "prerequisiteEvolutionId": "evolution-magic-gladiator",
+      "evidenceRefs": ["evd-0002", "evd-0005", "evd-0006", "evd-0007", "evd-0012", "evd-0021"]
+    }
+  ],
+  "progressionRuleRefs": ["progression-seven-per-level"],
+  "evidenceRefs": ["evd-0001", "evd-0002", "evd-0005", "evd-0006", "evd-0007", "evd-0012", "evd-0014", "evd-0016", "evd-0017", "evd-0018", "evd-0019", "evd-0020", "evd-0021"],
+  "conflictIds": ["dsp-0002"]
+}

@@ -9,7 +9,9 @@ El proyecto avanza por capas verticales verificables. Ninguna fase depende de te
 
 ## Fase 1 — Investigación técnica Season 4
 **Entregables:** matriz de personajes, stats base, evolución, puntos, Marlon, resets, catálogo preliminar de fórmulas y conflictos.  
-**Salida:** cada dato requerido por el MVP tiene al menos dos evidencias o una prueba reproducible y estado explícito.
+**Salida:** cada dato requerido por el MVP tiene al menos dos evidencias, una
+prueba reproducible o un axioma de ruleset aprobado explícitamente por el
+propietario; siempre conserva estado y provenance explícitos.
 
 ## Fase 2 — Modelo de dominio y contratos
 **Entregables:** entidades, JSON Schemas, repositorios, IDs estables, política de versiones y migraciones.  

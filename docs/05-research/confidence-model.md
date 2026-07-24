@@ -2,7 +2,9 @@
 
 - **UNVERIFIED:** hallazgo sin contraste suficiente.
 - **PARTIAL:** evidencia útil, pero faltan versión, redondeo o interacción.
-- **VERIFIED:** evidencia independiente suficiente o prueba reproducible aprobada.
+- **VERIFIED:** evidencia independiente suficiente, prueba reproducible aprobada
+  o axioma de proyecto aceptado expresamente por el propietario y registrado con
+  su alcance. Un axioma no convierte en independientes ni históricas sus fuentes.
 - **DISPUTED:** fuentes confiables incompatibles.
 - **DEPRECATED:** reemplazado por una versión posterior.
 
@@ -16,4 +18,5 @@
 - Copia no atribuida: -2.
 - Contradicción abierta: impide VERIFIED.
 
-La puntuación ayuda, pero no sustituye revisión razonada.
+La puntuación ayuda, pero no sustituye revisión razonada ni una decisión de
+alcance explícita del propietario.

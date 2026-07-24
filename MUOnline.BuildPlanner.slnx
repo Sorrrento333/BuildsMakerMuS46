@@ -3,12 +3,17 @@
     <Project Path="apps/desktop/MuOnline.BuildPlanner.App/MuOnline.BuildPlanner.App.csproj" />
   </Folder>
   <Folder Name="/packages/">
+    <Project Path="packages/application/MuOnline.BuildPlanner.Application/MuOnline.BuildPlanner.Application.csproj" />
+    <Project Path="packages/calculation-engine/MuOnline.BuildPlanner.CalculationEngine/MuOnline.BuildPlanner.CalculationEngine.csproj" />
     <Project Path="packages/data-access/MuOnline.BuildPlanner.Data/MuOnline.BuildPlanner.Data.csproj" />
+    <Project Path="packages/domain/MuOnline.BuildPlanner.Domain/MuOnline.BuildPlanner.Domain.csproj" />
   </Folder>
   <Folder Name="/tools/">
     <Project Path="tools/validators/MuOnline.SchemaValidator/MuOnline.SchemaValidator.csproj" />
   </Folder>
   <Folder Name="/tests/">
+    <Project Path="tests/MuOnline.BuildPlanner.Application.IntegrationTests/MuOnline.BuildPlanner.Application.IntegrationTests.csproj" />
+    <Project Path="tests/MuOnline.BuildPlanner.CalculationEngine.Tests/MuOnline.BuildPlanner.CalculationEngine.Tests.csproj" />
     <Project Path="tests/MuOnline.BuildPlanner.Data.IntegrationTests/MuOnline.BuildPlanner.Data.IntegrationTests.csproj" />
     <Project Path="tests/MuOnline.SchemaValidator.Tests/MuOnline.SchemaValidator.Tests.csproj" />
   </Folder>

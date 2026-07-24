@@ -7,6 +7,8 @@ La versión `1.0.0` de los primeros contratos está en `packages/schemas/v1`:
 - `evidence.schema.json`
 - `formula.schema.json`
 - `character-class.schema.json`
+- `progression-rule.schema.json`
+- `stat-distribution.schema.json`
 - `server-profile.schema.json`
 - `build.schema.json`
 
@@ -14,13 +16,40 @@ Incluyen ejemplos técnicos válidos e inválidos en
 `packages/schemas/examples`. No contienen datos ni fórmulas factuales del
 juego.
 
+El contrato de progresión `1.0.0` modela puntos por nivel desde un primer nivel
+premiado y un bonus opcional de quest con nivel mínimo, evoluciones elegibles,
+puntos adicionales y origen retroactivo. Este diseño representa sin fórmulas
+ocultas tanto la regla estándar con Hero Status como la progresión de MG/DL sin
+quest; los fixtures actuales siguen siendo sintéticos.
+
+El contrato de distribución `1.0.0` conserva la referencia al presupuesto de
+progresión, el presupuesto ganado, las asignaciones por stat, el total gastado
+y los puntos restantes. Sus contadores son enteros no negativos de 64 bits.
+Las igualdades entre totales y la disponibilidad de cada stat dependen del
+catálogo de clases y se declaran como invariantes semánticas en
+`docs/04-domain/stat-distribution-contract.md`; no se simulan con datos del
+juego dentro del schema.
+
+Los primeros registros canónicos viven en
+`packages/rulesets/mu-s4-global-reference/v1`: seis definiciones de clase y dos
+reglas de progresión `VERIFIED`. El validador integral comprueba los ocho
+archivos contra sus contratos. Las dos reglas están `PUBLISHED`: la regla
+estándar enlaza cinco casos y la regla de Magic Gladiator/Dark Lord enlaza dos.
+El gate semántico exige que cada `testCaseRef` resuelva a un fixture positivo
+del mismo ruleset y regla, y que una regla publicada cubra todos sus casos
+positivos. Tres controles negativos prueban segunda clase y exclusión de Magic
+Gladiator/Dark Lord sin añadir claims factuales ni ser referencias publicadas.
+
 La validación integral está implementada en .NET 10 bajo
 `tools/validators/MuOnline.SchemaValidator`, con `JsonSchema.Net 9.2.2`
 compilado reproduciblemente desde fuente MIT, validación de formatos y un
 registro de schemas aislado por ejecución. Las
-pruebas verifican que los cinco fixtures válidos sean aceptados, los cinco
-inválidos sean rechazados y el validador pueda ejecutarse repetidamente dentro
-del mismo proceso. El workflow `.github/workflows/ci.yml` restaura en modo
+pruebas verifican que los siete fixtures válidos sean aceptados, los siete
+inválidos sean rechazados, que los ocho registros canónicos sean válidos y que
+los diez casos de progresión coincidan con su resultado esperado, además de que
+las dos reglas resuelvan exactamente sus siete casos positivos y de que el
+validador pueda ejecutarse repetidamente dentro del mismo proceso. El
+workflow `.github/workflows/ci.yml` restaura en modo
 bloqueado, compila y ejecuta esas pruebas con Microsoft Testing Platform.
 
 La comprobación PowerShell de estructura se conserva como control

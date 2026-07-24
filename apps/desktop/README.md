@@ -1,7 +1,10 @@
 # Aplicación de escritorio WPF
 
 Primera superficie aprobada por ADR-0004. El proyecto es una base técnica WPF
-para .NET 10 y no contiene todavía flujos, datos ni fórmulas de MU Online.
+para .NET 10. Su primer flujo funcional calcula el presupuesto de puntos por
+nivel y Hero Status a través de Application: clase, evolución, nivel y quest se
+seleccionan desde el snapshot canónico publicado; la UI no contiene valores ni
+fórmulas duplicados.
 
 ## Publicación inicial
 
@@ -18,8 +21,7 @@ dotnet publish apps/desktop/MuOnline.BuildPlanner.App/MuOnline.BuildPlanner.App.
 ## Smoke test de publicación
 
 `tools/smoke-tests/Test-WpfPublishedArtifact.ps1` publica el proyecto con
-`--no-restore`, ejecuta el binario WPF directamente y usa únicamente un schema
-sintético. Verifica:
+`--no-restore` y ejecuta el binario WPF directamente. Verifica:
 
 - carga de SQLite nativo y versión informada;
 - migración y ledger;
@@ -29,6 +31,10 @@ sintético. Verifica:
 - reapertura de la misma base desde una copia reemplazada del artefacto;
 - presencia, contenido no vacío e identidad SHA-256 de los diez archivos legales
   requeridos antes y después del reemplazo.
+- presencia e identidad SHA-256 del snapshot
+  `rulesets/mu-s4-global-reference/v1` dentro de ambas publicaciones;
+- carga del snapshot por el adaptador productivo y reproducción de sus siete
+  casos positivos y tres rechazos canónicos en ambas fases.
 
 La publicación incorpora `LICENSE.md`, `NOTICE`, `THIRD-PARTY-NOTICES.md`, los
 textos de Microsoft.Data.Sqlite y SQLitePCLRaw, y las licencias/avisos de los
@@ -60,3 +66,8 @@ Verificación local del 2026-07-19 después de incorporar avisos: PASS con SDK
 `10.0.301`, runtime packs `10.0.9`, SQLite `3.53.3`, 417 archivos y 148.506.472
 bytes. Se comprobaron diez archivos legales en ambas publicaciones y sus hashes
 permanecieron idénticos durante la actualización simulada.
+
+Verificación local del 2026-07-23 después de incorporar el flujo de progresión:
+PASS en `win-x64`, SQLite `3.53.3`, 441 archivos y 148.644.801 bytes. El
+artefacto incluyó 18 JSON del snapshot y reprodujo 7/7 casos positivos y 3/3
+rechazos antes y después del reemplazo simulado.

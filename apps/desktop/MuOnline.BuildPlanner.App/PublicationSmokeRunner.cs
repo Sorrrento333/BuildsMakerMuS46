@@ -1,7 +1,10 @@
 using System.Data;
 using System.IO;
+using System.Text.Json;
 using Microsoft.Data.Sqlite;
+using MuOnline.BuildPlanner.Application.Progression;
 using MuOnline.BuildPlanner.Data;
+using MuOnline.BuildPlanner.Domain.Progression;
 
 namespace MuOnline.BuildPlanner.App;
 
@@ -27,14 +30,23 @@ internal static class PublicationSmokeRunner
         ArgumentNullException.ThrowIfNull(options);
         EnsureDataOutsideBinaryDirectory(options.DataDirectory);
         Directory.CreateDirectory(options.DataDirectory);
+        var progressionVerification = VerifyPublishedProgressionRuleset();
 
         var databasePath = Path.Combine(options.DataDirectory, DatabaseFileName);
         var backupPath = Path.Combine(options.DataDirectory, BackupFileName);
 
         return options.Phase switch
         {
-            PublicationSmokePhase.Initialize => Initialize(databasePath, backupPath, options),
-            PublicationSmokePhase.VerifyUpdate => VerifyUpdate(databasePath, backupPath, options),
+            PublicationSmokePhase.Initialize => Initialize(
+                databasePath,
+                backupPath,
+                options,
+                progressionVerification),
+            PublicationSmokePhase.VerifyUpdate => VerifyUpdate(
+                databasePath,
+                backupPath,
+                options,
+                progressionVerification),
             _ => throw new ArgumentOutOfRangeException(nameof(options)),
         };
     }
@@ -42,7 +54,8 @@ internal static class PublicationSmokeRunner
     private static PublicationSmokeReport Initialize(
         string databasePath,
         string backupPath,
-        PublicationSmokeOptions options)
+        PublicationSmokeOptions options,
+        ProgressionVerificationResult progressionVerification)
     {
         if (File.Exists(databasePath) || File.Exists(backupPath))
         {
@@ -81,13 +94,15 @@ internal static class PublicationSmokeRunner
             databasePath,
             backupPath,
             sqliteVersion,
-            migrationResult);
+            migrationResult,
+            progressionVerification);
     }
 
     private static PublicationSmokeReport VerifyUpdate(
         string databasePath,
         string backupPath,
-        PublicationSmokeOptions options)
+        PublicationSmokeOptions options,
+        ProgressionVerificationResult progressionVerification)
     {
         if (!File.Exists(databasePath) || !File.Exists(backupPath))
         {
@@ -104,7 +119,8 @@ internal static class PublicationSmokeRunner
             databasePath,
             backupPath,
             connection.ServerVersion,
-            migrationResult);
+            migrationResult,
+            progressionVerification);
     }
 
     private static PublicationSmokeReport CreateSuccessfulReport(
@@ -112,7 +128,8 @@ internal static class PublicationSmokeRunner
         string databasePath,
         string backupPath,
         string sqliteVersion,
-        MigrationApplicationResult migrationResult) => new(
+        MigrationApplicationResult migrationResult,
+        ProgressionVerificationResult progressionVerification) => new(
             Success: true,
             Phase: options.Phase == PublicationSmokePhase.Initialize ? "initialize" : "verify-update",
             SqliteVersion: sqliteVersion,
@@ -123,10 +140,103 @@ internal static class PublicationSmokeRunner
             BackupPath: backupPath,
             BinaryDirectory: AppContext.BaseDirectory,
             DataOutsideBinaryDirectory: true,
+            RulesetId: progressionVerification.RulesetId,
+            RulesetSnapshotPath: PublishedProgressionRuleset.SnapshotRoot,
+            ApprovedProgressionCaseCount: progressionVerification.ApprovedCaseCount,
+            RejectedProgressionCaseCount: progressionVerification.RejectedCaseCount,
             AppliedMigrationCount: migrationResult.AppliedCount,
             AlreadyAppliedMigrationCount: migrationResult.AlreadyAppliedCount,
             ErrorType: null,
             ErrorMessage: null);
+
+    private static ProgressionVerificationResult VerifyPublishedProgressionRuleset()
+    {
+        var catalog = PublishedProgressionRuleset.Catalog;
+        var useCase = PublishedProgressionRuleset.CreateUseCase();
+        var referenceCaseRoot = Path.Combine(
+            PublishedProgressionRuleset.SnapshotRoot,
+            "reference-cases",
+            "progression");
+        var approvedCases = LoadReferenceCases(Path.Combine(referenceCaseRoot, "valid"));
+        var rejectedCases = LoadReferenceCases(Path.Combine(referenceCaseRoot, "invalid"));
+
+        foreach (var referenceCase in approvedCases)
+        {
+            var result = useCase.Execute(referenceCase.ToRequest());
+            if (result.RulesetId != referenceCase.RulesetId ||
+                result.ProgressionRuleId != referenceCase.ProgressionRuleId ||
+                result.EarnedPoints != referenceCase.ExpectedEarnedPoints ||
+                result.Contributions.Sum(item => item.EarnedPoints) != result.EarnedPoints)
+            {
+                throw new InvalidOperationException(
+                    $"Published progression case '{referenceCase.Id}' did not reproduce its approved result.");
+            }
+        }
+
+        foreach (var referenceCase in rejectedCases)
+        {
+            try
+            {
+                _ = useCase.Execute(referenceCase.ToRequest());
+            }
+            catch (ProgressionPointBudgetException exception)
+                when (exception.Code == referenceCase.ExpectedErrorCode)
+            {
+                continue;
+            }
+
+            throw new InvalidOperationException(
+                $"Published progression case '{referenceCase.Id}' did not reproduce rejection " +
+                $"'{referenceCase.ExpectedErrorCode}'.");
+        }
+
+        return new ProgressionVerificationResult(
+            catalog.RulesetId,
+            approvedCases.Length,
+            rejectedCases.Length);
+    }
+
+    private static PublishedProgressionReferenceCase[] LoadReferenceCases(string directory)
+    {
+        if (!Directory.Exists(directory))
+        {
+            throw new DirectoryNotFoundException(
+                $"Published progression reference directory '{directory}' was not found.");
+        }
+
+        return Directory.GetFiles(directory, "*.json")
+            .Order(StringComparer.Ordinal)
+            .Select(path =>
+            {
+                using var document = JsonDocument.Parse(File.ReadAllText(path));
+                var element = document.RootElement;
+                return new PublishedProgressionReferenceCase(
+                    RequiredString(element, "id"),
+                    RequiredString(element, "rulesetId"),
+                    RequiredString(element, "progressionRuleId"),
+                    RequiredString(element, "classId"),
+                    RequiredString(element, "evolutionId"),
+                    element.GetProperty("level").GetInt32(),
+                    StringArray(element, "completedQuestIds"),
+                    element.GetProperty("expectedEarnedPoints").GetInt64(),
+                    element.TryGetProperty("expectedErrorCode", out var errorCode)
+                        ? errorCode.GetString()
+                        : null);
+            })
+            .ToArray();
+    }
+
+    private static string RequiredString(JsonElement element, string propertyName) =>
+        element.GetProperty(propertyName).GetString()
+        ?? throw new InvalidDataException($"'{propertyName}' cannot be null.");
+
+    private static string[] StringArray(JsonElement element, string propertyName) =>
+        element.GetProperty(propertyName)
+            .EnumerateArray()
+            .Select(item => item.GetString()
+                ?? throw new InvalidDataException(
+                    $"'{propertyName}' cannot contain null values."))
+            .ToArray();
 
     private static SqliteConnection OpenConnection(string databasePath)
     {
@@ -202,5 +312,25 @@ internal static class PublicationSmokeRunner
         command.CommandText = sql;
         command.Parameters.AddWithValue("$value", value);
         command.ExecuteNonQuery();
+    }
+
+    private sealed record ProgressionVerificationResult(
+        string RulesetId,
+        int ApprovedCaseCount,
+        int RejectedCaseCount);
+
+    private sealed record PublishedProgressionReferenceCase(
+        string Id,
+        string RulesetId,
+        string ProgressionRuleId,
+        string ClassId,
+        string EvolutionId,
+        int Level,
+        string[] CompletedQuestIds,
+        long ExpectedEarnedPoints,
+        string? ExpectedErrorCode)
+    {
+        public ProgressionPointBudgetRequest ToRequest() =>
+            new(ClassId, EvolutionId, Level, CompletedQuestIds);
     }
 }

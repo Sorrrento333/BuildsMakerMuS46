@@ -8,9 +8,15 @@
     <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
   </PropertyGroup>
   <ItemGroup>
+    <ProjectReference Include="../../../packages/application/MuOnline.BuildPlanner.Application/MuOnline.BuildPlanner.Application.csproj" />
     <ProjectReference Include="../../../packages/data-access/MuOnline.BuildPlanner.Data/MuOnline.BuildPlanner.Data.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="../../../packages/rulesets/mu-s4-global-reference/v1/**/*">
+      <Link>rulesets/mu-s4-global-reference/v1/%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
     <Content Include="../../../LICENSE.md"
              Link="LICENSE.md"
              CopyToPublishDirectory="PreserveNewest" />

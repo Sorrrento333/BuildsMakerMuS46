@@ -1,0 +1,50 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "class-dark-wizard",
+  "rulesetId": "mu-s4-global-reference",
+  "displayName": "Dark Wizard",
+  "confidence": "VERIFIED",
+  "stats": {
+    "strength": {
+      "baseValue": 18,
+      "evidenceRefs": ["evd-0014", "evd-0016", "evd-0017", "evd-0019", "evd-0020", "evd-0021"]
+    },
+    "agility": {
+      "baseValue": 18,
+      "evidenceRefs": ["evd-0014", "evd-0016", "evd-0017", "evd-0019", "evd-0020", "evd-0021"]
+    },
+    "vitality": {
+      "baseValue": 15,
+      "evidenceRefs": ["evd-0014", "evd-0016", "evd-0017", "evd-0019", "evd-0020", "evd-0021"]
+    },
+    "energy": {
+      "baseValue": 30,
+      "evidenceRefs": ["evd-0014", "evd-0016", "evd-0017", "evd-0019", "evd-0020", "evd-0021"]
+    }
+  },
+  "evolutions": [
+    {
+      "id": "evolution-dark-wizard",
+      "displayName": "Dark Wizard",
+      "stage": 0,
+      "evidenceRefs": ["evd-0002", "evd-0005", "evd-0006", "evd-0007", "evd-0021"]
+    },
+    {
+      "id": "evolution-soul-master",
+      "displayName": "Soul Master",
+      "stage": 1,
+      "prerequisiteEvolutionId": "evolution-dark-wizard",
+      "evidenceRefs": ["evd-0002", "evd-0005", "evd-0006", "evd-0007", "evd-0012", "evd-0021"]
+    },
+    {
+      "id": "evolution-grand-master",
+      "displayName": "Grand Master",
+      "stage": 2,
+      "prerequisiteEvolutionId": "evolution-soul-master",
+      "evidenceRefs": ["evd-0002", "evd-0005", "evd-0006", "evd-0007", "evd-0012", "evd-0021"]
+    }
+  ],
+  "progressionRuleRefs": ["progression-five-per-level-hero-status"],
+  "evidenceRefs": ["evd-0002", "evd-0005", "evd-0006", "evd-0007", "evd-0012", "evd-0013", "evd-0014", "evd-0016", "evd-0017", "evd-0019", "evd-0020", "evd-0021"],
+  "conflictIds": ["dsp-0001"]
+}

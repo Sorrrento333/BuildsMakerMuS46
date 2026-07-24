@@ -3,7 +3,7 @@ $ErrorActionPreference = 'Stop'
 $repositoryRoot = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path
 $schemaRoot = Join-Path $repositoryRoot 'packages/schemas/v1'
 $exampleRoot = Join-Path $repositoryRoot 'packages/schemas/examples'
-$expectedNames = @('evidence', 'formula', 'character-class', 'server-profile', 'build')
+$expectedNames = @('evidence', 'formula', 'character-class', 'progression-rule', 'stat-distribution', 'server-profile', 'build')
 
 foreach ($name in $expectedNames) {
     $schemaPath = Join-Path $schemaRoot "$name.schema.json"
@@ -28,4 +28,4 @@ foreach ($name in $expectedNames) {
     }
 }
 
-Write-Output "PASS: $($expectedNames.Count) schemas and 10 examples are structurally readable."
+Write-Output "PASS: $($expectedNames.Count) schemas and 14 examples are structurally readable."

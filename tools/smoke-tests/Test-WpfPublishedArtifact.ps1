@@ -32,6 +32,13 @@ $requiredLegalFiles = @(
     "licenses\aspnetcore-runtime\LICENSE.txt",
     "licenses\aspnetcore-runtime\THIRD-PARTY-NOTICES.txt"
 )
+$publishedRulesetRelativePath = "rulesets\mu-s4-global-reference\v1"
+$requiredRulesetDirectories = @(
+    "character-classes",
+    "progression-rules",
+    "reference-cases\progression\valid",
+    "reference-cases\progression\invalid"
+)
 
 function Assert-PublishedLegalFiles {
     param(
@@ -54,6 +61,28 @@ function Assert-PublishedLegalFiles {
     }
 }
 
+function Assert-PublishedRuleset {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$PublishDirectory,
+
+        [Parameter(Mandatory = $true)]
+        [string]$Phase
+    )
+
+    $rulesetRoot = Join-Path $PublishDirectory $publishedRulesetRelativePath
+    foreach ($relativePath in $requiredRulesetDirectories) {
+        $publishedPath = Join-Path $rulesetRoot $relativePath
+        if (-not (Test-Path -LiteralPath $publishedPath -PathType Container)) {
+            throw "The $Phase publication is missing ruleset directory '$relativePath'."
+        }
+
+        if ((Get-ChildItem -LiteralPath $publishedPath -Filter "*.json" -File).Count -eq 0) {
+            throw "The $Phase publication contains no JSON files in '$relativePath'."
+        }
+    }
+}
+
 New-Item -ItemType Directory -Path $initialPublishDirectory -Force | Out-Null
 New-Item -ItemType Directory -Path $replacementPublishDirectory -Force | Out-Null
 New-Item -ItemType Directory -Path $dataDirectory -Force | Out-Null
@@ -69,6 +98,9 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 Assert-PublishedLegalFiles `
+    -PublishDirectory $initialPublishDirectory `
+    -Phase "initial"
+Assert-PublishedRuleset `
     -PublishDirectory $initialPublishDirectory `
     -Phase "initial"
 
@@ -99,6 +131,9 @@ Copy-Item -Path (Join-Path $initialPublishDirectory "*") `
     -Force
 
 Assert-PublishedLegalFiles `
+    -PublishDirectory $replacementPublishDirectory `
+    -Phase "replacement"
+Assert-PublishedRuleset `
     -PublishDirectory $replacementPublishDirectory `
     -Phase "replacement"
 
@@ -155,6 +190,47 @@ if ($initialReport.AppliedMigrationCount -ne 1 -or
 if ($initialReport.SqliteVersion -ne $replacementReport.SqliteVersion) {
     throw "The SQLite runtime version changed between publication phases."
 }
+if ($initialReport.RulesetId -ne "mu-s4-global-reference" -or
+    $replacementReport.RulesetId -ne $initialReport.RulesetId) {
+    throw "The published progression ruleset was absent or changed between phases."
+}
+if ($initialReport.ApprovedProgressionCaseCount -ne 7 -or
+    $replacementReport.ApprovedProgressionCaseCount -ne 7 -or
+    $initialReport.RejectedProgressionCaseCount -ne 3 -or
+    $replacementReport.RejectedProgressionCaseCount -ne 3) {
+    throw "The published ruleset did not reproduce all 7 approved cases and 3 rejections."
+}
+
+$initialRulesetRoot = Join-Path $initialPublishDirectory $publishedRulesetRelativePath
+$replacementRulesetRoot = Join-Path $replacementPublishDirectory $publishedRulesetRelativePath
+$initialRulesetFiles = Get-ChildItem -LiteralPath $initialRulesetRoot -Recurse -File
+$initialRulesetPrefix = $initialRulesetRoot.TrimEnd(
+    [System.IO.Path]::DirectorySeparatorChar) +
+    [System.IO.Path]::DirectorySeparatorChar
+foreach ($initialRulesetFile in $initialRulesetFiles) {
+    if (-not $initialRulesetFile.FullName.StartsWith(
+        $initialRulesetPrefix,
+        [System.StringComparison]::OrdinalIgnoreCase)) {
+        throw "Ruleset file '$($initialRulesetFile.FullName)' is outside the published root."
+    }
+
+    $relativePath = $initialRulesetFile.FullName.Substring(
+        $initialRulesetPrefix.Length)
+    $replacementRulesetFile = Join-Path $replacementRulesetRoot $relativePath
+    if (-not (Test-Path -LiteralPath $replacementRulesetFile -PathType Leaf)) {
+        throw "Ruleset file '$relativePath' was lost during the simulated update."
+    }
+
+    $initialRulesetHash = (Get-FileHash `
+        -LiteralPath $initialRulesetFile.FullName `
+        -Algorithm SHA256).Hash
+    $replacementRulesetHash = (Get-FileHash `
+        -LiteralPath $replacementRulesetFile `
+        -Algorithm SHA256).Hash
+    if ($initialRulesetHash -cne $replacementRulesetHash) {
+        throw "Ruleset file '$relativePath' changed during the simulated update."
+    }
+}
 
 $publishedFiles = Get-ChildItem -LiteralPath $initialPublishDirectory -Recurse -File
 $publishedBytes = ($publishedFiles | Measure-Object -Property Length -Sum).Sum
@@ -165,4 +241,6 @@ Write-Output "SQLite: $($initialReport.SqliteVersion)"
 Write-Output "Published files: $($publishedFiles.Count)"
 Write-Output "Published bytes: $publishedBytes"
 Write-Output "Verified legal files: $($requiredLegalFiles.Count)"
+Write-Output "Progression cases: $($initialReport.ApprovedProgressionCaseCount) approved, $($initialReport.RejectedProgressionCaseCount) rejected"
+Write-Output "Ruleset files: $($initialRulesetFiles.Count)"
 Write-Output "Artifacts: $runRoot"

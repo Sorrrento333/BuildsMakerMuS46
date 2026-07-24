@@ -1,0 +1,12 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "progression-case-standard-level-220-with-hero-status",
+  "rulesetId": "mu-s4-global-reference",
+  "progressionRuleId": "progression-five-per-level-hero-status",
+  "classId": "class-dark-wizard",
+  "evolutionId": "evolution-soul-master",
+  "level": 220,
+  "completedQuestIds": ["quest-hero-status"],
+  "expectedEarnedPoints": 1095,
+  "evidenceRefs": ["evd-0014", "evd-0015", "evd-0017", "evd-0021"]
+}

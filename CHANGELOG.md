@@ -4,6 +4,72 @@
 
 ### Added
 
+- Contrato JSON Schema 2020-12 `stat-distribution.schema.json` `1.0.0` para
+  conservar presupuesto ganado, referencia de progresión, asignaciones por
+  stat, puntos gastados y remanente, más fixtures sintéticos válido/inválido.
+- Especificación previa al código de invariantes, límite entero de 64 bits,
+  errores estables y seis casos sintéticos mínimos para la futura distribución;
+  `command` se resuelve exclusivamente desde los stats de la clase canónica.
+- Cobertura del séptimo contrato en el validador .NET y en la comprobación
+  estructural PowerShell: 7 schemas y 14 fixtures.
+- Primer flujo funcional WPF para seleccionar clase, evolución, nivel y Hero
+  Status desde el catálogo publicado, calcular mediante Application y mostrar
+  total, regla/version y traza sin duplicar valores del juego en XAML o C#.
+- Empaquetado del snapshot canónico completo en
+  `rulesets/mu-s4-global-reference/v1` de la publicación WPF, con resolución
+  exclusiva desde la carpeta del artefacto.
+- Gate de publicación que carga el snapshot con el adaptador productivo,
+  reproduce 7/7 casos positivos y 3/3 rechazos en ambas fases y compara los 18
+  JSON por SHA-256 durante el reemplazo simulado.
+- Proyecto `MuOnline.BuildPlanner.Application` con adaptador JSON para
+  materializar el catálogo de progresión ya validado y caso de uso mínimo que
+  invoca `ProgressionPointBudgetCalculator` sin depender de WPF ni SQLite.
+- Gate productivo de snapshot con errores tipados para directorios o contenido
+  inválidos, IDs duplicados, mezcla de rulesets, reglas no `PUBLISHED` y
+  referencias clase/regla incoherentes.
+- Doce pruebas de integración de Application que leen entradas y resultados
+  desde los diez casos canónicos, reproducen 7/7 resultados y 3/3 rechazos, y
+  demuestran fallo cerrado con una regla `REVIEWED` y una referencia inexistente
+  en copias temporales.
+- Primera vertical productiva del presupuesto de puntos en los proyectos
+  `MuOnline.BuildPlanner.Domain` y `MuOnline.BuildPlanner.CalculationEngine`:
+  resuelve por clase una única regla `PUBLISHED`, valida evolución, nivel y
+  Hero Status, y devuelve puntos ganados con aportes trazables por nivel/quest.
+- Errores de dominio tipados para clase/evolución/nivel, resolución de reglas y
+  elegibilidad de quest, con los mismos códigos estables de los controles
+  canónicos.
+- Doce pruebas del motor cargan las definiciones JSON canónicas sin duplicar el
+  ruleset: reproducen los siete casos positivos y tres rechazos de progresión,
+  fijan la traza 1145+10 del caso de nivel 230 y demuestran que una regla no
+  publicada no se ejecuta.
+- Gate semántico para `testCaseRefs` de progresión: cada enlace debe resolver a
+  un caso positivo del mismo ruleset y regla, y una regla publicada debe cubrir
+  todos sus casos positivos. La prueba fija la asignación exacta 5+2 y mantiene
+  fuera los tres controles negativos.
+- Siete fixtures factuales versionados para los casos aprobados de progresión en
+  nivel 1/220/221/230 y MG/DL en nivel 220, con IDs estables y provenance hacia
+  `RES-0001`.
+- Validación ejecutable de los casos de progresión en el tooling: confirma
+  0/1095/1095/1101/1155/1533 puntos y rechaza controles de Hero Status con clase
+  base, Magic Gladiator o Dark Lord.
+- Ocho registros canónicos `VERIFIED` para
+  `mu-s4-global-reference`: seis clases con stats/evoluciones trazados y las
+  reglas `progression-five-per-level-hero-status` y
+  `progression-seven-per-level`, separadas de los fixtures sintéticos.
+- Validación integral de los registros canónicos contra los contratos de clase
+  y progresión, más una prueba que fija el conjunto de ocho IDs estables.
+- Documentación del paquete de ruleset, su convención de IDs y el gate de casos
+  ejecutables mediante `testCaseRefs` resolubles.
+- Contrato JSON Schema 2020-12 `progression-rule.schema.json` `1.0.0` para
+  puntos por nivel y bonus opcional de quest con elegibilidad y retroactividad
+  explícitas, más fixtures sintéticos válido e inválido.
+- Cobertura del sexto contrato en el validador .NET, sus pruebas de contrato y
+  la comprobación estructural PowerShell: 6 schemas y 12 fixtures.
+- `EVD-0021` como decisión del propietario que fija la matriz completa de
+  `RES-0001` como axioma estable del ruleset y habilita su implementación.
+- `EVD-0019` y `EVD-0020` en `RES-0001`: transcripciones históricas Season 1/3
+  con la matriz completa, seis guías fechadas en 2010 y auditoría CDX de sus
+  primeras capturas disponibles, sin promover claims ni fixtures.
 - `EVD-0014`–`EVD-0018` en `RES-0001` para las seis matrices de stats base,
   stats distribuibles, puntos por nivel, Hero Status/Marlon, contraste oficial
   de Webzen y confirmación del propietario.
@@ -110,6 +176,28 @@
 
 ### Changed
 
+- `MuOnline.BuildPlanner.App` referencia Application de forma unidireccional y
+  su lock registra sólo las nuevas dependencias internas de proyecto.
+- Las reglas `progression-five-per-level-hero-status` y
+  `progression-seven-per-level` pasan de `REVIEWED` a `PUBLISHED` tras enlazar
+  respectivamente cinco y dos casos factuales aprobados.
+- La matriz de `RES-0001` reemplaza los seis IDs provisionales por IDs
+  definitivos con prefijo `class-` y registra la materialización canónica sin
+  cambiar la clasificación individual de ninguna fuente.
+- `RES-0001` queda cerrado: `CLM-0001`–`CLM-0006` pasan a `VERIFIED`; la
+  búsqueda histórica deja de ser un gate para clases, evoluciones, stats base,
+  puntos por nivel y Marlon.
+- `DSP-0001` queda resuelto a favor de Dark Wizard → Soul Master → Grand Master,
+  con Soul Wizard fuera de Season 4. `DSP-0002` conserva Energy 26 para Magic
+  Gladiator y su divergencia documental.
+- El modelo de confianza admite axiomas de ruleset aprobados explícitamente por
+  el propietario, sin reclasificar la calidad o independencia de las fuentes.
+- La política permanente de fuentes queda alineada con la decisión del
+  propietario del 2026-07-19: Fanz sigue como fuente inicial prioritaria y se
+  autorizan fuentes adicionales con provenance, versión y confianza propias.
+- `RES-0001` pasa de 18 a 20 evidencias. `CLM-0002` y `CLM-0003` permanecen
+  `PARTIAL` porque no se localizó un original de Webzen ni un snapshot
+  contemporáneo que demuestre continuidad de la matriz hasta Season 4.
 - `DSP-0002` queda resuelto por decisión explícita del propietario: el proyecto
   adopta `ENE 26` para Magic Gladiator (`26/26/26/26`). El valor 16 de Webzen se
   conserva como divergencia documental de otra versión no demostrada, sin

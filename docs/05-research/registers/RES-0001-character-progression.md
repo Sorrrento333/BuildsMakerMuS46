@@ -10,48 +10,49 @@ scope:
   class: null
   mode: "general"
   ruleset: "mu-s4-global-reference"
-status: PARTIAL
+status: VERIFIED
 claims:
   - id: CLM-0001
     statement: "El conjunto de clases jugables del ruleset de referencia está identificado."
-    status: PARTIAL
-    evidence: [EVD-0001, EVD-0002, EVD-0005, EVD-0006, EVD-0007, EVD-0008, EVD-0009, EVD-0011, EVD-0012]
+    status: VERIFIED
+    evidence: [EVD-0001, EVD-0002, EVD-0005, EVD-0006, EVD-0007, EVD-0008, EVD-0009, EVD-0011, EVD-0012, EVD-0021]
   - id: CLM-0002
     statement: "Las estadísticas iniciales de cada clase están identificadas."
-    status: PARTIAL
-    evidence: [EVD-0014, EVD-0016, EVD-0017, EVD-0018]
+    status: VERIFIED
+    evidence: [EVD-0014, EVD-0016, EVD-0017, EVD-0018, EVD-0019, EVD-0020, EVD-0021]
   - id: CLM-0003
     statement: "Las estadísticas disponibles para distribuir en cada clase están identificadas."
-    status: PARTIAL
-    evidence: [EVD-0014, EVD-0016, EVD-0017, EVD-0018]
+    status: VERIFIED
+    evidence: [EVD-0014, EVD-0016, EVD-0017, EVD-0018, EVD-0019, EVD-0020, EVD-0021]
   - id: CLM-0004
     statement: "La cadena de evoluciones de cada clase está identificada."
-    status: PARTIAL
-    evidence: [EVD-0002, EVD-0003, EVD-0004, EVD-0005, EVD-0006, EVD-0007, EVD-0008, EVD-0009, EVD-0011, EVD-0012, EVD-0013]
+    status: VERIFIED
+    evidence: [EVD-0002, EVD-0003, EVD-0004, EVD-0005, EVD-0006, EVD-0007, EVD-0008, EVD-0009, EVD-0011, EVD-0012, EVD-0013, EVD-0021]
   - id: CLM-0005
     statement: "Los puntos otorgados por nivel para cada clase y etapa están identificados."
-    status: PARTIAL
-    evidence: [EVD-0014, EVD-0015, EVD-0016, EVD-0017]
+    status: VERIFIED
+    evidence: [EVD-0014, EVD-0015, EVD-0016, EVD-0017, EVD-0021]
   - id: CLM-0006
     statement: "La disponibilidad y el efecto de Marlon para cada clase y etapa están identificados."
-    status: PARTIAL
-    evidence: [EVD-0015, EVD-0017]
+    status: VERIFIED
+    evidence: [EVD-0015, EVD-0017, EVD-0021]
 conflicts:
   - id: DSP-0001
     statement: "MU Online Fanz nombra Dark Wizard → Soul Wizard en la página de segunda clase, aunque sus páginas de tercera y cuarta clase sitúan Soul Master → Grand Master → Soul Wizard."
     evidence: [EVD-0011, EVD-0012, EVD-0013]
     scope: "Páginas actuales y primeras capturas disponibles de 2023; aplicabilidad a Season 4 no demostrada."
-    impact: "Impide usar EVD-0011 como evidencia de la etapa posterior a Dark Wizard; EVD-0012/EVD-0013 aclaran el orden actual, pero no la frontera histórica de Season 4."
-    status: OPEN
+    impact: "EVD-0011 no se usa para fijar la etapa posterior a Dark Wizard. EVD-0021 adopta Soul Master → Grand Master para el ruleset y conserva Soul Wizard sólo como divergencia posterior."
+    status: RESOLVED
+    resolution: OWNER_DECISION
   - id: DSP-0002
     statement: "La guía actual de Webzen publica Energy 16 para Magic Gladiator, mientras MU Online Fanz y la decisión del propietario fijan Energy 26."
     evidence: [EVD-0014, EVD-0016, EVD-0017, EVD-0018]
     scope: "Stats iniciales de Magic Gladiator; Webzen muestra referencias a renovaciones Season 16/18 y ninguna fuente externa demuestra todavía el valor histórico de Season 4."
-    impact: "La divergencia se conserva como diferencia documental y de versión, pero no altera el valor adoptado por el proyecto: ENE 26. La aplicabilidad histórica del conjunto a Season 4 continúa evaluándose separadamente."
+    impact: "La divergencia se conserva como diferencia documental y de versión, pero no altera el valor adoptado por el proyecto: ENE 26. EVD-0021 retira la aplicabilidad histórica como gate para esta matriz."
     status: RESOLVED
     resolution: OWNER_DECISION
-test_plan: "Contrastar cada celda factual con dos evidencias independientes o con una prueba reproducible aprobada; verificar explícitamente temporada, etapa, límites y condiciones antes de promoverla."
-conclusion: "Investigación abierta para Season 4 global/inglés. Las seis matrices de stats iniciales, stats distribuibles, puntos por nivel y reglas de Marlon quedaron identificadas como candidatas y aprobadas por el propietario, pero permanecen PARTIAL por falta de atribución histórica directa a Season 4. DSP-0002 se resolvió por decisión explícita: Magic Gladiator usa Energy 26; el 16 de la guía actual de Webzen se conserva sólo como divergencia documental de otra versión no demostrada. No se autoriza todavía publicar fixtures ni reglas productivas."
+test_plan: "Convertir la matriz aprobada en contratos y fixtures productivos; validar IDs, referencias, bordes de nivel 1/220/221, retroactividad de Hero Status y exclusión de MG/DL antes de publicar el ruleset."
+conclusion: "Investigación cerrada para el alcance de clases, evoluciones, stats iniciales/distribuibles, puntos por nivel y Marlon de Season 4 global/inglés. EVD-0021 establece estos valores como axiomas estables del ruleset por decisión explícita del propietario y retira la evidencia histórica como gate. DSP-0001 se resuelve usando Dark Wizard → Soul Master → Grand Master y excluyendo Soul Wizard; DSP-0002 conserva la divergencia de Webzen, pero adopta Energy 26 para Magic Gladiator. Se autoriza avanzar a contratos, fixtures y reglas productivas con pruebas."
 reviewed_by: ["project-owner"]
 last_reviewed_at: "2026-07-19"
 ```
@@ -468,7 +469,166 @@ last_reviewed_at: "2026-07-19"
 - Confianza y uso permitido: `APPROVED` para seleccionar `ENE 26`; la promoción
   productiva conjunta continúa sujeta a los gates de versión, schemas y pruebas.
 
+### EVD-0019 — Transcripciones históricas de stats anteriores a Season 4
+
+- URLs canónicas:
+  - https://lostmu.wiki/guide/2005-08-30-season-1-kunduns-counterattack/
+  - https://lostmu.wiki/guide/2007-12-06-season-3-old-promise-new-character-summoner/
+- Título/editor visible: `Season 1. Kundun's Counterattack Item Update` y
+  `Season 3. old promise - New Character Summoner`, LostMu.wiki.
+- Consulta: 2026-07-19; fechas internas declaradas: 2005-08-30 y 2007-12-06.
+- Datos extraídos: la tabla de mínimo reducible por fruta publica, en orden
+  `STR/AGI/VIT/ENE[/CMD]`, DK `28/20/25/10`, DW `18/18/15/30`, ELF
+  `22/25/20/15`, MG `26/26/26/26` y DL `26/20/20/15/25`. La guía de
+  introducción de Summoner publica `21/21/18/23` como estado inicial.
+- Transformación: `black knight`, `warlock`, `fairy` y `magic swordsman` se
+  asociaron sólo con las familias DK, DW, ELF y MG ya contrastadas en el
+  registro; `health` se normalizó como `VIT`. No se extrajeron fórmulas ni otros
+  valores de las páginas.
+- Versión y aplicabilidad: las tablas se atribuyen a Season 1 y Season 3, por lo
+  que demuestran que la matriz candidata completa ya aparece antes de Season 4.
+  No declaran que permaneciera sin cambios durante Season 4 global/inglesa.
+- Procedencia/independencia: LostMu.wiki se presenta como alternativa al sitio
+  de Webzen, pero también declara que es un sitio fan y que su contenido es
+  editable. No se localizó la publicación primaria de Webzen, un snapshot
+  contemporáneo ni un artefacto hasheable que pruebe el linaje de la
+  transcripción. Las dos páginas son una sola línea editorial y no cuentan como
+  evidencia primaria independiente.
+- Confianza y uso permitido: `PARTIAL`; refuerza la antigüedad y consistencia de
+  los seis valores, pero no habilita promoción ni fixtures productivos.
+- Snapshot/hash: no capturado; sólo URLs, fechas visibles y extracción atómica.
+
+### EVD-0020 — Guías comunitarias fechadas en 2010 y auditoría archivística
+
+- URLs canónicas:
+  - https://guiasmu.com/personaje-dark-wizard/
+  - https://guiasmu.com/dark-knight/
+  - https://guiasmu.com/personaje-fairy-elf/
+  - https://guiasmu.com/personaje-summoner/
+  - https://guiasmu.com/personaje-magic-gladiator/
+  - https://guiasmu.com/personaje-dark-lord/
+- Título/editor: seis guías de personajes, GuiasMU.com; las páginas muestran
+  fechas internas 2010-05-17 o 2010-05-18 y se describen como contenido para
+  múltiples temporadas.
+- Consulta: 2026-07-19.
+- Datos extraídos: coinciden las seis filas de stats iniciales y los puntos por
+  nivel de la matriz candidata: 5 para DW/DK/ELF/SUM y 7 para MG/DL.
+- Versión y límite: la fecha visible cae en la ventana histórica próxima a
+  Season 4 global, pero las páginas actuales mezclan adiciones explícitas de
+  Season 9 y no atribuyen la tabla base a una versión concreta.
+- Auditoría archivística: el índice CDX de Wayback sólo devolvió primeras
+  capturas entre 2020-09-19 y 2020-09-25 para estas seis URLs. Por tanto, la
+  fecha editorial de 2010 no está respaldada por un snapshot contemporáneo y no
+  se presume que el contenido actual sea idéntico al publicado entonces.
+- Tipo/independencia: fuente comunitaria distinta de Fanz, Webzen y LostMu; la
+  autoría o fuente original de las tablas no está declarada, así que tampoco se
+  demostró independencia del contenido.
+- Confianza y uso permitido: `PARTIAL`; contraste histórico nominal, no prueba
+  de aplicabilidad directa a Season 4.
+- Preservación: digests de las primeras respuestas HTML del índice CDX:
+  DW `LMOJVATTVPNE5KCQH7GCRF6COL3JWVZZ`, DK
+  `IKX2Y4WYYKALQYSR4FDHKNCZFBKM3CIK`, ELF
+  `NA5QMSVVUNNRJJ43QPVCLZDU2ZBU2I4B`, SUM
+  `6WMKR3DZ56UFHEBG5E5MBNTZJ2OCBYTC`, MG
+  `GNILSDHWJI6MEGKAUQHQ3NQHCVXYPF2V` y DL
+  `45ZCRMYGMWK7JBFGW4X2WMG5ZW4IB2N`; son digests archivísticos de 2020, no
+  hashes de contenido de 2010 ni del cliente del juego.
+
+### EVD-0021 — Axioma de estabilidad aprobado por el propietario
+
+- Fecha: 2026-07-19.
+- Decisión: el propietario indica que las clases, evoluciones, stats iniciales,
+  puntos por nivel y reglas de Marlon registradas son estables desde los inicios
+  del juego y ordena no mantener bloqueado el proyecto por nuevas comprobaciones
+  históricas de estos datos.
+- Alcance aprobado: las seis filas de la matriz de este registro, la cadena Dark
+  Wizard → Soul Master → Grand Master, la exclusión de Soul Wizard del ruleset
+  Season 4, `ENE 26` para Magic Gladiator, 5 puntos por nivel para
+  DW/DK/ELF/SUM, el sexto punto posterior a Hero Status desde nivel 220 y 7
+  puntos por nivel sin Marlon para MG/DL.
+- Clasificación: `VERIFIED` como axioma del ruleset
+  `mu-s4-global-reference`. La decisión sustituye el gate de evidencia histórica
+  para este alcance exacto; no reclasifica las fuentes individuales ni prueba su
+  independencia o fecha.
+- Conflictos: resuelve `DSP-0001` y mantiene resuelto `DSP-0002` mediante
+  `OWNER_DECISION`; las divergencias documentales permanecen visibles.
+- Uso permitido: contratos, fixtures, reglas productivas y pruebas. No autoriza
+  derivar HP, Mana, AG, SD, daño, defensa ni otras fórmulas sin evidencia y
+  especificación propias.
+
 ## Bitácora de investigación
+
+### 2026-07-23 — Publicación de reglas de progresión
+
+- No se añadió evidencia, fórmula ni claim, y no se reclasificó ninguna fuente.
+- Los cinco casos estándar quedaron enlazados desde
+  `progression-five-per-level-hero-status`; los casos separados de Magic
+  Gladiator y Dark Lord quedaron enlazados desde
+  `progression-seven-per-level`.
+- El gate ejecutable verifica que los siete IDs resuelvan a fixtures positivos
+  del mismo ruleset y regla. Los tres controles negativos permanecen fuera de
+  `testCaseRefs`.
+- Ambas reglas pasan de `REVIEWED` a `PUBLISHED`. La transformación continúa
+  limitada al tooling de validación; no se implementó el motor productivo.
+
+### 2026-07-23 — Materialización de casos de referencia de progresión
+
+- No se añadió evidencia, fórmula ni claim. Se materializaron los seis renglones
+  aprobados de la tabla de casos como siete fixtures positivos: MG y DL poseen
+  casos separados para conservar IDs resolubles por clase.
+- El validador ejecuta la transformación limitada registrada en este documento:
+  puntos base desde nivel 2 y bonus de Hero Status desde el primer nivel
+  posterior a 220. Los resultados esperados son 0, 1095, 1095, 1101, 1155 y
+  1533 para MG/DL.
+- Tres controles técnicos negativos demuestran que Hero Status requiere una
+  evolución elegible de segunda clase y no pertenece a la regla de Magic
+  Gladiator/Dark Lord. No se implementó el motor productivo.
+- Las reglas permanecen `REVIEWED` y sus `testCaseRefs` siguen vacíos; enlazarlas
+  y promoverlas a `PUBLISHED` queda como la siguiente tarea independiente.
+
+### 2026-07-23 — Materialización de registros canónicos
+
+- No se añadió evidencia ni se reclasificaron fuentes. Se materializó únicamente
+  el alcance `VERIFIED` y autorizado por EVD-0021.
+- Se fijaron seis IDs de clase con prefijo `class-`, dieciséis IDs de evolución
+  con prefijo `evolution-`, las reglas
+  `progression-five-per-level-hero-status` y
+  `progression-seven-per-level`, y la referencia `quest-hero-status`.
+- Los seis registros de clase conservan evidencias por stat y evolución, además
+  de `DSP-0001` o `DSP-0002` donde corresponde. Las dos reglas conservan
+  `confidence: VERIFIED`, pero quedan `REVIEWED` hasta convertir los casos
+  numéricos aprobados en fixtures ejecutables.
+- El validador integral acepta los ocho registros contra
+  `character-class.schema.json` y `progression-rule.schema.json`. No se
+  implementó el cálculo del presupuesto ni se derivaron fórmulas adicionales.
+
+### 2026-07-19 — Cierre de RES-0001 por axioma del ruleset
+
+- El propietario retiró la búsqueda histórica como condición de publicación
+  para la matriz completa y confirmó su estabilidad desde los inicios del juego.
+- Se añade EVD-0021, se promueven `CLM-0001`–`CLM-0006` a `VERIFIED` y el
+  registro pasa a `VERIFIED`.
+- `DSP-0001` queda resuelto a favor de Dark Wizard → Soul Master → Grand Master;
+  Soul Wizard permanece fuera de Season 4. `DSP-0002` conserva Energy 26 para
+  Magic Gladiator.
+- Las evidencias externas mantienen su clasificación original. La decisión
+  habilita la implementación productiva, no una reescritura de su provenance.
+
+### 2026-07-19 — Búsqueda histórica de stats iniciales
+
+- Pregunta: si existe evidencia primaria o un snapshot contemporáneo que
+  atribuya a Season 4 la matriz candidata de stats iniciales.
+- Hallazgo: EVD-0019 reúne dos transcripciones fechadas en Season 1 y Season 3
+  con la matriz completa; EVD-0020 coincide desde páginas fechadas en 2010.
+- Auditoría: no se localizó el original de Webzen de EVD-0019 y LostMu declara
+  edición comunitaria. Las seis URLs de EVD-0020 carecen de capturas anteriores
+  a septiembre de 2020 en el índice CDX consultado.
+- Resultado: la consistencia histórica de los números mejora, pero ninguna
+  fuente demuestra por sí sola continuidad hasta Season 4 global/inglesa ni
+  independencia técnica. `CLM-0002` y `CLM-0003` permanecen `PARTIAL`.
+- Decisión: no promover datos, no crear fixtures y dirigir la siguiente búsqueda
+  al original/snapshot de las actualizaciones históricas o a un artefacto
+  Season 4 global/inglés reproducible.
 
 ### 2026-07-19 — Stats iniciales, puntos por nivel, Marlon y fuentes adicionales
 
@@ -609,10 +769,10 @@ last_reviewed_at: "2026-07-19"
 
 ## Matriz de investigación
 
-Las filas son candidatas, no un ruleset publicable. `PARTIAL` indica coincidencia
-nominal entre varias publicaciones, no líneas independientes demostradas. La
-auditoría de EVD-0005/EVD-0008/EVD-0009 no resolvió su procedencia desde el
-ruleset global/inglés.
+Las filas fueron aprobadas como axiomas publicables del ruleset mediante
+EVD-0021. Las matrices de contraste conservan `PARTIAL` para describir la
+calidad individual de sus fuentes; esa clasificación no reduce el estado
+`VERIFIED` de la decisión de producto.
 
 ### Claims atómicos extraídos de Webzen
 
@@ -653,7 +813,7 @@ EVD-0006 y EVD-0007 no cuentan como dos editores independientes.
 |---|---|---|---|---|
 | WZ-CLM-001 | EVD-0011 | Coincide Dark Knight → Blade Knight. | Página/build 2022–2025 con clases posteriores; sin Season 4. | PARTIAL |
 | WZ-CLM-002 | EVD-0012 | Coincide Blade Knight → Blade Master. | Página/build 2022–2025 con clases posteriores; sin Season 4. | PARTIAL |
-| WZ-CLM-003 | EVD-0011, EVD-0012, EVD-0013 | EVD-0012/EVD-0013 ordenan Soul Master → Grand Master → Soul Wizard; EVD-0011 omite etapas. | `DSP-0001` abierto y sin frontera histórica de Season 4. | PARTIAL |
+| WZ-CLM-003 | EVD-0011, EVD-0012, EVD-0013 | EVD-0012/EVD-0013 ordenan Soul Master → Grand Master → Soul Wizard; EVD-0011 omite etapas. | `DSP-0001` resuelto por EVD-0021; la fuente individual sigue sin frontera histórica. | PARTIAL |
 | WZ-CLM-004 | EVD-0012, EVD-0013 | Coincide Soul Master → Grand Master y sitúa Soul Wizard después. | No demuestra que Season 4 terminara en Grand Master. | PARTIAL |
 | WZ-CLM-005 | EVD-0011 | Coincide Fairy Elf → Muse Elf. | Página/build 2022–2025 con clases posteriores; sin Season 4. | PARTIAL |
 | WZ-CLM-006 | EVD-0012 | Coincide Muse Elf → High Elf. | Página/build 2022–2025 con clases posteriores; sin Season 4. | PARTIAL |
@@ -681,14 +841,14 @@ solas promoción.
   retroactividad declarada por EVD-0015. No incluye puntos de quests diferentes,
   resets, frutas, perfiles privados ni puntos ya distribuidos.
 
-| Clase / ID provisional | Stats iniciales | Stats disponibles | Evolución | Puntos por nivel | Marlon | Evidencias independientes | Conflictos | Confianza |
+| Clase / ID definitivo | Stats iniciales | Stats disponibles | Evolución | Puntos por nivel | Marlon | Evidencias independientes | Conflictos | Confianza |
 |---|---|---|---|---|---|---:|---|---|
-| Dark Knight (`dark-knight`, provisional) | `28/20/25/10` | `STR/AGI/VIT/ENE` | Dark Knight → Blade Knight → Blade Master | 5; 6 tras Hero Status | Desde 220, segunda clase; extra retroactivo al completar | Fanz EVD-0014/15 + Webzen EVD-0016 + decisión EVD-0017 | Ninguno numérico | PARTIAL |
-| Dark Wizard (`dark-wizard`, provisional) | `18/18/15/30` | `STR/AGI/VIT/ENE` | Dark Wizard → Soul Master → Grand Master | 5; 6 tras Hero Status | Desde 220, segunda clase; extra retroactivo al completar | Fanz EVD-0014/15 + Webzen EVD-0016 + decisión EVD-0017 | Ninguno numérico | PARTIAL |
-| Fairy Elf (`fairy-elf`, provisional) | `22/25/20/15` | `STR/AGI/VIT/ENE` | Fairy Elf → Muse Elf → High Elf | 5; 6 tras Hero Status | Desde 220, segunda clase; extra retroactivo al completar | Fanz EVD-0014/15 + Webzen EVD-0016 + decisión EVD-0017 | Diferencia nominal `Elf`/`Fairy Elf` fuera de la cifra | PARTIAL |
-| Magic Gladiator (`magic-gladiator`, provisional) | `26/26/26/26` | `STR/AGI/VIT/ENE` | Magic Gladiator → Duel Master | 7 desde el inicio | No realiza | Fanz EVD-0014 + Webzen EVD-0016 + decisiones EVD-0017/18 | `DSP-0002` resuelto: se adopta ENE 26; Webzen actual publica 16 | PARTIAL |
-| Dark Lord (`dark-lord`, provisional) | `26/20/20/15/25` | `STR/AGI/VIT/ENE/CMD` | Dark Lord → Lord Emperor | 7 desde el inicio | No realiza | Fanz EVD-0014 + Webzen EVD-0016 + decisión EVD-0017 | Ninguno numérico | PARTIAL |
-| Summoner (`summoner`, provisional) | `21/21/18/23` | `STR/AGI/VIT/ENE` | Summoner → Bloody Summoner → Dimension Master | 5; 6 tras Hero Status | Desde 220, segunda clase; extra retroactivo al completar | Fanz EVD-0014/15 + Webzen EVD-0016 + decisión EVD-0017 | EVD-0006 omite Summoner de su tabla de evoluciones | PARTIAL |
+| Dark Knight (`class-dark-knight`) | `28/20/25/10` | `STR/AGI/VIT/ENE` | Dark Knight → Blade Knight → Blade Master | 5; 6 tras Hero Status | Desde 220, segunda clase; extra retroactivo al completar | Fanz EVD-0014/15 + Webzen EVD-0016 + históricas EVD-0019/20 + decisiones EVD-0017/21 | Ninguno numérico | VERIFIED |
+| Dark Wizard (`class-dark-wizard`) | `18/18/15/30` | `STR/AGI/VIT/ENE` | Dark Wizard → Soul Master → Grand Master | 5; 6 tras Hero Status | Desde 220, segunda clase; extra retroactivo al completar | Fanz EVD-0014/15 + Webzen EVD-0016 + históricas EVD-0019/20 + decisiones EVD-0017/21 | Ninguno numérico | VERIFIED |
+| Fairy Elf (`class-fairy-elf`) | `22/25/20/15` | `STR/AGI/VIT/ENE` | Fairy Elf → Muse Elf → High Elf | 5; 6 tras Hero Status | Desde 220, segunda clase; extra retroactivo al completar | Fanz EVD-0014/15 + Webzen EVD-0016 + históricas EVD-0019/20 + decisiones EVD-0017/21 | Diferencia nominal `Elf`/`Fairy Elf` fuera de la cifra | VERIFIED |
+| Magic Gladiator (`class-magic-gladiator`) | `26/26/26/26` | `STR/AGI/VIT/ENE` | Magic Gladiator → Duel Master | 7 desde el inicio | No realiza | Fanz EVD-0014 + Webzen EVD-0016 + históricas EVD-0019/20 + decisiones EVD-0017/18/21 | `DSP-0002` resuelto: se adopta ENE 26; Webzen actual publica 16 | VERIFIED |
+| Dark Lord (`class-dark-lord`) | `26/20/20/15/25` | `STR/AGI/VIT/ENE/CMD` | Dark Lord → Lord Emperor | 7 desde el inicio | No realiza | Fanz EVD-0014 + Webzen EVD-0016 + históricas EVD-0019/20 + decisiones EVD-0017/21 | Ninguno numérico | VERIFIED |
+| Summoner (`class-summoner`) | `21/21/18/23` | `STR/AGI/VIT/ENE` | Summoner → Bloody Summoner → Dimension Master | 5; 6 tras Hero Status | Desde 220, segunda clase; extra retroactivo al completar | Fanz EVD-0014/15 + Webzen EVD-0016 + históricas EVD-0019/20 + decisiones EVD-0017/21 | EVD-0006 omite Summoner de su tabla de evoluciones | VERIFIED |
 
 ### Casos de prueba de investigación para puntos
 
@@ -701,8 +861,10 @@ solas promoción.
 | Retroactividad | nivel 230, Hero Status completado | `1145 + 10 = 1155` |
 | MG/DL | nivel 220 | `7 × 219 = 1533` |
 
-Estos resultados prueban únicamente la transformación documentada; no son
-casos de referencia productivos mientras los claims permanezcan `PARTIAL`.
+Estos resultados quedan autorizados como casos de referencia para la futura
+implementación productiva mediante EVD-0021. Ya viven como fixtures ejecutables
+versionados bajo `reference-cases/progression/valid`; la transformación se
+ejecuta sólo en el validador de repositorio, no en un motor productivo.
 
 EVD-0004 contrasta los nombres de tercera clase desde una fuente oficial
 posterior, pero no se suma al conteo por carecer de atribución a Season 4.
@@ -726,23 +888,20 @@ posterior, pero no se suma al conteo por carecer de atribución a Season 4.
    promoverlo al ruleset `mu-s4-global-reference`.
 3. Capturar documentación oficial de Webzen cuando sea legalmente accesible,
    sin descartar páginas por su fecha de publicación.
-4. Buscar evidencia histórica permitida para aplicar a Season 4 las matrices de
-   EVD-0014/EVD-0017, conservando la resolución de MG registrada en EVD-0018.
-5. Mantener cerrada como negativa la auditoría histórica de las rutas de quests
-   de Fanz hasta que exista una marca de Season 4 o captura anterior verificable.
-6. Convertir los casos de investigación en fixtures sólo después de promover
-   los claims y fijar IDs no provisionales.
-7. Registrar cualquier diferencia de versión o implementación como conflicto.
-8. Solicitar revisión antes de promover datos o derivar fórmulas productivas.
+4. Conservar EVD-0019/EVD-0020 como provenance auxiliar, sin reabrir su búsqueda
+   como gate salvo nueva decisión del propietario.
+5. Usar los siete casos publicados como primera regresión del futuro motor
+   productivo del presupuesto, sin ampliar su alcance factual.
+6. Registrar cualquier diferencia de versión o implementación como conflicto.
+7. No derivar fórmulas fuera de este alcance sin investigación propia.
 
 ## Estado de evidencia
 
-- Evidencias registradas: 18 (las 13 anteriores, un conjunto de seis guías de
-  clase de Fanz, la guía Hero Status, un conjunto oficial de seis guías Webzen y
-  dos confirmaciones/decisiones del propietario).
-- Claims verificados: 0 de 6.
-- Claims parciales: 6 de 6.
-- Conflictos registrados: 2; `DSP-0001` permanece abierto por la inconsistencia
-  nominal de evolución y `DSP-0002` está resuelto por decisión del propietario
-  a favor de Energy 26 para Magic Gladiator.
-- Datos o fórmulas incorporados al producto: ninguno.
+- Evidencias registradas: 21.
+- Claims verificados: 6 de 6.
+- Claims parciales: 0 de 6.
+- Conflictos registrados: 2; `DSP-0001` y `DSP-0002` están resueltos por decisión
+  del propietario.
+- Datos incorporados al producto: seis registros canónicos de clase, dos reglas
+  de progresión `PUBLISHED` y siete fixtures numéricos ejecutables; cálculo
+  productivo pendiente.

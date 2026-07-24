@@ -1,0 +1,49 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "class-dark-knight",
+  "rulesetId": "mu-s4-global-reference",
+  "displayName": "Dark Knight",
+  "confidence": "VERIFIED",
+  "stats": {
+    "strength": {
+      "baseValue": 28,
+      "evidenceRefs": ["evd-0014", "evd-0016", "evd-0017", "evd-0019", "evd-0020", "evd-0021"]
+    },
+    "agility": {
+      "baseValue": 20,
+      "evidenceRefs": ["evd-0014", "evd-0016", "evd-0017", "evd-0019", "evd-0020", "evd-0021"]
+    },
+    "vitality": {
+      "baseValue": 25,
+      "evidenceRefs": ["evd-0014", "evd-0016", "evd-0017", "evd-0019", "evd-0020", "evd-0021"]
+    },
+    "energy": {
+      "baseValue": 10,
+      "evidenceRefs": ["evd-0014", "evd-0016", "evd-0017", "evd-0019", "evd-0020", "evd-0021"]
+    }
+  },
+  "evolutions": [
+    {
+      "id": "evolution-dark-knight",
+      "displayName": "Dark Knight",
+      "stage": 0,
+      "evidenceRefs": ["evd-0002", "evd-0005", "evd-0006", "evd-0007", "evd-0021"]
+    },
+    {
+      "id": "evolution-blade-knight",
+      "displayName": "Blade Knight",
+      "stage": 1,
+      "prerequisiteEvolutionId": "evolution-dark-knight",
+      "evidenceRefs": ["evd-0002", "evd-0005", "evd-0006", "evd-0007", "evd-0011", "evd-0021"]
+    },
+    {
+      "id": "evolution-blade-master",
+      "displayName": "Blade Master",
+      "stage": 2,
+      "prerequisiteEvolutionId": "evolution-blade-knight",
+      "evidenceRefs": ["evd-0002", "evd-0005", "evd-0006", "evd-0007", "evd-0012", "evd-0021"]
+    }
+  ],
+  "progressionRuleRefs": ["progression-five-per-level-hero-status"],
+  "evidenceRefs": ["evd-0002", "evd-0005", "evd-0006", "evd-0007", "evd-0011", "evd-0012", "evd-0014", "evd-0016", "evd-0017", "evd-0019", "evd-0020", "evd-0021"]
+}

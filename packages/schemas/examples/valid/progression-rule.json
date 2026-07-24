@@ -1,0 +1,23 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "progression-synthetic",
+  "version": "1.0.0",
+  "rulesetId": "ruleset-synthetic",
+  "status": "PUBLISHED",
+  "confidence": "VERIFIED",
+  "appliesToClassIds": ["class-synthetic"],
+  "levelPoints": {
+    "pointsPerLevel": 1,
+    "firstAwardedLevel": 2
+  },
+  "questBonus": {
+    "questId": "quest-synthetic",
+    "minimumLevel": 2,
+    "eligibleEvolutionIds": ["evolution-synthetic"],
+    "additionalPointsPerLevel": 1,
+    "retroactiveFromLevel": 2,
+    "evidenceRefs": ["evidence-synthetic-001"]
+  },
+  "evidenceRefs": ["evidence-synthetic-001"],
+  "testCaseRefs": ["test-synthetic-001"]
+}

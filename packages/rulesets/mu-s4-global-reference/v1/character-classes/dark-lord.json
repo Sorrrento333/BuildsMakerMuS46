@@ -1,0 +1,46 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "class-dark-lord",
+  "rulesetId": "mu-s4-global-reference",
+  "displayName": "Dark Lord",
+  "confidence": "VERIFIED",
+  "stats": {
+    "strength": {
+      "baseValue": 26,
+      "evidenceRefs": ["evd-0014", "evd-0016", "evd-0017", "evd-0019", "evd-0020", "evd-0021"]
+    },
+    "agility": {
+      "baseValue": 20,
+      "evidenceRefs": ["evd-0014", "evd-0016", "evd-0017", "evd-0019", "evd-0020", "evd-0021"]
+    },
+    "vitality": {
+      "baseValue": 20,
+      "evidenceRefs": ["evd-0014", "evd-0016", "evd-0017", "evd-0019", "evd-0020", "evd-0021"]
+    },
+    "energy": {
+      "baseValue": 15,
+      "evidenceRefs": ["evd-0014", "evd-0016", "evd-0017", "evd-0019", "evd-0020", "evd-0021"]
+    },
+    "command": {
+      "baseValue": 25,
+      "evidenceRefs": ["evd-0014", "evd-0016", "evd-0017", "evd-0019", "evd-0020", "evd-0021"]
+    }
+  },
+  "evolutions": [
+    {
+      "id": "evolution-dark-lord",
+      "displayName": "Dark Lord",
+      "stage": 0,
+      "evidenceRefs": ["evd-0001", "evd-0005", "evd-0006", "evd-0007", "evd-0021"]
+    },
+    {
+      "id": "evolution-lord-emperor",
+      "displayName": "Lord Emperor",
+      "stage": 2,
+      "prerequisiteEvolutionId": "evolution-dark-lord",
+      "evidenceRefs": ["evd-0002", "evd-0005", "evd-0006", "evd-0007", "evd-0012", "evd-0021"]
+    }
+  ],
+  "progressionRuleRefs": ["progression-seven-per-level"],
+  "evidenceRefs": ["evd-0001", "evd-0002", "evd-0005", "evd-0006", "evd-0007", "evd-0012", "evd-0014", "evd-0016", "evd-0017", "evd-0019", "evd-0020", "evd-0021"]
+}

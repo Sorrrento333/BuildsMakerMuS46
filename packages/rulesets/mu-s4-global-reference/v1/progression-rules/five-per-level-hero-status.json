@@ -1,0 +1,39 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "progression-five-per-level-hero-status",
+  "version": "1.0.0",
+  "rulesetId": "mu-s4-global-reference",
+  "status": "PUBLISHED",
+  "confidence": "VERIFIED",
+  "appliesToClassIds": [
+    "class-dark-knight",
+    "class-dark-wizard",
+    "class-fairy-elf",
+    "class-summoner"
+  ],
+  "levelPoints": {
+    "pointsPerLevel": 5,
+    "firstAwardedLevel": 2
+  },
+  "questBonus": {
+    "questId": "quest-hero-status",
+    "minimumLevel": 220,
+    "eligibleEvolutionIds": [
+      "evolution-blade-knight",
+      "evolution-soul-master",
+      "evolution-muse-elf",
+      "evolution-bloody-summoner"
+    ],
+    "additionalPointsPerLevel": 1,
+    "retroactiveFromLevel": 221,
+    "evidenceRefs": ["evd-0015", "evd-0017", "evd-0021"]
+  },
+  "evidenceRefs": ["evd-0014", "evd-0015", "evd-0016", "evd-0017", "evd-0021"],
+  "testCaseRefs": [
+    "progression-case-standard-level-1-no-hero-status",
+    "progression-case-standard-level-220-no-hero-status",
+    "progression-case-standard-level-220-with-hero-status",
+    "progression-case-standard-level-221-with-hero-status",
+    "progression-case-standard-level-230-with-hero-status"
+  ]
+}

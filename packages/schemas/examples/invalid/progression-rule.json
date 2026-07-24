@@ -1,0 +1,15 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "progression-synthetic",
+  "version": "1.0.0",
+  "rulesetId": "ruleset-synthetic",
+  "status": "PUBLISHED",
+  "confidence": "VERIFIED",
+  "appliesToClassIds": [],
+  "levelPoints": {
+    "pointsPerLevel": 0,
+    "firstAwardedLevel": 1
+  },
+  "evidenceRefs": ["evidence-synthetic-001"],
+  "testCaseRefs": []
+}

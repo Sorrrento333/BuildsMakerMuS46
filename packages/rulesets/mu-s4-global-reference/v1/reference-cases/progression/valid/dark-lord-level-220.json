@@ -1,0 +1,12 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "progression-case-dark-lord-level-220",
+  "rulesetId": "mu-s4-global-reference",
+  "progressionRuleId": "progression-seven-per-level",
+  "classId": "class-dark-lord",
+  "evolutionId": "evolution-dark-lord",
+  "level": 220,
+  "completedQuestIds": [],
+  "expectedEarnedPoints": 1533,
+  "evidenceRefs": ["evd-0014", "evd-0017", "evd-0021"]
+}

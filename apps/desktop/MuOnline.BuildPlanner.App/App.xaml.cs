@@ -4,7 +4,7 @@ using System.Windows;
 
 namespace MuOnline.BuildPlanner.App;
 
-public partial class App : Application
+public partial class App : System.Windows.Application
 {
     private static readonly JsonSerializerOptions ReportSerializerOptions = new()
     {

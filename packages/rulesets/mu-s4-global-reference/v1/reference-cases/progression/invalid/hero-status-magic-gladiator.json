@@ -1,0 +1,13 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "progression-case-invalid-hero-status-magic-gladiator",
+  "rulesetId": "mu-s4-global-reference",
+  "progressionRuleId": "progression-seven-per-level",
+  "classId": "class-magic-gladiator",
+  "evolutionId": "evolution-magic-gladiator",
+  "level": 220,
+  "completedQuestIds": ["quest-hero-status"],
+  "expectedEarnedPoints": 1533,
+  "expectedErrorCode": "quest-not-supported",
+  "evidenceRefs": ["evd-0015", "evd-0017", "evd-0021"]
+}

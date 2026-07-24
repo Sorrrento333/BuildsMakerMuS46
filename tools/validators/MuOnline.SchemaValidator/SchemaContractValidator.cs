@@ -14,6 +14,13 @@ public sealed record FixtureValidationResult(
     public bool MatchesExpectation => ExpectedValidity == ActualValidity;
 }
 
+public sealed record RulesetRecordValidationResult(
+    string ContractName,
+    string RecordId,
+    bool ActualValidity,
+    string SchemaPath,
+    string RecordPath);
+
 public static class SchemaContractValidator
 {
     private static readonly string[] ContractNames =
@@ -21,6 +28,8 @@ public static class SchemaContractValidator
         "evidence",
         "formula",
         "character-class",
+        "progression-rule",
+        "stat-distribution",
         "server-profile",
         "build",
     ];
@@ -58,6 +67,70 @@ public static class SchemaContractValidator
                 schemaPath,
                 schema,
                 Path.Combine(fixtureRoot, "invalid", $"{contractName}.json")));
+        }
+
+        return results;
+    }
+
+    public static IReadOnlyList<RulesetRecordValidationResult> ValidateRulesetRecords(
+        string repositoryRoot)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(repositoryRoot);
+
+        var fullRoot = Path.GetFullPath(repositoryRoot);
+        var schemaRoot = Path.Combine(fullRoot, "packages", "schemas", "v1");
+        var rulesetRoot = Path.Combine(
+            fullRoot,
+            "packages",
+            "rulesets",
+            "mu-s4-global-reference",
+            "v1");
+        var recordSets = new[]
+        {
+            (ContractName: "character-class", DirectoryName: "character-classes"),
+            (ContractName: "progression-rule", DirectoryName: "progression-rules"),
+        };
+        var results = new List<RulesetRecordValidationResult>();
+
+        foreach (var recordSet in recordSets)
+        {
+            var schemaPath = Path.Combine(
+                schemaRoot,
+                $"{recordSet.ContractName}.schema.json");
+            EnsureFileExists(schemaPath, "Schema");
+            var schema = JsonSchema.FromFile(
+                schemaPath,
+                new BuildOptions { SchemaRegistry = new SchemaRegistry() });
+            var recordDirectory = Path.Combine(rulesetRoot, recordSet.DirectoryName);
+
+            if (!Directory.Exists(recordDirectory))
+            {
+                throw new DirectoryNotFoundException(
+                    $"Ruleset record directory was not found: {recordDirectory}");
+            }
+
+            foreach (var recordPath in Directory.GetFiles(recordDirectory, "*.json")
+                         .Order(StringComparer.Ordinal))
+            {
+                using var instance = JsonDocument.Parse(File.ReadAllText(recordPath));
+                var evaluation = schema.Evaluate(
+                    instance.RootElement,
+                    new EvaluationOptions
+                    {
+                        OutputFormat = OutputFormat.List,
+                        RequireFormatValidation = true,
+                    });
+                var recordId = instance.RootElement.TryGetProperty("id", out var idElement)
+                    ? idElement.GetString() ?? Path.GetFileNameWithoutExtension(recordPath)
+                    : Path.GetFileNameWithoutExtension(recordPath);
+
+                results.Add(new RulesetRecordValidationResult(
+                    recordSet.ContractName,
+                    recordId,
+                    evaluation.IsValid,
+                    schemaPath,
+                    recordPath));
+            }
         }
 
         return results;

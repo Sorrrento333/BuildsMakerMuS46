@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.mu46.local/v1/stat-distribution.schema.json",
+  "title": "StatDistribution",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "rulesetId",
+    "characterClassId",
+    "progressionRule",
+    "earnedPoints",
+    "allocations",
+    "spentPoints",
+    "remainingPoints"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "1.0.0" },
+    "rulesetId": { "$ref": "#/$defs/id" },
+    "characterClassId": { "$ref": "#/$defs/id" },
+    "progressionRule": { "$ref": "#/$defs/versionedRef" },
+    "earnedPoints": { "$ref": "#/$defs/nonNegativeInt64" },
+    "allocations": {
+      "type": "object",
+      "minProperties": 1,
+      "propertyNames": { "$ref": "#/$defs/id" },
+      "additionalProperties": { "$ref": "#/$defs/nonNegativeInt64" }
+    },
+    "spentPoints": { "$ref": "#/$defs/nonNegativeInt64" },
+    "remainingPoints": { "$ref": "#/$defs/nonNegativeInt64" }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+    },
+    "semver": {
+      "type": "string",
+      "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)$"
+    },
+    "nonNegativeInt64": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9223372036854775807
+    },
+    "versionedRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "version"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "version": { "$ref": "#/$defs/semver" }
+      }
+    }
+  }
+}

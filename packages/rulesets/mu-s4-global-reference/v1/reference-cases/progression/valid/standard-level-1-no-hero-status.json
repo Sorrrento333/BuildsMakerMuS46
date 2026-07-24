@@ -1,0 +1,12 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "progression-case-standard-level-1-no-hero-status",
+  "rulesetId": "mu-s4-global-reference",
+  "progressionRuleId": "progression-five-per-level-hero-status",
+  "classId": "class-dark-wizard",
+  "evolutionId": "evolution-dark-wizard",
+  "level": 1,
+  "completedQuestIds": [],
+  "expectedEarnedPoints": 0,
+  "evidenceRefs": ["evd-0014", "evd-0017", "evd-0021"]
+}

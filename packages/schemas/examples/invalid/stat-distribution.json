@@ -1,0 +1,15 @@
+{
+  "schemaVersion": "1.0.0",
+  "rulesetId": "ruleset-synthetic",
+  "characterClassId": "class-synthetic",
+  "progressionRule": {
+    "id": "progression-synthetic",
+    "version": "1.0"
+  },
+  "earnedPoints": 10,
+  "allocations": {
+    "stat-alpha": -1
+  },
+  "spentPoints": 11,
+  "remainingPoints": -1
+}

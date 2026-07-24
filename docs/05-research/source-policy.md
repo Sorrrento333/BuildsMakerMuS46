@@ -15,6 +15,10 @@
 - Si ninguna fuente permite demostrar la versión objetivo, se registra el
   resultado negativo o `PARTIAL`; la coincidencia entre páginas actuales no se
   transforma por inferencia en evidencia histórica.
+- El propietario puede aceptar explícitamente un dato estable como axioma del
+  ruleset para desbloquear el producto. La decisión debe quedar registrada y
+  conserva las divergencias de las fuentes, pero elimina la búsqueda histórica
+  como gate sólo para el alcance exacto aprobado.
 
 ## Fuentes de contexto, procedencia y contraste
 

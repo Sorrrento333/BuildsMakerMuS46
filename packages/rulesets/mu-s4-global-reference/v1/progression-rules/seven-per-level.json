@@ -1,0 +1,21 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "progression-seven-per-level",
+  "version": "1.0.0",
+  "rulesetId": "mu-s4-global-reference",
+  "status": "PUBLISHED",
+  "confidence": "VERIFIED",
+  "appliesToClassIds": [
+    "class-magic-gladiator",
+    "class-dark-lord"
+  ],
+  "levelPoints": {
+    "pointsPerLevel": 7,
+    "firstAwardedLevel": 2
+  },
+  "evidenceRefs": ["evd-0014", "evd-0016", "evd-0017", "evd-0021"],
+  "testCaseRefs": [
+    "progression-case-magic-gladiator-level-220",
+    "progression-case-dark-lord-level-220"
+  ]
+}

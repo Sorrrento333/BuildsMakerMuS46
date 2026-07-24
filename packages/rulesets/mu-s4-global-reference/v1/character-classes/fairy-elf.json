@@ -1,0 +1,49 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "class-fairy-elf",
+  "rulesetId": "mu-s4-global-reference",
+  "displayName": "Fairy Elf",
+  "confidence": "VERIFIED",
+  "stats": {
+    "strength": {
+      "baseValue": 22,
+      "evidenceRefs": ["evd-0014", "evd-0016", "evd-0017", "evd-0019", "evd-0020", "evd-0021"]
+    },
+    "agility": {
+      "baseValue": 25,
+      "evidenceRefs": ["evd-0014", "evd-0016", "evd-0017", "evd-0019", "evd-0020", "evd-0021"]
+    },
+    "vitality": {
+      "baseValue": 20,
+      "evidenceRefs": ["evd-0014", "evd-0016", "evd-0017", "evd-0019", "evd-0020", "evd-0021"]
+    },
+    "energy": {
+      "baseValue": 15,
+      "evidenceRefs": ["evd-0014", "evd-0016", "evd-0017", "evd-0019", "evd-0020", "evd-0021"]
+    }
+  },
+  "evolutions": [
+    {
+      "id": "evolution-fairy-elf",
+      "displayName": "Fairy Elf",
+      "stage": 0,
+      "evidenceRefs": ["evd-0002", "evd-0005", "evd-0007", "evd-0021"]
+    },
+    {
+      "id": "evolution-muse-elf",
+      "displayName": "Muse Elf",
+      "stage": 1,
+      "prerequisiteEvolutionId": "evolution-fairy-elf",
+      "evidenceRefs": ["evd-0002", "evd-0005", "evd-0006", "evd-0007", "evd-0011", "evd-0021"]
+    },
+    {
+      "id": "evolution-high-elf",
+      "displayName": "High Elf",
+      "stage": 2,
+      "prerequisiteEvolutionId": "evolution-muse-elf",
+      "evidenceRefs": ["evd-0002", "evd-0005", "evd-0006", "evd-0007", "evd-0012", "evd-0021"]
+    }
+  ],
+  "progressionRuleRefs": ["progression-five-per-level-hero-status"],
+  "evidenceRefs": ["evd-0002", "evd-0005", "evd-0006", "evd-0007", "evd-0011", "evd-0012", "evd-0014", "evd-0016", "evd-0017", "evd-0019", "evd-0020", "evd-0021"]
+}

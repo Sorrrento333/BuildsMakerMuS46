@@ -35,10 +35,15 @@ Los locks, SPDX, provenance y hashes revisados viven en
 `spikes/json-everything-source-build/`. El diseño, la integración y sus límites
 están en `docs/03-architecture/json-everything-source-integration.md`.
 
-El comando valida los cinco contratos `1.0.0`, acepta los cinco fixtures de
-`examples/valid`, rechaza los cinco de `examples/invalid` y devuelve un código
-distinto de cero si alguna expectativa no se cumple. Las pruebas de contrato se
-ejecutan con:
+El comando valida los siete contratos `1.0.0`, acepta los siete fixtures de
+`examples/valid`, rechaza los siete de `examples/invalid` y devuelve un código
+distinto de cero si alguna expectativa no se cumple. También valida contra
+`character-class.schema.json` y `progression-rule.schema.json` los ocho
+registros canónicos de `packages/rulesets/mu-s4-global-reference/v1`; estos
+registros no son fixtures sintéticos. Además ejecuta siete casos de referencia
+factuales de progresión y exige el rechazo de tres controles semánticos
+inválidos. Esta comprobación pertenece al tooling de validación y no constituye
+todavía el motor productivo. Las pruebas de contrato se ejecutan con:
 
 ```powershell
 dotnet test --solution MUOnline.BuildPlanner.slnx
@@ -54,6 +59,21 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File tests/schemas/Test-Schem
 CI restaura las dependencias bloqueadas, compila en Release y ejecuta las
 pruebas mediante Microsoft Testing Platform, seleccionado en `global.json`.
 Los fixtures siguen siendo exclusivamente técnicos y sintéticos.
+
+`progression-rule.schema.json` representa puntos base otorgados al subir de
+nivel y un bonus opcional condicionado por quest. Separa el nivel mínimo para
+completar la quest del nivel desde el que se aplica la retroactividad y exige
+declarar clases, evoluciones elegibles, evidencia y casos de prueba. Las
+relaciones semánticas entre esos campos se validarán además en el dominio.
+
+`stat-distribution.schema.json` representa una distribución trazable del
+presupuesto ya ganado: referencia la regla de progresión, enumera asignaciones,
+puntos gastados y remanente. El schema valida rangos escalares; la suma de
+asignaciones y su coincidencia exacta con los stats declarados por la clase son
+invariantes del dominio documentadas en
+`docs/04-domain/stat-distribution-contract.md`. Por ello `command` sólo será
+admitido cuando exista en la definición canónica de la clase y no mediante una
+lista de clases duplicada en el contrato.
 
 Los binarios NuGet publicados de Json Everything ya no forman parte del grafo
 normal. El validador consume referencias directas a los DLL autocompilados y su
