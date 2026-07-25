@@ -38,7 +38,7 @@ de compararlos línea por línea con locks regenerados desde el origen configura
 `tools/spikes/Test-JsonEverythingSourceBuild.ps1` obtiene dos checkouts
 independientes del commit exacto, inyecta los locks revisados, restaura con
 `--locked-mode`, compila con `PathMap`, compara los hashes esperados y ejecuta
-dos veces los diez fixtures más la prueba de formatos `uri`/`date`. También
+dos veces los veinte fixtures más la prueba de formatos `uri`/`date`. También
 contrasta el inventario generado con el SPDX revisado y rechaza
 `OSMFEULA.txt` en la salida runtime.
 
@@ -59,7 +59,7 @@ pipeline fuente y luego restore bloqueado, build, pruebas e inspección de
 publicación. El job WPF no adquiere esta dependencia y mantiene su verificación
 separada.
 
-El harness enlazado al validador ejecuta los ocho contratos actuales: 16/16
+El harness enlazado al validador ejecuta los diez contratos actuales: 20/20
 fixtures en cada una de dos rutas fuente independientes, más la prueba explícita
 de formatos.
 

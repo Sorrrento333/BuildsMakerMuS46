@@ -1,0 +1,22 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "trace-synthetic-invalid",
+  "rulesetId": "ruleset-synthetic",
+  "formulaRef": {
+    "id": "formula-synthetic-001"
+  },
+  "context": {
+    "characterClassId": "class-synthetic",
+    "evolutionId": "evolution-synthetic"
+  },
+  "inputs": {},
+  "steps": [],
+  "rounding": {
+    "mode": "UNKNOWN",
+    "stage": "visible-output"
+  },
+  "rawOutput": "not-a-number",
+  "visibleOutput": 2,
+  "evidenceRefs": [],
+  "conflictIds": []
+}

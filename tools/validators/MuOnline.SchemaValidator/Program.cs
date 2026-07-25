@@ -15,6 +15,8 @@ var progressionCaseResults =
     ProgressionReferenceCaseValidator.ValidateRepository(repositoryRoot);
 var progressionRuleReferenceResults =
     ProgressionReferenceCaseValidator.ValidateRuleReferences(repositoryRoot);
+var formulaReferenceResults =
+    FormulaReferenceCaseValidator.ValidateRepository(repositoryRoot);
 
 foreach (var result in results)
 {
@@ -51,9 +53,20 @@ foreach (var result in progressionRuleReferenceResults)
         $"errors={string.Join(" | ", result.Errors.DefaultIfEmpty("none"))}");
 }
 
+foreach (var result in formulaReferenceResults)
+{
+    var status = result.IsValid ? "PASS" : "FAIL";
+    Console.WriteLine(
+        $"{status}: formula '{result.FormulaId}' version={result.FormulaVersion}, " +
+        $"status={result.Status}, positive cases={result.PositiveCaseIds.Count}, " +
+        $"negative controls={result.NegativeCaseIds.Count}, " +
+        $"errors={string.Join(" | ", result.Errors.DefaultIfEmpty("none"))}");
+}
+
 return results.All(result => result.MatchesExpectation) &&
        rulesetResults.All(result => result.ActualValidity) &&
        progressionCaseResults.All(result => result.MatchesExpectation) &&
-       progressionRuleReferenceResults.All(result => result.IsValid)
+       progressionRuleReferenceResults.All(result => result.IsValid) &&
+       formulaReferenceResults.All(result => result.IsValid)
     ? 0
     : 1;

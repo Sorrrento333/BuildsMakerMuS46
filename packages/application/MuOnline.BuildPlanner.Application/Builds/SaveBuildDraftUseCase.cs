@@ -3,6 +3,7 @@ namespace MuOnline.BuildPlanner.Application.Builds;
 public sealed record SaveBuildDraftRequest(
     string Id,
     BuildDraftProgressionInputs ProgressionInputs,
+    BuildDraftResetInputs ResetInputs,
     IReadOnlyDictionary<string, long> Allocations);
 
 public sealed class SaveBuildDraftUseCase
@@ -27,6 +28,7 @@ public sealed class SaveBuildDraftUseCase
         ArgumentNullException.ThrowIfNull(request);
         ArgumentException.ThrowIfNullOrWhiteSpace(request.Id);
         ArgumentNullException.ThrowIfNull(request.ProgressionInputs);
+        ArgumentNullException.ThrowIfNull(request.ResetInputs);
         ArgumentNullException.ThrowIfNull(request.Allocations);
 
         var progressionInputs = request.ProgressionInputs with
@@ -36,6 +38,7 @@ public sealed class SaveBuildDraftUseCase
         var distribution = BuildDraftCalculation.Calculate(
             _context,
             progressionInputs,
+            request.ResetInputs,
             request.Allocations);
         var draft = new BuildDraft(
             BuildDraft.CurrentSchemaVersion,
@@ -44,6 +47,7 @@ public sealed class SaveBuildDraftUseCase
             _context.Dataset,
             _context.EngineVersion,
             progressionInputs,
+            request.ResetInputs,
             distribution);
 
         await _repository.SaveAsync(draft, cancellationToken);

@@ -10,6 +10,7 @@ internal static class BuildDraftCalculation
     public static BuildDraftStatDistribution Calculate(
         BuildDraftRuntimeContext context,
         BuildDraftProgressionInputs inputs,
+        BuildDraftResetInputs resetInputs,
         IReadOnlyDictionary<string, long> allocations)
     {
         EnsureRuntimeContext(context);
@@ -22,6 +23,9 @@ internal static class BuildDraftCalculation
                 inputs.CompletedQuestIds));
         var distribution = new CalculateStatDistributionUseCase(context.Catalog).Execute(
             budget,
+            new ResetPointInputs(
+                resetInputs.ResetCount,
+                resetInputs.PointsPerReset),
             allocations);
 
         return ToSnapshot(distribution);
@@ -56,6 +60,11 @@ internal static class BuildDraftCalculation
                 result.ProgressionRuleId,
                 result.ProgressionRuleVersion),
             result.EarnedPoints,
+            new BuildDraftResetInputs(
+                result.ResetInputs.ResetCount,
+                result.ResetInputs.PointsPerReset),
+            result.ResetPoints,
+            result.TotalDistributablePoints,
             new Dictionary<string, long>(result.Allocations, StringComparer.Ordinal),
             result.SpentPoints,
             result.RemainingPoints);

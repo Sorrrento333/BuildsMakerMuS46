@@ -4,6 +4,117 @@
 
 ### Added
 
+- Definición factual `formula-hp-dark-wizard` `1.0.0`, incorporada inicialmente
+  como `DRAFT` y publicada tras su revisión, con
+  aplicabilidad exacta a Dark Wizard, Soul Master y Grand Master, inputs
+  tipados, bounds técnicos/factuales, expresión aprobada, truncamiento visible,
+  cinco pasos de traza, `EVD-0021`/`EVD-0026` y conflicto `DSP-0003`.
+- Cuatro casos positivos y cuatro controles negativos de HP materializados bajo
+  `reference-cases/formulas`, sin duplicar constantes o resultados en C#.
+  Cubren base, incremento de nivel, incremento de Vitality, Grand Master, nivel
+  inválido, Vitality bajo base, familia no aplicable y overflow técnico.
+- Gate semántico factual de fórmulas en el validador integral. Comprueba
+  identidad exacta, pertenencia al catálogo, inputs, pasos/outputs, redondeo,
+  provenance y cobertura completa de positivos; cuatro mutaciones prueban el
+  fallo cerrado. No se añadió motor, Application, Data ni WPF para HP.
+- Contratos JSON Schema 2020-12 `formula.schema.json` `1.1.0`,
+  `calculation-trace.schema.json` `1.0.0` y
+  `formula-test-case.schema.json` `1.0.0`. Separan definición, ejecución y
+  expectativa, con aplicabilidad, bounds clasificados, fuentes cerradas de
+  inputs, pasos ordenados y referencias exactas de ID/versión.
+- Seis fixtures exclusivamente sintéticos para los tres contratos. El caso
+  positivo de fórmula resuelve mediante `$ref` una traza completa y la unión
+  cerrada admite alternativamente un único `expectedErrorCode`; no se añadió
+  ninguna fórmula ni caso factual al ruleset.
+- Cobertura del validador integral, la prueba estructural y el harness de
+  compilación fuente ampliada a 10 schemas y 20 fixtures. Pruebas focalizadas
+  rechazan aplicabilidad vacía/duplicada, bounds factuales sin evidencia,
+  procedencia incompleta, pasos duplicados, salidas fuera de la declaración y
+  expectativas positivas/negativas ambiguas.
+- Decisión técnica de contratos de fórmula, ya implementada:
+  `formula.schema.json` avanzó a
+  `1.1.0` con aplicabilidad, bounds clasificados, procedencia cerrada de inputs
+  y pasos ordenados; `calculation-trace.schema.json` y
+  `formula-test-case.schema.json` separarán ejecución y expectativas en
+  `1.0.0`.
+- Comparación de alternativas, responsabilidades de campos, versionado,
+  referencias exactas y gates semánticos para fórmulas/trazas/casos. La
+  implementación quedó limitada a schemas, fixtures y tooling; no se creó
+  ninguna fórmula canónica ni código productivo.
+- Diseño previo a implementación de `DR-HP-DARK-WIZARD` con ID candidato
+  `formula-hp-dark-wizard` `1.0.0`, alcance sobre las tres evoluciones de la
+  familia, entradas, límites técnicos, aritmética comprobada y traza explícita
+  `base + nivel + Vitality → raw → truncamiento visible`.
+- Ocho casos manuales propuestos para HP de Dark Wizard: base 60, incremento
+  aislado de nivel, incremento aislado de Vitality, combinación en Grand Master,
+  mínimos inválidos, familia no aplicable y overflow técnico. Permanecen fuera
+  del ruleset y del motor hasta aprobar el diseño.
+- Análisis de brecha de `formula.schema.json` `1.0.0` para aplicabilidad por
+  clase/evolución, límites numéricos, procedencia del input, traza ordenada y
+  contrato de casos de fórmula, sin modificar todavía schemas ni fixtures.
+- EVD-0032 con la fórmula base de SD de Summoner y `defense = agi / 3`.
+  El propietario confirma SD inicial 102 y truncamiento independiente de los
+  tres términos antes de sumarlos. `DSP-0004` queda resuelto y `RES-0002`
+  alcanza 24/24 claims `VERIFIED`.
+- EVD-0031 conserva la corrección final del propietario a +1.7 Mana por punto
+  de Energy para Summoner Season 4 y Mana 40 al nacer en nivel 1 con Energy 23,
+  coincidente con Fanz; el valor 1.5 por Energy queda retirado. La confirmación
+  de +1.5 Mana por nivel cierra
+  `40 + (lvl - 1) * 1.5 + (ene - 23) * 1.7` y promueve el claim a `VERIFIED`.
+- EVD-0030 con la corrección del propietario para Summoner: nivel 1,
+  Vitality 18 = HP 70, +2 HP por cada punto adicional de Vitality y +1 HP por
+  nivel. `DR-HP-SUMMONER` pasa a `VERIFIED` con
+  `70 + (lvl - 1) + (vit - 18) * 2`; aún no se implementa en el motor.
+- EVD-0027–EVD-0029 para los recursos faltantes de Summoner: MU Online Fanz,
+  Webzen y MUonline Helper coinciden en HP 70, Mana 40, SD 102 y aumentos por
+  nivel de HP/Mana. Los tres claims pasaron inicialmente a `PARTIAL`; EVD-0030
+  cerró después HP. No se modifica el catálogo ejecutable.
+- EVD-0026 como decisión explícita del propietario para el catálogo de fórmulas
+  Season 4 global/inglés de las seis familias. Conserva expresiones de recursos,
+  daño, wizardry, defensa, rates, regeneración, buffs, Fenrir, pets y clan, con
+  truncamiento de la parte decimal en el valor mostrado.
+- Veinticuatro claims `VERIFIED` en `RES-0002`: HP, Mana, AG y SD para las seis
+  familias, incluida Summoner.
+  HP y Mana de Summoner quedan `VERIFIED`; SD sigue `PARTIAL`.
+- Catálogo Summoner aprobado para daño físico y wizardry, attack/defense rates,
+  defensa, velocidad, AG y buffs Reflect, Berserker, Innovation y Weakness.
+  Queda documentado para futuros contratos sin implementación productiva.
+- Primer contraste de `DR-HP-DARK-WIZARD` en `RES-0002`: EVD-0022–EVD-0025
+  trazan MU Online Fanz, Webzen, StrategyWiki e InfinityMU. El claim queda
+  `PARTIAL` y `DSP-0003` conserva la divergencia de 1 frente a 2 HP por
+  Stamina/Vitality; no se publican fórmulas, fixtures ni datos del ruleset.
+- Registro de investigación `RES-0002` para HP, Mana, AG y SD: 24 claims
+  separados por atributo y familia de clase, todos inicialmente `UNVERIFIED`,
+  sin fórmulas ni evidencias. El gate exige versión, evolución aplicable,
+  entradas, orden de operaciones, redondeo y casos reproducibles antes de
+  modificar schemas, ruleset o motor.
+- Configuración de resets aprobada por el propietario: cantidad y puntos por
+  reset empiezan en cero, el motor calcula su producto con overflow controlado y
+  suma esos puntos al presupuesto disponible para distribución sin modificar el
+  ruleset Season 4.
+- Controles WPF `Resets`, `Puntos por reset` y `Puntos totales por resets`, más
+  desglose visible de progresión, resets, total distribuible, gasto y remanente.
+- Cuatro códigos tipados para inputs negativos y overflow de resets; pruebas
+  sintéticas cubren defaults, `2 × 100 = 200`, producto fuera de rango y suma
+  fuera de rango.
+- Persistencia y revalidación de los inputs de reset en borradores. El smoke
+  publicado distribuye los 200 puntos configurados y reproduce el mismo
+  resultado después de backup/restore y reemplazo del artefacto.
+- Composición WPF de `SaveBuildDraftUseCase` y `LoadBuildDraftUseCase` con
+  `SqliteBuildDraftRepository`. La base productiva vive en
+  `%LOCALAPPDATA%\MuOnline.BuildPlanner\build-planner.sqlite` y aplica
+  `SqliteBuildDraftMigrations.All` antes de construir el repositorio.
+- Identidad explícita para borradores publicados: ruleset `1.0.0`, dataset
+  `2026-07-24.1`, motor `0.1.0` y SHA-256 determinista sobre rutas relativas y
+  bytes exactos de los 27 JSON empaquetados.
+- Controles WPF mínimos para guardar/cargar por ID. La carga vuelve
+  exclusivamente por Application, recalcula antes de repoblar la pantalla y
+  muestra los seis códigos `build-draft-*`, incluido
+  `build-draft-write-conflict`, junto con su explicación.
+- Gate del artefacto publicado para guardar un borrador sintético en la base
+  externa, revalidarlo, incluirlo en backup/restore y volver a cargarlo desde
+  los binarios de reemplazo. Compara ID, metadata, hash, asignaciones, gasto y
+  remanente sin añadir datos ni fórmulas de MU Online.
 - Migración SQLite hacia adelante `1/create_build_drafts` y
   `SqliteBuildDraftRepository` como implementación Data de
   `IBuildDraftRepository`. Cada alta/reemplazo confirma payload JSON y metadata
@@ -236,9 +347,33 @@
 
 ### Changed
 
+- `formula-hp-dark-wizard` `1.0.0` pasa de `DRAFT` a `PUBLISHED` después de una
+  revisión limitada de sus nueve JSON contra el contrato aprobado. Identidad,
+  provenance, aplicabilidad, inputs, bounds, expresión, cinco pasos, redondeo,
+  cuatro casos positivos y cuatro controles negativos quedaron sin cambios; una
+  prueba fija el nuevo estado y el motor continúa fuera de alcance.
+- Se cierra la decisión abierta sobre aplicabilidad, límites, procedencia,
+  traza y casos. El diseño de `DR-HP-DARK-WIZARD`, el plan de schemas y la
+  estrategia de pruebas apuntan ahora al contrato técnico único documentado,
+  sin alterar evidencia ni registros de investigación.
+- Revisión técnica aprobada de `formula-hp-dark-wizard` `1.0.0` para ID,
+  aplicabilidad, tipos, errores, traza y ocho casos manuales. Se corrigió la
+  procedencia: `EVD-0026` autoriza la fórmula y `EVD-0021` sustenta Vitality 15
+  como mínimo canónico; los extremos enteros quedan clasificados como límites
+  técnicos, no como máximos factuales del juego. En ese cierre la estrategia de
+  schemas permanecía pendiente; la decisión técnica posterior de este mismo
+  bloque la resuelve sin materializar datos ni código.
+- `DSP-0003` se resuelve por decisión del propietario a favor de
+  `HP = 30 + (lvl - 1) + vit * 2` para la familia Dark Wizard. La evidencia
+  contradictoria de MU Online Fanz conserva su clasificación individual.
+- `stat-distribution.schema.json` y `build-draft.schema.json` avanzan a `1.1.0`
+  para conservar inputs/producto de resets y total distribuible. El motor WPF
+  avanza a `0.2.0`; ruleset `1.0.0` y dataset `2026-07-24.1` no cambian.
+- La carga normaliza borradores `1.0.0` a resets cero en memoria y los revalida
+  como `1.1.0` sin mutar el payload SQLite durante la lectura.
 - El validador integral, la prueba de contrato, la comprobación PowerShell y el
-  harness de compilación fuente cubren ahora 8 schemas y 16 fixtures; el
-  harness autocompilado aprueba dos ejecuciones 16/16 y la prueba de formatos.
+  harness de compilación fuente cubren ahora 10 schemas y 20 fixtures; el
+  harness autocompilado aprueba dos ejecuciones 20/20 y la prueba de formatos.
 - `ProgressionPointBudgetResult` conserva ahora `CharacterClassId`, y
   `CharacterProgressionDefinition` los IDs de stats del snapshot, para validar
   la procedencia y disponibilidad sin duplicar datos factuales.
@@ -361,7 +496,7 @@
 - `global.json` fija exactamente el SDK `10.0.301` con `rollForward: disable` y
   CI declara la versión como cadena. Así un SDK `10.0.302` preinstalado en el
   runner no reemplaza al SDK revisado durante el build reproducible.
-- El harness de compilación fuente valida ahora los 16 fixtures de los ocho
+- El harness de compilación fuente valida ahora los 20 fixtures de los diez
   contratos actuales en cada ejecución, en lugar de conservar inventarios
   anteriores.
 - El pipeline reproducible de Json Everything fuerza checkouts LF y elimina

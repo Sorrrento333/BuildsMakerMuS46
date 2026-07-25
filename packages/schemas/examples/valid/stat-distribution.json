@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "1.0.0",
+  "schemaVersion": "1.1.0",
   "rulesetId": "ruleset-synthetic",
   "characterClassId": "class-synthetic",
   "progressionRule": {
@@ -7,10 +7,16 @@
     "version": "1.0.0"
   },
   "earnedPoints": 10,
+  "resetInputs": {
+    "resetCount": 2,
+    "pointsPerReset": 100
+  },
+  "resetPoints": 200,
+  "totalDistributablePoints": 210,
   "allocations": {
     "stat-alpha": 4,
     "stat-beta": 3
   },
   "spentPoints": 7,
-  "remainingPoints": 3
+  "remainingPoints": 203
 }

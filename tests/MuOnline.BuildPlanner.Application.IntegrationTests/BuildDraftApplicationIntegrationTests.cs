@@ -35,8 +35,12 @@ public sealed class BuildDraftApplicationIntegrationTests
             loaded.StatDistribution.Allocations);
         Assert.NotSame(saved.StatDistribution, loaded.StatDistribution);
         Assert.Equal(10, loaded.StatDistribution.EarnedPoints);
+        Assert.Equal(2, loaded.ResetInputs.ResetCount);
+        Assert.Equal(100, loaded.ResetInputs.PointsPerReset);
+        Assert.Equal(200, loaded.StatDistribution.ResetPoints);
+        Assert.Equal(210, loaded.StatDistribution.TotalDistributablePoints);
         Assert.Equal(7, loaded.StatDistribution.SpentPoints);
-        Assert.Equal(3, loaded.StatDistribution.RemainingPoints);
+        Assert.Equal(203, loaded.StatDistribution.RemainingPoints);
     }
 
     [Fact]
@@ -63,7 +67,7 @@ public sealed class BuildDraftApplicationIntegrationTests
             .ExecuteAsync(replacement.Id, TestContext.Current.CancellationToken);
 
         Assert.Equal(10, loaded.StatDistribution.SpentPoints);
-        Assert.Equal(0, loaded.StatDistribution.RemainingPoints);
+        Assert.Equal(200, loaded.StatDistribution.RemainingPoints);
         Assert.Equal(1, repository.Count);
     }
 
@@ -145,6 +149,66 @@ public sealed class BuildDraftApplicationIntegrationTests
     }
 
     [Fact]
+    public async Task LoadRejectsAlteredResetPointCache()
+    {
+        var draft = await CreateValidDraftAsync(TestContext.Current.CancellationToken);
+        var repository = new InMemoryBuildDraftRepository();
+        await repository.SaveAsync(
+            draft with
+            {
+                StatDistribution = draft.StatDistribution with
+                {
+                    ResetPoints = 201,
+                    TotalDistributablePoints = 211,
+                    RemainingPoints = 204,
+                },
+            },
+            TestContext.Current.CancellationToken);
+
+        var exception = await Assert.ThrowsAsync<BuildDraftException>(
+            () => new LoadBuildDraftUseCase(repository, RuntimeContext)
+                .ExecuteAsync(draft.Id, TestContext.Current.CancellationToken));
+
+        Assert.Equal(BuildDraftErrorCodes.RevalidationFailed, exception.Code);
+    }
+
+    [Fact]
+    public async Task LoadUpgradesVersionOneDraftWithZeroResetDefaults()
+    {
+        var repository = new InMemoryBuildDraftRepository();
+        var current = await new SaveBuildDraftUseCase(repository, RuntimeContext)
+            .ExecuteAsync(
+                CreateSaveRequest("draft-legacy") with
+                {
+                    ResetInputs = new BuildDraftResetInputs(0, 0),
+                },
+                TestContext.Current.CancellationToken);
+        var legacy = current with
+        {
+            SchemaVersion = BuildDraft.PreviousSchemaVersion,
+            ResetInputs = null!,
+            StatDistribution = current.StatDistribution with
+            {
+                SchemaVersion = BuildDraftStatDistribution.PreviousSchemaVersion,
+                ResetInputs = null!,
+                ResetPoints = 0,
+                TotalDistributablePoints = 0,
+            },
+        };
+        await repository.SaveAsync(legacy, TestContext.Current.CancellationToken);
+
+        var loaded = await new LoadBuildDraftUseCase(repository, RuntimeContext)
+            .ExecuteAsync(legacy.Id, TestContext.Current.CancellationToken);
+
+        Assert.Equal(BuildDraft.CurrentSchemaVersion, loaded.SchemaVersion);
+        Assert.Equal(0, loaded.ResetInputs.ResetCount);
+        Assert.Equal(0, loaded.ResetInputs.PointsPerReset);
+        Assert.Equal(0, loaded.StatDistribution.ResetPoints);
+        Assert.Equal(10, loaded.StatDistribution.TotalDistributablePoints);
+        Assert.Equal(3, loaded.StatDistribution.RemainingPoints);
+    }
+
+    [Fact]
     public async Task SerializableModelUsesExactSchemaPropertyNames()
     {
         var draft = await CreateValidDraftAsync(TestContext.Current.CancellationToken);
@@ -153,6 +217,7 @@ public sealed class BuildDraftApplicationIntegrationTests
         using var document = JsonDocument.Parse(json);
         var root = document.RootElement;
         var progressionInputs = root.GetProperty("progressionInputs");
+        var resetInputs = root.GetProperty("resetInputs");
         var distribution = root.GetProperty("statDistribution");
 
         Assert.Equal(BuildDraft.CurrentSchemaVersion, root.GetProperty("schemaVersion").GetString());
@@ -160,6 +225,14 @@ public sealed class BuildDraftApplicationIntegrationTests
         Assert.Equal(
             draft.ProgressionInputs.CharacterClassId,
             progressionInputs.GetProperty("characterClassId").GetString());
+        Assert.Equal(2, resetInputs.GetProperty("resetCount").GetInt64());
+        Assert.Equal(100, resetInputs.GetProperty("pointsPerReset").GetInt64());
+        Assert.Equal(
+            200,
+            distribution.GetProperty("resetPoints").GetInt64());
+        Assert.Equal(
+            210,
+            distribution.GetProperty("totalDistributablePoints").GetInt64());
         Assert.Equal(
             draft.StatDistribution.ProgressionRule.Id,
             distribution.GetProperty("progressionRule").GetProperty("id").GetString());
@@ -180,6 +253,7 @@ public sealed class BuildDraftApplicationIntegrationTests
                 "evolution-synthetic",
                 3,
                 []),
+            new BuildDraftResetInputs(2, 100),
             new Dictionary<string, long>(StringComparer.Ordinal)
             {
                 ["stat-alpha"] = 4,

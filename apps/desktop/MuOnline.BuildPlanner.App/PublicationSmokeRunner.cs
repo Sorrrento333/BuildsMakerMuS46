@@ -2,6 +2,7 @@ using System.Data;
 using System.IO;
 using System.Text.Json;
 using Microsoft.Data.Sqlite;
+using MuOnline.BuildPlanner.Application.Builds;
 using MuOnline.BuildPlanner.Application.Progression;
 using MuOnline.BuildPlanner.Application.Stats;
 using MuOnline.BuildPlanner.Data;
@@ -13,11 +14,11 @@ namespace MuOnline.BuildPlanner.App;
 internal static class PublicationSmokeRunner
 {
     private const string ExpectedPersistedValue = "persisted-across-update";
-    private const string DatabaseFileName = "publication-smoke.sqlite";
     private const string BackupFileName = "publication-smoke.backup.sqlite";
+    private const string BuildDraftId = "publication-smoke-draft";
 
     private static readonly SqliteMigration SyntheticMigration = new(
-        1,
+        2,
         "create_publication_smoke_probe",
         """
         CREATE TABLE publication_smoke_probe (
@@ -33,8 +34,11 @@ internal static class PublicationSmokeRunner
         EnsureDataOutsideBinaryDirectory(options.DataDirectory);
         Directory.CreateDirectory(options.DataDirectory);
         var progressionVerification = VerifyPublishedProgressionRuleset();
+        var buildDraftServices = PublishedBuildDraftServices.Create(
+            options.DataDirectory,
+            [SyntheticMigration]);
 
-        var databasePath = Path.Combine(options.DataDirectory, DatabaseFileName);
+        var databasePath = buildDraftServices.DatabasePath;
         var backupPath = Path.Combine(options.DataDirectory, BackupFileName);
 
         return options.Phase switch
@@ -43,12 +47,14 @@ internal static class PublicationSmokeRunner
                 databasePath,
                 backupPath,
                 options,
-                progressionVerification),
+                progressionVerification,
+                buildDraftServices),
             PublicationSmokePhase.VerifyUpdate => VerifyUpdate(
                 databasePath,
                 backupPath,
                 options,
-                progressionVerification),
+                progressionVerification,
+                buildDraftServices),
             _ => throw new ArgumentOutOfRangeException(nameof(options)),
         };
     }
@@ -57,12 +63,13 @@ internal static class PublicationSmokeRunner
         string databasePath,
         string backupPath,
         PublicationSmokeOptions options,
-        ProgressionVerificationResult progressionVerification)
+        ProgressionVerificationResult progressionVerification,
+        PublishedBuildDraftServices buildDraftServices)
     {
-        if (File.Exists(databasePath) || File.Exists(backupPath))
+        if (!File.Exists(databasePath) || File.Exists(backupPath))
         {
             throw new InvalidOperationException(
-                "The initialize phase requires a new data directory without prior smoke artifacts.");
+                "The initialize phase requires only the freshly migrated build-draft database.");
         }
 
         string sqliteVersion;
@@ -71,11 +78,12 @@ internal static class PublicationSmokeRunner
         using (var connection = OpenConnection(databasePath))
         {
             sqliteVersion = connection.ServerVersion;
-            migrationResult = new SqliteMigrationRunner().Apply(connection, [SyntheticMigration]);
+            migrationResult = buildDraftServices.MigrationResult;
             ExecuteNonQuery(
                 connection,
                 "INSERT INTO publication_smoke_probe (id, value) VALUES (2, $value);",
                 ExpectedPersistedValue);
+            SaveAndVerifyBuildDraft(buildDraftServices, progressionVerification);
             SqliteBackupService.CreateVerifiedBackup(connection, backupPath);
             ExecuteNonQuery(
                 connection,
@@ -90,6 +98,7 @@ internal static class PublicationSmokeRunner
         {
             EnsureExpectedDatabaseState(reopenedConnection);
         }
+        VerifyBuildDraft(buildDraftServices, progressionVerification);
 
         return CreateSuccessfulReport(
             options,
@@ -97,14 +106,16 @@ internal static class PublicationSmokeRunner
             backupPath,
             sqliteVersion,
             migrationResult,
-            progressionVerification);
+            progressionVerification,
+            buildDraftServices);
     }
 
     private static PublicationSmokeReport VerifyUpdate(
         string databasePath,
         string backupPath,
         PublicationSmokeOptions options,
-        ProgressionVerificationResult progressionVerification)
+        ProgressionVerificationResult progressionVerification,
+        PublishedBuildDraftServices buildDraftServices)
     {
         if (!File.Exists(databasePath) || !File.Exists(backupPath))
         {
@@ -113,8 +124,9 @@ internal static class PublicationSmokeRunner
         }
 
         using var connection = OpenConnection(databasePath);
-        var migrationResult = new SqliteMigrationRunner().Apply(connection, [SyntheticMigration]);
+        var migrationResult = buildDraftServices.MigrationResult;
         EnsureExpectedDatabaseState(connection);
+        VerifyBuildDraft(buildDraftServices, progressionVerification);
 
         return CreateSuccessfulReport(
             options,
@@ -122,7 +134,8 @@ internal static class PublicationSmokeRunner
             backupPath,
             connection.ServerVersion,
             migrationResult,
-            progressionVerification);
+            progressionVerification,
+            buildDraftServices);
     }
 
     private static PublicationSmokeReport CreateSuccessfulReport(
@@ -131,7 +144,8 @@ internal static class PublicationSmokeRunner
         string backupPath,
         string sqliteVersion,
         MigrationApplicationResult migrationResult,
-        ProgressionVerificationResult progressionVerification) => new(
+        ProgressionVerificationResult progressionVerification,
+        PublishedBuildDraftServices buildDraftServices) => new(
             Success: true,
             Phase: options.Phase == PublicationSmokePhase.Initialize ? "initialize" : "verify-update",
             SqliteVersion: sqliteVersion,
@@ -154,6 +168,20 @@ internal static class PublicationSmokeRunner
                 progressionVerification.SyntheticDistribution.SpentPoints,
             SyntheticStatDistributionRemainingPoints:
                 progressionVerification.SyntheticDistribution.RemainingPoints,
+            SyntheticResetCount:
+                progressionVerification.SyntheticDistribution.ResetInputs.ResetCount,
+            SyntheticPointsPerReset:
+                progressionVerification.SyntheticDistribution.ResetInputs.PointsPerReset,
+            SyntheticResetPoints:
+                progressionVerification.SyntheticDistribution.ResetPoints,
+            SyntheticTotalDistributablePoints:
+                progressionVerification.SyntheticDistribution.TotalDistributablePoints,
+            BuildDraftPersistenceVerified: true,
+            BuildDraftId: BuildDraftId,
+            BuildDraftDatasetVersion:
+                buildDraftServices.RuntimeContext.Dataset.Version,
+            BuildDraftDatasetHash:
+                buildDraftServices.RuntimeContext.Dataset.Hash,
             AppliedMigrationCount: migrationResult.AppliedCount,
             AlreadyAppliedMigrationCount: migrationResult.AlreadyAppliedCount,
             ErrorType: null,
@@ -228,12 +256,16 @@ internal static class PublicationSmokeRunner
             statId => statId,
             _ => 0L,
             StringComparer.Ordinal);
-        allocations[statIds[0]] = 1;
+        var resetInputs = new ResetPointInputs(2, 100);
+        allocations[statIds[0]] = 201;
 
         var result = new CalculateStatDistributionUseCase(catalog).Execute(
             budget,
+            resetInputs,
             allocations);
-        if (result.SpentPoints != 1 ||
+        if (result.ResetPoints != 200 ||
+            result.TotalDistributablePoints != budget.EarnedPoints + 200 ||
+            result.SpentPoints != 201 ||
             result.RemainingPoints != budget.EarnedPoints - 1 ||
             !result.Allocations.Keys.ToHashSet(StringComparer.Ordinal)
                 .SetEquals(characterClass.StatIds))
@@ -246,8 +278,72 @@ internal static class PublicationSmokeRunner
             Verified: true,
             StatCount: statIds.Length,
             SpentPoints: result.SpentPoints,
-            RemainingPoints: result.RemainingPoints);
+            RemainingPoints: result.RemainingPoints,
+            ResetInputs: new BuildDraftResetInputs(
+                resetInputs.ResetCount,
+                resetInputs.PointsPerReset),
+            ResetPoints: result.ResetPoints,
+            TotalDistributablePoints: result.TotalDistributablePoints,
+            ProgressionInputs: new BuildDraftProgressionInputs(
+                sourceCase.ClassId,
+                sourceCase.EvolutionId,
+                sourceCase.Level,
+                sourceCase.CompletedQuestIds),
+            Allocations: allocations);
     }
+
+    private static void SaveAndVerifyBuildDraft(
+        PublishedBuildDraftServices services,
+        ProgressionVerificationResult progressionVerification)
+    {
+        _ = services.SaveUseCase.ExecuteAsync(
+                new SaveBuildDraftRequest(
+                    BuildDraftId,
+                    progressionVerification.SyntheticDistribution.ProgressionInputs,
+                    progressionVerification.SyntheticDistribution.ResetInputs,
+                    progressionVerification.SyntheticDistribution.Allocations))
+            .GetAwaiter()
+            .GetResult();
+        VerifyBuildDraft(services, progressionVerification);
+    }
+
+    private static void VerifyBuildDraft(
+        PublishedBuildDraftServices services,
+        ProgressionVerificationResult progressionVerification)
+    {
+        var draft = services.LoadUseCase.ExecuteAsync(BuildDraftId)
+            .GetAwaiter()
+            .GetResult();
+        if (draft.Id != BuildDraftId ||
+            draft.Ruleset != services.RuntimeContext.Ruleset ||
+            draft.Dataset != services.RuntimeContext.Dataset ||
+            draft.EngineVersion != services.RuntimeContext.EngineVersion ||
+            draft.ResetInputs !=
+                progressionVerification.SyntheticDistribution.ResetInputs ||
+            draft.StatDistribution.ResetPoints !=
+                progressionVerification.SyntheticDistribution.ResetPoints ||
+            draft.StatDistribution.TotalDistributablePoints !=
+                progressionVerification.SyntheticDistribution.TotalDistributablePoints ||
+            draft.StatDistribution.SpentPoints !=
+                progressionVerification.SyntheticDistribution.SpentPoints ||
+            draft.StatDistribution.RemainingPoints !=
+                progressionVerification.SyntheticDistribution.RemainingPoints ||
+            !SameAllocations(
+                draft.StatDistribution.Allocations,
+                progressionVerification.SyntheticDistribution.Allocations))
+        {
+            throw new InvalidOperationException(
+                "The build draft did not survive persistence and Application revalidation.");
+        }
+    }
+
+    private static bool SameAllocations(
+        IReadOnlyDictionary<string, long> first,
+        IReadOnlyDictionary<string, long> second) =>
+        first.Count == second.Count &&
+        first.All(item =>
+            second.TryGetValue(item.Key, out var value) &&
+            item.Value == value);
 
     private static PublishedProgressionReferenceCase[] LoadReferenceCases(string directory)
     {
@@ -377,7 +473,12 @@ internal static class PublicationSmokeRunner
         bool Verified,
         int StatCount,
         long SpentPoints,
-        long RemainingPoints);
+        long RemainingPoints,
+        BuildDraftResetInputs ResetInputs,
+        long ResetPoints,
+        long TotalDistributablePoints,
+        BuildDraftProgressionInputs ProgressionInputs,
+        IReadOnlyDictionary<string, long> Allocations);
 
     private sealed record PublishedProgressionReferenceCase(
         string Id,

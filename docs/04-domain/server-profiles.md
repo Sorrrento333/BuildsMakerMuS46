@@ -9,7 +9,10 @@ Representar modificaciones privadas sin contaminar el ruleset de referencia.
 - progresión por clase;
 - nivel y stat máximos;
 - quests habilitadas;
-- política de reset/master reset;
+- cantidad de resets y puntos por reset para el escenario actual, con cero como
+  valor predeterminado;
+- futuras políticas de reset/master reset, si un perfil necesita más que el
+  aporte lineal ya implementado;
 - multiplicadores PvM/PvP;
 - overrides de fórmulas permitidos;
 - contenido habilitado/deshabilitado;

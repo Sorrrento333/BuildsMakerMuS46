@@ -38,5 +38,18 @@ en español y conservan visible el código estable original.
 
 Cambiar clase, evolución, nivel o Hero Status invalida el presupuesto anterior
 y obliga a calcularlo de nuevo antes de distribuir, evitando combinar entradas
-actuales con un origen obsoleto. Persistencia, resets, equipo y atributos
-derivados permanecen fuera de esta vertical.
+actuales con un origen obsoleto.
+
+La sección **Borrador local** permite guardar o cargar por un ID estable. El
+guardado entrega inputs y asignaciones a `SaveBuildDraftUseCase`; la carga pasa
+exclusivamente por `LoadBuildDraftUseCase`, que recalcula y contrasta la caché
+antes de repoblar controles y resultados. Los seis códigos `build-draft-*`,
+incluido `build-draft-write-conflict`, permanecen visibles junto con su
+explicación. Equipo y atributos derivados continúan fuera de esta vertical.
+
+La Calculadora incluye además **Configuración de resets del servidor** con tres
+campos: cantidad de resets, puntos por reset y producto de sólo lectura. Los dos
+inputs empiezan en cero. El producto y el total distribuible se recalculan con
+overflow controlado; los puntos resultantes pueden asignarse a cualquier stat
+disponible para la clase. Esta configuración no modifica el ruleset ni se
+presenta como regla de Season 4.

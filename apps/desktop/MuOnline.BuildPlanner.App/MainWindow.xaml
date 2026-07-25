@@ -3,13 +3,17 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="MU Online Build Planner"
         Width="720"
-        Height="780"
+        Height="920"
         MinWidth="640"
         MinHeight="640"
         WindowStartupLocation="CenterScreen">
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <Grid Margin="32">
             <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
@@ -104,13 +108,65 @@
             <GroupBox Grid.Row="8"
                       Grid.ColumnSpan="2"
                       Margin="0,24,0,0"
-                      Header="Distribución de puntos ganados">
+                      Header="Configuración de resets del servidor">
+                <Grid Margin="12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="180" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <TextBlock VerticalAlignment="Center"
+                               Text="Resets" />
+                    <TextBox x:Name="ResetCountTextBox"
+                             Grid.Column="1"
+                             MinHeight="30"
+                             VerticalContentAlignment="Center"
+                             TextChanged="ResetInputChanged"
+                             Text="0" />
+
+                    <TextBlock Grid.Row="1"
+                               Margin="0,12,0,0"
+                               VerticalAlignment="Center"
+                               Text="Puntos por reset" />
+                    <TextBox x:Name="PointsPerResetTextBox"
+                             Grid.Row="1"
+                             Grid.Column="1"
+                             Margin="0,12,0,0"
+                             MinHeight="30"
+                             VerticalContentAlignment="Center"
+                             TextChanged="ResetInputChanged"
+                             Text="0" />
+
+                    <TextBlock Grid.Row="2"
+                               Margin="0,12,0,0"
+                               VerticalAlignment="Center"
+                               Text="Puntos totales por resets" />
+                    <TextBox x:Name="TotalResetPointsTextBox"
+                             Grid.Row="2"
+                             Grid.Column="1"
+                             Margin="0,12,0,0"
+                             MinHeight="30"
+                             IsReadOnly="True"
+                             VerticalContentAlignment="Center"
+                             Text="0" />
+                </Grid>
+            </GroupBox>
+
+            <GroupBox Grid.Row="9"
+                      Grid.ColumnSpan="2"
+                      Margin="0,24,0,0"
+                      Header="Distribución de puntos disponibles">
                 <StackPanel x:Name="StatsAllocationPanel"
                             Margin="12" />
             </GroupBox>
 
             <Button x:Name="DistributeStatsButton"
-                    Grid.Row="9"
+                    Grid.Row="10"
                     Grid.Column="1"
                     Width="160"
                     Margin="0,16,0,0"
@@ -121,7 +177,7 @@
                     Content="Distribuir stats" />
 
             <TextBox x:Name="DistributionResultTextBox"
-                     Grid.Row="10"
+                     Grid.Row="11"
                      Grid.ColumnSpan="2"
                      Margin="0,16,0,0"
                      Padding="12"
@@ -130,6 +186,56 @@
                      TextWrapping="Wrap"
                      VerticalScrollBarVisibility="Auto"
                      AutomationProperties.Name="Resultado de distribución" />
+
+            <GroupBox Grid.Row="12"
+                      Grid.ColumnSpan="2"
+                      Margin="0,24,0,0"
+                      Header="Borrador local">
+                <Grid Margin="12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="180" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <TextBlock VerticalAlignment="Center"
+                               Text="ID del borrador" />
+                    <TextBox x:Name="BuildDraftIdTextBox"
+                             Grid.Column="1"
+                             MinHeight="30"
+                             VerticalContentAlignment="Center"
+                             Text="mi-build" />
+
+                    <StackPanel Grid.Row="1"
+                                Grid.Column="1"
+                                Margin="0,12,0,0"
+                                Orientation="Horizontal">
+                        <Button Width="120"
+                                Padding="12,6"
+                                Click="SaveBuildDraftButtonClick"
+                                Content="Guardar" />
+                        <Button Width="120"
+                                Margin="12,0,0,0"
+                                Padding="12,6"
+                                Click="LoadBuildDraftButtonClick"
+                                Content="Cargar" />
+                    </StackPanel>
+                </Grid>
+            </GroupBox>
+
+            <TextBox x:Name="BuildDraftResultTextBox"
+                     Grid.Row="13"
+                     Grid.ColumnSpan="2"
+                     Margin="0,16,0,0"
+                     Padding="12"
+                     MinHeight="72"
+                     IsReadOnly="True"
+                     TextWrapping="Wrap"
+                     VerticalScrollBarVisibility="Auto"
+                     AutomationProperties.Name="Resultado de borrador" />
         </Grid>
     </ScrollViewer>
 </Window>

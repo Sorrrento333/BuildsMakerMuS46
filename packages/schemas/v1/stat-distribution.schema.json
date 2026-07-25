@@ -10,16 +10,22 @@
     "characterClassId",
     "progressionRule",
     "earnedPoints",
+    "resetInputs",
+    "resetPoints",
+    "totalDistributablePoints",
     "allocations",
     "spentPoints",
     "remainingPoints"
   ],
   "properties": {
-    "schemaVersion": { "const": "1.0.0" },
+    "schemaVersion": { "const": "1.1.0" },
     "rulesetId": { "$ref": "#/$defs/id" },
     "characterClassId": { "$ref": "#/$defs/id" },
     "progressionRule": { "$ref": "#/$defs/versionedRef" },
     "earnedPoints": { "$ref": "#/$defs/nonNegativeInt64" },
+    "resetInputs": { "$ref": "#/$defs/resetInputs" },
+    "resetPoints": { "$ref": "#/$defs/nonNegativeInt64" },
+    "totalDistributablePoints": { "$ref": "#/$defs/nonNegativeInt64" },
     "allocations": {
       "type": "object",
       "minProperties": 1,
@@ -42,6 +48,15 @@
       "type": "integer",
       "minimum": 0,
       "maximum": 9223372036854775807
+    },
+    "resetInputs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["resetCount", "pointsPerReset"],
+      "properties": {
+        "resetCount": { "$ref": "#/$defs/nonNegativeInt64" },
+        "pointsPerReset": { "$ref": "#/$defs/nonNegativeInt64" }
+      }
     },
     "versionedRef": {
       "type": "object",

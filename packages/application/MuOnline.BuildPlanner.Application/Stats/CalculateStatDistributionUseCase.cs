@@ -17,9 +17,11 @@ public sealed class CalculateStatDistributionUseCase
 
     public StatDistributionResult Execute(
         ProgressionPointBudgetResult budget,
+        ResetPointInputs resetInputs,
         IReadOnlyDictionary<string, long> allocations)
     {
         ArgumentNullException.ThrowIfNull(budget);
+        ArgumentNullException.ThrowIfNull(resetInputs);
         ArgumentNullException.ThrowIfNull(allocations);
 
         var matchingClasses = _catalog.Classes
@@ -38,6 +40,7 @@ public sealed class CalculateStatDistributionUseCase
             new StatDistributionRequest(
                 budget,
                 matchingClasses[0],
+                resetInputs,
                 allocations));
     }
 }

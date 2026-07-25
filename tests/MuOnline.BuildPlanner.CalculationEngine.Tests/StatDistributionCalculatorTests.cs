@@ -30,12 +30,36 @@ public sealed class StatDistributionCalculatorTests
         Assert.Equal(7, result.SpentPoints);
         Assert.Equal(3, result.RemainingPoints);
         Assert.Equal(10, result.EarnedPoints);
+        Assert.Equal(0, result.ResetInputs.ResetCount);
+        Assert.Equal(0, result.ResetInputs.PointsPerReset);
+        Assert.Equal(0, result.ResetPoints);
+        Assert.Equal(10, result.TotalDistributablePoints);
         Assert.Equal(RulesetId, result.RulesetId);
         Assert.Equal(ClassId, result.CharacterClassId);
         Assert.Equal(RuleId, result.ProgressionRuleId);
         Assert.Equal("1.0.0", result.ProgressionRuleVersion);
         Assert.Equal(4, result.Allocations["stat-alpha"]);
         Assert.Equal(3, result.Allocations["stat-beta"]);
+    }
+
+    [Fact]
+    public void ResetConfigurationAddsPointsToDistributableBudget()
+    {
+        var result = Calculate(
+            new Dictionary<string, long>
+            {
+                ["stat-alpha"] = 104,
+                ["stat-beta"] = 103,
+            },
+            new ResetPointInputs(2, 100));
+
+        Assert.Equal(10, result.EarnedPoints);
+        Assert.Equal(2, result.ResetInputs.ResetCount);
+        Assert.Equal(100, result.ResetInputs.PointsPerReset);
+        Assert.Equal(200, result.ResetPoints);
+        Assert.Equal(210, result.TotalDistributablePoints);
+        Assert.Equal(207, result.SpentPoints);
+        Assert.Equal(3, result.RemainingPoints);
     }
 
     [Fact]
@@ -111,6 +135,7 @@ public sealed class StatDistributionCalculatorTests
         var request = new StatDistributionRequest(
             CreateBudget(rulesetId, classId, progressionRuleId),
             CharacterClass,
+            new ResetPointInputs(0, 0),
             new Dictionary<string, long>
             {
                 ["stat-alpha"] = 0,
@@ -129,6 +154,7 @@ public sealed class StatDistributionCalculatorTests
         var request = new StatDistributionRequest(
             CreateBudget(earnedPoints: long.MaxValue),
             CharacterClass,
+            new ResetPointInputs(0, 0),
             new Dictionary<string, long>
             {
                 ["stat-alpha"] = long.MaxValue,
@@ -141,12 +167,70 @@ public sealed class StatDistributionCalculatorTests
         Assert.Equal(StatDistributionErrorCodes.AllocationOverflow, exception.Code);
     }
 
+    [Theory]
+    [InlineData(-1, 0, StatDistributionErrorCodes.ResetCountNegative)]
+    [InlineData(0, -1, StatDistributionErrorCodes.PointsPerResetNegative)]
+    public void NegativeResetInputsAreRejected(
+        long resetCount,
+        long pointsPerReset,
+        string expectedCode)
+    {
+        var exception = Assert.Throws<StatDistributionException>(
+            () => Calculate(
+                new Dictionary<string, long>
+                {
+                    ["stat-alpha"] = 0,
+                    ["stat-beta"] = 0,
+                },
+                new ResetPointInputs(resetCount, pointsPerReset)));
+
+        Assert.Equal(expectedCode, exception.Code);
+    }
+
+    [Fact]
+    public void ResetPointProductOverflowIsRejected()
+    {
+        var exception = Assert.Throws<StatDistributionException>(
+            () => Calculate(
+                new Dictionary<string, long>
+                {
+                    ["stat-alpha"] = 0,
+                    ["stat-beta"] = 0,
+                },
+                new ResetPointInputs(long.MaxValue, 2)));
+
+        Assert.Equal(StatDistributionErrorCodes.ResetPointsOverflow, exception.Code);
+    }
+
+    [Fact]
+    public void TotalDistributablePointOverflowIsRejected()
+    {
+        var request = new StatDistributionRequest(
+            CreateBudget(earnedPoints: long.MaxValue),
+            CharacterClass,
+            new ResetPointInputs(1, 1),
+            new Dictionary<string, long>
+            {
+                ["stat-alpha"] = 0,
+                ["stat-beta"] = 0,
+            });
+
+        var exception = Assert.Throws<StatDistributionException>(
+            () => StatDistributionCalculator.Calculate(request));
+
+        Assert.Equal(
+            StatDistributionErrorCodes.TotalDistributablePointsOverflow,
+            exception.Code);
+    }
+
     private static StatDistributionResult Calculate(
-        IReadOnlyDictionary<string, long> allocations) =>
+        IReadOnlyDictionary<string, long> allocations,
+        ResetPointInputs? resetInputs = null) =>
         StatDistributionCalculator.Calculate(
             new StatDistributionRequest(
                 CreateBudget(),
                 CharacterClass,
+                resetInputs ?? new ResetPointInputs(0, 0),
                 allocations));
 
     private static void AssertError(

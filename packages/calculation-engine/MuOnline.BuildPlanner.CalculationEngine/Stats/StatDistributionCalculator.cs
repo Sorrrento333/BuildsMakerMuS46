@@ -9,10 +9,12 @@ public static class StatDistributionCalculator
         ArgumentNullException.ThrowIfNull(request);
         ArgumentNullException.ThrowIfNull(request.Budget);
         ArgumentNullException.ThrowIfNull(request.CharacterClass);
+        ArgumentNullException.ThrowIfNull(request.ResetInputs);
         ArgumentNullException.ThrowIfNull(request.Allocations);
 
         var budget = request.Budget;
         var characterClass = request.CharacterClass;
+        var resetInputs = request.ResetInputs;
         var allocations = request.Allocations;
 
         if (budget.RulesetId != characterClass.RulesetId ||
@@ -24,6 +26,45 @@ public static class StatDistributionCalculator
             throw Error(
                 StatDistributionErrorCodes.BudgetSourceMismatch,
                 "The progression budget does not match the character class definition.");
+        }
+
+        if (resetInputs.ResetCount < 0)
+        {
+            throw Error(
+                StatDistributionErrorCodes.ResetCountNegative,
+                "Reset count cannot be negative.");
+        }
+
+        if (resetInputs.PointsPerReset < 0)
+        {
+            throw Error(
+                StatDistributionErrorCodes.PointsPerResetNegative,
+                "Points per reset cannot be negative.");
+        }
+
+        long resetPoints;
+        try
+        {
+            resetPoints = checked(
+                resetInputs.ResetCount * resetInputs.PointsPerReset);
+        }
+        catch (OverflowException)
+        {
+            throw Error(
+                StatDistributionErrorCodes.ResetPointsOverflow,
+                "Reset points exceed the supported 64-bit integer range.");
+        }
+
+        long totalDistributablePoints;
+        try
+        {
+            totalDistributablePoints = checked(budget.EarnedPoints + resetPoints);
+        }
+        catch (OverflowException)
+        {
+            throw Error(
+                StatDistributionErrorCodes.TotalDistributablePointsOverflow,
+                "Total distributable points exceed the supported 64-bit integer range.");
         }
 
         var unavailableStat = allocations.Keys.FirstOrDefault(
@@ -67,17 +108,18 @@ public static class StatDistributionCalculator
                 "The allocation sum exceeds the supported 64-bit integer range.");
         }
 
-        if (spentPoints > budget.EarnedPoints)
+        if (spentPoints > totalDistributablePoints)
         {
             throw Error(
                 StatDistributionErrorCodes.AllocationExceedsEarnedPoints,
-                $"Allocated points '{spentPoints}' exceed earned points '{budget.EarnedPoints}'.");
+                $"Allocated points '{spentPoints}' exceed total distributable points " +
+                $"'{totalDistributablePoints}'.");
         }
 
         long remainingPoints;
         try
         {
-            remainingPoints = checked(budget.EarnedPoints - spentPoints);
+            remainingPoints = checked(totalDistributablePoints - spentPoints);
         }
         catch (OverflowException)
         {
@@ -99,6 +141,9 @@ public static class StatDistributionCalculator
             budget.ProgressionRuleId,
             budget.ProgressionRuleVersion,
             budget.EarnedPoints,
+            resetInputs,
+            resetPoints,
+            totalDistributablePoints,
             normalizedAllocations,
             spentPoints,
             remainingPoints);

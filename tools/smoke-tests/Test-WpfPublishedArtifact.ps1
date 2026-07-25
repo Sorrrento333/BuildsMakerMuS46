@@ -183,9 +183,10 @@ if (-not $initialReport.DataOutsideBinaryDirectory -or
     -not $replacementReport.DataOutsideBinaryDirectory) {
     throw "The smoke database was stored inside a binary directory."
 }
-if ($initialReport.AppliedMigrationCount -ne 1 -or
-    $replacementReport.AlreadyAppliedMigrationCount -ne 1) {
-    throw "The migration was not applied once and recognized after binary replacement."
+if ($initialReport.AppliedMigrationCount -ne 2 -or
+    $initialReport.AlreadyAppliedMigrationCount -ne 0 -or
+    $replacementReport.AlreadyAppliedMigrationCount -ne 2) {
+    throw "The build-draft and smoke migrations were not recognized across binary replacement."
 }
 if ($initialReport.SqliteVersion -ne $replacementReport.SqliteVersion) {
     throw "The SQLite runtime version changed between publication phases."
@@ -205,11 +206,32 @@ if (-not $initialReport.SyntheticStatDistributionVerified -or
     $initialReport.SyntheticStatDistributionStatCount -le 0 -or
     $replacementReport.SyntheticStatDistributionStatCount -ne
         $initialReport.SyntheticStatDistributionStatCount -or
-    $initialReport.SyntheticStatDistributionSpentPoints -ne 1 -or
-    $replacementReport.SyntheticStatDistributionSpentPoints -ne 1 -or
+    $initialReport.SyntheticStatDistributionSpentPoints -ne 201 -or
+    $replacementReport.SyntheticStatDistributionSpentPoints -ne 201 -or
     $replacementReport.SyntheticStatDistributionRemainingPoints -ne
         $initialReport.SyntheticStatDistributionRemainingPoints) {
     throw "The published snapshot did not preserve the synthetic stat distribution."
+}
+if ($initialReport.SyntheticResetCount -ne 2 -or
+    $replacementReport.SyntheticResetCount -ne 2 -or
+    $initialReport.SyntheticPointsPerReset -ne 100 -or
+    $replacementReport.SyntheticPointsPerReset -ne 100 -or
+    $initialReport.SyntheticResetPoints -ne 200 -or
+    $replacementReport.SyntheticResetPoints -ne 200 -or
+    $replacementReport.SyntheticTotalDistributablePoints -ne
+        $initialReport.SyntheticTotalDistributablePoints) {
+    throw "The configurable reset contribution was not preserved."
+}
+if (-not $initialReport.BuildDraftPersistenceVerified -or
+    -not $replacementReport.BuildDraftPersistenceVerified -or
+    $initialReport.BuildDraftId -ne "publication-smoke-draft" -or
+    $replacementReport.BuildDraftId -ne $initialReport.BuildDraftId -or
+    $replacementReport.BuildDraftDatasetVersion -ne
+        $initialReport.BuildDraftDatasetVersion -or
+    $replacementReport.BuildDraftDatasetHash -ne
+        $initialReport.BuildDraftDatasetHash -or
+    -not $initialReport.BuildDraftDatasetHash.StartsWith("sha256:")) {
+    throw "The external build draft did not survive replacement and exact revalidation."
 }
 
 $initialRulesetRoot = Join-Path $initialPublishDirectory $publishedRulesetRelativePath
@@ -254,5 +276,7 @@ Write-Output "Published bytes: $publishedBytes"
 Write-Output "Verified legal files: $($requiredLegalFiles.Count)"
 Write-Output "Progression cases: $($initialReport.ApprovedProgressionCaseCount) approved, $($initialReport.RejectedProgressionCaseCount) rejected"
 Write-Output "Synthetic stat distribution: $($initialReport.SyntheticStatDistributionStatCount) stats, $($initialReport.SyntheticStatDistributionSpentPoints) spent"
+Write-Output "Reset configuration: $($initialReport.SyntheticResetCount) x $($initialReport.SyntheticPointsPerReset) = $($initialReport.SyntheticResetPoints)"
+Write-Output "Build draft: $($initialReport.BuildDraftId), dataset $($initialReport.BuildDraftDatasetVersion)"
 Write-Output "Ruleset files: $($initialRulesetFiles.Count)"
 Write-Output "Artifacts: $runRoot"
