@@ -27,6 +27,8 @@ public static class SchemaContractValidator
     [
         "evidence",
         "formula",
+        "calculation-trace",
+        "formula-test-case",
         "character-class",
         "progression-rule",
         "stat-distribution",
@@ -73,6 +75,59 @@ public static class SchemaContractValidator
         return results;
     }
 
+    public static bool ValidateInstance(
+        string repositoryRoot,
+        string contractName,
+        JsonElement instance)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(repositoryRoot);
+        ArgumentException.ThrowIfNullOrWhiteSpace(contractName);
+
+        if (!ContractNames.Contains(contractName, StringComparer.Ordinal))
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(contractName),
+                contractName,
+                "Unknown schema contract.");
+        }
+
+        var schemaRoot = Path.Combine(
+            Path.GetFullPath(repositoryRoot),
+            "packages",
+            "schemas",
+            "v1");
+        var buildOptions = new BuildOptions
+        {
+            SchemaRegistry = new SchemaRegistry(),
+        };
+        JsonSchema? requestedSchema = null;
+
+        foreach (var currentContractName in ContractNames)
+        {
+            var schemaPath = Path.Combine(
+                schemaRoot,
+                $"{currentContractName}.schema.json");
+            EnsureFileExists(schemaPath, "Schema");
+            var schema = JsonSchema.FromFile(schemaPath, buildOptions);
+
+            if (currentContractName == contractName)
+            {
+                requestedSchema = schema;
+            }
+        }
+
+        var evaluation = requestedSchema!.Evaluate(
+            instance,
+            new EvaluationOptions
+            {
+                OutputFormat = OutputFormat.List,
+                RequireFormatValidation = true,
+            });
+
+        return evaluation.IsValid &&
+               MatchesContractSemantics(contractName, instance);
+    }
+
     public static IReadOnlyList<RulesetRecordValidationResult> ValidateRulesetRecords(
         string repositoryRoot)
     {
@@ -90,6 +145,7 @@ public static class SchemaContractValidator
         {
             (ContractName: "character-class", DirectoryName: "character-classes"),
             (ContractName: "progression-rule", DirectoryName: "progression-rules"),
+            (ContractName: "formula", DirectoryName: "formulas"),
         };
         var results = new List<RulesetRecordValidationResult>();
 
@@ -160,9 +216,34 @@ public static class SchemaContractValidator
             contractName,
             fixtureKind,
             expectedValidity,
-            evaluation.IsValid,
+            evaluation.IsValid &&
+            MatchesContractSemantics(contractName, instance.RootElement),
             schemaPath,
             fixturePath);
+    }
+
+    private static bool MatchesContractSemantics(
+        string contractName,
+        JsonElement instance)
+    {
+        if (contractName != "formula")
+        {
+            return true;
+        }
+
+        var trace = instance.GetProperty("trace");
+        var stepIds = trace
+            .GetProperty("stepIds")
+            .EnumerateArray()
+            .Select(step => step.GetString())
+            .ToArray();
+        var rawOutputStepId = trace.GetProperty("rawOutputStepId").GetString();
+        var visibleOutputStepId =
+            trace.GetProperty("visibleOutputStepId").GetString();
+
+        return stepIds.Contains(rawOutputStepId, StringComparer.Ordinal) &&
+               stepIds.Contains(visibleOutputStepId, StringComparer.Ordinal) &&
+               stepIds[^1] == visibleOutputStepId;
     }
 
     private static void EnsureFileExists(string path, string kind)

@@ -8,6 +8,11 @@ public static class StatDistributionErrorCodes
     public const string AllocationExceedsEarnedPoints = "allocation-exceeds-earned-points";
     public const string AllocationOverflow = "allocation-overflow";
     public const string BudgetSourceMismatch = "budget-source-mismatch";
+    public const string ResetCountNegative = "reset-count-negative";
+    public const string PointsPerResetNegative = "points-per-reset-negative";
+    public const string ResetPointsOverflow = "reset-points-overflow";
+    public const string TotalDistributablePointsOverflow =
+        "total-distributable-points-overflow";
 }
 
 public sealed class StatDistributionException : Exception

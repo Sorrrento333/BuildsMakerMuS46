@@ -244,19 +244,23 @@ public sealed class SqliteBuildDraftRepositoryTests
                 "evolution-synthetic",
                 3,
                 []),
+            new BuildDraftResetInputs(2, 100),
             new BuildDraftStatDistribution(
                 BuildDraftStatDistribution.CurrentSchemaVersion,
                 "ruleset-synthetic",
                 "class-synthetic",
                 new BuildDraftVersionedReference("progression-synthetic", "1.0.0"),
                 10,
+                new BuildDraftResetInputs(2, 100),
+                200,
+                210,
                 new Dictionary<string, long>(StringComparer.Ordinal)
                 {
                     ["stat-alpha"] = 4,
                     ["stat-beta"] = 3,
                 },
                 7,
-                3));
+                203));
 
     private static T ExecuteScalar<T>(SqliteConnection connection, string sql)
     {

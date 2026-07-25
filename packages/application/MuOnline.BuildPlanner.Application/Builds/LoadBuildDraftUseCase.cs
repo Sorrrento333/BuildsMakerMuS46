@@ -32,13 +32,7 @@ public sealed class LoadBuildDraftUseCase
                 $"Build draft '{id}' was not found.");
         }
 
-        if (stored.SchemaVersion != BuildDraft.CurrentSchemaVersion ||
-            stored.StatDistribution.SchemaVersion != BuildDraftStatDistribution.CurrentSchemaVersion)
-        {
-            throw Error(
-                BuildDraftErrorCodes.SchemaUnsupported,
-                $"Build draft '{id}' uses an unsupported schema version.");
-        }
+        stored = NormalizeSupportedSchema(id, stored);
 
         EnsureCoherentSources(id, stored);
         EnsureDependenciesAvailable(stored);
@@ -49,6 +43,7 @@ public sealed class LoadBuildDraftUseCase
             recalculated = BuildDraftCalculation.Calculate(
                 _context,
                 stored.ProgressionInputs,
+                stored.ResetInputs,
                 stored.StatDistribution.Allocations);
         }
         catch (Exception exception) when (
@@ -92,6 +87,40 @@ public sealed class LoadBuildDraftUseCase
         }
     }
 
+    private static BuildDraft NormalizeSupportedSchema(string id, BuildDraft stored)
+    {
+        if (stored.SchemaVersion == BuildDraft.CurrentSchemaVersion &&
+            stored.StatDistribution.SchemaVersion ==
+                BuildDraftStatDistribution.CurrentSchemaVersion)
+        {
+            return stored;
+        }
+
+        if (stored.SchemaVersion == BuildDraft.PreviousSchemaVersion &&
+            stored.StatDistribution.SchemaVersion ==
+                BuildDraftStatDistribution.PreviousSchemaVersion)
+        {
+            var zeroResetInputs = new BuildDraftResetInputs(0, 0);
+            return stored with
+            {
+                SchemaVersion = BuildDraft.CurrentSchemaVersion,
+                ResetInputs = zeroResetInputs,
+                StatDistribution = stored.StatDistribution with
+                {
+                    SchemaVersion = BuildDraftStatDistribution.CurrentSchemaVersion,
+                    ResetInputs = zeroResetInputs,
+                    ResetPoints = 0,
+                    TotalDistributablePoints =
+                        stored.StatDistribution.EarnedPoints,
+                },
+            };
+        }
+
+        throw Error(
+            BuildDraftErrorCodes.SchemaUnsupported,
+            $"Build draft '{id}' uses an unsupported schema version.");
+    }
+
     private static void EnsureCoherentSources(string requestedId, BuildDraft draft)
     {
         if (draft.Id != requestedId ||
@@ -112,6 +141,9 @@ public sealed class LoadBuildDraftUseCase
         stored.CharacterClassId == recalculated.CharacterClassId &&
         stored.ProgressionRule == recalculated.ProgressionRule &&
         stored.EarnedPoints == recalculated.EarnedPoints &&
+        stored.ResetInputs == recalculated.ResetInputs &&
+        stored.ResetPoints == recalculated.ResetPoints &&
+        stored.TotalDistributablePoints == recalculated.TotalDistributablePoints &&
         stored.SpentPoints == recalculated.SpentPoints &&
         stored.RemainingPoints == recalculated.RemainingPoints &&
         SameAllocations(stored.Allocations, recalculated.Allocations);

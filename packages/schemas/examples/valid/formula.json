@@ -1,14 +1,56 @@
 {
-  "schemaVersion": "1.0.0",
+  "schemaVersion": "1.1.0",
   "id": "formula-synthetic-001",
   "version": "0.1.0",
   "rulesetId": "ruleset-synthetic",
   "status": "DRAFT",
   "confidence": "UNVERIFIED",
-  "inputs": [{ "id": "input-a", "dataType": "INTEGER", "unit": "synthetic-unit" }],
-  "output": { "id": "output-a", "dataType": "INTEGER", "unit": "synthetic-unit" },
-  "strategy": { "kind": "EXPRESSION", "definition": "input-a" },
-  "rounding": { "mode": "NONE", "stage": "No arithmetic in synthetic fixture" },
+  "purpose": "Exercise the formula contract without game data.",
+  "applicability": {
+    "characterClassId": "class-synthetic",
+    "evolutionIds": ["evolution-synthetic"]
+  },
+  "inputs": [
+    {
+      "id": "input-synthetic",
+      "numericType": "INT32",
+      "unit": "synthetic-unit",
+      "numericBounds": {
+        "minimum": 0,
+        "minimumInclusive": true,
+        "maximum": 100,
+        "maximumInclusive": true,
+        "classification": "TECHNICAL"
+      },
+      "source": {
+        "kind": "CONTEXT_VALUE",
+        "valueId": "context-synthetic-value"
+      }
+    }
+  ],
+  "output": {
+    "id": "output-synthetic",
+    "numericType": "INT64",
+    "unit": "synthetic-unit"
+  },
+  "strategy": {
+    "kind": "EXPRESSION",
+    "definition": "input-synthetic"
+  },
+  "rounding": {
+    "mode": "NONE",
+    "stage": "visible-output"
+  },
+  "trace": {
+    "stepIds": [
+      "input-contribution",
+      "raw-output",
+      "visible-output"
+    ],
+    "rawOutputStepId": "raw-output",
+    "visibleOutputStepId": "visible-output"
+  },
   "evidenceRefs": [],
+  "conflictIds": [],
   "testCaseRefs": []
 }

@@ -3,21 +3,21 @@
 ## Alcance
 
 Esta especificación gobierna la primera persistencia de usuario. Modela
-exclusivamente la identidad, las entradas de progresión y la distribución de
-stats que ya ejecuta la aplicación. No incorpora resets, equipo, buffs,
-atributos derivados ni datos nuevos de MU Online.
+exclusivamente la identidad, las entradas de progresión, la configuración de
+resets y la distribución de stats que ya ejecuta la aplicación. No incorpora
+equipo, buffs, atributos derivados ni datos nuevos de MU Online.
 
-El contrato serializable es `build-draft.schema.json` `1.0.0`. Sus fixtures son
+El contrato serializable es `build-draft.schema.json` `1.1.0`. Sus fixtures son
 sintéticos. Application materializa el modelo, el puerto y los casos de uso;
-Data implementa el puerto y su migración. La integración WPF permanece fuera
-de esta vertical.
+Data implementa el puerto y su migración. WPF compone ambas capas y ofrece el
+primer flujo local de guardado/carga por ID.
 
 ## Separación respecto de `build.schema.json`
 
 `build.schema.json` representa una build más completa y exige dataset, versión
-del motor, resets y un mapa `stats`. El flujo actual no conoce resets y sus
-asignaciones no equivalen a valores finales de stats. Completar esos campos con
-ceros o inferencias convertiría ausencia de implementación en datos.
+del motor, resets y un mapa `stats`. El borrador ya conoce los inputs
+configurables de resets, pero sus asignaciones continúan sin equivaler a valores
+finales de stats y todavía no representa el resto de una build completa.
 
 Por ello el borrador usa un contrato independiente. No modifica ni reinterpreta
 `build.schema.json`; una futura promoción de borrador a build completa requerirá
@@ -32,6 +32,7 @@ un caso de uso y validaciones propios.
 | `dataset.version/hash` | Snapshot exacto resuelto | Gate de integridad; no se infiere |
 | `engineVersion` | Versión del motor que calculó el resultado | Gate de compatibilidad |
 | `progressionInputs` | Clase, evolución, nivel y quests elegidos por el usuario | Autoritativo |
+| `resetInputs` | Cantidad de resets y puntos por reset configurados por el usuario | Autoritativo |
 | `statDistribution.allocations` | Asignaciones elegidas por el usuario | Autoritativo |
 | Resto de `statDistribution` | Resultado calculado y su referencia de origen | Caché verificable, nunca nueva verdad factual |
 
@@ -50,15 +51,21 @@ JSON Schema valida forma, rangos, versiones y la composición completa de
    `statDistribution.characterClassId`.
 3. Ruleset, dataset y motor exactos están disponibles antes de calcular.
 4. Se recalcula `ProgressionPointBudgetResult` desde `progressionInputs`.
-5. Se recalcula `StatDistributionResult` usando únicamente las asignaciones
-   guardadas.
-6. Ruleset, clase, regla/version, presupuesto, asignaciones, gasto y remanente
-   recalculados coinciden exactamente con la caché persistida.
+5. Se recalcula `StatDistributionResult` usando únicamente `resetInputs` y las
+   asignaciones guardadas.
+6. Ruleset, clase, regla/version, presupuesto de progresión, resets, total
+   distribuible, asignaciones, gasto y remanente recalculados coinciden
+   exactamente con la caché persistida.
 7. Sólo el resultado recalculado se entrega al llamador. La caché nunca evita la
    validación ni se promueve a dato del ruleset.
 
 Una divergencia falla cerrada. No se corrige silenciosamente el borrador ni se
 reemplazan versiones durante una carga.
+
+Application admite borradores `1.0.0` ya persistidos: los normaliza en memoria a
+`1.1.0` con `resetCount=0`, `pointsPerReset=0`, `resetPoints=0` y
+`totalDistributablePoints=earnedPoints`, y luego ejecuta la misma revalidación.
+El payload almacenado no se reescribe durante la lectura.
 
 ## Errores estables
 
@@ -71,8 +78,8 @@ reemplazan versiones durante una carga.
 | `build-draft-revalidation-failed` | El recálculo no reproduce la caché persistida. |
 | `build-draft-write-conflict` | La escritura no puede completarse bajo la política transaccional. |
 
-Estos códigos ya forman parte de Application mediante `BuildDraftException`.
-Todavía no existen traducciones de UI.
+Estos códigos forman parte de Application mediante `BuildDraftException` y WPF
+los muestra junto con una traducción en español.
 
 ## Límite Application/Data
 
@@ -97,6 +104,26 @@ revalida ni modifica datos.
 Application únicamente para implementar el puerto; Application no referencia
 Data ni tipos SQLite.
 
+## Composición WPF
+
+`PublishedBuildDraftServices` crea la base
+`%LOCALAPPDATA%\MuOnline.BuildPlanner\build-planner.sqlite`, aplica
+`SqliteBuildDraftMigrations.All` y sólo después construye
+`SqliteBuildDraftRepository`. El smoke inyecta un directorio temporal externo a
+los binarios, pero recorre la misma composición.
+
+La composición declara ruleset `1.0.0`, dataset `2026-07-24.1` y motor `0.2.0`.
+El hash del dataset se calcula de forma determinista sobre los 27 JSON
+publicados: ruta relativa normalizada con `/`, byte nulo, contenido exacto y
+byte nulo, ordenados por ruta y acumulados con SHA-256. Así una carga exige el
+snapshot byte a byte sin deducir metadata desde la carpeta, la fecha del sistema
+o la versión de un ensamblado.
+
+La política interactiva usa timeout de dos segundos por intento, dos reintentos
+y 150 ms entre intentos. El agotamiento llega a la pantalla como
+`build-draft-write-conflict`, siempre acompañado por una explicación en
+español sin ocultar el código estable.
+
 ## Casos mínimos
 
 La etapa estructural conserva:
@@ -115,3 +142,8 @@ los nombres del schema.
 La vertical Data cubre alta/carga, reemplazo por ID, metadata y payload exactos,
 rollback ante fallo, reapertura, lectura ausente sin mutaciones y traducción del
 agotamiento de contención. Ningún caso usa datos o fórmulas del juego.
+
+El smoke publicado guarda un borrador sintético derivado de un caso canónico ya
+aprobado, lo carga mediante `LoadBuildDraftUseCase`, realiza backup/restore y
+repite la carga desde los binarios de reemplazo. Exige identidad, metadata,
+hash, asignaciones y resultado recalculado exactos.

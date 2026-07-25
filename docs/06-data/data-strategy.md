@@ -45,7 +45,7 @@ agotamiento; Data devuelve un error tipado y no presupone escritores paralelos.
 
 ## Primera persistencia de usuario
 
-`build-draft.schema.json` `1.0.0` y
+`build-draft.schema.json` `1.1.0` y
 `docs/06-data/build-draft-persistence-contract.md` gobiernan la primera tabla de
 usuario. El borrador conserva metadata exacto, entradas de progresión,
 asignaciones y una copia verificable del resultado. Los valores calculados no
@@ -57,6 +57,13 @@ proveedor hacia el puerto. La migración `1/create_build_drafts` almacena por
 `id` el payload JSON completo y columnas de schema, ruleset, dataset/hash y
 motor en una sola fila. Guardar usa reemplazo atómico dentro de
 `SqliteWriteContentionPolicy`; cargar ejecuta una lectura sin mutaciones.
+
+WPF compone esta persistencia en
+`%LOCALAPPDATA%\MuOnline.BuildPlanner\build-planner.sqlite`, aplica el catálogo
+antes de construir el repositorio y aporta metadata explícito `1.0.0`,
+`2026-07-24.1` y motor `0.2.0`. El hash SHA-256 se deriva de las rutas relativas
+y bytes exactos de los 27 JSON publicados. El smoke usa la misma composición
+sobre su directorio de usuario temporal externo al artefacto.
 
 ## Separación
 Datos canónicos, traducciones, evidencia y assets se almacenan por separado para evitar duplicación.

@@ -40,7 +40,10 @@ public sealed class StatDistributionApplicationIntegrationTests
         var budget = CreateSyntheticBudget(catalog, characterClass, earnedPoints: 10);
         var useCase = new CalculateStatDistributionUseCase(catalog);
 
-        var result = useCase.Execute(budget, allocations);
+        var result = useCase.Execute(
+            budget,
+            new ResetPointInputs(0, 0),
+            allocations);
 
         Assert.Equal(10 - expectedRemainingPoints, result.SpentPoints);
         Assert.Equal(expectedRemainingPoints, result.RemainingPoints);
@@ -49,6 +52,33 @@ public sealed class StatDistributionApplicationIntegrationTests
         Assert.Equal(
             statIds,
             result.Allocations.Keys.Order(StringComparer.Ordinal));
+    }
+
+    [Fact]
+    public void UseCaseMakesConfiguredResetPointsAvailableForDistribution()
+    {
+        using var snapshot = TemporarySnapshot.CopyFrom(CanonicalSnapshotRoot);
+        var catalog = new JsonProgressionRulesetSnapshotReader().Read(snapshot.Root);
+        var characterClass = catalog.Classes
+            .OrderBy(item => item.Id, StringComparer.Ordinal)
+            .First();
+        var statIds = characterClass.StatIds.Order(StringComparer.Ordinal).ToArray();
+        var allocations = statIds.ToDictionary(
+            statId => statId,
+            _ => 0L,
+            StringComparer.Ordinal);
+        allocations[statIds[0]] = 210;
+        var budget = CreateSyntheticBudget(catalog, characterClass, earnedPoints: 10);
+
+        var result = new CalculateStatDistributionUseCase(catalog).Execute(
+            budget,
+            new ResetPointInputs(2, 100),
+            allocations);
+
+        Assert.Equal(200, result.ResetPoints);
+        Assert.Equal(210, result.TotalDistributablePoints);
+        Assert.Equal(210, result.SpentPoints);
+        Assert.Equal(0, result.RemainingPoints);
     }
 
     [Fact]
@@ -70,7 +100,10 @@ public sealed class StatDistributionApplicationIntegrationTests
         var useCase = new CalculateStatDistributionUseCase(catalog);
 
         var exception = Assert.Throws<StatDistributionException>(
-            () => useCase.Execute(budget, allocations));
+            () => useCase.Execute(
+                budget,
+                new ResetPointInputs(0, 0),
+                allocations));
 
         Assert.Equal(StatDistributionErrorCodes.BudgetSourceMismatch, exception.Code);
     }
@@ -92,7 +125,10 @@ public sealed class StatDistributionApplicationIntegrationTests
         var useCase = new CalculateStatDistributionUseCase(catalog);
 
         var exception = Assert.Throws<StatDistributionException>(
-            () => useCase.Execute(budget, allocations));
+            () => useCase.Execute(
+                budget,
+                new ResetPointInputs(0, 0),
+                allocations));
 
         Assert.Equal(StatDistributionErrorCodes.AllocationNegative, exception.Code);
     }

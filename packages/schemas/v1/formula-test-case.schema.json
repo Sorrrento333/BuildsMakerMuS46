@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.mu46.local/v1/formula-test-case.schema.json",
+  "title": "FormulaTestCase",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "id",
+    "rulesetId",
+    "formulaRef",
+    "context",
+    "inputs"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "1.0.0" },
+    "id": { "$ref": "#/$defs/id" },
+    "rulesetId": { "$ref": "#/$defs/id" },
+    "formulaRef": { "$ref": "#/$defs/versionedRef" },
+    "context": { "$ref": "#/$defs/context" },
+    "inputs": { "$ref": "#/$defs/valueMap" },
+    "expectedTrace": {
+      "$ref": "https://schemas.mu46.local/v1/calculation-trace.schema.json"
+    },
+    "expectedErrorCode": { "$ref": "#/$defs/id" }
+  },
+  "oneOf": [
+    {
+      "required": ["expectedTrace"],
+      "not": { "required": ["expectedErrorCode"] }
+    },
+    {
+      "required": ["expectedErrorCode"],
+      "not": { "required": ["expectedTrace"] }
+    }
+  ],
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+    },
+    "semver": {
+      "type": "string",
+      "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)$"
+    },
+    "versionedRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "version"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "version": { "$ref": "#/$defs/semver" }
+      }
+    },
+    "context": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["characterClassId", "evolutionId"],
+      "properties": {
+        "characterClassId": { "$ref": "#/$defs/id" },
+        "evolutionId": { "$ref": "#/$defs/id" }
+      }
+    },
+    "valueMap": {
+      "type": "object",
+      "minProperties": 1,
+      "propertyNames": { "$ref": "#/$defs/id" },
+      "additionalProperties": { "type": "number" }
+    }
+  }
+}

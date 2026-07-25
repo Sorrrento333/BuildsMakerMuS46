@@ -1,14 +1,49 @@
 {
-  "schemaVersion": "1.0.0",
-  "id": "formula-synthetic-001",
-  "version": "one",
+  "schemaVersion": "1.1.0",
+  "id": "formula-synthetic-invalid",
+  "version": "0.1.0",
   "rulesetId": "ruleset-synthetic",
-  "status": "PUBLISHED",
-  "confidence": "VERIFIED",
-  "inputs": [],
-  "output": { "id": "output-a", "dataType": "INTEGER", "unit": "unit" },
-  "strategy": { "kind": "EXPRESSION", "definition": "0" },
-  "rounding": { "mode": "UNKNOWN", "stage": "invalid fixture" },
+  "status": "DRAFT",
+  "confidence": "UNVERIFIED",
+  "applicability": {
+    "characterClassId": "class-synthetic",
+    "evolutionIds": []
+  },
+  "inputs": [
+    {
+      "id": "input-synthetic",
+      "numericType": "INT32",
+      "unit": "synthetic-unit",
+      "numericBounds": {
+        "minimum": 0,
+        "minimumInclusive": true,
+        "classification": "FACTUAL",
+        "evidenceRefs": []
+      },
+      "source": {
+        "kind": "CONTEXT_VALUE"
+      }
+    }
+  ],
+  "output": {
+    "id": "output-synthetic",
+    "numericType": "INT64",
+    "unit": "synthetic-unit"
+  },
+  "strategy": {
+    "kind": "EXPRESSION",
+    "definition": "input-synthetic"
+  },
+  "rounding": {
+    "mode": "NONE",
+    "stage": "visible-output"
+  },
+  "trace": {
+    "stepIds": ["raw-output", "raw-output"],
+    "rawOutputStepId": "missing-raw-output",
+    "visibleOutputStepId": "visible-output"
+  },
   "evidenceRefs": [],
+  "conflictIds": [],
   "testCaseRefs": []
 }

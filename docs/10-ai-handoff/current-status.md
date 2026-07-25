@@ -17,9 +17,8 @@
 - Spikes equivalentes de TypeScript/Node.js 24 y C#/.NET 10 para cálculo
   sintético trazable, SQLite y ejecución offline.
 - C#/.NET 10 seleccionado para el núcleo y la aplicación inicial (ADR-0002).
-- Ocho schemas JSON 2020-12 `1.0.0`: evidencia, fórmula, clase de personaje,
-  progresión, distribución de stats, borrador de build, perfil de servidor y
-  build, con dieciséis fixtures sintéticos.
+- Diez schemas JSON 2020-12: siete en `1.0.0` y fórmula, distribución de
+  stats/borrador de build en `1.1.0`, con veinte fixtures sintéticos.
 - Solución mínima .NET 10, validador integral con `JsonSchema.Net 9.2.2`, dos
   pruebas de contrato y CI básico, ampliado a ocho schemas y dieciséis fixtures.
 - Evaluación de Json Everything completada. Las copias de `OSMFEULA.txt` de
@@ -180,9 +179,11 @@
 - El smoke WPF publicado carga el snapshot con Application y reproduce 7/7
   casos positivos y 3/3 rechazos en las fases inicial/reemplazo. También exige
   las cuatro carpetas de contenido y conserva SHA-256 idéntico para sus 18 JSON.
-- Contrato estructural de distribución de stats `1.0.0` definido antes del
-  código productivo. Registra presupuesto ganado, regla de origen, asignaciones,
-  puntos gastados y restantes con contadores no negativos de 64 bits.
+- Contrato estructural de distribución de stats definido inicialmente en
+  `1.0.0` y ampliado de forma compatible a `1.1.0` para resets configurables.
+  Definido antes del código productivo, registra presupuesto de progresión,
+  inputs/producto de resets, total distribuible, asignaciones, gasto y remanente
+  con contadores no negativos de 64 bits.
 - Las invariantes semánticas fijan asignaciones exactamente para los stats de
   la clase canónica, sumas consistentes y gasto dentro del presupuesto.
   `command` sólo está disponible si la clase lo declara. Se documentaron seis
@@ -200,9 +201,9 @@
   prueba de integración adicional contrasta los IDs materializados con los JSON
   canónicos.
 - `CalculateStatDistributionUseCase` integra la distribución en Application.
-  Recibe el presupuesto existente y las asignaciones, resuelve una única clase
-  del mismo ruleset desde el catálogo y delega en el motor sin recalcular
-  progresión ni aceptar una definición alternativa.
+  Recibe el presupuesto existente, inputs de resets y asignaciones, resuelve una
+  única clase del mismo ruleset desde el catálogo y delega en el motor sin
+  recalcular progresión ni aceptar una definición alternativa.
 - Cuatro pruebas de integración adicionales recorren una copia temporal del
   snapshot hasta el motor para distribuciones sintéticas parcial/exacta y
   `budget-source-mismatch` ante un ruleset de origen incoherente, y confirman la
@@ -213,12 +214,14 @@
   materializada. Cambiar clase, evolución, nivel o Hero Status invalida ese
   presupuesto antes de permitir una distribución.
 - La pantalla delega en `CalculateStatDistributionUseCase` y muestra puntos
-  gastados, restantes y asignaciones por ID. Los seis códigos tipados tienen
+  de progresión, resets, total, gasto, remanente y asignaciones por ID. Los diez
+  códigos tipados tienen
   explicación visible en español sin ocultar el identificador estable.
 - El smoke WPF publicado verifica en ambas fases una distribución sintética de
-  un punto sobre el conjunto de stats obtenido del snapshot. No incorpora un
-  fixture factual, persistencia ni valores nuevos del juego.
-- Contrato `build-draft.schema.json` `1.0.0` definido antes de la primera
+  `2 × 100 = 200` sobre el conjunto de stats obtenido del snapshot. No incorpora
+  una regla factual de resets ni valores nuevos del juego.
+- Contrato `build-draft.schema.json` definido inicialmente en `1.0.0` y
+  ampliado a `1.1.0`. Fue definido antes de la primera
   persistencia de usuario. Conserva identidad, metadata exacto de
   ruleset/dataset/motor, entradas de progresión y el resultado de distribución
   compuesto mediante `$ref`.
@@ -231,7 +234,7 @@
   migración productivas se incorporaron después de este gate estructural.
 - Modelo `BuildDraft` materializado en Application con nombres JSON explícitos
   y estructura alineada con los contratos `build-draft` y `stat-distribution`
-  `1.0.0`. `BuildDraftRuntimeContext` recibe explícitamente catálogo,
+  `1.1.0`. `BuildDraftRuntimeContext` recibe explícitamente catálogo,
   ruleset/version, dataset/version/hash y motor/version; no los deriva de rutas,
   fechas o ensamblados.
 - Puerto `IBuildDraftRepository` y casos de uso de guardado/carga implementados
@@ -255,36 +258,159 @@
   metadata, reemplazo único, rollback completo, reapertura, ausencia sin
   mutaciones y traducción tipada de contención. No se añadieron datos ni
   fórmulas del juego.
+- WPF compone `SaveBuildDraftUseCase` y `LoadBuildDraftUseCase` con
+  `SqliteBuildDraftRepository`. La base productiva vive en
+  `%LOCALAPPDATA%\MuOnline.BuildPlanner\build-planner.sqlite` y la migración
+  productiva se aplica antes de construir el repositorio.
+- La composición declara ruleset `1.0.0`, dataset `2026-07-24.1` y motor
+  `0.1.0`. El hash SHA-256 se calcula de forma determinista sobre rutas
+  relativas y bytes exactos de los 27 JSON publicados; no se infiere desde
+  carpetas, fechas del sistema ni versiones de ensamblado.
+- La pantalla guarda y carga por ID exclusivamente mediante los casos de uso.
+  La carga recalcula y contrasta antes de repoblar entradas y resultados; los
+  seis códigos `build-draft-*`, incluido `build-draft-write-conflict`, conservan
+  su identificador estable y una explicación visible.
+- El smoke publicado guarda un borrador sintético en la base externa, lo
+  revalida, ejecuta backup/restore y repite la carga desde los binarios de
+  reemplazo. Verifica ID, metadata, hash, asignaciones, gasto y remanente sin
+  incorporar datos ni fórmulas nuevos del juego.
+- Por decisión del propietario del 2026-07-24, los resets se modelan sólo como
+  configuración del servidor y no como mecánica del ruleset Season 4. Los dos
+  inputs no negativos son cantidad y puntos por reset; ambos valen cero por
+  defecto.
+- `StatDistributionCalculator` calcula con overflow controlado
+  `resetCount × pointsPerReset`, suma el resultado al presupuesto de progresión
+  y habilita el total combinado para asignaciones. La salida conserva separados
+  puntos de progresión, inputs/producto de resets, total, gasto y remanente.
+- Los contratos `stat-distribution` y `build-draft` avanzan a `1.1.0`; el motor
+  WPF avanza a `0.2.0`. Ruleset `1.0.0`, dataset `2026-07-24.1`, sus 18 JSON y
+  su hash permanecen sin cambios porque no se añadió información factual.
+- WPF presenta `Resets`, `Puntos por reset` y `Puntos totales por resets`.
+  Guardado/carga conservan los inputs autoritativos y revalidan producto y
+  presupuesto total. Se añadieron cuatro errores tipados para negativos y
+  overflow.
+- `RES-0002` abierto para investigar HP, Mana, AG y SD. Contiene 24 claims
+  independientes —una combinación por atributo y familia de clase canónica—,
+  abiertos inicialmente como `UNVERIFIED`, sin evidencia, cifras, constantes ni
+  fórmulas candidatas. El registro exige verificar por claim versión, evolución
+  aplicable, entradas, orden de operaciones y redondeo antes de publicar.
+- Primer claim de `RES-0002` investigado. EVD-0022–EVD-0025 registran que la
+  página actual de MU Online Fanz publica HP 60, 1 por nivel y 1 por Stamina
+  para Dark Wizard; Webzen confirma sólo HP 60 y 1 por nivel, mientras
+  StrategyWiki e InfinityMU publican 2 por Vitality. Como ninguna fuente
+  demuestra Season 4 global/inglés y faltan semántica inicial y redondeo,
+  el contraste individual permanece `PARTIAL`.
+- EVD-0026 registra la decisión explícita del propietario del 2026-07-24: las
+  fórmulas entregadas corresponden a Season 4 global/inglés, aplican a las
+  familias completas y el valor mostrado trunca la parte decimal. En ese punto
+  quedaron
+  `VERIFIED` 21/24 claims de `RES-0002`: HP, Mana, AG y SD de cinco familias,
+  más AG de Summoner.
+- EVD-0027–EVD-0029 investigan HP, Mana y SD de Summoner en MU Online Fanz,
+  Webzen y MUonline Helper. Coinciden en HP 70, Mana 40, SD 102 y aumentos por
+  nivel de 1 HP y 1.5 Mana; sólo Fanz añade coeficientes de stat y componentes
+  de SD. Como ninguna fuente demuestra una fórmula cerrada Season 4 ni la
+  semántica de base, orden y truncamientos, los tres claims pasan a `PARTIAL`.
+- EVD-0030 registra la corrección del propietario: Summoner en nivel 1 con
+  Vitality 18 tiene HP 70 y cada punto adicional de Vitality suma 2 HP. Coincide
+  con EVD-0027–EVD-0029. La confirmación posterior de +1 HP por nivel cierra
+  `hp = 70 + (lvl - 1) + (vit - 18) * 2`; `DR-HP-SUMMONER` pasa a `VERIFIED`.
+- EVD-0031 conserva la corrección final del propietario: +1.7 Mana por cada
+  punto de Energy de Summoner, coincidente con Fanz. El valor 1.5 comunicado
+  antes queda retirado. El propietario también fija Mana 40 al nacer en nivel 1
+  con Energy 23 y confirma +1.5 Mana por nivel. Queda aprobada
+  `mana = 40 + (lvl - 1) * 1.5 + (ene - 23) * 1.7`;
+  `DR-MANA-SUMMONER` pasa a `VERIFIED`.
+- EVD-0032 identifica por decisión del propietario la fórmula de SD de Summoner
+  y `defense = agi / 3`. El propietario confirma SD visible 102 en nivel 1 con
+  stats base y fija truncamiento independiente de cada término antes de sumar.
+  `DSP-0004` queda resuelto y `DR-SD-SUMMONER` pasa a `VERIFIED`.
+- `DSP-0003` queda resuelto por decisión del propietario a favor de
+  `30 + (lvl - 1) + vit * 2` para HP de la familia Dark Wizard. La divergencia
+  de Fanz se conserva sin reclasificar su evidencia. EVD-0026 preserva además
+  fórmulas de daño, wizardry, defensa, rates, regeneración, buffs, Fenrir, pets y
+  capacidad de clan, todavía sin contratos ni implementación productiva.
+- Diseño documental completado para `DR-HP-DARK-WIZARD`. Propone el ID
+  `formula-hp-dark-wizard` `1.0.0`, alcance sobre las tres evoluciones de la
+  familia, inputs enteros, aritmética comprobada, truncamiento visible final,
+  traza de tres aportes y ocho casos manuales. El análisis detecta que
+  `formula.schema.json` `1.0.0` aún no representa aplicabilidad, límites,
+  procedencia del input ni traza estructurada. No se modificaron schemas,
+  ruleset, casos ejecutables, motor, Application, Data o WPF.
+- Revisión técnica de `formula-hp-dark-wizard` completada y aprobada el
+  2026-07-24 para ID, versión, aplicabilidad, tipos, errores, traza y ocho casos
+  manuales. Se corrigió la procedencia: `EVD-0026` autoriza la fórmula y
+  `EVD-0021` sustenta Vitality 15 como mínimo canónico. Los máximos de los tipos
+  son límites técnicos, no límites factuales de MU Online. La revisión no
+  creó datos o código.
+- Decisión de contratos de fórmula aprobada técnicamente el 2026-07-25.
+  `formula.schema.json` avanzó a `1.1.0` para aplicabilidad, bounds
+  clasificados, procedencia cerrada de inputs y declaración ordenada de pasos.
+  `calculation-trace.schema.json` y `formula-test-case.schema.json` nacieron en
+  `1.0.0` para separar ejecución y expectativas de la definición factual.
+  La decisión fija versionado, referencias y gates semánticos sin modificar el
+  ruleset ni el código productivo.
+- Contratos de fórmula materializados según la decisión:
+  `formula.schema.json` `1.1.0`, `calculation-trace.schema.json` `1.0.0` y
+  `formula-test-case.schema.json` `1.0.0`. Seis fixtures sintéticos prueban
+  definición, ejecución, unión positiva/negativa y resolución real del `$ref`
+  caso → traza.
+- El validador integral cubre 10 contratos/20 fixtures y añade pruebas
+  focalizadas para aplicabilidad vacía/duplicada, bounds factuales sin
+  evidencia, source incompleto, pasos duplicados, salidas fuera de `stepIds`,
+  salida visible no final y expectativas ambiguas.
+- `formula-hp-dark-wizard` `1.0.0` materializada, revisada y `PUBLISHED`, con
+  aplicabilidad exacta a las tres evoluciones, inputs `INT32`/`INT64`, mínimo
+  factual de Vitality trazado a `EVD-0021`, expresión y truncamiento autorizados
+  por `EVD-0026`, y conflicto resuelto `DSP-0003`.
+- Cuatro casos positivos conservan los aportes y resultados aprobados; cuatro
+  controles negativos cubren nivel, Vitality, familia y overflow. Sólo los
+  positivos están enlazados mediante referencias versionadas.
+- Gate semántico factual incorporado al validador: exige identidad exacta,
+  clase/evoluciones del catálogo, inputs, orden de pasos, correspondencia de
+  outputs, redondeo, provenance y cobertura completa de positivos. Cuatro
+  mutaciones temporales demuestran fallo cerrado.
+- La revisión de publicación del 2026-07-25 contrastó los nueve JSON con el
+  contrato aprobado sin encontrar divergencias. Sólo promovió `status` de
+  `DRAFT` a `PUBLISHED`; una prueba de contrato fija el nuevo estado. No se
+  añadió motor de HP ni integración en Application, Data o WPF.
 - Alcance anterior retirado y documentación migrada a Season 4 global/inglesa.
 
 ## No iniciado
 
-- Integración WPF de guardado/carga de borradores, composición del repositorio,
-  ubicación externa de la base y extensión del smoke publicado.
-- Schemas restantes (`ruleset`, quests, resets, ítems, skills, escenarios y
+- Motor de `DR-HP-DARK-WIZARD`; la definición canónica está `PUBLISHED`, pero
+  todavía no existe cálculo productivo.
+- IDs, contratos, casos de referencia y motor para los otros 23 claims
+  `VERIFIED` de `RES-0002` y para el resto del catálogo de EVD-0026. La decisión
+  factual no sustituye esos gates ni define todavía precisión de dependencias
+  intermedias.
+- Schemas restantes (`ruleset`, quests, ítems, skills, escenarios y
   trazas); el validador integral/CI ya cubre el contrato de progresión.
-- Persistencia de builds, resto del motor de cálculo y flujos de UI posteriores
-  al presupuesto ganado.
+- Builds completas, resto del motor de cálculo y flujos de UI
+  posteriores al presupuesto ganado y los borradores locales.
 
 ## Decisiones abiertas
 
-- Ninguna decisión inmediata de arquitectura o gobierno. El canal público de
-  actualización y firma continúa como decisión posterior de distribución.
+- El canal público de actualización y firma continúa como decisión posterior de
+  distribución.
 
-## Verificación más reciente — 2026-07-24
+## Verificación más reciente — 2026-07-25
 
-- Schemas: 8/8 contratos y 16/16 fixtures estructuralmente legibles.
-- Validador integral: 8/8 fixtures válidos aceptados, 8/8 inválidos rechazados
-  y 8/8 registros canónicos válidos. Ejecuta además 7/7 casos factuales y
-  rechaza 3/3 controles semánticos. Sus 6/6 pruebas .NET aprueban también la
-  ejecución repetida, los IDs estables, la retroactividad, la elegibilidad y
-  los enlaces exactos 5+2 de las reglas publicadas.
+- Schemas: 10/10 contratos y 20/20 fixtures estructuralmente legibles.
+- Validador integral: 10/10 fixtures válidos aceptados, 10/10 inválidos rechazados
+  y 9/9 registros canónicos válidos. Ejecuta además 7/7 casos de progresión,
+  rechaza 3/3 controles semánticos y valida 4/4 casos de fórmula más 4/4
+  controles negativos. La fórmula se informa `PUBLISHED` con cero errores. Sus
+  20/20 pruebas .NET aprueban también la
+  ejecución repetida, los IDs estables, la retroactividad, la elegibilidad, los
+  enlaces exactos 5+2 de las reglas publicadas y los contratos sintéticos de
+  fórmula/traza/caso, además de cuatro mutaciones del gate factual.
 - Solución .NET 10 de diez proyectos: restauración bloqueada y build Release
   aprobados con 0 advertencias y 0 errores; CLI del validador y formato
   verificados.
 - Persistencia SQLite: 18/18 pruebas de integración aprobadas en `win-x64`;
-  junto con 6/6 pruebas del validador, 22/22 del motor y 24/24 de Application,
-  la solución ejecuta 70/70 pruebas correctamente. Los seis casos nuevos
+  junto con 20/20 pruebas del validador, 27/27 del motor y 27/27 de Application,
+  la solución ejecuta 92/92 pruebas correctamente. Los seis casos nuevos
   cubren la migración y el repositorio de borradores con payload/metadata,
   reemplazo, rollback, reapertura, lectura pura y contención tipada.
 - Motor de puntos: 7/7 casos positivos canónicos, 3/3 rechazos semánticos y
@@ -294,6 +420,10 @@
   aprobados; incluyen negativos, conjunto exacto de stats, exceso, tres
   divergencias de origen y overflow. El resultado copia clase, ruleset,
   regla/version y presupuesto sin recalcular progresión.
+- Resets configurables: `2 × 100 = 200`, defaults `0 × 0 = 0`, ambos inputs
+  negativos, overflow del producto y overflow del total aprobados. Una prueba
+  de Application distribuye los 200 puntos adicionales desde un snapshot
+  temporal sin convertirlos en datos del ruleset.
 - Application: 7/7 casos positivos y 3/3 rechazos reproducidos por el camino
   archivo → adaptador → caso de uso → motor; 2/2 alteraciones de snapshot
   rechazadas antes del cálculo y 1/1 control confirma los IDs de stats
@@ -303,15 +433,19 @@
   serialización, guardado/reemplazo, carga con recálculo y fallos cerrados por
   ausencia, identidad, dependencia o caché. El proyecto no incorpora paquetes
   externos ni referencia Data o WPF.
-- WPF/Application: el build copia 18 JSON canónicos a una ruta estable tanto en
+- WPF/Application: el build copia 27 JSON canónicos a una ruta estable tanto en
   salida normal como publicada. El flujo de ventana obtiene clase/evolución y
   Hero Status desde el catálogo/regla, muestra el total junto con la traza y
   conserva ese presupuesto para distribuir sobre controles derivados de
-  `StatIds`. Muestra gasto/remanente y errores tipados; App referencia
-  Application y las capas internas no incorporan referencias inversas.
+  `StatIds`. Muestra progresión, resets, total, gasto/remanente y errores
+  tipados; App referencia
+  Application y las capas internas no incorporan referencias inversas. El mismo
+  composition root aplica la migración de borradores, configura contención en
+  2 s × 3 intentos con 150 ms entre reintentos y conecta guardado/carga por ID
+  sin omitir la revalidación de Application.
 - Json Everything fuente: 2 compilaciones independientes con SDK `10.0.301`,
   restore bloqueado de los tres proyectos fuente, hashes esperados para 3/3
-  DLL y SPDX contrastado. El harness actualizado ejecuta 2 × 16/16 fixtures y
+  DLL y SPDX contrastado. El harness actualizado ejecuta 2 × 20/20 fixtures y
   rechaza formatos inválidos: PASS.
 - Integración del validador: lock con sólo `Humanizer.Core 3.0.10`, tres DLL
   clasificados como referencias directas, aviso MIT presente y ausencia de
@@ -337,20 +471,29 @@
 - Spike C#: 4/4 comprobaciones aprobadas con .NET SDK 10.0.301.
 - Node.js y `pwsh` no están disponibles en el `PATH`; la prueba de schemas se
   ejecuta con Windows PowerShell.
-- Se incorporaron sólo los datos factuales autorizados por EVD-0021: seis clases
-  y dos reglas de progresión canónicas publicadas con siete referencias
-  ejecutables. No se incorporaron HP, Mana, AG, SD, daño, defensa ni fórmulas
-  derivadas.
+- El motor incorpora sólo los datos factuales autorizados por EVD-0021: seis
+  clases y dos reglas de progresión canónicas publicadas con siete referencias
+  ejecutables. La definición de HP de Dark Wizard está `PUBLISHED` como dato,
+  pero HP, Mana, AG, SD, daño y defensa todavía no se ejecutan.
 - Licencia: texto Apache-2.0 contrastado con la publicación oficial; ADR-0005,
   `NOTICE` e inventario de terceros incorporados. La auditoría leyó metadatos
   `.nuspec` de todas las dependencias restauradas y el acuerdo incluido por la
   familia Json Everything.
-- Investigación documental: 21 evidencias registradas; 6/6 claims principales
-  `VERIFIED`, 0 `PARTIAL` y dos conflictos resueltos. EVD-0014–EVD-0018
-  trazan stats, puntos, Marlon, contraste oficial y decisiones del propietario;
-  EVD-0019/EVD-0020 trazan la presencia anterior de la matriz candidata y la
-  búsqueda negativa de un original o snapshot contemporáneo; EVD-0021 fija la
-  matriz como axioma del ruleset y cierra la investigación.
+- Investigación documental: `RES-0001` conserva 21 evidencias, 6/6 claims
+  `VERIFIED` y dos conflictos resueltos. `RES-0002` queda `VERIFIED` con 24/24
+  claims, once evidencias y dos conflictos resueltos.
+  EVD-0026 autoriza diseñar contratos y casos para su alcance exacto,
+  pero todavía no existen fórmulas productivas.
+  EVD-0014–EVD-0018 trazan stats, puntos, Marlon, contraste oficial y decisiones
+  del propietario; EVD-0019/EVD-0020 trazan la presencia anterior de la matriz
+  candidata y la búsqueda negativa de un original o snapshot contemporáneo;
+  EVD-0021 fija la matriz como axioma del ruleset y cierra `RES-0001`.
+- Contrato documental de HP de Dark Wizard: revisión técnica aprobada para
+  `formula-hp-dark-wizard` `1.0.0`; `EVD-0026` traza la expresión y
+  aplicabilidad, mientras `EVD-0021` traza el mínimo canónico de Vitality. La
+  estrategia de tres contratos, la definición JSON, los ocho casos y el gate
+  semántico están implementados. La revisión de publicación no encontró
+  divergencias y la fórmula está `PUBLISHED`; todavía no existe motor.
 - Contraste técnico: 2 registros comunitarios nuevos y matriz completa para
   `WZ-CLM-001`–`WZ-CLM-010`; la auditoría concluyó que su independencia y
   procedencia global/inglesa no son demostrables con los artefactos disponibles.
@@ -378,11 +521,18 @@
   148.339.336 bytes. Los dos reportes JSON confirman SQLite `3.53.3`, integridad
   `ok`, 1 migración aplicada/1 reconocida y datos fuera de los binarios.
 - Publicación WPF con avisos: PASS local más reciente en `win-x64` con SDK
-  `10.0.301`, SQLite `3.53.3`, 441 archivos y 148.672.301 bytes después de
-  integrar la distribución WPF. Los diez archivos legales y los 18 JSON del
+  `10.0.301`, SQLite `3.53.3`, 450 archivos y 148.754.557 bytes después de
+  publicar la primera fórmula factual. Los diez archivos legales y los 27
+  JSON del
   ruleset estuvieron presentes y conservaron sus hashes entre ambas carpetas;
   el modo headless reprodujo 7/7 casos positivos, 3/3 rechazos y una
-  distribución sintética sobre cinco stats con un punto gastado en ambas fases.
+  configuración `2 × 100 = 200` y una distribución sintética con 201 puntos
+  gastados sobre cinco stats en ambas fases.
+  Aplicó dos migraciones en la fase inicial, reconoció ambas tras el reemplazo y
+  revalidó `publication-smoke-draft` con dataset `2026-07-24.1` y hash
+  `sha256:b45eda3083634c43aa4eaead02e02945793075a3c6ee865973c8b4776917a7ad`.
+  La fórmula `PUBLISHED` quedó empaquetada como dato canónico, pero WPF no la
+  materializa ni la ejecuta.
 - Publicación WPF en runner limpio: PASS en Microsoft Windows Server 2025,
   imagen `windows-2025-vs2026`, runner `2.335.1` y SDK .NET `10.0.302`. El job
   auditó los cinco proyectos sin paquetes vulnerables en los orígenes
@@ -426,7 +576,7 @@
   hash y los commits declarados por los paquetes. Los 10 fixtures actuales pasan
   con la API evaluada, pero los binarios NuGet publicados fueron retirados. La
   compilación propia MIT integrada demuestra hashes idénticos entre dos rutas
-  fuente, 2 × 16/16 fixtures, formatos, SBOM, locks, auditoría y publicación
+  fuente, 2 × 20/20 fixtures, formatos, SBOM, locks, auditoría y publicación
   inspeccionada. Corvus 4.6.7 se conserva como contingencia sin asumir paridad.
 
 ## Decisión del propietario — 2026-07-18
@@ -464,3 +614,24 @@
 - Decisión posterior: dejar de exigir comprobación histórica adicional para la
   matriz de `RES-0001`, promover sus seis claims a `VERIFIED` como axiomas del
   ruleset y continuar con la implementación productiva.
+
+## Decisión del propietario — 2026-07-24
+
+- Los resets dependen de cada servidor, no de la versión ni del juego estándar.
+- No se requiere investigación factual ni una regla de resets dentro de
+  `mu-s4-global-reference`.
+- La UI debe recibir cantidad de resets y puntos por reset, ambos con valor
+  predeterminado cero, calcular su producto y habilitar esos puntos para la
+  distribución de stats.
+- Esta decisión se implementa como configuración explícita y conserva los
+  puntos de progresión separados de los puntos por resets.
+- Las fórmulas de EVD-0026 corresponden a Season 4 global/inglés y se aceptan
+  como axiomas del ruleset para las familias completas confirmadas.
+- El resultado mostrado por el juego trunca la parte decimal. No se autoriza
+  inventar redondeos intermedios; cada futura dependencia deberá especificar su
+  precisión y punto de truncamiento.
+- Para Summoner se aprueban daño, wizardry, rates, defensa, velocidad, AG,
+  Reflect, Berserker, Innovation y Weakness. HP también queda aprobado como
+  `70 + (lvl - 1) + (vit - 18) * 2` y Mana como
+  `40 + (lvl - 1) * 1.5 + (ene - 23) * 1.7`. SD trunca sus tres términos antes
+  de sumarlos; `RES-0002` queda completamente verificado.

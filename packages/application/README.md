@@ -11,9 +11,10 @@ ni SQLite. La primera vertical contiene:
 - `CalculateProgressionPointBudgetUseCase`, caso de uso que delega el cálculo en
   `ProgressionPointBudgetCalculator`;
 - `CalculateStatDistributionUseCase`, caso de uso que recibe el presupuesto ya
-  calculado y las asignaciones, resuelve su única clase en el catálogo y delega
-  en `StatDistributionCalculator` sin aceptar una definición alternativa;
-- tipos serializables `BuildDraft` alineados con el contrato JSON `1.0.0`,
+  calculado, los inputs configurables de resets y las asignaciones, resuelve su
+  única clase en el catálogo y delega en `StatDistributionCalculator` sin
+  aceptar una definición alternativa;
+- tipos serializables `BuildDraft` alineados con el contrato JSON `1.1.0`,
   `IBuildDraftRepository` como puerto sin tipos SQLite y casos de uso de
   guardado/carga;
 - errores tipados de snapshot para ausencia, formato, IDs duplicados, mezcla de
@@ -40,12 +41,14 @@ deduce de carpetas, fechas ni ensamblados. El guardado calcula progresión y
 distribución antes de entregar el borrador completo al repositorio; guardar el
 mismo ID tiene semántica de reemplazo para las implementaciones del puerto.
 
-La carga exige el schema `1.0.0`, coherencia entre las identidades persistidas y
+La carga acepta `1.1.0` y normaliza borradores `1.0.0` a resets cero sin
+reescribirlos. Exige coherencia entre las identidades persistidas y
 disponibilidad exacta del contexto. Después recalcula progresión y distribución
-desde las entradas y asignaciones autoritativas, compara toda la caché y sólo
+desde progresión, resets y asignaciones autoritativas, compara toda la caché y sólo
 entonces devuelve una copia con el resultado recalculado. Los fallos usan los
 seis códigos estables `build-draft-*` definidos por la especificación.
 
 Las pruebas usan un repositorio sintético en memoria. Application continúa sin
 referenciar Data, SQLite ni WPF. Data implementa el puerto en un adaptador
-separado; la siguiente vertical conectará esa composición desde WPF.
+separado; WPF compone ese adaptador y mantiene la carga a través del caso de uso
+para no omitir la revalidación.

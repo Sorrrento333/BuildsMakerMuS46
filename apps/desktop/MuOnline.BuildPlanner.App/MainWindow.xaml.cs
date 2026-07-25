@@ -1,5 +1,6 @@
 using System.Windows;
 using System.Windows.Controls;
+using MuOnline.BuildPlanner.Application.Builds;
 using MuOnline.BuildPlanner.Application.Progression;
 using MuOnline.BuildPlanner.Application.Stats;
 using MuOnline.BuildPlanner.Domain.Progression;
@@ -12,16 +13,26 @@ public partial class MainWindow : Window
     private readonly ProgressionRulesetCatalog _catalog;
     private readonly CalculateProgressionPointBudgetUseCase _useCase;
     private readonly CalculateStatDistributionUseCase _statDistributionUseCase;
+    private readonly SaveBuildDraftUseCase _saveBuildDraftUseCase;
+    private readonly LoadBuildDraftUseCase _loadBuildDraftUseCase;
     private readonly Dictionary<string, TextBox> _allocationInputs =
         new(StringComparer.Ordinal);
     private ProgressionPointBudgetResult? _currentBudget;
 
     public MainWindow()
+        : this(PublishedBuildDraftServices.CreateDefault())
     {
+    }
+
+    private MainWindow(PublishedBuildDraftServices buildDraftServices)
+    {
+        ArgumentNullException.ThrowIfNull(buildDraftServices);
         InitializeComponent();
         _catalog = PublishedProgressionRuleset.Catalog;
         _useCase = PublishedProgressionRuleset.CreateUseCase();
         _statDistributionUseCase = PublishedProgressionRuleset.CreateStatDistributionUseCase();
+        _saveBuildDraftUseCase = buildDraftServices.SaveUseCase;
+        _loadBuildDraftUseCase = buildDraftServices.LoadUseCase;
 
         ClassComboBox.ItemsSource = _catalog.CharacterOptions
             .OrderBy(item => item.DisplayName, StringComparer.CurrentCulture)
@@ -134,7 +145,16 @@ public partial class MainWindow : Window
 
         try
         {
-            var result = _statDistributionUseCase.Execute(_currentBudget, allocations);
+            if (!TryReadResetInputs(out var resetInputs, out var validationMessage))
+            {
+                DistributionResultTextBox.Text = validationMessage;
+                return;
+            }
+
+            var result = _statDistributionUseCase.Execute(
+                _currentBudget,
+                resetInputs,
+                allocations);
             DistributionResultTextBox.Text = FormatDistributionResult(result);
         }
         catch (StatDistributionException exception)
@@ -142,6 +162,74 @@ public partial class MainWindow : Window
             DistributionResultTextBox.Text =
                 $"No se pudo distribuir ({exception.Code}): " +
                 TranslateDistributionError(exception.Code);
+        }
+    }
+
+    private async void SaveBuildDraftButtonClick(object sender, RoutedEventArgs e)
+    {
+        if (!TryReadDraftInputs(
+                out var progressionInputs,
+                out var resetInputs,
+                out var allocations,
+                out var validationMessage))
+        {
+            BuildDraftResultTextBox.Text = validationMessage;
+            return;
+        }
+
+        try
+        {
+            var draft = await _saveBuildDraftUseCase.ExecuteAsync(
+                new SaveBuildDraftRequest(
+                    BuildDraftIdTextBox.Text.Trim(),
+                    progressionInputs,
+                    resetInputs,
+                    allocations));
+            BuildDraftResultTextBox.Text =
+                $"Borrador '{draft.Id}' guardado. " +
+                $"Dataset {draft.Dataset.Version} ({draft.Dataset.Hash[..15]}…).";
+        }
+        catch (BuildDraftException exception)
+        {
+            BuildDraftResultTextBox.Text =
+                $"No se pudo guardar ({exception.Code}): " +
+                TranslateBuildDraftError(exception.Code);
+        }
+        catch (StatDistributionException exception)
+        {
+            BuildDraftResultTextBox.Text =
+                $"No se pudo guardar ({exception.Code}): " +
+                TranslateDistributionError(exception.Code);
+        }
+        catch (ProgressionPointBudgetException exception)
+        {
+            BuildDraftResultTextBox.Text =
+                $"No se pudo guardar ({exception.Code}): {exception.Message}";
+        }
+    }
+
+    private async void LoadBuildDraftButtonClick(object sender, RoutedEventArgs e)
+    {
+        var id = BuildDraftIdTextBox.Text.Trim();
+        if (!IsValidBuildDraftId(id))
+        {
+            BuildDraftResultTextBox.Text =
+                "El ID debe usar minúsculas, números y guiones simples.";
+            return;
+        }
+
+        try
+        {
+            var draft = await _loadBuildDraftUseCase.ExecuteAsync(id);
+            ApplyLoadedDraft(draft);
+            BuildDraftResultTextBox.Text =
+                $"Borrador '{draft.Id}' cargado y revalidado contra el snapshot exacto.";
+        }
+        catch (BuildDraftException exception)
+        {
+            BuildDraftResultTextBox.Text =
+                $"No se pudo cargar ({exception.Code}): " +
+                TranslateBuildDraftError(exception.Code);
         }
     }
 
@@ -208,6 +296,123 @@ public partial class MainWindow : Window
         }
     }
 
+    private bool TryReadDraftInputs(
+        out BuildDraftProgressionInputs progressionInputs,
+        out BuildDraftResetInputs resetInputs,
+        out IReadOnlyDictionary<string, long> allocations,
+        out string validationMessage)
+    {
+        progressionInputs = null!;
+        resetInputs = null!;
+        allocations = null!;
+        validationMessage = string.Empty;
+        var id = BuildDraftIdTextBox.Text.Trim();
+        if (!IsValidBuildDraftId(id))
+        {
+            validationMessage =
+                "El ID debe usar minúsculas, números y guiones simples.";
+            return false;
+        }
+
+        if (ClassComboBox.SelectedItem is not ProgressionCharacterOption selectedClass ||
+            EvolutionComboBox.SelectedItem is not ProgressionEvolutionOption selectedEvolution)
+        {
+            validationMessage = "Selecciona una clase y una evolución.";
+            return false;
+        }
+
+        if (!int.TryParse(LevelTextBox.Text, out var level))
+        {
+            validationMessage = "El nivel debe ser un número entero.";
+            return false;
+        }
+
+        var parsedAllocations = new Dictionary<string, long>(StringComparer.Ordinal);
+        foreach (var (statId, input) in _allocationInputs)
+        {
+            if (!long.TryParse(input.Text, out var value))
+            {
+                validationMessage =
+                    $"La asignación de '{statId}' debe ser un número entero.";
+                return false;
+            }
+
+            parsedAllocations.Add(statId, value);
+        }
+
+        var questBonus = GetSelectedQuestBonus();
+        var completedQuestIds =
+            HeroStatusCheckBox.IsChecked == true && questBonus is not null
+                ? new[] { questBonus.QuestId }
+                : Array.Empty<string>();
+        progressionInputs = new BuildDraftProgressionInputs(
+            selectedClass.Id,
+            selectedEvolution.Id,
+            level,
+            completedQuestIds);
+        if (!TryReadResetInputs(out var domainResetInputs, out validationMessage))
+        {
+            return false;
+        }
+
+        resetInputs = new BuildDraftResetInputs(
+            domainResetInputs.ResetCount,
+            domainResetInputs.PointsPerReset);
+        allocations = parsedAllocations;
+        return true;
+    }
+
+    private void ApplyLoadedDraft(BuildDraft draft)
+    {
+        var selectedClass = _catalog.CharacterOptions.Single(
+            item => item.Id == draft.ProgressionInputs.CharacterClassId);
+        ClassComboBox.SelectedItem = selectedClass;
+        EvolutionComboBox.SelectedItem = selectedClass.Evolutions.Single(
+            item => item.Id == draft.ProgressionInputs.EvolutionId);
+        LevelTextBox.Text = draft.ProgressionInputs.Level.ToString(
+            System.Globalization.CultureInfo.InvariantCulture);
+
+        var questBonus = GetSelectedQuestBonus();
+        HeroStatusCheckBox.IsChecked =
+            questBonus is not null &&
+            draft.ProgressionInputs.CompletedQuestIds.Contains(
+                questBonus.QuestId,
+                StringComparer.Ordinal);
+        ResetCountTextBox.Text = draft.ResetInputs.ResetCount.ToString(
+            System.Globalization.CultureInfo.InvariantCulture);
+        PointsPerResetTextBox.Text = draft.ResetInputs.PointsPerReset.ToString(
+            System.Globalization.CultureInfo.InvariantCulture);
+
+        foreach (var (statId, value) in draft.StatDistribution.Allocations)
+        {
+            _allocationInputs[statId].Text = value.ToString(
+                System.Globalization.CultureInfo.InvariantCulture);
+        }
+
+        _currentBudget = _useCase.Execute(new ProgressionPointBudgetRequest(
+            draft.ProgressionInputs.CharacterClassId,
+            draft.ProgressionInputs.EvolutionId,
+            draft.ProgressionInputs.Level,
+            draft.ProgressionInputs.CompletedQuestIds));
+        DistributeStatsButton.IsEnabled = true;
+        ResultTextBox.Text = FormatResult(_currentBudget);
+        DistributionResultTextBox.Text = FormatDistributionResult(
+            new StatDistributionResult(
+                draft.StatDistribution.RulesetId,
+                draft.StatDistribution.CharacterClassId,
+                draft.StatDistribution.ProgressionRule.Id,
+                draft.StatDistribution.ProgressionRule.Version,
+                draft.StatDistribution.EarnedPoints,
+                new ResetPointInputs(
+                    draft.StatDistribution.ResetInputs.ResetCount,
+                    draft.StatDistribution.ResetInputs.PointsPerReset),
+                draft.StatDistribution.ResetPoints,
+                draft.StatDistribution.TotalDistributablePoints,
+                draft.StatDistribution.Allocations,
+                draft.StatDistribution.SpentPoints,
+                draft.StatDistribution.RemainingPoints));
+    }
+
     private void InvalidateCurrentBudget()
     {
         _currentBudget = null;
@@ -217,6 +422,59 @@ public partial class MainWindow : Window
         }
 
         DistributionResultTextBox?.Clear();
+    }
+
+    private void ResetInputChanged(object sender, TextChangedEventArgs e)
+    {
+        if (TotalResetPointsTextBox is null)
+        {
+            return;
+        }
+
+        if (!long.TryParse(ResetCountTextBox.Text, out var resetCount) ||
+            !long.TryParse(PointsPerResetTextBox.Text, out var pointsPerReset) ||
+            resetCount < 0 ||
+            pointsPerReset < 0)
+        {
+            TotalResetPointsTextBox.Text = "Entrada inválida";
+        }
+        else
+        {
+            try
+            {
+                TotalResetPointsTextBox.Text = checked(resetCount * pointsPerReset)
+                    .ToString(System.Globalization.CultureInfo.InvariantCulture);
+            }
+            catch (OverflowException)
+            {
+                TotalResetPointsTextBox.Text = "Fuera de rango";
+            }
+        }
+
+        DistributionResultTextBox?.Clear();
+        BuildDraftResultTextBox?.Clear();
+    }
+
+    private bool TryReadResetInputs(
+        out ResetPointInputs resetInputs,
+        out string validationMessage)
+    {
+        resetInputs = null!;
+        validationMessage = string.Empty;
+        if (!long.TryParse(ResetCountTextBox.Text, out var resetCount))
+        {
+            validationMessage = "La cantidad de resets debe ser un número entero.";
+            return false;
+        }
+
+        if (!long.TryParse(PointsPerResetTextBox.Text, out var pointsPerReset))
+        {
+            validationMessage = "Los puntos por reset deben ser un número entero.";
+            return false;
+        }
+
+        resetInputs = new ResetPointInputs(resetCount, pointsPerReset);
+        return true;
     }
 
     private static string FormatResult(ProgressionPointBudgetResult result)
@@ -238,6 +496,11 @@ public partial class MainWindow : Window
     {
         var lines = new List<string>
         {
+            $"Puntos por nivel/quests: {result.EarnedPoints}",
+            $"Resets: {result.ResetInputs.ResetCount}",
+            $"Puntos por reset: {result.ResetInputs.PointsPerReset}",
+            $"Puntos totales por resets: {result.ResetPoints}",
+            $"Puntos distribuibles totales: {result.TotalDistributablePoints}",
             $"Puntos gastados: {result.SpentPoints}",
             $"Puntos restantes: {result.RemainingPoints}",
             "Asignaciones:",
@@ -262,6 +525,65 @@ public partial class MainWindow : Window
             "la suma de asignaciones excede el rango numérico permitido.",
         StatDistributionErrorCodes.BudgetSourceMismatch =>
             "el presupuesto no corresponde a la clase, ruleset o regla cargados.",
+        StatDistributionErrorCodes.ResetCountNegative =>
+            "la cantidad de resets no puede ser negativa.",
+        StatDistributionErrorCodes.PointsPerResetNegative =>
+            "los puntos por reset no pueden ser negativos.",
+        StatDistributionErrorCodes.ResetPointsOverflow =>
+            "el total de puntos por resets excede el rango permitido.",
+        StatDistributionErrorCodes.TotalDistributablePointsOverflow =>
+            "el presupuesto distribuible total excede el rango permitido.",
         _ => "se produjo un error de distribución no reconocido.",
+    };
+
+    private static bool IsValidBuildDraftId(string id)
+    {
+        if (string.IsNullOrWhiteSpace(id) ||
+            id[0] == '-' ||
+            id[^1] == '-')
+        {
+            return false;
+        }
+
+        var previousWasHyphen = false;
+        foreach (var character in id)
+        {
+            if (character == '-')
+            {
+                if (previousWasHyphen)
+                {
+                    return false;
+                }
+
+                previousWasHyphen = true;
+                continue;
+            }
+
+            if (!char.IsAsciiLetterLower(character) && !char.IsAsciiDigit(character))
+            {
+                return false;
+            }
+
+            previousWasHyphen = false;
+        }
+
+        return true;
+    }
+
+    private static string TranslateBuildDraftError(string code) => code switch
+    {
+        BuildDraftErrorCodes.NotFound =>
+            "no existe un borrador con ese ID.",
+        BuildDraftErrorCodes.SchemaUnsupported =>
+            "el borrador usa una versión de schema no soportada.",
+        BuildDraftErrorCodes.DependencyUnavailable =>
+            "no está disponible exactamente el ruleset, dataset o motor guardado.",
+        BuildDraftErrorCodes.SourceMismatch =>
+            "las identidades internas del borrador no son coherentes.",
+        BuildDraftErrorCodes.RevalidationFailed =>
+            "el recálculo no reproduce la caché persistida.",
+        BuildDraftErrorCodes.WriteConflict =>
+            "la base local siguió ocupada después de los reintentos configurados.",
+        _ => "se produjo un error de borrador no reconocido.",
     };
 }

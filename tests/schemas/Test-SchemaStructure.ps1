@@ -3,7 +3,23 @@ $ErrorActionPreference = 'Stop'
 $repositoryRoot = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path
 $schemaRoot = Join-Path $repositoryRoot 'packages/schemas/v1'
 $exampleRoot = Join-Path $repositoryRoot 'packages/schemas/examples'
-$expectedNames = @('evidence', 'formula', 'character-class', 'progression-rule', 'stat-distribution', 'build-draft', 'server-profile', 'build')
+$expectedNames = @(
+    'evidence',
+    'formula',
+    'calculation-trace',
+    'formula-test-case',
+    'character-class',
+    'progression-rule',
+    'stat-distribution',
+    'build-draft',
+    'server-profile',
+    'build'
+)
+$expectedVersions = @{
+    'formula' = '1.1.0'
+    'stat-distribution' = '1.1.0'
+    'build-draft' = '1.1.0'
+}
 
 foreach ($name in $expectedNames) {
     $schemaPath = Join-Path $schemaRoot "$name.schema.json"
@@ -15,8 +31,13 @@ foreach ($name in $expectedNames) {
     if ($schema.schemaVersion) {
         throw "$name exposes schemaVersion at the schema root instead of as an instance property."
     }
-    if ($schema.properties.schemaVersion.const -ne '1.0.0') {
-        throw "$name does not constrain schemaVersion to 1.0.0."
+    $expectedVersion = if ($expectedVersions.ContainsKey($name)) {
+        $expectedVersions[$name]
+    } else {
+        '1.0.0'
+    }
+    if ($schema.properties.schemaVersion.const -ne $expectedVersion) {
+        throw "$name does not constrain schemaVersion to $expectedVersion."
     }
     if (-not $schema.'$id') {
         throw "$name does not declare a schema ID."
@@ -28,4 +49,5 @@ foreach ($name in $expectedNames) {
     }
 }
 
-Write-Output "PASS: $($expectedNames.Count) schemas and 16 examples are structurally readable."
+$exampleCount = $expectedNames.Count * 2
+Write-Output "PASS: $($expectedNames.Count) schemas and $exampleCount examples are structurally readable."

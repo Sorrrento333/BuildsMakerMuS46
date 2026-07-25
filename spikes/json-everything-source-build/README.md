@@ -13,7 +13,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File tools/spikes/Test-JsonEveryt
 El script exige el SDK indicado, obtiene y verifica los commits fijados, copia
 los locks revisados, restaura con `--locked-mode`, compila en dos rutas fuente
 independientes con `PathMap`, compara hashes y el SPDX revisado,
-ejecuta dos veces los diez fixtures y una
+ejecuta dos veces los veinte fixtures y una
 prueba aislada de formatos `uri`/`date`, audita paquetes y genera bajo
 `artifacts/json-everything-source-build/`:
 

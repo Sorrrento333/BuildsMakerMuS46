@@ -1,0 +1,54 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "formula-case-synthetic-positive",
+  "rulesetId": "ruleset-synthetic",
+  "formulaRef": {
+    "id": "formula-synthetic-001",
+    "version": "0.1.0"
+  },
+  "context": {
+    "characterClassId": "class-synthetic",
+    "evolutionId": "evolution-synthetic"
+  },
+  "inputs": {
+    "input-synthetic": 2
+  },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-synthetic-case-positive",
+    "rulesetId": "ruleset-synthetic",
+    "formulaRef": {
+      "id": "formula-synthetic-001",
+      "version": "0.1.0"
+    },
+    "context": {
+      "characterClassId": "class-synthetic",
+      "evolutionId": "evolution-synthetic"
+    },
+    "inputs": {
+      "input-synthetic": 2
+    },
+    "steps": [
+      {
+        "stepId": "input-contribution",
+        "value": 2
+      },
+      {
+        "stepId": "raw-output",
+        "value": 2
+      },
+      {
+        "stepId": "visible-output",
+        "value": 2
+      }
+    ],
+    "rounding": {
+      "mode": "NONE",
+      "stage": "visible-output"
+    },
+    "rawOutput": 2,
+    "visibleOutput": 2,
+    "evidenceRefs": [],
+    "conflictIds": []
+  }
+}

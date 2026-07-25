@@ -1,0 +1,18 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "hp-dark-wizard-invalid-level",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": {
+    "id": "formula-hp-dark-wizard",
+    "version": "1.0.0"
+  },
+  "context": {
+    "characterClassId": "class-dark-wizard",
+    "evolutionId": "evolution-dark-wizard"
+  },
+  "inputs": {
+    "character-level": 0,
+    "vitality": 15
+  },
+  "expectedErrorCode": "formula-level-out-of-range"
+}

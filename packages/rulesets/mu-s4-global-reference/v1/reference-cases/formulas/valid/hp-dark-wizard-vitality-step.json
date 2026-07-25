@@ -1,0 +1,65 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "hp-dark-wizard-vitality-step",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": {
+    "id": "formula-hp-dark-wizard",
+    "version": "1.0.0"
+  },
+  "context": {
+    "characterClassId": "class-dark-wizard",
+    "evolutionId": "evolution-dark-wizard"
+  },
+  "inputs": {
+    "character-level": 1,
+    "vitality": 16
+  },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-hp-dark-wizard-vitality-step",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": {
+      "id": "formula-hp-dark-wizard",
+      "version": "1.0.0"
+    },
+    "context": {
+      "characterClassId": "class-dark-wizard",
+      "evolutionId": "evolution-dark-wizard"
+    },
+    "inputs": {
+      "character-level": 1,
+      "vitality": 16
+    },
+    "steps": [
+      {
+        "stepId": "base",
+        "value": 30
+      },
+      {
+        "stepId": "level-contribution",
+        "value": 0
+      },
+      {
+        "stepId": "vitality-contribution",
+        "value": 32
+      },
+      {
+        "stepId": "raw-hp",
+        "value": 62
+      },
+      {
+        "stepId": "visible-hp",
+        "value": 62
+      }
+    ],
+    "rounding": {
+      "mode": "TRUNCATE",
+      "stage": "visible-hp",
+      "decimalPlaces": 0
+    },
+    "rawOutput": 62,
+    "visibleOutput": 62,
+    "evidenceRefs": ["evd-0021", "evd-0026"],
+    "conflictIds": ["dsp-0003"]
+  }
+}
