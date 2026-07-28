@@ -46,9 +46,10 @@ persiste payload y metadata atómicamente mediante la migración
 
 Los registros canónicos viven en
 `packages/rulesets/mu-s4-global-reference/v1`: seis definiciones de clase, dos
-reglas de progresión `PUBLISHED` y `formula-hp-dark-wizard` `1.0.0`
-`PUBLISHED`. El validador integral comprueba los nueve archivos contra sus
-contratos. La regla
+reglas de progresión `PUBLISHED` y dieciocho definiciones de fórmula `PUBLISHED`,
+diecisiete de ellas ejecutables. El validador integral comprueba los veintiséis archivos
+contra el contrato seleccionado por `schemaVersion` y exige identidad compuesta
+`id` + `version` única. La regla
 estándar enlaza cinco casos y la regla de Magic Gladiator/Dark Lord enlaza dos.
 El gate semántico exige que cada `testCaseRef` resuelva a un fixture positivo
 del mismo ruleset y regla, y que una regla publicada cubra todos sus casos
@@ -64,13 +65,18 @@ La validación integral está implementada en .NET 10 bajo
 `tools/validators/MuOnline.SchemaValidator`, con `JsonSchema.Net 9.2.2`
 compilado reproduciblemente desde fuente MIT, validación de formatos y un
 registro de schemas aislado por ejecución. Las
-pruebas verifican que los diez fixtures válidos sean aceptados, los diez
-inválidos sean rechazados, que los nueve registros canónicos sean válidos y que
+pruebas verifican que los once fixtures válidos sean aceptados, los once
+inválidos sean rechazados, que los veintiséis registros canónicos sean válidos y que
 los diez casos de progresión coincidan con su resultado esperado, además de que
 las dos reglas resuelvan exactamente sus siete casos positivos y de que el
-validador pueda ejecutarse repetidamente dentro del mismo proceso. Para la
-primera fórmula factual comprueba cuatro positivos, cuatro negativos, identidad,
-catálogo, inputs, pasos, outputs, redondeo, provenance y cobertura. El
+validador pueda ejecutarse repetidamente dentro del mismo proceso. Para las
+dieciocho definiciones factuales comprueba identidad, catálogo, inputs, pasos,
+outputs, redondeo, provenance y cobertura. Las referencias HP/Mana conservan
+cuatro positivos y cuatro negativos; AG de Dark Wizard, Dark Knight y Fairy Elf
+conservan cuatro positivos y seis negativos cada una para cubrir cada mínimo
+factual. AG de Summoner y Magic Gladiator conservan cuatro positivos y cinco
+negativos cada una: cubren los cuatro mínimos y familia sin inventar un
+overflow imposible en su dominio. El
 workflow `.github/workflows/ci.yml` restaura en modo
 bloqueado, compila y ejecuta esas pruebas con Microsoft Testing Platform.
 
@@ -101,6 +107,26 @@ materializó la primera fórmula factual y sus ocho casos, pero no añadió cód
 productivo. El validador prueba además
 aplicabilidad, bounds factuales, variantes cerradas de procedencia, unicidad de
 pasos, pertenencia de salidas y la unión exclusiva positivo/negativo.
+
+El diseño de ejecución posterior detectó que `strategy.definition` continúa
+siendo sólo texto: no enlaza aliases con inputs, pasos con operaciones ni
+bounds con códigos de error. `packages/schemas/v2/formula.schema.json` `2.0.0`
+ya implementa el programa `CHECKED_INT64_V1`, operaciones y operandos cerrados,
+aridades explícitas y `rangeErrorCode` por input. Los gates rechazan inputs no
+declarados, referencias adelantadas, bounds incoherentes y divergencias entre
+programa, traza, salidas y redondeo. El contrato `v1` y la definición publicada
+`formula-hp-dark-wizard` `1.0.0` permanecen inmutables. La versión factual
+`1.1.0` está `PUBLISHED`, conserva la semántica aprobada mediante el programa
+estructurado y enlaza cuatro positivos de su serie exacta de ocho casos. La
+revisión de publicación no encontró divergencias y cambió sólo `status`; antes
+de cualquier evaluación falta implementar el intérprete. La decisión completa está en
+`../04-domain/dark-wizard-hp-execution-vertical-design.md`.
+
+La evolución compatible `2.1.0` añade `CHECKED_DECIMAL_V1` y literales
+decimales exactos para coeficientes finitos en base 10. Mantiene inputs y salida
+`INT32`/`INT64`, conserva los intermedios fraccionarios en la traza y aplica el
+redondeo exclusivamente en `APPLY_ROUNDING`. Las definiciones `2.0.0` continúan
+exigiendo `CHECKED_INT64_V1`.
 
 ## Plan restante
 

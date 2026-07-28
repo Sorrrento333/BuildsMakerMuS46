@@ -112,8 +112,8 @@ Data ni tipos SQLite.
 `SqliteBuildDraftRepository`. El smoke inyecta un directorio temporal externo a
 los binarios, pero recorre la misma composición.
 
-La composición declara ruleset `1.0.0`, dataset `2026-07-24.1` y motor `0.2.0`.
-El hash del dataset se calcula de forma determinista sobre los 27 JSON
+La composición declara ruleset `1.0.0`, dataset `2026-07-25.2` y motor `0.2.0`.
+El hash del dataset se calcula de forma determinista sobre los 54 JSON
 publicados: ruta relativa normalizada con `/`, byte nulo, contenido exacto y
 byte nulo, ordenados por ruta y acumulados con SHA-256. Así una carga exige el
 snapshot byte a byte sin deducir metadata desde la carpeta, la fecha del sistema

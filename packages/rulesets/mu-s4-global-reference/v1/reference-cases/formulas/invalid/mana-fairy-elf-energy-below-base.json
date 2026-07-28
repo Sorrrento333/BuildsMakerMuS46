@@ -1,0 +1,12 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "mana-fairy-elf-energy-below-base",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-mana-fairy-elf", "version": "1.0.0" },
+  "context": {
+    "characterClassId": "class-fairy-elf",
+    "evolutionId": "evolution-fairy-elf"
+  },
+  "inputs": { "character-level": 1, "energy": 14 },
+  "expectedErrorCode": "formula-stat-below-base"
+}

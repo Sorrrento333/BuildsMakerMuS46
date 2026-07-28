@@ -4,6 +4,443 @@
 
 ### Added
 
+- Vertical funcional de AG de Magic Gladiator desde el claim `VERIFIED`
+  `DR-AG-MAGIC-GLADIATOR` hasta WPF. `formula-ag-magic-gladiator` `1.0.0`
+  nace `PUBLISHED` contra schema `2.1.0`, aplica a Magic Gladiator/Duel Master
+  y conserva `EVD-0021`, `EVD-0026` y `DSP-0002` sin añadir evidencia ni
+  reclasificar la divergencia de Energy.
+- Cuatro casos positivos reproducen raw/visible
+  `23.40/23`, `23.85/23`, `23.85/23` y `24.30/24`; cinco negativos cubren los
+  cuatro stats por debajo de su base y familia. El programa materializa
+  exactamente `ene * 0.15 + vit * 0.3 + agi * 0.25 + str * 0.2`.
+- `CHECKED_DECIMAL_V1` conserva los cuatro coeficientes exactamente, no
+  redondea aportes y trunca una sola vez en `visible-ag`. No se inventa un
+  overflow imposible: la suma de coeficientes `0.9` mantiene la salida válida
+  dentro de `INT64`.
+- Contrato técnico `magic-gladiator-ag-formula-contract.md` y bitácora de
+  `RES-0002` para identidad, aplicabilidad, cuatro inputs/límites, seis pasos,
+  truncamiento, casos y conflicto resuelto.
+- Smoke WPF `win-x64` aprobado con SQLite `3.53.3`, 611 archivos,
+  149.076.719 bytes y 10 avisos legales. El dataset avanza a `2026-07-28.2`,
+  contiene 188 JSON y produce
+  `sha256:5246861cec04e5e618611091d365e7e0a4c03d8227013f84c13e93354253d901`.
+- Vertical funcional de AG de Summoner desde el claim `VERIFIED`
+  `DR-AG-SUMMONER` hasta WPF. `formula-ag-summoner` `1.0.0` nace
+  `PUBLISHED` contra schema `2.1.0`, aplica a Summoner/Bloody
+  Summoner/Dimension Master y conserva `EVD-0021`/`EVD-0026` sin añadir
+  evidencia ni conflictos.
+- Cuatro casos positivos reproducen raw/visible
+  `18.30/18`, `18.75/18`, `18.75/18` y `19.20/19`; cinco negativos cubren los
+  cuatro stats por debajo de su base y familia. El programa materializa
+  exactamente `str * 0.2 + agi * 0.25 + vit * 0.3 + ene * 0.15`.
+- `CHECKED_DECIMAL_V1` conserva los cuatro coeficientes exactamente, no
+  redondea aportes y trunca una sola vez en `visible-ag`. No se inventa un
+  overflow imposible: la suma de coeficientes `0.9` mantiene la salida válida
+  dentro de `INT64`.
+- Contrato técnico `summoner-ag-formula-contract.md` y bitácora de `RES-0002`
+  para identidad, aplicabilidad, cuatro inputs/límites, seis pasos,
+  truncamiento, casos y ausencia explícita de conflictos.
+- Smoke WPF `win-x64` aprobado con SQLite `3.53.3`, 601 archivos,
+  149.063.645 bytes y 10 avisos legales. El dataset avanza a `2026-07-28.1`,
+  contiene 178 JSON y produce
+  `sha256:6380346e97b61e31a6da3329b86f91954f2b120d880e751733e778f4cbb75f43`.
+- Vertical funcional de AG de Fairy Elf desde el claim `VERIFIED`
+  `DR-AG-FAIRY-ELF` hasta WPF. `formula-ag-fairy-elf` `1.0.0` nace
+  `PUBLISHED` contra schema `2.1.0`, aplica a Fairy Elf/Muse Elf/High Elf y
+  conserva `EVD-0021`/`EVD-0026` sin añadir evidencia ni conflictos.
+- Cuatro casos positivos reproducen raw/visible
+  `20.6/20`, `21.1/21`, `21.1/21` y `21.6/21`; seis negativos cubren los
+  cuatro stats por debajo de su base, familia y overflow. El programa
+  materializa exactamente
+  `ene * 0.2 + vit * 0.3 + agi * 0.2 + str * 0.3`.
+- `CHECKED_DECIMAL_V1` conserva `0.2` y `0.3` exactamente, no redondea aportes
+  y trunca una sola vez en `visible-ag`. Application materializa quince
+  referencias; WPF reutiliza selección, contexto e intérpretes genéricos.
+- Contrato técnico `fairy-elf-ag-formula-contract.md` y bitácora de `RES-0002`
+  para identidad, aplicabilidad, cuatro inputs/límites, seis pasos,
+  truncamiento, casos y ausencia explícita de conflictos.
+- Smoke WPF `win-x64` aprobado con SQLite `3.53.3`, 591 archivos,
+  149.051.441 bytes y 10 avisos legales. El dataset avanza a `2026-07-26.12`,
+  contiene 168 JSON y produce
+  `sha256:432b6a062fbd5ed996a9d58dbfa32daafec5cf09c447dc7c40bb0ac98e645177`.
+- Vertical funcional de AG de Dark Knight desde el claim `VERIFIED`
+  `DR-AG-DARK-KNIGHT` hasta WPF. `formula-ag-dark-knight` `1.0.0` nace
+  `PUBLISHED` contra schema `2.1.0`, aplica a Dark Knight/Blade Knight/Blade
+  Master y conserva `EVD-0021`/`EVD-0026` sin añadir evidencia ni conflictos.
+- Cuatro casos positivos reproducen raw/visible
+  `25.70/25`, `27.00/27`, `26.05/26` y `27.35/27`; seis negativos cubren los
+  cuatro stats por debajo de su base, familia y overflow. El programa
+  materializa exactamente
+  `ene + vit * 0.3 + agi * 0.2 + str * 0.15`.
+- `CHECKED_DECIMAL_V1` conserva `0.3`, `0.2` y `0.15` exactamente, consume
+  Energy sin transformación, no redondea aportes y trunca una sola vez en
+  `visible-ag`. Application materializa catorce referencias; WPF reutiliza
+  selección, contexto e intérpretes genéricos.
+- Contrato técnico `dark-knight-ag-formula-contract.md` y bitácora de
+  `RES-0002` para identidad, aplicabilidad, cuatro inputs/límites, cinco pasos,
+  truncamiento, casos y ausencia explícita de conflictos.
+- Smoke WPF `win-x64` aprobado con SQLite `3.53.3`, 580 archivos,
+  149.038.270 bytes y 10 avisos legales. El dataset avanza a `2026-07-26.11`,
+  contiene 157 JSON y produce
+  `sha256:67d6fd0e614d3072f214b7dc09f7295e2450d2b4b7c0cd24a91f70a14dad13ef`.
+- Vertical funcional de AG de Dark Wizard desde el claim `VERIFIED`
+  `DR-AG-DARK-WIZARD` hasta WPF. `formula-ag-dark-wizard` `1.0.0` nace
+  `PUBLISHED` contra schema `2.1.0`, aplica a Dark Wizard/Soul Master/Grand
+  Master y conserva `EVD-0021`/`EVD-0026` sin añadir evidencia ni conflictos.
+- Cuatro casos positivos reproducen raw/visible
+  `21.3/21`, `21.8/21`, `21.9/21` y `22.4/22`; seis negativos cubren los
+  cuatro stats por debajo de su base, familia y overflow. El programa
+  materializa exactamente
+  `ene * 0.2 + vit * 0.3 + agi * 0.4 + str * 0.2`.
+- `CHECKED_DECIMAL_V1` conserva `0.2`, `0.3` y `0.4` exactamente, no redondea
+  aportes y trunca una sola vez en `visible-ag`. Application materializa trece
+  referencias; WPF reutiliza selección, contexto e intérpretes genéricos.
+- Contrato técnico `dark-wizard-ag-formula-contract.md` y bitácora de
+  `RES-0002` para identidad, aplicabilidad, cuatro inputs/límites, seis pasos,
+  truncamiento, casos y ausencia explícita de conflictos.
+- El smoke y la prueba contextual admiten fórmulas publicadas que no consumen
+  nivel: usan nivel 1 sólo para componer un estado de progresión válido y
+  verifican exclusivamente los inputs declarados por la fórmula.
+- Smoke WPF `win-x64` aprobado con SQLite `3.53.3`, 569 archivos,
+  149.025.417 bytes y 10 avisos legales. El dataset avanza a `2026-07-26.10`,
+  contiene 146 JSON y produce
+  `sha256:469f18aec26813dcb75dab054df3df7b2469d730d76d532ed2ef8432711e4651`.
+- Vertical funcional de Mana de Dark Lord desde el claim `VERIFIED`
+  `DR-MANA-DARK-LORD` hasta WPF. `formula-mana-dark-lord` `1.0.0` nace
+  `PUBLISHED` contra schema `2.1.0`, aplica a Dark Lord/Lord Emperor y conserva
+  `EVD-0021`/`EVD-0026` sin añadir evidencia ni conflictos.
+- Cuatro casos positivos reproducen raw/visible
+  `40/40`, `41/41`, `41.5/41` y `42.5/42`; cuatro negativos cubren nivel,
+  Energy, familia y overflow. El programa materializa exactamente
+  `40 + (lvl - 1) + (ene - 15) * 1.5`.
+- `CHECKED_DECIMAL_V1` conserva `1.5` exactamente, no redondea aportes y trunca
+  una sola vez en `visible-mana`. Application materializa doce referencias y
+  WPF reutiliza selección, contexto e intérpretes genéricos.
+- Contrato técnico `dark-lord-mana-formula-contract.md` y bitácora de
+  `RES-0002` para identidad, aplicabilidad, inputs, límites, seis pasos,
+  truncamiento, casos y ausencia explícita de conflictos.
+- Smoke WPF `win-x64` aprobado con SQLite `3.53.3`, 558 archivos,
+  149.012.089 bytes y 10 avisos legales. El dataset avanza a `2026-07-26.9`,
+  contiene 135 JSON y produce
+  `sha256:440b7fb4a1ef1bd5b57202323bf7cb447c3bf252abe81cf112f8832220e7817a`.
+- Vertical funcional de Mana de Magic Gladiator desde el claim `VERIFIED`
+  `DR-MANA-MAGIC-GLADIATOR` hasta WPF.
+  `formula-mana-magic-gladiator` `1.0.0` nace `PUBLISHED` contra schema `2.0.0`,
+  aplica a Magic Gladiator/Duel Master y conserva `EVD-0021`, `EVD-0026` y el
+  conflicto resuelto `DSP-0002`.
+- Cuatro casos positivos reproducen 60/61/62/63 Mana y cuatro negativos cubren
+  nivel, Energy, familia y overflow. El programa materializa exactamente
+  `8 + (lvl - 1) + ene * 2`, sin desplazamiento de Energy ni redondeo
+  intermedio.
+- Application materializa once referencias; WPF reutiliza selección, contexto e
+  intérprete genéricos. El contrato técnico y la bitácora de `RES-0002`
+  conservan identidad, aplicabilidad, límites, cinco pasos, truncamiento y
+  conflicto sin reclasificar fuentes.
+- Smoke WPF `win-x64` aprobado con SQLite `3.53.3`, 549 archivos,
+  149.001.252 bytes y 10 avisos legales. El dataset avanza a `2026-07-26.8`,
+  contiene 126 JSON y produce
+  `sha256:cff8d5726f433448ac7212a7a6e7465475024cc4346e904a649bcc2615e706f5`.
+- Vertical funcional de Mana de Summoner desde el claim `VERIFIED`
+  `DR-MANA-SUMMONER` hasta WPF. `formula-mana-summoner` `1.0.0` nace
+  `PUBLISHED` contra schema `2.1.0`, aplica a Summoner/Bloody
+  Summoner/Dimension Master y conserva
+  `EVD-0021`, `EVD-0026`, `EVD-0027`–`EVD-0029` y `EVD-0031`.
+- Cuatro casos positivos reproducen raw/visible
+  `40/40`, `41.5/41`, `41.7/41` y `43.2/43`; cuatro negativos cubren nivel,
+  Energy, familia y overflow. El programa materializa exactamente
+  `40 + (lvl - 1) * 1.5 + (ene - 23) * 1.7`.
+- `CHECKED_DECIMAL_V1` conserva `1.5` y `1.7` exactamente, no redondea aportes
+  y trunca una sola vez en `visible-mana`. Application materializa diez
+  referencias y WPF reutiliza selección, contexto e intérpretes genéricos.
+- Contrato técnico `summoner-mana-formula-contract.md` y bitácora de
+  `RES-0002` para identidad, aplicabilidad, inputs, límites, siete pasos,
+  truncamiento, casos y ausencia explícita de conflictos.
+- Smoke WPF `win-x64` aprobado con SQLite `3.53.3`, 540 archivos,
+  148.989.299 bytes y 10 avisos legales. El dataset avanza a `2026-07-26.7`,
+  contiene 117 JSON y produce
+  `sha256:7d0e75d9212837a9245a339253b9622ecff2ec4b157cb839606601c3ee73331b`.
+- Vertical funcional de Mana de Fairy Elf desde el claim `VERIFIED`
+  `DR-MANA-FAIRY-ELF` hasta WPF. `formula-mana-fairy-elf` `1.0.0` nace
+  `PUBLISHED` contra schema `2.1.0`, aplica a Fairy Elf/Muse Elf/High Elf y
+  conserva `EVD-0021`/`EVD-0026` sin añadir evidencia ni conflictos.
+- Cuatro casos positivos reproducen raw/visible
+  `30/30`, `31.5/31`, `31/31` y `32.5/32`; cuatro negativos cubren nivel,
+  Energy, familia y overflow. El programa materializa exactamente
+  `15 + (lvl - 1) * 1.5 + ene`.
+- `CHECKED_DECIMAL_V1` conserva `1.5` exactamente, no redondea aportes y trunca
+  una sola vez en `visible-mana`. Application materializa nueve referencias y
+  WPF reutiliza selección, contexto e intérpretes genéricos.
+- Contrato técnico `fairy-elf-mana-formula-contract.md` y bitácora de
+  `RES-0002` para identidad, aplicabilidad, inputs, límites, seis pasos,
+  truncamiento, casos y ausencia explícita de conflictos.
+- Smoke WPF `win-x64` aprobado con SQLite `3.53.3`, 531 archivos,
+  148.977.675 bytes y 10 avisos legales. El dataset avanza a `2026-07-26.6`,
+  contiene 108 JSON y produce
+  `sha256:78d8688b3b08a02b13ea9971fa45f90ff59612c6c5b1a2981cb102b82c1adc7e`.
+- Vertical funcional de Mana de Dark Knight desde el claim `VERIFIED`
+  `DR-MANA-DARK-KNIGHT` hasta WPF. `formula-mana-dark-knight` `1.0.0` nace
+  `PUBLISHED` contra schema `2.1.0`, aplica a Dark Knight/Blade Knight/Blade
+  Master y conserva `EVD-0021`/`EVD-0026` sin añadir evidencia ni conflictos.
+- Cuatro casos positivos reproducen raw/visible
+  `20/20`, `20.5/20`, `21/21` y `21.5/21`; cuatro negativos cubren nivel,
+  Energy, familia y overflow. El programa materializa exactamente
+  `10 + (lvl - 1) * 0.5 + ene`.
+- `CHECKED_DECIMAL_V1` conserva `0.5` exactamente, no redondea aportes y trunca
+  una sola vez en `visible-mana`. Application materializa ocho referencias y
+  WPF reutiliza la selección genérica entre HP y Mana sin handlers factuales.
+- Contrato técnico `dark-knight-mana-formula-contract.md` y bitácora de
+  `RES-0002` para identidad, aplicabilidad, inputs, límites, seis pasos,
+  truncamiento, casos y ausencia explícita de conflictos.
+- Smoke WPF `win-x64` aprobado con SQLite `3.53.3`, 522 archivos,
+  148.967.275 bytes y 10 avisos legales. El dataset avanza a `2026-07-26.5`,
+  contiene 99 JSON y produce
+  `sha256:868ef53f5238066e928f51a56e2f375124c8d2f7b2a5fb6d75078c61c557c120`.
+- Vertical funcional de Mana de Dark Wizard desde el claim `VERIFIED`
+  `DR-MANA-DARK-WIZARD` hasta WPF. `formula-mana-dark-wizard` `1.0.0` nace
+  `PUBLISHED` contra schema `2.0.0`, aplica a Dark Wizard/Soul Master/Grand
+  Master y conserva `EVD-0021`/`EVD-0026` sin añadir evidencia ni conflictos.
+- Cuatro casos positivos reproducen 60/62/62/64 Mana y cuatro negativos cubren
+  nivel, Energy, familia y overflow. El programa materializa exactamente
+  `(lvl - 1) * 2 + ene * 2`, sin constante base inferida ni redondeo
+  intermedio.
+- Application materializa siete fórmulas ejecutables y reproduce 28/28 trazas
+  y 28/28 errores desde JSON. WPF incorpora una selección genérica por
+  referencia exacta para resolver HP o Mana de Dark Wizard sin handlers ni
+  constantes factuales en C#.
+- Contrato técnico `dark-wizard-mana-formula-contract.md` y bitácora de
+  `RES-0002` para identidad, aplicabilidad, inputs, límites, cinco pasos,
+  truncamiento, casos y ausencia explícita de conflictos.
+- Smoke WPF `win-x64` aprobado con SQLite `3.53.3`, 513 archivos,
+  148.956.244 bytes y 10 avisos legales. El dataset avanza a `2026-07-26.4`,
+  contiene 90 JSON y produce
+  `sha256:a663630cbf054bef3c71eeb969b0edcb2dc95ec686d6cb2663fee8a2c5af6089`.
+- Vertical funcional de HP de Dark Lord desde el claim `VERIFIED`
+  `DR-HP-DARK-LORD` hasta WPF. `formula-hp-dark-lord` `1.0.0` nace
+  `PUBLISHED`, aplica a Dark Lord/Lord Emperor y conserva
+  `EVD-0021`/`EVD-0026` sin añadir evidencia ni conflictos.
+- Evolución compatible de `formula.schema.json` a `2.1.0` y modelo
+  `CHECKED_DECIMAL_V1`. Conservan exactamente literales base 10 como `1.5`,
+  aritmética comprobada y trazas fraccionarias; el redondeo se aplica sólo en
+  `APPLY_ROUNDING` y la salida continúa siendo `INT64`.
+- Cuatro casos positivos reproducen raw/visible
+  `90/90`, `91.5/91`, `92/92` y `93.5/93`; cuatro negativos cubren nivel,
+  Vitality, familia y overflow de salida. Application reproduce 24/24 trazas y
+  24/24 errores de las seis referencias ejecutables.
+- Cuatro pruebas sintéticas del intérprete decimal y un gate de contrato `2.1.0`
+  fijan conservación de
+  fracciones, ausencia de redondeo intermedio, truncamiento final, rechazo de
+  operandos incoherentes y overflow. La solución alcanza 195/195 pruebas.
+- Contrato técnico `dark-lord-hp-formula-contract.md` y bitácora de `RES-0002`
+  para identidad, aplicabilidad, inputs, límites, representación exacta,
+  truncamiento y casos, sin reclasificaciones nuevas.
+- Smoke WPF `win-x64` aprobado con SQLite `3.53.3`, 504 archivos,
+  148.940.709 bytes y 10 avisos legales. El dataset avanza a `2026-07-26.3`,
+  contiene 81 JSON y produce
+  `sha256:d7810c927ec692c161d0adcfcfa8cc6374d2213cac97805e9e77ec9d2ecefb32`.
+- Vertical funcional de HP de Magic Gladiator desde el claim `VERIFIED`
+  `DR-HP-MAGIC-GLADIATOR` hasta WPF. `formula-hp-magic-gladiator` `1.0.0`
+  nace `PUBLISHED` contra el schema ejecutable `2.0.0`, aplica a Magic
+  Gladiator y Duel Master, y conserva `EVD-0021`/`EVD-0026`.
+- Cuatro casos positivos reproducen 110/111/112/113 HP y cuatro controles
+  negativos cubren nivel, Vitality, familia y overflow. `DSP-0002` afecta
+  Energy, no una entrada de esta fórmula, por lo que `conflictIds` permanece
+  vacío.
+- Application materializa cinco fórmulas ejecutables por referencia exacta y
+  reproduce 20/20 trazas y 20/20 errores desde JSON. La solución alcanza
+  190/190 pruebas sin añadir handlers ni constantes de Magic Gladiator a C#.
+- WPF reutiliza la selección genérica por clase/evolución y muestra HP de Magic
+  Gladiator con trazas contextual y aritmética. El smoke cubre cinco
+  referencias ejecutables, veinte casos, 72/72 JSON y ambas fases.
+- Contrato técnico `magic-gladiator-hp-formula-contract.md` y bitácora de
+  `RES-0002` para identidad, aplicabilidad, inputs, límites, seis pasos,
+  redondeo, casos y alcance exacto del conflicto, sin evidencia ni
+  reclasificaciones nuevas.
+- Smoke WPF `win-x64` aprobado con SQLite `3.53.3`, 495 archivos,
+  148.920.099 bytes y 10 avisos legales. El dataset avanza a `2026-07-26.2`,
+  contiene 72 JSON y produce
+  `sha256:a15ce32bc9610539ca406bdcdb80bbe7049f1879f0222014c9c10e28e30ed7aa`.
+- Vertical funcional de HP de Summoner desde el claim `VERIFIED`
+  `DR-HP-SUMMONER` hasta WPF. `formula-hp-summoner` `1.0.0` nace
+  `PUBLISHED` contra el schema ejecutable `2.0.0`, aplica a Summoner, Bloody
+  Summoner y Dimension Master, y conserva
+  `EVD-0021`/`EVD-0027`–`EVD-0030` sin reclasificar el contraste.
+- Cuatro casos positivos reproducen 70/71/72/73 HP y cuatro controles negativos
+  cubren nivel, Vitality, familia y overflow. La definición conserva
+  `conflictIds: []` porque no existe un conflicto aplicable documentado.
+- Application materializa cuatro fórmulas ejecutables por referencia exacta y
+  reproduce 16/16 trazas y 16/16 errores desde JSON. La solución alcanza
+  182/182 pruebas sin añadir handlers ni constantes de Summoner a C#.
+- WPF reutiliza la selección genérica por clase/evolución y muestra HP de
+  Summoner con trazas contextual y aritmética. El smoke cubre cuatro
+  referencias ejecutables, dieciséis casos, 63/63 JSON y ambas fases.
+- Contrato técnico `summoner-hp-formula-contract.md` y bitácora de `RES-0002`
+  para identidad, aplicabilidad, inputs, límites, seis pasos, redondeo, casos y
+  ausencia explícita de conflictos, sin evidencia ni reclasificaciones nuevas.
+- Smoke WPF `win-x64` aprobado con SQLite `3.53.3`, 486 archivos,
+  148.908.207 bytes y 10 avisos legales. El dataset avanza a `2026-07-26.1`,
+  contiene 63 JSON y produce
+  `sha256:afb77b6daa3112da782dbcc68685f0f7e5bc3cbb1ae8f9bf3f6d1f80d0b61dc8`.
+- Vertical funcional de HP de Fairy Elf desde el claim `VERIFIED`
+  `DR-HP-FAIRY-ELF` hasta WPF. `formula-hp-fairy-elf` `1.0.0` nace
+  `PUBLISHED` contra el schema ejecutable `2.0.0`, aplica a Fairy Elf, Muse Elf
+  y High Elf, y traza exclusivamente `EVD-0021`/`EVD-0026`.
+- Cuatro casos positivos reproducen 80/81/82/83 HP y cuatro controles negativos
+  cubren nivel, Vitality, familia y overflow. La definición conserva
+  `conflictIds: []` porque no existe un conflicto aplicable documentado.
+- Application materializa las tres fórmulas ejecutables por referencia exacta
+  y reproduce 12/12 trazas y 12/12 errores desde JSON. La solución alcanza
+  174/174 pruebas sin añadir handlers ni constantes de Fairy Elf a C#.
+- WPF reutiliza la selección genérica por clase/evolución y muestra HP de Fairy
+  Elf con trazas contextual y aritmética. El smoke cubre las tres referencias
+  ejecutables, doce casos, 54/54 JSON y ambas fases de publicación.
+- Contrato técnico `fairy-elf-hp-formula-contract.md` y bitácora de `RES-0002`
+  para identidad, aplicabilidad, inputs, límites, seis pasos, redondeo, casos y
+  ausencia explícita de conflictos, sin nueva evidencia ni reclasificaciones.
+- Smoke WPF `win-x64` aprobado con SQLite `3.53.3`, 477 archivos,
+  148.896.977 bytes y 10 avisos legales. El dataset avanza a `2026-07-25.2`,
+  contiene 54 JSON y produce
+  `sha256:aa3c761e9c3a8a2739c2cf424175c5d5b2ee703793f1489d2b8ebbb823521afa`.
+- Vertical funcional de HP de Dark Knight desde el claim `VERIFIED`
+  `DR-HP-DARK-KNIGHT` hasta WPF. `formula-hp-dark-knight` `1.0.0` nace
+  `PUBLISHED` contra el schema ejecutable `2.0.0`, aplica a Dark Knight, Blade
+  Knight y Blade Master, y traza exclusivamente `EVD-0021`/`EVD-0026`.
+- Cuatro casos positivos reproducen 110/112/113/115 HP y cuatro controles
+  negativos cubren nivel, Vitality, familia y overflow. La definición conserva
+  `conflictIds: []` porque no existe un conflicto aplicable documentado; el gate
+  ya no exige inventar uno.
+- Application y sus pruebas materializan las dos fórmulas ejecutables por
+  referencia exacta y reproducen 8/8 trazas y 8/8 errores desde JSON. La
+  solución alcanza 166/166 pruebas sin añadir handlers ni constantes de Dark
+  Knight a C#.
+- WPF reutiliza la selección genérica por clase/evolución y muestra HP de Dark
+  Knight con trazas contextual y aritmética. El smoke cubre exactamente
+  `formula-hp-dark-knight@1.0.0` y `formula-hp-dark-wizard@1.1.0`, ocho casos,
+  45/45 JSON y ambas fases de publicación.
+- Contrato técnico `dark-knight-hp-formula-contract.md` y bitácora de
+  `RES-0002` para identidad, aplicabilidad, inputs, límites, seis pasos,
+  redondeo, casos y ausencia explícita de conflictos, sin nueva evidencia ni
+  reclasificaciones.
+- Smoke WPF `win-x64` aprobado con SQLite `3.53.3`, 468 archivos,
+  148.884.866 bytes y 10 avisos legales. El dataset avanza a `2026-07-25.1`,
+  contiene 45 JSON y produce
+  `sha256:11a3d88ed670f998ba8ff3d5c149aa2f4017ae9ef1dd4a34994f35644a7024b3`.
+- Vertical funcional de HP de Dark Wizard desde snapshot hasta WPF.
+  `FormulaInputDefinition` preserva `source.kind/valueId`; las clases
+  materializadas conservan `baseValue` y `evidenceRefs`; Application construye
+  un estado inmutable desde progresión/distribución y resuelve
+  `character-level` y `resolved-{statId}` sin aceptar valores contextuales
+  entregados por la UI.
+- `FormulaContextValueResolver`, `ResolvedCharacterState` y
+  `CalculateCharacterFormulaUseCase`, con traza contextual separada de la
+  aritmética y seis códigos estables para mismatch, fuente no soportada, valor
+  no resoluble, base/asignación ausentes y overflow comprobado.
+- Ocho pruebas de Application para materialización fiel de bases/evidencias y
+  `source.valueId`, reproducción 4/4 de los positivos canónicos por la ruta
+  completa, errores de contexto, inmutabilidad y rechazo previo de nivel o
+  asignación inválidos. La solución alcanza 158/158 pruebas.
+- Resultado WPF de atributo derivado con referencia exacta y trazas contextual
+  y aritmética. La fórmula aplicable se obtiene del catálogo publicado; cambiar
+  progresión, resets o asignaciones invalida el resultado sin persistirlo en el
+  borrador.
+- Gate de publicación ampliado para reproducir los cuatro casos positivos de
+  `formula-hp-dark-wizard` `1.1.0` mediante progresión, distribución y
+  resolución contextual en las fases inicial y de reemplazo. El smoke local
+  `win-x64` pasó con SQLite `3.53.3`, 459 archivos, 148.871.955 bytes, 10 avisos
+  legales y 36/36 JSON idénticos.
+- Diseño cerrado de resolución productiva de `source.kind: CONTEXT_VALUE`.
+  Application queda como autoridad del estado calculado: `character-level`
+  procede de progresión validada y cada `resolved-{statId}` de
+  `checked(baseValue + allocation)` usando base/evidencia del snapshot y la
+  asignación vigente de distribución. Define preservación de `source.valueId`,
+  traza contextual, errores, provenance e invalidación antes de modificar
+  código o WPF; no añade datos ni fórmulas de MU Online.
+- Adaptador `JsonExecutableFormulaSnapshotReader` en Application para
+  materializar definiciones schema `2.0.0` desde `character-classes/` y
+  `formulas/`. Conserva `1.0.0` como historia no ejecutable y falla cerrado
+  ante rulesets mezclados, referencias duplicadas, estado no publicado,
+  aplicabilidad, inputs, aridades, orden, traza/redondeo o dependencias
+  incoherentes.
+- `ExecutableFormulaCatalog` inmutable y
+  `CalculatePublishedFormulaUseCase`. La resolución usa exclusivamente
+  `FormulaReference` exacta `id` + `version`, no elige la última versión, no
+  acepta definiciones externas y delega en
+  `CheckedIntegerFormulaInterpreter`; una referencia histórica o ausente
+  produce `formula-not-executable`.
+- Catorce pruebas de integración de Application para la vertical de fórmulas.
+  Leen desde archivos los 4/4 casos positivos y 4/4 negativos
+  `formula-hp-dark-wizard` `1.1.0`, comparan la traza completa, rechazan
+  `1.0.0` y fijan selección exacta, estado, aplicabilidad, referencias hacia
+  atrás y unicidad compuesta mediante copias temporales. No se duplican
+  constantes ni resultados de HP en C#; Data y WPF permanecen sin cambios.
+- Representación inmutable y ajena a JSON de fórmulas ejecutables en Domain:
+  referencia/definición, aplicabilidad, inputs y bounds con código de rango,
+  programa `CHECKED_INT64_V1`, pasos/operandos, redondeo, solicitud, resultado y
+  traza con provenance.
+- Intérprete genérico en Calculation Engine para `CONSTANT`, `ADD`, `SUBTRACT`,
+  `MULTIPLY` y `APPLY_ROUNDING`. Exige estado publicado, aplicabilidad e inputs
+  exactos, usa aritmética comprobada de 64 bits y no ramifica por fórmula,
+  clase, input o paso.
+- Veinticinco pruebas exclusivamente sintéticas para las cinco operaciones,
+  estado, aplicabilidad, bounds/códigos, orden, seis modos de redondeo,
+  programas inválidos/no soportados, overflow, traza/provenance e inmutabilidad
+  de colecciones. Application, Data, WPF y los datos canónicos permanecen fuera
+  de esta vertical.
+- Smoke WPF publicado aprobado tras incorporar los nuevos binarios: SQLite
+  `3.53.3`, 459 archivos, 148.808.995 bytes, 10 avisos legales y 36/36 JSON
+  idénticos entre fases. Progresión, distribución, resets, backup/restore y
+  borrador persistido permanecen aprobados; WPF aún no ejecuta fórmulas.
+- Ocho casos versionados para `formula-hp-dark-wizard` `1.1.0`: cuatro
+  positivos y cuatro controles negativos en archivos propios. Conservan IDs,
+  contexto, inputs, trazas, resultados, errores, evidencia y conflicto de
+  `1.0.0`; el único cambio semántico es `formulaRef.version`. La definición
+  `DRAFT` enlaza exclusivamente sus cuatro positivos.
+- Identidad compuesta de casos de fórmula mediante `id` + versión de
+  `formulaRef`. El gate permite coexistir ambas series, rechaza una pareja
+  repetida sin abortar la validación y prueba por comparación estructural que
+  las ocho copias no divergen. `1.1.0` permanece `DRAFT`; no se creó evaluador
+  ni se modificaron Domain, Calculation Engine, Application, Data o WPF.
+- Smoke WPF publicado aprobado con 36/36 JSON idénticos entre publicación
+  inicial y reemplazo, SQLite `3.53.3`, 459 archivos y 148.766.267 bytes. El
+  hash resultante del snapshot fue
+  `sha256:cfe267e51cf07532d5d1828fd524078bf832a122f367cf6381309e0d9010dbf7`.
+- Definición canónica `formula-hp-dark-wizard` `1.1.0` en estado `DRAFT`
+  contra `formula.schema.json` `2.0.0`. Conserva identidad factual,
+  aplicabilidad, inputs, bounds, redondeo, cinco pasos, evidencia y conflicto
+  de `1.0.0`; añade los códigos de rango aprobados y expresa la misma
+  aritmética únicamente como `CHECKED_INT64_V1`. El artefacto publicado
+  `1.0.0` y sus ocho casos permanecen intactos.
+- Gate canónico consciente de `schemaVersion` e identidad compuesta
+  `id` + `version`. Valida las versiones `1.0.0` y `1.1.0` contra `v1` y `v2`
+  respectivamente, permite su coexistencia sin elegir una versión implícita y
+  rechaza identidades compuestas duplicadas. No se crearon casos `1.1.0`, un
+  evaluador ni cambios en Domain, Calculation Engine, Application, Data o WPF.
+- Smoke WPF publicado aprobado con 28/28 JSON idénticos entre publicación
+  inicial y reemplazo, SQLite `3.53.3`, persistencia y backup/restore intactos.
+  La definición `DRAFT` se empaqueta como parte del snapshot, pero WPF no la
+  materializa ni ejecuta.
+- Contrato JSON Schema 2020-12 `packages/schemas/v2/formula.schema.json`
+  `2.0.0`, coexistente con `v1`, para programas `CHECKED_INT64_V1` sin
+  interpretar `strategy.definition`. Cierra inputs `INT32`/`INT64`, output y
+  literales `INT64`, `rangeErrorCode`, operandos y las operaciones
+  `CONSTANT`, `ADD`, `SUBTRACT`, `MULTIPLY` y `APPLY_ROUNDING`.
+- Dos fixtures exclusivamente sintéticos `formula-v2` y gates de contrato para
+  aridades, formas incompletas y texto ejecutable no permitido. Los gates
+  semánticos rechazan IDs duplicados, inputs inexistentes, referencias a pasos
+  actuales o futuros, bounds incompatibles y divergencias entre programa,
+  traza, salida cruda y redondeo visible.
+- Inventario integral ampliado a once contratos y veintidós fixtures, con
+  selección explícita de versión en el validador, control estructural y harness
+  de compilación fuente. No se modificaron ruleset, dataset, fórmula factual,
+  casos canónicos, registros de investigación ni capas productivas.
+- Diseño técnico de la primera vertical ejecutable de
+  `formula-hp-dark-wizard`. Determina que `strategy.definition` `1.1.0` no
+  permite ejecución cerrada, rechaza handlers factuales y parsing de texto
+  implícito, y selecciona un programa estructurado `CHECKED_INT64_V1`.
+- Límite explícito Domain/Application/Calculation Engine, gates de
+  materialización, errores y estrategia de pruebas sin Data ni WPF. La fórmula
+  publicada `1.0.0` permanece inmutable; el contrato `2.0.0` ya se implementó
+  y la ruta posterior exige una fórmula `1.1.0` y casos equivalentes antes de
+  crear el evaluador. No se añadieron datos ni fórmulas de MU Online.
 - Definición factual `formula-hp-dark-wizard` `1.0.0`, incorporada inicialmente
   como `DRAFT` y publicada tras su revisión, con
   aplicabilidad exacta a Dark Wizard, Soul Master y Grand Master, inputs
@@ -347,6 +784,16 @@
 
 ### Changed
 
+- La planificación de `next-actions.md` adopta verticales funcionales completas:
+  diseño restante, implementación, integración, pruebas, documentación y smoke
+  se agrupan cuando no existe un gate real. La prioridad inmediata une ahora la
+  resolución de `CONTEXT_VALUE` con la entrega trazable de HP de Dark Wizard en
+  WPF.
+- `formula-hp-dark-wizard` `1.1.0` pasa de `DRAFT` a `PUBLISHED` después de
+  revisar su definición y ocho casos contra el schema `2.0.0`, los contratos
+  de traza/caso y el diseño aprobado. La auditoría no encontró divergencias:
+  el único cambio del artefacto fue `status`; una prueba fija la promoción y el
+  evaluador continúa fuera de alcance.
 - `formula-hp-dark-wizard` `1.0.0` pasa de `DRAFT` a `PUBLISHED` después de una
   revisión limitada de sus nueve JSON contra el contrato aprobado. Identidad,
   provenance, aplicabilidad, inputs, bounds, expresión, cinco pasos, redondeo,

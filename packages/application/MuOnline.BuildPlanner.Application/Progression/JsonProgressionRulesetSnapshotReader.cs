@@ -99,7 +99,7 @@ public sealed class JsonProgressionRulesetSnapshotReader : IProgressionRulesetSn
 
         foreach (var characterClass in classes)
         {
-            if (characterClass.ProgressionRuleRefs.Count == 0)
+            if (characterClass.ProgressionRuleRefs.Length == 0)
             {
                 throw Incoherent(
                     $"Character class '{characterClass.Id}' has no progression rule reference.");
@@ -136,19 +136,24 @@ public sealed class JsonProgressionRulesetSnapshotReader : IProgressionRulesetSn
             .ThenBy(evolution => evolution.Id, StringComparer.Ordinal)
             .ToArray();
         var id = RequiredString(element, "id");
+        var stats = element.GetProperty("stats")
+            .EnumerateObject()
+            .Select(stat => new CharacterBaseStatDefinition(
+                stat.Name,
+                stat.Value.GetProperty("baseValue").GetInt64(),
+                StringArray(stat.Value, "evidenceRefs")))
+            .ToArray();
 
         return new ParsedCharacterClass(
             new CharacterProgressionDefinition(
                 id,
                 RequiredString(element, "rulesetId"),
-                element.GetProperty("stats")
-                    .EnumerateObject()
-                    .Select(stat => stat.Name)
-                    .ToHashSet(StringComparer.Ordinal),
+                stats.Select(stat => stat.StatId),
                 evolutions
                     .Select(evolution => evolution.Id)
                     .ToHashSet(StringComparer.Ordinal),
-                StringArray(element, "progressionRuleRefs")),
+                StringArray(element, "progressionRuleRefs"),
+                stats),
             new ProgressionCharacterOption(
                 id,
                 RequiredString(element, "displayName"),

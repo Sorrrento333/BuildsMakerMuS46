@@ -1,0 +1,36 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "mana-summoner-energy-step",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-mana-summoner", "version": "1.0.0" },
+  "context": {
+    "characterClassId": "class-summoner",
+    "evolutionId": "evolution-summoner"
+  },
+  "inputs": { "character-level": 1, "energy": 24 },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-mana-summoner-energy-step",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": { "id": "formula-mana-summoner", "version": "1.0.0" },
+    "context": {
+      "characterClassId": "class-summoner",
+      "evolutionId": "evolution-summoner"
+    },
+    "inputs": { "character-level": 1, "energy": 24 },
+    "steps": [
+      { "stepId": "base", "value": 40 },
+      { "stepId": "level-offset", "value": 0 },
+      { "stepId": "level-contribution", "value": 0 },
+      { "stepId": "energy-offset", "value": 1 },
+      { "stepId": "energy-contribution", "value": 1.7 },
+      { "stepId": "raw-mana", "value": 41.7 },
+      { "stepId": "visible-mana", "value": 41 }
+    ],
+    "rounding": { "mode": "TRUNCATE", "stage": "visible-mana", "decimalPlaces": 0 },
+    "rawOutput": 41.7,
+    "visibleOutput": 41,
+    "evidenceRefs": ["evd-0021", "evd-0026", "evd-0027", "evd-0028", "evd-0029", "evd-0031"],
+    "conflictIds": []
+  }
+}

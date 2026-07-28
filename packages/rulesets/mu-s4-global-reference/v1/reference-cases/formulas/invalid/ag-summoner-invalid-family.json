@@ -1,0 +1,12 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "ag-summoner-invalid-family",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-ag-summoner", "version": "1.0.0" },
+  "context": {
+    "characterClassId": "class-dark-wizard",
+    "evolutionId": "evolution-dark-wizard"
+  },
+  "inputs": { "strength": 21, "agility": 21, "vitality": 18, "energy": 23 },
+  "expectedErrorCode": "formula-not-applicable"
+}

@@ -61,9 +61,13 @@ motor en una sola fila. Guardar usa reemplazo atómico dentro de
 WPF compone esta persistencia en
 `%LOCALAPPDATA%\MuOnline.BuildPlanner\build-planner.sqlite`, aplica el catálogo
 antes de construir el repositorio y aporta metadata explícito `1.0.0`,
-`2026-07-24.1` y motor `0.2.0`. El hash SHA-256 se deriva de las rutas relativas
-y bytes exactos de los 27 JSON publicados. El smoke usa la misma composición
-sobre su directorio de usuario temporal externo al artefacto.
+`2026-07-25.2` y motor `0.2.0`. El hash SHA-256 se deriva de las rutas relativas
+y bytes exactos de los 54 JSON publicados. El cambio de dataset corresponde a
+la fórmula y los ocho casos factuales de HP de Fairy Elf. El smoke usa la
+misma composición sobre su directorio de usuario temporal externo al artefacto.
+El cierre calculó
+`sha256:aa3c761e9c3a8a2739c2cf424175c5d5b2ee703793f1489d2b8ebbb823521afa`
+y confirmó la misma identidad después del reemplazo.
 
 ## Separación
 Datos canónicos, traducciones, evidencia y assets se almacenan por separado para evitar duplicación.

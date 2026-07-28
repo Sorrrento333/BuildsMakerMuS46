@@ -65,6 +65,9 @@ ruleset y no crea el evaluador.
 
 La definición canónica seguirá conservando identidad, ruleset, estado,
 confianza, estrategia, redondeo, evidencia, conflictos y referencias de casos.
+`conflictIds` es opcional en la definición y sólo contiene conflictos realmente
+aplicables; el gate no inventa uno para fórmulas sin divergencias documentadas.
+La traza siempre materializa el arreglo heredado, aunque sea vacío.
 Además declarará:
 
 - `applicability`, con un `characterClassId` estable y el conjunto no vacío y
@@ -200,7 +203,8 @@ Las relaciones con clases, evoluciones, evidencias y cobertura de casos se
 añadirán al gate semántico al materializar la primera fórmula factual.
 JSON Schema por sí solo no sustituye esas comprobaciones.
 
-El validador integral cubre diez contratos y veinte fixtures. Las pruebas
+En esta implementación v1, el validador integral alcanzó diez contratos y
+veinte fixtures. Las pruebas
 focalizadas ejercitan por separado los rechazos enumerados y alteran una traza
 anidada para demostrar la resolución real del `$ref`. El gate semántico mínimo
 de esta tarea exige que ambas salidas pertenezcan a `stepIds` y que la salida
@@ -214,6 +218,51 @@ visible sea el último paso. Todos los valores e IDs usados son sintéticos.
 - decidir precisión intermedia de otras fórmulas;
 - incorporar límites de nivel o stats no demostrados;
 - cambiar ruleset, dataset, Application, Data o WPF.
+
+## Evolución ejecutable `2.0.0` — 2026-07-25
+
+El diseño posterior demostró que `strategy.definition` `1.1.0` no vincula
+inputs, operaciones y pasos de forma ejecutable. Sin reescribir este contrato
+histórico, se incorporó `packages/schemas/v2/formula.schema.json` `2.0.0` con:
+
+- `kind: PROGRAM` y `executionModel: CHECKED_INT64_V1`;
+- inputs exclusivamente `INT32`/`INT64`, con bounds obligatorios y
+  `rangeErrorCode`;
+- salida `INT64`;
+- operaciones cerradas `CONSTANT`, `ADD`, `SUBTRACT`, `MULTIPLY` y
+  `APPLY_ROUNDING`, con aridad validada;
+- operandos exclusivos `INPUT`, `STEP` y `LITERAL`, sin texto ejecutable.
+
+El gate semántico añade lo que JSON Schema no puede expresar por sí solo:
+unicidad de IDs, referencias sólo a inputs declarados o pasos anteriores,
+coherencia y ancho de bounds, igualdad ordenada entre pasos del programa y de
+la traza, y correspondencia entre salida cruda, paso de redondeo y salida
+visible final.
+
+El inventario queda en once contratos y veintidós fixtures. Los fixtures
+`formula-v2` son exclusivamente sintéticos y recorren las cinco operaciones.
+No se modificaron el ruleset, la fórmula factual `1.0.0`, sus casos, el dataset
+ni las capas productivas. La materialización factual `1.1.0` permanece como
+tarea posterior.
+
+## Evolución compatible `2.1.0` — 2026-07-26
+
+HP de Dark Lord exige conservar el coeficiente decimal exacto `1.5` hasta el
+truncamiento visible. `CHECKED_INT64_V1` no puede representar ese intermedio sin
+pérdida. El mismo contrato mayor admite ahora `schemaVersion: 2.1.0` con
+`CHECKED_DECIMAL_V1`:
+
+- los literales se materializan con `System.Decimal`, sin conversión binaria;
+- inputs y output publicados permanecen `INT32`/`INT64`;
+- suma, resta y multiplicación usan aritmética comprobada;
+- la traza conserva valores decimales exactos;
+- `APPLY_ROUNDING` sigue siendo la única etapa autorizada de redondeo;
+- una salida redondeada fuera de `INT64` produce
+  `formula-arithmetic-overflow`.
+
+`2.0.0` continúa exigiendo `CHECKED_INT64_V1`; las cinco definiciones existentes
+no se reescriben. No se añadieron operaciones, dependencias ni handlers
+factuales.
 
 ## Consecuencias
 

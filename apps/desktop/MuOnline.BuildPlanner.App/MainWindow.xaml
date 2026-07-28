@@ -24,6 +24,7 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
@@ -190,6 +191,37 @@
             <GroupBox Grid.Row="12"
                       Grid.ColumnSpan="2"
                       Margin="0,24,0,0"
+                      Header="Atributo derivado publicado">
+                <Grid Margin="12">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <TextBlock Text="Fórmula publicada"
+                               FontWeight="SemiBold" />
+                    <ComboBox x:Name="FormulaComboBox"
+                              Grid.Row="1"
+                              Margin="0,6,0,12"
+                              MinWidth="320"
+                              HorizontalAlignment="Left"
+                              DisplayMemberPath="DisplayName"
+                              SelectionChanged="FormulaSelectionChanged"
+                              AutomationProperties.Name="Fórmula derivada publicada" />
+                    <TextBox x:Name="FormulaResultTextBox"
+                             Grid.Row="2"
+                             Padding="12"
+                             MinHeight="160"
+                             IsReadOnly="True"
+                             TextWrapping="Wrap"
+                             VerticalScrollBarVisibility="Auto"
+                             AutomationProperties.Name="Resultado y trazas de fórmula" />
+                </Grid>
+            </GroupBox>
+
+            <GroupBox Grid.Row="13"
+                      Grid.ColumnSpan="2"
+                      Margin="0,24,0,0"
                       Header="Borrador local">
                 <Grid Margin="12">
                     <Grid.ColumnDefinitions>
@@ -227,7 +259,7 @@
             </GroupBox>
 
             <TextBox x:Name="BuildDraftResultTextBox"
-                     Grid.Row="13"
+                     Grid.Row="14"
                      Grid.ColumnSpan="2"
                      Margin="0,16,0,0"
                      Padding="12"

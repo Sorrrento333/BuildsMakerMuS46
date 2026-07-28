@@ -23,6 +23,54 @@ existen. Los cuatro positivos son referencias versionadas de
 validó la promoción de la fórmula a `PUBLISHED` y fija ese estado mediante una
 prueba de contrato, pero todavía no ejecuta un motor de HP.
 
+El diseño de la vertical ejecutable concluye que el contrato `1.1.0` no basta
+para un motor cerrado. El contrato `formula` `2.0.0` ya separa el programa
+sintético de la futura regresión factual y sus pruebas rechazan operaciones o
+aridades no soportadas, referencias adelantadas, inputs no declarados, pasos
+divergentes, `rangeErrorCode` ausente, bounds incoherentes y desacoples de
+salida/redondeo. La futura cobertura del intérprete leerá definición, inputs,
+trazas, resultados y errores de los ocho casos factuales versionados, sin
+constantes en C#, y rechazará el artefacto textual histórico como ejecutable.
+Véase `../04-domain/dark-wizard-hp-execution-vertical-design.md`.
+
+La definición canónica `formula-hp-dark-wizard` `1.1.0` está `PUBLISHED` y
+enlaza cuatro positivos de su propia versión. La revisión de sus nueve JSON no
+encontró divergencias y cambió únicamente `status`; una prueba fija el estado.
+Las pruebas del gate demuestran
+que `schemaVersion` selecciona `v1` o `v2`, que `1.0.0`/`1.1.0` coexisten bajo
+el mismo ID y que una repetición de la pareja de fórmula `id` + `version` falla
+cerrada. Las dos series de ocho casos conservan IDs y contenido y coexisten por
+la versión de `formulaRef`; una pareja de caso `id` + versión repetida también
+falla cerrada. Una prueba compara cada copia y exige que el único cambio sea
+`formulaRef.version`. La versión `1.1.0` ya se ejecuta en la vertical de
+Application descrita más abajo.
+
+El intérprete `CHECKED_INT64_V1` ya está cubierto por veinticinco pruebas
+exclusivamente sintéticas. Recorren las cinco operaciones cerradas, estado
+publicado, aplicabilidad, conjunto exacto de inputs, bounds
+inclusivos/exclusivos, rango técnico de 32 bits, códigos de rango
+materializados, seis modos de redondeo sobre enteros, orden de traza,
+referencias adelantadas, programa no soportado y overflow de suma, resta y
+multiplicación. Una prueba adicional dentro de ese conjunto muta las
+colecciones del llamador después de construir definición y solicitud para
+demostrar que Domain conserva copias inmutables.
+
+Cuatro pruebas sintéticas adicionales cubren `CHECKED_DECIMAL_V1`: conservación
+exacta de `1.5`, ausencia de redondeo intermedio, truncamiento final, operandos
+incoherentes y overflow al convertir la salida publicada a `INT64`.
+
+Esta cobertura no lee la fórmula ni los casos de HP y por tanto no constituye
+regresión factual. El gate independiente de Application ya materializa
+`formula` `2.0.0`/`2.1.0`, ejecuta desde archivos 68/68 positivos y 76/76 negativos
+entre Dark Wizard `1.1.0`, Dark Knight `1.0.0`, Fairy Elf `1.0.0` y Summoner
+`1.0.0`, Magic Gladiator `1.0.0`, Dark Lord `1.0.0` y Mana de Dark Wizard
+`1.0.0`, Dark Knight `1.0.0`, Fairy Elf `1.0.0`, Summoner `1.0.0`, Magic
+Gladiator `1.0.0`, Dark Lord `1.0.0`, AG de Dark Wizard `1.0.0`, AG de Dark
+Knight `1.0.0` y AG de Fairy Elf `1.0.0`, y rechaza
+el `1.0.0` histórico de
+Dark Wizard como no ejecutable. Las trazas se comparan campo por campo,
+incluidos contexto, inputs, pasos, redondeo, outputs, evidencias y conflictos.
+
 Los casos de fórmula tendrán contrato propio. Un positivo compondrá mediante
 `$ref` una traza completa y un negativo conservará sólo el código de error
 esperado. Una fórmula publicada referenciará únicamente sus positivos del mismo
@@ -31,15 +79,25 @@ semántico comprobará además que cada traza contiene exactamente los pasos
 declarados por la fórmula, en orden, y que salida cruda, redondeo y salida
 visible son coherentes.
 
-La suite de contrato actual usa seis fixtures exclusivamente sintéticos para
-`formula`, `calculation-trace` y `formula-test-case`. Pruebas focalizadas
+La suite de contrato actual usa ocho fixtures exclusivamente sintéticos para
+`formula` v1/v2, `calculation-trace` y `formula-test-case`. Pruebas focalizadas
 rechazan aplicabilidad vacía o duplicada, bounds factuales sin evidencia,
 procedencia incompleta, pasos duplicados y salidas no declaradas; también
 demuestran la unión exclusiva positivo/negativo y que una alteración interna de
-la traza es rechazada a través del `$ref` real.
+la traza es rechazada a través del `$ref` real. Para v2 prueban además las cinco
+operaciones permitidas, la unión cerrada de operandos, sus aridades, orden de
+referencias, compatibilidad de bounds con `INT32` y correspondencia exacta entre
+programa y traza.
 
-La suite factual de fórmula lee la definición y los ocho casos desde el
-ruleset. No duplica resultados ni constantes del juego en C#. El gate exige
+La suite factual lee las dieciocho definiciones —una histórica y diecisiete
+ejecutables— y sus casos desde el ruleset. Las doce referencias HP/Mana
+conservan cuatro positivos y cuatro negativos; AG de Dark Wizard, Dark Knight y
+Fairy Elf conservan cuatro positivos y seis negativos cada una para cubrir cada
+mínimo factual. AG de Summoner y Magic Gladiator conservan cuatro positivos y
+cinco negativos cada una porque su dominio válido no puede desbordar la salida.
+No duplica
+resultados ni constantes del juego en C#.
+El gate exige
 identidad exacta de ruleset/fórmula/versión, clase y evolución existentes,
 inputs completos, orden de pasos, correspondencia de outputs, redondeo,
 evidencias/conflictos heredados y cobertura exacta de los cuatro positivos.
@@ -81,6 +139,22 @@ canónicos; no se duplican números del juego en el código de prueba. Dos copia
 temporales alteradas verifican además que el adaptador rechace una regla no
 `PUBLISHED` y una referencia a regla inexistente antes de ejecutar cálculos.
 
+Para fórmulas, la suite usa una copia temporal que contiene únicamente
+`character-classes/` y `formulas/`; esto demuestra que el camino normal no lee
+casos de referencia. Además de los veinte casos canónicos, mutaciones verifican
+fallo cerrado ante estado no publicado, evolución ajena, referencia a un paso
+futuro y duplicado exacto `id` + `version`. La solicitud de `1.0.0` falla con
+`formula-not-executable` antes de llegar al intérprete.
+
+El gate independiente de `CONTEXT_VALUE` está implementado. Compara bases,
+evidencias y `source.valueId` con los JSON, construye el estado mediante
+progresión y distribución y deriva las asignaciones requeridas desde casos
+canónicos y bases leídas, sin copiar números del juego en C#. Los controles
+cubren contexto no resoluble, fuente no soportada, mismatch, base/asignación
+ausentes, inmutabilidad y overflow de `baseValue + allocation`. Nivel inválido
+y asignación negativa fallan antes en sus casos de uso de origen. La ruta
+productiva no acepta un diccionario contextual aportado por WPF.
+
 El smoke WPF publicado añade el camino artefacto → snapshot empaquetado →
 Application → motor. Debe localizar las cuatro carpetas requeridas, reproducir
 7/7 casos positivos y 3/3 rechazos desde los propios JSON, y repetir el gate
@@ -90,6 +164,14 @@ Sobre un presupuesto positivo ya reproducido, genera todas las asignaciones
 desde los `StatIds` materializados, configura dos resets de 100 puntos y
 verifica producto 200, presupuesto combinado, gasto, remanente y conjunto exacto
 en ambas fases. Este control no publica una regla factual de resets.
+El mismo smoke carga las quince definiciones ejecutables y sus positivos, deriva
+el nivel técnico de composición cuando la fórmula no lo consume y las
+asignaciones desde cada JSON y la base materializada, y reproduce 24/24
+casos de HP más 4/4 casos de Mana de Dark Wizard, 4/4 de Mana de Dark Knight y
+4/4 de Mana de Fairy Elf, 4/4 de Mana de Summoner y 4/4 de Mana de Magic
+Gladiator, 4/4 de Mana de Dark Lord, 4/4 de AG de Dark Wizard, 4/4 de AG de
+Dark Knight y 4/4 de AG de Fairy Elf,
+con trazas contextual y aritmética antes y después del reemplazo.
 
 El contrato de distribución de stats conserva fixtures estructurales
 sintéticos. La suite productiva cubre distribución parcial y exacta, valores

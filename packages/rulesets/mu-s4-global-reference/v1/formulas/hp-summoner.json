@@ -1,0 +1,186 @@
+{
+  "schemaVersion": "2.0.0",
+  "id": "formula-hp-summoner",
+  "version": "1.0.0",
+  "rulesetId": "mu-s4-global-reference",
+  "status": "PUBLISHED",
+  "confidence": "VERIFIED",
+  "purpose": "Calculate visible base HP for the Summoner family before equipment, options, buffs, private profiles, or undeclared modifiers.",
+  "applicability": {
+    "characterClassId": "class-summoner",
+    "evolutionIds": [
+      "evolution-summoner",
+      "evolution-bloody-summoner",
+      "evolution-dimension-master"
+    ]
+  },
+  "inputs": [
+    {
+      "id": "character-level",
+      "numericType": "INT32",
+      "unit": "level",
+      "numericBounds": {
+        "minimum": 1,
+        "minimumInclusive": true,
+        "maximum": 2147483647,
+        "maximumInclusive": true,
+        "classification": "TECHNICAL"
+      },
+      "rangeErrorCode": "formula-level-out-of-range",
+      "source": {
+        "kind": "CONTEXT_VALUE",
+        "valueId": "character-level"
+      }
+    },
+    {
+      "id": "vitality",
+      "numericType": "INT64",
+      "unit": "stat-point",
+      "numericBounds": {
+        "minimum": 18,
+        "minimumInclusive": true,
+        "classification": "FACTUAL",
+        "evidenceRefs": ["evd-0021"]
+      },
+      "rangeErrorCode": "formula-stat-below-base",
+      "source": {
+        "kind": "CONTEXT_VALUE",
+        "valueId": "resolved-vitality"
+      }
+    }
+  ],
+  "output": {
+    "id": "hp",
+    "numericType": "INT64",
+    "unit": "hp-point"
+  },
+  "strategy": {
+    "kind": "PROGRAM",
+    "executionModel": "CHECKED_INT64_V1",
+    "steps": [
+      {
+        "id": "base",
+        "operation": "CONSTANT",
+        "operands": [
+          {
+            "kind": "LITERAL",
+            "value": 34
+          }
+        ]
+      },
+      {
+        "id": "level-offset",
+        "operation": "SUBTRACT",
+        "operands": [
+          {
+            "kind": "INPUT",
+            "inputId": "character-level"
+          },
+          {
+            "kind": "LITERAL",
+            "value": 1
+          }
+        ]
+      },
+      {
+        "id": "level-contribution",
+        "operation": "MULTIPLY",
+        "operands": [
+          {
+            "kind": "STEP",
+            "stepId": "level-offset"
+          },
+          {
+            "kind": "LITERAL",
+            "value": 1
+          }
+        ]
+      },
+      {
+        "id": "vitality-contribution",
+        "operation": "MULTIPLY",
+        "operands": [
+          {
+            "kind": "INPUT",
+            "inputId": "vitality"
+          },
+          {
+            "kind": "LITERAL",
+            "value": 2
+          }
+        ]
+      },
+      {
+        "id": "raw-hp",
+        "operation": "ADD",
+        "operands": [
+          {
+            "kind": "STEP",
+            "stepId": "base"
+          },
+          {
+            "kind": "STEP",
+            "stepId": "level-contribution"
+          },
+          {
+            "kind": "STEP",
+            "stepId": "vitality-contribution"
+          }
+        ]
+      },
+      {
+        "id": "visible-hp",
+        "operation": "APPLY_ROUNDING",
+        "operands": [
+          {
+            "kind": "STEP",
+            "stepId": "raw-hp"
+          }
+        ]
+      }
+    ],
+    "dependencyFormulaRefs": []
+  },
+  "rounding": {
+    "mode": "TRUNCATE",
+    "stage": "visible-hp",
+    "decimalPlaces": 0
+  },
+  "trace": {
+    "stepIds": [
+      "base",
+      "level-offset",
+      "level-contribution",
+      "vitality-contribution",
+      "raw-hp",
+      "visible-hp"
+    ],
+    "rawOutputStepId": "raw-hp",
+    "visibleOutputStepId": "visible-hp"
+  },
+  "constraints": [
+    "Resolve class and evolution applicability before evaluating arithmetic.",
+    "Use checked integer subtraction, multiplication, and addition.",
+    "Truncate raw-hp toward zero at visible-hp."
+  ],
+  "evidenceRefs": ["evd-0021", "evd-0027", "evd-0028", "evd-0029", "evd-0030"],
+  "conflictIds": [],
+  "testCaseRefs": [
+    {
+      "id": "hp-summoner-base",
+      "version": "1.0.0"
+    },
+    {
+      "id": "hp-summoner-level-step",
+      "version": "1.0.0"
+    },
+    {
+      "id": "hp-summoner-vitality-step",
+      "version": "1.0.0"
+    },
+    {
+      "id": "hp-summoner-combined-step",
+      "version": "1.0.0"
+    }
+  ]
+}

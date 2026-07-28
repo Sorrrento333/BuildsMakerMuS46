@@ -32,24 +32,38 @@ public static class FormulaReferenceCaseValidator
             RulesetId,
             "v1");
         var classes = LoadRecords(Path.Combine(rulesetRoot, "character-classes"));
-        var formulas = LoadRecords(Path.Combine(rulesetRoot, "formulas"));
-        var positiveCases = LoadRecords(
+        var formulas = LoadFormulaRecords(Path.Combine(rulesetRoot, "formulas"));
+        var positiveCases = LoadCaseRecords(
             Path.Combine(rulesetRoot, "reference-cases", "formulas", "valid"));
-        var negativeCases = LoadRecords(
+        var negativeCases = LoadCaseRecords(
             Path.Combine(rulesetRoot, "reference-cases", "formulas", "invalid"));
         var results = new List<FormulaReferenceValidationResult>();
         var orphanCaseErrors = FindOrphanCaseErrors(
-            formulas,
-            positiveCases.Values.Concat(negativeCases.Values));
+            formulas.Select(formula => formula.Record),
+            positiveCases.Concat(negativeCases));
+        var duplicateCaseErrors = FindDuplicateCaseErrors(
+            positiveCases.Concat(negativeCases));
 
-        foreach (var formulaEntry in formulas.OrderBy(item => item.Key, StringComparer.Ordinal))
+        foreach (var formulaEntry in formulas
+                     .OrderBy(item => GetFormulaIdentity(item.Record, item.Path).Id,
+                         StringComparer.Ordinal)
+                     .ThenBy(item => GetFormulaIdentity(item.Record, item.Path).Version,
+                         StringComparer.Ordinal))
         {
-            var formula = formulaEntry.Value.Record;
-            var formulaId = GetString(formula, "id", formulaEntry.Value.Path);
-            var formulaVersion = GetString(formula, "version", formulaEntry.Value.Path);
-            var status = GetString(formula, "status", formulaEntry.Value.Path);
+            var formula = formulaEntry.Record;
+            var formulaId = GetString(formula, "id", formulaEntry.Path);
+            var formulaVersion = GetString(formula, "version", formulaEntry.Path);
+            var status = GetString(formula, "status", formulaEntry.Path);
             var errors = new List<string>();
             errors.AddRange(orphanCaseErrors);
+            errors.AddRange(duplicateCaseErrors);
+            if (formulas.Count(candidate =>
+                    GetFormulaIdentity(candidate.Record, candidate.Path) ==
+                    new FormulaIdentity(formulaId, formulaVersion)) > 1)
+            {
+                errors.Add(
+                    $"Formula identity '{formulaId}' version '{formulaVersion}' is duplicated.");
+            }
             var matchingPositiveCases = SelectCases(
                 positiveCases,
                 formulaId,
@@ -61,7 +75,7 @@ public static class FormulaReferenceCaseValidator
 
             ValidateFormulaCatalogRelations(
                 formula,
-                formulaEntry.Value.Path,
+                formulaEntry.Path,
                 classes,
                 errors);
 
@@ -91,9 +105,9 @@ public static class FormulaReferenceCaseValidator
 
             ValidatePositiveCaseCoverage(
                 formula,
-                formulaEntry.Value.Path,
+                formulaEntry.Path,
                 matchingPositiveCases,
-                negativeCases,
+                matchingNegativeCases,
                 errors);
 
             results.Add(new FormulaReferenceValidationResult(
@@ -103,7 +117,7 @@ public static class FormulaReferenceCaseValidator
                 matchingPositiveCases.Keys.Order(StringComparer.Ordinal).ToArray(),
                 matchingNegativeCases.Keys.Order(StringComparer.Ordinal).ToArray(),
                 errors,
-                formulaEntry.Value.Path));
+                formulaEntry.Path));
         }
 
         return results;
@@ -150,12 +164,6 @@ public static class FormulaReferenceCaseValidator
         if (evidenceRefs.Length == 0)
         {
             errors.Add($"Formula '{GetString(formula, "id", formulaPath)}' has no evidence.");
-        }
-
-        if (GetOptionalStringArray(formula, "conflictIds", formulaPath).Length == 0)
-        {
-            errors.Add(
-                $"Formula '{GetString(formula, "id", formulaPath)}' has no traced conflict.");
         }
 
         foreach (var input in GetArray(formula, "inputs", formulaPath)
@@ -401,29 +409,36 @@ public static class FormulaReferenceCaseValidator
     }
 
     private static Dictionary<string, RecordWithPath> SelectCases(
-        Dictionary<string, RecordWithPath> cases,
+        IEnumerable<RecordWithPath> cases,
         string formulaId,
         string formulaVersion) =>
         cases
             .Where(item =>
             {
                 var formulaRef = GetObject(
-                    item.Value.Record,
+                    item.Record,
                     "formulaRef",
-                    item.Value.Path);
-                return GetString(formulaRef, "id", item.Value.Path) == formulaId &&
-                       GetString(formulaRef, "version", item.Value.Path) == formulaVersion;
+                    item.Path);
+                return GetString(formulaRef, "id", item.Path) == formulaId &&
+                       GetString(formulaRef, "version", item.Path) == formulaVersion;
             })
-            .ToDictionary(item => item.Key, item => item.Value, StringComparer.Ordinal);
+            .GroupBy(
+                item => GetString(item.Record, "id", item.Path),
+                StringComparer.Ordinal)
+            .ToDictionary(
+                group => group.Key,
+                group => group.First(),
+                StringComparer.Ordinal);
 
     private static List<string> FindOrphanCaseErrors(
-        Dictionary<string, RecordWithPath> formulas,
+        IEnumerable<JsonObject> formulas,
         IEnumerable<RecordWithPath> referenceCases)
     {
-        var formulaVersions = formulas.ToDictionary(
-            item => item.Key,
-            item => GetString(item.Value.Record, "version", item.Value.Path),
-            StringComparer.Ordinal);
+        var formulaIdentities = formulas
+            .Select(formula => new FormulaIdentity(
+                GetString(formula, "id", "formula catalog"),
+                GetString(formula, "version", "formula catalog")))
+            .ToHashSet();
         var errors = new List<string>();
 
         foreach (var referenceCase in referenceCases)
@@ -436,8 +451,7 @@ public static class FormulaReferenceCaseValidator
             var formulaId = GetString(formulaRef, "id", referenceCase.Path);
             var formulaVersion = GetString(formulaRef, "version", referenceCase.Path);
 
-            if (!formulaVersions.TryGetValue(formulaId, out var resolvedVersion) ||
-                resolvedVersion != formulaVersion)
+            if (!formulaIdentities.Contains(new FormulaIdentity(formulaId, formulaVersion)))
             {
                 errors.Add(
                     $"Case '{caseId}' references unresolved formula " +
@@ -447,6 +461,21 @@ public static class FormulaReferenceCaseValidator
 
         return errors;
     }
+
+    private static List<string> FindDuplicateCaseErrors(
+        IEnumerable<RecordWithPath> referenceCases) =>
+        referenceCases
+            .GroupBy(
+                referenceCase => GetCaseIdentity(
+                    referenceCase.Record,
+                    referenceCase.Path))
+            .Where(group => group.Count() > 1)
+            .OrderBy(group => group.Key.Id, StringComparer.Ordinal)
+            .ThenBy(group => group.Key.Version, StringComparer.Ordinal)
+            .Select(group =>
+                $"Formula case identity '{group.Key.Id}' version " +
+                $"'{group.Key.Version}' is duplicated.")
+            .ToList();
 
     private static Dictionary<string, RecordWithPath> LoadRecords(string directory)
     {
@@ -461,6 +490,42 @@ public static class FormulaReferenceCaseValidator
                 item => GetString(item.Record, "id", item.Path),
                 StringComparer.Ordinal);
     }
+
+    private static RecordWithPath[] LoadFormulaRecords(string directory)
+    {
+        if (!Directory.Exists(directory))
+        {
+            throw new DirectoryNotFoundException($"Ruleset directory was not found: {directory}");
+        }
+
+        return Directory.GetFiles(directory, "*.json")
+            .Select(path => new RecordWithPath(ParseObject(path), path))
+            .ToArray();
+    }
+
+    private static RecordWithPath[] LoadCaseRecords(string directory)
+    {
+        if (!Directory.Exists(directory))
+        {
+            throw new DirectoryNotFoundException($"Ruleset directory was not found: {directory}");
+        }
+
+        return Directory.GetFiles(directory, "*.json")
+            .Select(path => new RecordWithPath(ParseObject(path), path))
+            .ToArray();
+    }
+
+    private static FormulaIdentity GetFormulaIdentity(JsonObject formula, string context) =>
+        new(
+            GetString(formula, "id", context),
+            GetString(formula, "version", context));
+
+    private static FormulaCaseIdentity GetCaseIdentity(
+        JsonObject referenceCase,
+        string context) =>
+        new(
+            GetString(referenceCase, "id", context),
+            GetString(GetObject(referenceCase, "formulaRef", context), "version", context));
 
     private static JsonObject ParseObject(string path) =>
         JsonNode.Parse(File.ReadAllText(path))?.AsObject()
@@ -519,4 +584,6 @@ public static class FormulaReferenceCaseValidator
             .ToHashSet(StringComparer.Ordinal);
 
     private sealed record RecordWithPath(JsonObject Record, string Path);
+    private sealed record FormulaIdentity(string Id, string Version);
+    private sealed record FormulaCaseIdentity(string Id, string Version);
 }

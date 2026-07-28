@@ -1,0 +1,12 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "hp-dark-lord-invalid-level",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-hp-dark-lord", "version": "1.0.0" },
+  "context": {
+    "characterClassId": "class-dark-lord",
+    "evolutionId": "evolution-dark-lord"
+  },
+  "inputs": { "character-level": 0, "vitality": 20 },
+  "expectedErrorCode": "formula-level-out-of-range"
+}

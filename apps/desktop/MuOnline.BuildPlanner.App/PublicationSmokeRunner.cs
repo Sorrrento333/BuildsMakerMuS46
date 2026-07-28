@@ -3,9 +3,11 @@ using System.IO;
 using System.Text.Json;
 using Microsoft.Data.Sqlite;
 using MuOnline.BuildPlanner.Application.Builds;
+using MuOnline.BuildPlanner.Application.Formulas;
 using MuOnline.BuildPlanner.Application.Progression;
 using MuOnline.BuildPlanner.Application.Stats;
 using MuOnline.BuildPlanner.Data;
+using MuOnline.BuildPlanner.Domain.Formulas;
 using MuOnline.BuildPlanner.Domain.Progression;
 using MuOnline.BuildPlanner.Domain.Stats;
 
@@ -34,6 +36,7 @@ internal static class PublicationSmokeRunner
         EnsureDataOutsideBinaryDirectory(options.DataDirectory);
         Directory.CreateDirectory(options.DataDirectory);
         var progressionVerification = VerifyPublishedProgressionRuleset();
+        var formulaVerification = VerifyPublishedCharacterFormulas();
         var buildDraftServices = PublishedBuildDraftServices.Create(
             options.DataDirectory,
             [SyntheticMigration]);
@@ -48,12 +51,14 @@ internal static class PublicationSmokeRunner
                 backupPath,
                 options,
                 progressionVerification,
+                formulaVerification,
                 buildDraftServices),
             PublicationSmokePhase.VerifyUpdate => VerifyUpdate(
                 databasePath,
                 backupPath,
                 options,
                 progressionVerification,
+                formulaVerification,
                 buildDraftServices),
             _ => throw new ArgumentOutOfRangeException(nameof(options)),
         };
@@ -64,6 +69,7 @@ internal static class PublicationSmokeRunner
         string backupPath,
         PublicationSmokeOptions options,
         ProgressionVerificationResult progressionVerification,
+        PublishedFormulaVerification formulaVerification,
         PublishedBuildDraftServices buildDraftServices)
     {
         if (!File.Exists(databasePath) || File.Exists(backupPath))
@@ -107,6 +113,7 @@ internal static class PublicationSmokeRunner
             sqliteVersion,
             migrationResult,
             progressionVerification,
+            formulaVerification,
             buildDraftServices);
     }
 
@@ -115,6 +122,7 @@ internal static class PublicationSmokeRunner
         string backupPath,
         PublicationSmokeOptions options,
         ProgressionVerificationResult progressionVerification,
+        PublishedFormulaVerification formulaVerification,
         PublishedBuildDraftServices buildDraftServices)
     {
         if (!File.Exists(databasePath) || !File.Exists(backupPath))
@@ -135,6 +143,7 @@ internal static class PublicationSmokeRunner
             connection.ServerVersion,
             migrationResult,
             progressionVerification,
+            formulaVerification,
             buildDraftServices);
     }
 
@@ -145,6 +154,7 @@ internal static class PublicationSmokeRunner
         string sqliteVersion,
         MigrationApplicationResult migrationResult,
         ProgressionVerificationResult progressionVerification,
+        PublishedFormulaVerification formulaVerification,
         PublishedBuildDraftServices buildDraftServices) => new(
             Success: true,
             Phase: options.Phase == PublicationSmokePhase.Initialize ? "initialize" : "verify-update",
@@ -176,6 +186,12 @@ internal static class PublicationSmokeRunner
                 progressionVerification.SyntheticDistribution.ResetPoints,
             SyntheticTotalDistributablePoints:
                 progressionVerification.SyntheticDistribution.TotalDistributablePoints,
+            PublishedFormulaContextVerified: formulaVerification.Verified,
+            PublishedFormulaCount: formulaVerification.FormulaReferences.Length,
+            PublishedFormulaReferences: formulaVerification.FormulaReferences
+                .Select(reference => $"{reference.Id}@{reference.Version}")
+                .ToArray(),
+            ApprovedPublishedFormulaCaseCount: formulaVerification.ApprovedCaseCount,
             BuildDraftPersistenceVerified: true,
             BuildDraftId: BuildDraftId,
             BuildDraftDatasetVersion:
@@ -186,6 +202,86 @@ internal static class PublicationSmokeRunner
             AlreadyAppliedMigrationCount: migrationResult.AlreadyAppliedCount,
             ErrorType: null,
             ErrorMessage: null);
+
+    private static PublishedFormulaVerification VerifyPublishedCharacterFormulas()
+    {
+        var progressionCatalog = PublishedProgressionRuleset.Catalog;
+        var formulaCatalog = PublishedProgressionRuleset.FormulaCatalog;
+        var useCase = PublishedProgressionRuleset.CreateCharacterFormulaUseCase();
+        var cases = LoadPublishedFormulaCases();
+        var verifiedReferences = new HashSet<FormulaReference>();
+
+        foreach (var referenceCase in cases)
+        {
+            var formula = formulaCatalog.Resolve(referenceCase.FormulaReference);
+            verifiedReferences.Add(formula.Reference);
+
+            var characterClass = progressionCatalog.Classes.Single(
+                item => item.Id == referenceCase.CharacterClassId);
+            var levelInput = formula.Inputs.SingleOrDefault(
+                input => input.Source.ValueId == "character-level");
+            var allocations = characterClass.StatIds.ToDictionary(
+                statId => statId,
+                _ => 0L,
+                StringComparer.Ordinal);
+            foreach (var statInput in formula.Inputs.Where(
+                         input => input.Source.ValueId.StartsWith(
+                             "resolved-",
+                             StringComparison.Ordinal)))
+            {
+                var statId = statInput.Source.ValueId["resolved-".Length..];
+                allocations[statId] = checked(
+                    referenceCase.Inputs[statInput.Id] -
+                    characterClass.BaseStats[statId].BaseValue);
+            }
+
+            var configuredPoints = allocations.Values.Aggregate(
+                0L,
+                (sum, value) => checked(sum + value));
+            var result = useCase.Execute(
+                referenceCase.FormulaReference,
+                new ProgressionPointBudgetRequest(
+                    referenceCase.CharacterClassId,
+                    referenceCase.EvolutionId,
+                    levelInput is null
+                        ? 1
+                        : checked((int)referenceCase.Inputs[levelInput.Id]),
+                    []),
+                new ResetPointInputs(1, configuredPoints),
+                allocations);
+            if (result.Formula.RawOutput != referenceCase.RawOutput ||
+                result.Formula.VisibleOutput != referenceCase.VisibleOutput ||
+                !result.Formula.Trace.Steps.SequenceEqual(referenceCase.Steps) ||
+                result.ContextTrace.Length != formula.Inputs.Length ||
+                result.ContextTrace.Any(
+                    item =>
+                        !referenceCase.Inputs.TryGetValue(
+                            item.InputId,
+                            out var expectedInput) ||
+                        item.ResolvedValue != expectedInput))
+            {
+                throw new InvalidOperationException(
+                    $"Published formula case '{referenceCase.Id}' did not reproduce its approved context and arithmetic traces.");
+            }
+        }
+
+        var expectedReferences = formulaCatalog.Formulas
+            .Select(formula => formula.Reference)
+            .ToHashSet();
+        if (!verifiedReferences.SetEquals(expectedReferences))
+        {
+            throw new InvalidOperationException(
+                "Published formula smoke cases do not cover every executable formula reference.");
+        }
+
+        return new PublishedFormulaVerification(
+            Verified: true,
+            FormulaReferences: verifiedReferences
+                .OrderBy(reference => reference.Id, StringComparer.Ordinal)
+                .ThenBy(reference => reference.Version, StringComparer.Ordinal)
+                .ToArray(),
+            ApprovedCaseCount: cases.Length);
+    }
 
     private static ProgressionVerificationResult VerifyPublishedProgressionRuleset()
     {
@@ -375,6 +471,58 @@ internal static class PublicationSmokeRunner
             .ToArray();
     }
 
+    private static PublishedFormulaReferenceCase[] LoadPublishedFormulaCases()
+    {
+        var directory = Path.Combine(
+            PublishedProgressionRuleset.SnapshotRoot,
+            "reference-cases",
+            "formulas",
+            "valid");
+        if (!Directory.Exists(directory))
+        {
+            throw new DirectoryNotFoundException(
+                $"Published formula reference directory '{directory}' was not found.");
+        }
+
+        var executableReferences = PublishedProgressionRuleset.FormulaCatalog.Formulas
+            .Select(formula => formula.Reference)
+            .ToHashSet();
+        return Directory.GetFiles(directory, "*.json")
+            .Order(StringComparer.Ordinal)
+            .Select(path =>
+            {
+                using var document = JsonDocument.Parse(File.ReadAllText(path));
+                var element = document.RootElement;
+                var formulaRef = element.GetProperty("formulaRef");
+                var context = element.GetProperty("context");
+                var expectedTrace = element.GetProperty("expectedTrace");
+                return new PublishedFormulaReferenceCase(
+                    RequiredString(element, "id"),
+                    new FormulaReference(
+                        RequiredString(formulaRef, "id"),
+                        RequiredString(formulaRef, "version")),
+                    RequiredString(context, "characterClassId"),
+                    RequiredString(context, "evolutionId"),
+                    ReadLongValues(element.GetProperty("inputs")),
+                    expectedTrace.GetProperty("rawOutput").GetDecimal(),
+                    expectedTrace.GetProperty("visibleOutput").GetInt64(),
+                    expectedTrace.GetProperty("steps")
+                        .EnumerateArray()
+                        .Select(step => new FormulaCalculationTraceStep(
+                            RequiredString(step, "stepId"),
+                            step.GetProperty("value").GetDecimal()))
+                        .ToArray());
+            })
+            .Where(item => executableReferences.Contains(item.FormulaReference))
+            .ToArray();
+    }
+
+    private static Dictionary<string, long> ReadLongValues(JsonElement element) =>
+        element.EnumerateObject().ToDictionary(
+            property => property.Name,
+            property => property.Value.GetInt64(),
+            StringComparer.Ordinal);
+
     private static string RequiredString(JsonElement element, string propertyName) =>
         element.GetProperty(propertyName).GetString()
         ?? throw new InvalidDataException($"'{propertyName}' cannot be null.");
@@ -479,6 +627,21 @@ internal static class PublicationSmokeRunner
         long TotalDistributablePoints,
         BuildDraftProgressionInputs ProgressionInputs,
         IReadOnlyDictionary<string, long> Allocations);
+
+    private sealed record PublishedFormulaVerification(
+        bool Verified,
+        FormulaReference[] FormulaReferences,
+        int ApprovedCaseCount);
+
+    private sealed record PublishedFormulaReferenceCase(
+        string Id,
+        FormulaReference FormulaReference,
+        string CharacterClassId,
+        string EvolutionId,
+        IReadOnlyDictionary<string, long> Inputs,
+        decimal RawOutput,
+        long VisibleOutput,
+        IReadOnlyList<FormulaCalculationTraceStep> Steps);
 
     private sealed record PublishedProgressionReferenceCase(
         string Id,

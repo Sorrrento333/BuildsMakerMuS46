@@ -1,0 +1,15 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "mana-summoner-overflow",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-mana-summoner", "version": "1.0.0" },
+  "context": {
+    "characterClassId": "class-summoner",
+    "evolutionId": "evolution-summoner"
+  },
+  "inputs": {
+    "character-level": 1,
+    "energy": 9223372036854775807
+  },
+  "expectedErrorCode": "formula-arithmetic-overflow"
+}

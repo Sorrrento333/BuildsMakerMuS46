@@ -1,0 +1,69 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "hp-fairy-elf-base",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": {
+    "id": "formula-hp-fairy-elf",
+    "version": "1.0.0"
+  },
+  "context": {
+    "characterClassId": "class-fairy-elf",
+    "evolutionId": "evolution-fairy-elf"
+  },
+  "inputs": {
+    "character-level": 1,
+    "vitality": 20
+  },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-hp-fairy-elf-base",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": {
+      "id": "formula-hp-fairy-elf",
+      "version": "1.0.0"
+    },
+    "context": {
+      "characterClassId": "class-fairy-elf",
+      "evolutionId": "evolution-fairy-elf"
+    },
+    "inputs": {
+      "character-level": 1,
+      "vitality": 20
+    },
+    "steps": [
+      {
+        "stepId": "base",
+        "value": 40
+      },
+      {
+        "stepId": "level-offset",
+        "value": 0
+      },
+      {
+        "stepId": "level-contribution",
+        "value": 0
+      },
+      {
+        "stepId": "vitality-contribution",
+        "value": 40
+      },
+      {
+        "stepId": "raw-hp",
+        "value": 80
+      },
+      {
+        "stepId": "visible-hp",
+        "value": 80
+      }
+    ],
+    "rounding": {
+      "mode": "TRUNCATE",
+      "stage": "visible-hp",
+      "decimalPlaces": 0
+    },
+    "rawOutput": 80,
+    "visibleOutput": 80,
+    "evidenceRefs": ["evd-0021", "evd-0026"],
+    "conflictIds": []
+  }
+}

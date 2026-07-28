@@ -1,8 +1,9 @@
 # Schemas de dominio
 
-Contratos JSON Schema 2020-12 versionados de forma independiente. La versión
-inicial es `1.0.0` y vive en `v1/`; una versión publicada no se modifica de
-forma incompatible.
+Contratos JSON Schema 2020-12 versionados de forma independiente. Las versiones
+iniciales viven en `v1/`; una versión publicada no se modifica de forma
+incompatible. `v2/` conserva el primer salto incompatible, limitado al contrato
+ejecutable de fórmula.
 
 Los ejemplos de `examples/valid` y `examples/invalid` son fixtures técnicos.
 Los identificadores, valores y expresiones que contienen son sintéticos y no
@@ -35,17 +36,20 @@ Los locks, SPDX, provenance y hashes revisados viven en
 `spikes/json-everything-source-build/`. El diseño, la integración y sus límites
 están en `docs/03-architecture/json-everything-source-integration.md`.
 
-El comando valida siete contratos `1.0.0` y los contratos `formula`,
-`stat-distribution` y `build-draft` `1.1.0`, acepta los diez fixtures de
-`examples/valid`, rechaza los diez de `examples/invalid` y devuelve un código
+El comando valida siete contratos `1.0.0`, los contratos `formula`,
+`stat-distribution` y `build-draft` `1.1.0`, y
+`v2/formula.schema.json` `2.0.0`/`2.1.0`. Acepta los once fixtures de
+`examples/valid`, rechaza los once de `examples/invalid` y devuelve un código
 distinto de cero si alguna expectativa no se cumple. También valida contra
 `character-class.schema.json`, `progression-rule.schema.json` y
-`formula.schema.json` los nueve registros canónicos de
+`formula.schema.json` los diecisiete registros canónicos de
 `packages/rulesets/mu-s4-global-reference/v1`; estos registros no son fixtures
 sintéticos. Además ejecuta siete casos de referencia
 factuales de progresión y exige el rechazo de tres controles semánticos
-inválidos. El gate de fórmula valida cuatro casos factuales positivos y cuatro
-controles negativos sin ejecutar un cálculo productivo. Esta comprobación
+inválidos. El gate de fórmula valida cuarenta casos factuales positivos y
+cuarenta controles negativos entre el histórico y las nueve definiciones
+ejecutables, sin
+ejecutar un cálculo productivo. Esta comprobación
 pertenece al tooling de validación y no constituye el motor. Las pruebas de
 contrato se ejecutan con:
 
@@ -73,6 +77,27 @@ Los tres forman parte del inventario validado con fixtures exclusivamente
 sintéticos. El caso positivo resuelve mediante `$ref` el contrato real de traza;
 ninguno de esos fixtures materializa una fórmula de MU Online. La primera
 definición factual y sus casos viven separadamente en el ruleset canónico.
+
+`v2/formula.schema.json` admite `2.0.0` y su evolución compatible `2.1.0`.
+`2.0.0` sustituye la estrategia textual por un `PROGRAM` con modelo
+`CHECKED_INT64_V1`. Admite inputs `INT32`/`INT64`, literales `INT64` y
+exclusivamente `CONSTANT`, `ADD`, `SUBTRACT`, `MULTIPLY` y
+`APPLY_ROUNDING`, con aridades cerradas. Cada input exige bounds y un
+`rangeErrorCode`. Sus operandos son una unión exclusiva `INPUT`, `STEP` o
+`LITERAL`; el gate semántico exige que las referencias `STEP` apunten hacia
+atrás, que los inputs existan, que los bounds sean coherentes con el tipo y que
+programa, salidas, redondeo y traza coincidan exactamente. Los dos fixtures
+`formula-v2` son sintéticos. El ruleset conserva la fórmula histórica `1.0.0`
+contra `v1` y contiene `formula-hp-dark-wizard` `1.1.0` y
+`formula-hp-dark-knight` `1.0.0`, `formula-hp-fairy-elf` `1.0.0` y
+`formula-hp-summoner` `1.0.0` y `formula-hp-magic-gladiator` `1.0.0`, las cinco
+`PUBLISHED` contra `2.0.0` y con cuatro positivos propios. `2.1.0` añade
+`CHECKED_DECIMAL_V1`, literales decimales exactos y trazas fraccionarias sin
+redondeo intermedio; `formula-hp-dark-lord` `1.0.0` es su primera definición
+publicada. El
+gate canónico resuelve el schema mediante `schemaVersion`, conserva ambas
+versiones sin selección implícita de “la última” y rechaza identidades
+compuestas duplicadas de fórmulas o casos.
 
 `progression-rule.schema.json` representa puntos base otorgados al subir de
 nivel y un bonus opcional condicionado por quest. Separa el nivel mínimo para

@@ -1,0 +1,35 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "mana-dark-knight-base",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-mana-dark-knight", "version": "1.0.0" },
+  "context": {
+    "characterClassId": "class-dark-knight",
+    "evolutionId": "evolution-dark-knight"
+  },
+  "inputs": { "character-level": 1, "energy": 10 },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-mana-dark-knight-base",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": { "id": "formula-mana-dark-knight", "version": "1.0.0" },
+    "context": {
+      "characterClassId": "class-dark-knight",
+      "evolutionId": "evolution-dark-knight"
+    },
+    "inputs": { "character-level": 1, "energy": 10 },
+    "steps": [
+      { "stepId": "base", "value": 10 },
+      { "stepId": "level-offset", "value": 0 },
+      { "stepId": "level-contribution", "value": 0 },
+      { "stepId": "energy-contribution", "value": 10 },
+      { "stepId": "raw-mana", "value": 20 },
+      { "stepId": "visible-mana", "value": 20 }
+    ],
+    "rounding": { "mode": "TRUNCATE", "stage": "visible-mana", "decimalPlaces": 0 },
+    "rawOutput": 20,
+    "visibleOutput": 20,
+    "evidenceRefs": ["evd-0021", "evd-0026"],
+    "conflictIds": []
+  }
+}

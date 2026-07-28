@@ -1,0 +1,15 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "mana-fairy-elf-overflow",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-mana-fairy-elf", "version": "1.0.0" },
+  "context": {
+    "characterClassId": "class-fairy-elf",
+    "evolutionId": "evolution-fairy-elf"
+  },
+  "inputs": {
+    "character-level": 1,
+    "energy": 9223372036854775807
+  },
+  "expectedErrorCode": "formula-arithmetic-overflow"
+}

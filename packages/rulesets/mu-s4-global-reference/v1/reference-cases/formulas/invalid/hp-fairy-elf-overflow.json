@@ -1,0 +1,18 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "hp-fairy-elf-overflow",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": {
+    "id": "formula-hp-fairy-elf",
+    "version": "1.0.0"
+  },
+  "context": {
+    "characterClassId": "class-fairy-elf",
+    "evolutionId": "evolution-fairy-elf"
+  },
+  "inputs": {
+    "character-level": 1,
+    "vitality": 4611686018427387904
+  },
+  "expectedErrorCode": "formula-arithmetic-overflow"
+}

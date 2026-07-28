@@ -1,0 +1,35 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "mana-dark-lord-energy-step",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-mana-dark-lord", "version": "1.0.0" },
+  "context": {
+    "characterClassId": "class-dark-lord",
+    "evolutionId": "evolution-dark-lord"
+  },
+  "inputs": { "character-level": 1, "energy": 16 },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-mana-dark-lord-energy-step",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": { "id": "formula-mana-dark-lord", "version": "1.0.0" },
+    "context": {
+      "characterClassId": "class-dark-lord",
+      "evolutionId": "evolution-dark-lord"
+    },
+    "inputs": { "character-level": 1, "energy": 16 },
+    "steps": [
+      { "stepId": "base", "value": 40 },
+      { "stepId": "level-offset", "value": 0 },
+      { "stepId": "energy-offset", "value": 1 },
+      { "stepId": "energy-contribution", "value": 1.5 },
+      { "stepId": "raw-mana", "value": 41.5 },
+      { "stepId": "visible-mana", "value": 41 }
+    ],
+    "rounding": { "mode": "TRUNCATE", "stage": "visible-mana", "decimalPlaces": 0 },
+    "rawOutput": 41.5,
+    "visibleOutput": 41,
+    "evidenceRefs": ["evd-0021", "evd-0026"],
+    "conflictIds": []
+  }
+}

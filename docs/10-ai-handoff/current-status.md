@@ -17,8 +17,9 @@
 - Spikes equivalentes de TypeScript/Node.js 24 y C#/.NET 10 para cálculo
   sintético trazable, SQLite y ejecución offline.
 - C#/.NET 10 seleccionado para el núcleo y la aplicación inicial (ADR-0002).
-- Diez schemas JSON 2020-12: siete en `1.0.0` y fórmula, distribución de
-  stats/borrador de build en `1.1.0`, con veinte fixtures sintéticos.
+- Once contratos JSON Schema 2020-12: siete en `1.0.0`, fórmula,
+  distribución de stats/borrador de build en `1.1.0` y fórmula ejecutable
+  compatible `2.0.0`/`2.1.0`, con veintidós fixtures sintéticos.
 - Solución mínima .NET 10, validador integral con `JsonSchema.Net 9.2.2`, dos
   pruebas de contrato y CI básico, ampliado a ocho schemas y dieciséis fixtures.
 - Evaluación de Json Everything completada. Las copias de `OSMFEULA.txt` de
@@ -264,7 +265,7 @@
   productiva se aplica antes de construir el repositorio.
 - La composición declara ruleset `1.0.0`, dataset `2026-07-24.1` y motor
   `0.1.0`. El hash SHA-256 se calcula de forma determinista sobre rutas
-  relativas y bytes exactos de los 27 JSON publicados; no se infiere desde
+  relativas y bytes exactos de los 36 JSON publicados; no se infiere desde
   carpetas, fechas del sistema ni versiones de ensamblado.
 - La pantalla guarda y carga por ID exclusivamente mediante los casos de uso.
   La carga recalcula y contrasta antes de repoblar entradas y resultados; los
@@ -355,7 +356,8 @@
   `formula-test-case.schema.json` `1.0.0`. Seis fixtures sintéticos prueban
   definición, ejecución, unión positiva/negativa y resolución real del `$ref`
   caso → traza.
-- El validador integral cubre 10 contratos/20 fixtures y añade pruebas
+- En esa vertical, el validador integral alcanzó 10 contratos/20 fixtures y
+  añadió pruebas
   focalizadas para aplicabilidad vacía/duplicada, bounds factuales sin
   evidencia, source incompleto, pasos duplicados, salidas fuera de `stepIds`,
   salida visible no final y expectativas ambiguas.
@@ -374,13 +376,376 @@
   contrato aprobado sin encontrar divergencias. Sólo promovió `status` de
   `DRAFT` a `PUBLISHED`; una prueba de contrato fija el nuevo estado. No se
   añadió motor de HP ni integración en Application, Data o WPF.
+- Diseño técnico de la primera vertical ejecutable de HP cerrado. Determina que
+  `strategy.definition` `1.1.0` no basta para ejecutar sin interpretar texto:
+  no enlaza aliases con inputs, pasos con operaciones ni bounds con errores.
+  Se selecciona un programa estructurado `CHECKED_INT64_V1`, materializado por
+  Application y ejecutado genéricamente por Calculation Engine, sin handlers ni
+  constantes por fórmula en C#.
+- `formula-hp-dark-wizard` `1.0.0` permanecerá inmutable y válido como artefacto
+  histórico publicado. El schema `2.0.0` y la definición ejecutable
+  `formula-hp-dark-wizard` `1.1.0` ya existen; sus casos se materializaron
+  después y la revisión de publicación ya está cerrada. Antes de ejecutar falta
+  implementar el evaluador. Data y WPF quedan expresamente fuera de esa vertical.
+- Contrato ejecutable `packages/schemas/v2/formula.schema.json` `2.0.0`
+  implementado sin retirar `v1`. `CHECKED_INT64_V1` admite exclusivamente
+  inputs `INT32`/`INT64`, literales y salida `INT64`, y las operaciones
+  `CONSTANT`, `ADD`, `SUBTRACT`, `MULTIPLY` y `APPLY_ROUNDING` con aridades
+  cerradas. Cada input exige bounds y `rangeErrorCode`.
+- Dos fixtures `formula-v2` exclusivamente sintéticos recorren las cinco
+  operaciones y rechazan formas incompletas. El gate semántico exige IDs
+  únicos, inputs declarados, referencias sólo a pasos anteriores, bounds
+  coherentes con el tipo y correspondencia exacta entre programa, traza,
+  salidas y redondeo. Ruleset, dataset, fórmula factual `1.0.0`, casos
+  canónicos, Domain, Calculation Engine, Application, Data y WPF no cambiaron.
+- `formula-hp-dark-wizard` `1.1.0` materializada como un segundo artefacto
+  canónico en estado `DRAFT` contra el schema `2.0.0`. Conserva aplicabilidad,
+  inputs, bounds, salida, redondeo, traza, constraints, evidencia y conflicto
+  de la versión publicada; añade `rangeErrorCode` por input y expresa los cinco
+  pasos aprobados únicamente mediante `CHECKED_INT64_V1`.
+- El artefacto histórico `1.0.0` y sus ocho casos permanecen byte a byte
+  intactos. La versión `1.1.0` enlaza exclusivamente cuatro positivos de una
+  serie propia de ocho casos. Está `PUBLISHED` y ya se ejecuta por referencia
+  exacta desde Application.
+- El gate canónico selecciona `v1`/`v2` por `schemaVersion`, usa la identidad
+  compuesta `id` + `version`, admite ambas versiones sin resolver “la última” y
+  rechaza duplicados exactos. Dos pruebas nuevas fijan la equivalencia de los
+  campos compartidos y el fallo cerrado ante identidad compuesta duplicada.
+- Ocho casos `1.1.0` materializados en archivos distintos: cuatro positivos y
+  cuatro controles negativos. Conservan exactamente IDs, contextos, inputs,
+  trazas, resultados, errores, evidencia y conflicto; sólo cambia la versión
+  de `formulaRef`.
+- El gate de casos usa identidad compuesta `id` + versión de `formulaRef`,
+  permite coexistir ambas series y reporta un duplicado exacto como error sin
+  abortar la validación. Una prueba estructural compara las ocho parejas y
+  exige que no exista ninguna otra divergencia.
+- Revisión de publicación de `formula-hp-dark-wizard` `1.1.0` completada sobre
+  su definición y ocho casos. No se encontraron divergencias contra el schema
+  `2.0.0`, los contratos de traza/caso ni el diseño aprobado; el único cambio
+  del artefacto fue `status: PUBLISHED` y una prueba fija ese estado.
+- Primera vertical genérica de fórmulas ejecutables implementada en Domain y
+  Calculation Engine. Los tipos inmutables y ajenos a JSON representan
+  definición/referencia, aplicabilidad, inputs enteros de 32/64 bits,
+  bounds/códigos, output, redondeo, programa `CHECKED_INT64_V1`,
+  pasos/operandos, solicitud, resultado y traza con evidencia/conflictos.
+- `CheckedIntegerFormulaInterpreter` exige estado `PUBLISHED`, aplicabilidad y
+  conjunto exacto de inputs; ejecuta únicamente `CONSTANT`, `ADD`, `SUBTRACT`,
+  `MULTIPLY` y `APPLY_ROUNDING` con aritmética comprobada. No contiene handlers,
+  IDs, constantes ni resultados factuales.
+- Veinticinco pruebas exclusivamente sintéticas cubren operaciones, estado,
+  clase/evolución, inputs ausentes/extra, bounds inclusivos/exclusivos, tipo de
+  32 bits, código de rango materializado, seis modos de redondeo, orden,
+  referencia adelantada, programa no soportado, overflow, traza/provenance y
+  copia inmutable de colecciones. En ese cierre la fórmula canónica todavía no
+  se materializaba desde Application; la vertical posterior lo completa.
+- Adaptador de fórmulas ejecutables implementado en Application.
+  `JsonExecutableFormulaSnapshotReader` inspecciona `character-classes/` y
+  `formulas/`, conserva las definiciones schema `1.1.0` como historia no
+  ejecutable y materializa únicamente schema `2.0.0` en estado `PUBLISHED`.
+- El adaptador exige un ruleset único, identidad compuesta `id` + `version`,
+  aplicabilidad a clase/evoluciones existentes, inputs contextuales, tipos y
+  bounds soportados, aridades cerradas, referencias sólo hacia atrás,
+  equivalencia programa/traza, salida visible producida por el redondeo y cero
+  dependencias en esta primera vertical.
+- `ExecutableFormulaCatalog` conserva copias inmutables y resuelve sólo
+  referencias exactas. `CalculatePublishedFormulaUseCase` delega directamente
+  en `CheckedIntegerFormulaInterpreter`; no selecciona “la última versión” ni
+  lee casos de referencia. Una referencia histórica o ausente produce
+  `formula-not-executable`.
+- Catorce pruebas de integración nuevas leen desde archivos los ocho casos
+  canónicos `formula-hp-dark-wizard` `1.1.0`: reproducen 4/4 resultados y
+  trazas completos, 4/4 errores esperados y el rechazo de `1.0.0`. Cinco
+  controles adicionales dentro del conjunto fijan selección exacta y fallo
+  cerrado ante estado no publicado, evolución ajena, referencia adelantada y
+  duplicado exacto. No se copiaron datos, constantes o resultados de HP a C#.
+- Diseño de resolución productiva de `CONTEXT_VALUE` cerrado antes de modificar
+  código o WPF. Application queda como autoridad de composición: el nivel
+  procede de una solicitud de progresión validada y cada
+  `resolved-{statId}` de la suma `checked` entre `baseValue` canónico y la
+  asignación vigente validada por distribución.
+- El diseño exige preservar `source.valueId`, materializar base/evidencia desde
+  `character-classes/`, conservar estado inmutable con clase, evolución,
+  nivel, presupuesto y distribución, y emitir una traza contextual separada de
+  la traza aritmética. Fija fallos cerrados, provenance e invalidación; no
+  incorpora datos, fórmulas ni código productivo.
+- Vertical funcional de HP de Dark Wizard cerrada desde snapshot hasta WPF.
+  Domain preserva `source.kind/valueId`; progresión materializa `baseValue` y
+  `evidenceRefs`; Application compone progresión, distribución, estado
+  inmutable, resolución contextual y la referencia exacta
+  `formula-hp-dark-wizard` `1.1.0` sin constantes factuales en C#.
+- `FormulaContextValueResolver` obtiene `character-level` de la solicitud
+  validada y cada `resolved-{statId}` de
+  `checked(baseValue + allocation)`. Devuelve una traza contextual separada de
+  la aritmética e implementa los seis códigos estables `formula-context-*`.
+- Ocho pruebas nuevas de Application contrastan bases/evidencias y
+  `source.valueId` con los JSON, reproducen 4/4 positivos por la ruta completa,
+  y cubren fuentes/valores no resolubles, mismatch, base/asignación ausentes,
+  overflow, inmutabilidad y rechazo previo de nivel/asignación inválidos.
+- WPF obtiene la única fórmula publicada aplicable desde el catálogo después de
+  una distribución válida, muestra HP y ambas trazas e invalida el resultado al
+  cambiar progresión, resets o asignaciones. No acepta inputs contextuales
+  autoritativos ni persiste el resultado derivado.
+- Vertical funcional de HP de Dark Knight cerrada desde `DR-HP-DARK-KNIGHT`
+  hasta WPF. `formula-hp-dark-knight` `1.0.0` nace ejecutable y `PUBLISHED`
+  contra schema `2.0.0`, aplica a Dark Knight/Blade Knight/Blade Master y
+  materializa únicamente `35 + (lvl - 1) * 2 + vit * 3`.
+- `EVD-0026` sustenta expresión, alcance y truncamiento; `EVD-0021` sustenta
+  Vitality mínima 25. Cuatro positivos reproducen 110/112/113/115 HP y cuatro
+  negativos cubren nivel, Vitality, familia y overflow. No se añadió evidencia
+  ni un conflicto inexistente: definición y trazas conservan
+  `conflictIds: []`.
+- El gate canónico admite fórmulas sin conflictos cuando no hay uno aplicable y
+  continúa exigiendo herencia exacta entre definición y traza. Application
+  materializa dos referencias ejecutables y sus pruebas reproducen 8/8
+  positivos y 8/8 errores desde JSON, sin handlers ni constantes factuales en
+  C#.
+- WPF reutiliza la selección genérica por clase/evolución. El smoke publicado
+  exige cobertura exacta de ambas fórmulas y ocho positivos en las fases
+  inicial/reemplazo. El dataset avanza a `2026-07-25.1` porque incorpora nueve
+  JSON factuales nuevos; ruleset `1.0.0` y motor `0.2.0` no cambian.
+- Vertical funcional de HP de Fairy Elf cerrada desde `DR-HP-FAIRY-ELF` hasta
+  WPF. `formula-hp-fairy-elf` `1.0.0` nace ejecutable y `PUBLISHED` contra
+  schema `2.0.0`, aplica a Fairy Elf/Muse Elf/High Elf y materializa únicamente
+  `40 + (lvl - 1) + vit * 2`.
+- `EVD-0026` sustenta expresión, alcance y truncamiento; `EVD-0021` sustenta
+  Vitality mínima 20. Cuatro positivos reproducen 80/81/82/83 HP y cuatro
+  negativos cubren nivel, Vitality, familia y overflow. No se añadió evidencia
+  ni un conflicto inexistente: definición y trazas conservan
+  `conflictIds: []`.
+- Application materializa tres referencias ejecutables y reproduce 12/12
+  positivos y 12/12 errores desde JSON. WPF reutiliza selección, resolución
+  contextual e intérprete genéricos sin handlers ni constantes de Fairy Elf en
+  C#.
+- El dataset avanza a `2026-07-25.2` porque incorpora nueve JSON factuales
+  nuevos. Ruleset `1.0.0` y motor `0.2.0` permanecen sin cambios.
+- Vertical funcional de HP de Summoner cerrada desde `DR-HP-SUMMONER` hasta
+  WPF. `formula-hp-summoner` `1.0.0` nace ejecutable y `PUBLISHED` contra
+  schema `2.0.0`, aplica a Summoner/Bloody Summoner/Dimension Master y
+  materializa la forma equivalente
+  `34 + (lvl - 1) + vit * 2` de la expresión aprobada
+  `70 + (lvl - 1) + (vit - 18) * 2`.
+- `EVD-0021` sustenta Vitality mínima 18; `EVD-0030` autoriza expresión,
+  alcance y redondeo. `EVD-0027`–`EVD-0029` permanecen como contraste con su
+  clasificación individual intacta. Cuatro positivos reproducen 70/71/72/73
+  HP y cuatro negativos cubren nivel, Vitality, familia y overflow.
+- Application materializa cuatro referencias ejecutables y reproduce 16/16
+  positivos y 16/16 errores desde JSON. WPF reutiliza selección, resolución
+  contextual e intérprete genéricos sin handlers ni constantes de Summoner en
+  C#.
+- El dataset avanza a `2026-07-26.1` porque incorpora nueve JSON factuales
+  nuevos. Ruleset `1.0.0` y motor `0.2.0` permanecen sin cambios.
+- Vertical funcional de HP de Magic Gladiator cerrada desde
+  `DR-HP-MAGIC-GLADIATOR` hasta WPF. `formula-hp-magic-gladiator` `1.0.0`
+  nace ejecutable y `PUBLISHED` contra schema `2.0.0`, aplica a Magic
+  Gladiator/Duel Master y materializa exactamente
+  `58 + (lvl - 1) + vit * 2`.
+- `EVD-0021` sustenta Vitality mínima 26 y `EVD-0026` autoriza expresión,
+  alcance y truncamiento. `DSP-0002` afecta sólo Energy y no se hereda como
+  conflicto de esta fórmula. Cuatro positivos reproducen 110/111/112/113 HP y
+  cuatro negativos cubren nivel, Vitality, familia y overflow.
+- Application materializa cinco referencias ejecutables y reproduce 20/20
+  positivos y 20/20 errores desde JSON. WPF reutiliza selección, resolución
+  contextual e intérprete genéricos sin handlers ni constantes de Magic
+  Gladiator en C#.
+- El dataset avanza a `2026-07-26.2` porque incorpora nueve JSON factuales
+  nuevos. Ruleset `1.0.0` y motor `0.2.0` permanecen sin cambios.
+- Vertical funcional de HP de Dark Lord cerrada desde `DR-HP-DARK-LORD` hasta
+  WPF. `formula-hp-dark-lord` `1.0.0` nace ejecutable y `PUBLISHED` contra la
+  evolución compatible del schema `2.1.0`, aplica a Dark Lord/Lord Emperor y
+  materializa exactamente `50 + (lvl - 1) * 1.5 + vit * 2`.
+- `EVD-0021` sustenta Vitality mínima 20 y `EVD-0026` autoriza expresión,
+  alcance y truncamiento. Cuatro positivos conservan raw/visible
+  `90/90`, `91.5/91`, `92/92` y `93.5/93`; cuatro negativos cubren nivel,
+  Vitality, familia y overflow. No existe conflicto aplicable documentado.
+- `CHECKED_DECIMAL_V1` conserva literales e intermedios base 10 exactos,
+  ejecuta aritmética comprobada y aplica `TRUNCATE` una sola vez en
+  `visible-hp`. `2.0.0`/`CHECKED_INT64_V1` permanecen intactos para las cinco
+  fórmulas anteriores.
+- Application materializa seis referencias ejecutables y reproduce 24/24
+  positivos y 24/24 errores desde JSON. WPF y smoke reutilizan selección,
+  resolución contextual e intérpretes genéricos sin handlers ni constantes de
+  Dark Lord en C#.
+- El dataset avanza a `2026-07-26.3` porque incorpora nueve JSON factuales
+  nuevos. Ruleset `1.0.0` y motor `0.2.0` permanecen sin cambios.
+- Vertical funcional de Mana de Dark Wizard cerrada desde
+  `DR-MANA-DARK-WIZARD` hasta WPF. `formula-mana-dark-wizard` `1.0.0` nace
+  ejecutable y `PUBLISHED` contra schema `2.0.0`, aplica a Dark Wizard/Soul
+  Master/Grand Master y materializa exactamente
+  `(lvl - 1) * 2 + ene * 2`.
+- `EVD-0021` sustenta Energy mínima 30 y `EVD-0026` autoriza expresión,
+  alcance y truncamiento. Cuatro positivos reproducen 60/62/62/64 Mana y
+  cuatro negativos cubren nivel, Energy, familia y overflow. No existe
+  constante base ni conflicto aplicable documentado que incorporar.
+- Application materializa siete referencias ejecutables y reproduce 28/28
+  positivos y 28/28 errores desde JSON. WPF ofrece una selección genérica por
+  referencia exacta cuando Dark Wizard dispone de HP y Mana, sin handlers ni
+  constantes factuales en C#.
+- El dataset avanza a `2026-07-26.4` porque incorpora nueve JSON factuales
+  nuevos. Ruleset `1.0.0` y motor `0.2.0` permanecen sin cambios.
+- Vertical funcional de Mana de Dark Knight cerrada desde
+  `DR-MANA-DARK-KNIGHT` hasta WPF. `formula-mana-dark-knight` `1.0.0` nace
+  ejecutable y `PUBLISHED` contra schema `2.1.0`, aplica a Dark Knight/Blade
+  Knight/Blade Master y materializa exactamente
+  `10 + (lvl - 1) * 0.5 + ene`.
+- `EVD-0021` sustenta Energy mínima 10 y `EVD-0026` autoriza expresión,
+  alcance y truncamiento. Cuatro positivos conservan raw/visible
+  `20/20`, `20.5/20`, `21/21` y `21.5/21`; cuatro negativos cubren nivel,
+  Energy, familia y overflow. No existe conflicto aplicable documentado.
+- `CHECKED_DECIMAL_V1` conserva `0.5` exactamente, no redondea aportes y
+  trunca una sola vez en `visible-mana`. Application materializa ocho
+  referencias; WPF y smoke reutilizan selección, contexto e intérpretes
+  genéricos sin handlers ni constantes factuales de Dark Knight en C#.
+- El dataset avanza a `2026-07-26.5` porque incorpora nueve JSON factuales
+  nuevos. Ruleset `1.0.0` y motor `0.2.0` permanecen sin cambios.
+- Vertical funcional de Mana de Fairy Elf cerrada desde
+  `DR-MANA-FAIRY-ELF` hasta WPF. `formula-mana-fairy-elf` `1.0.0` nace
+  ejecutable y `PUBLISHED` contra schema `2.1.0`, aplica a Fairy Elf/Muse
+  Elf/High Elf y materializa exactamente
+  `15 + (lvl - 1) * 1.5 + ene`.
+- `EVD-0021` sustenta Energy mínima 15 y `EVD-0026` autoriza expresión,
+  alcance y truncamiento. Cuatro positivos conservan raw/visible
+  `30/30`, `31.5/31`, `31/31` y `32.5/32`; cuatro negativos cubren nivel,
+  Energy, familia y overflow. No existe conflicto aplicable documentado.
+- `CHECKED_DECIMAL_V1` conserva `1.5` exactamente, no redondea aportes y
+  trunca una sola vez en `visible-mana`. Application materializa nueve
+  referencias; WPF y smoke reutilizan selección, contexto e intérpretes
+  genéricos sin handlers ni constantes factuales de Fairy Elf en C#.
+- El dataset avanza a `2026-07-26.6` porque incorpora nueve JSON factuales
+  nuevos. Ruleset `1.0.0` y motor `0.2.0` permanecen sin cambios.
+- Vertical funcional de Mana de Summoner cerrada desde
+  `DR-MANA-SUMMONER` hasta WPF. `formula-mana-summoner` `1.0.0` nace
+  ejecutable y `PUBLISHED` contra schema `2.1.0`, aplica a
+  Summoner/Bloody Summoner/Dimension Master y materializa exactamente
+  `40 + (lvl - 1) * 1.5 + (ene - 23) * 1.7`.
+- `EVD-0021` sustenta Energy mínima 23; `EVD-0031` autoriza expresión y
+  alcance final, y `EVD-0026` el truncamiento visible. `EVD-0027`–`EVD-0029`
+  permanecen como contraste y `EVD-0030`, limitado a HP, no se hereda.
+- Cuatro positivos conservan raw/visible
+  `40/40`, `41.5/41`, `41.7/41` y `43.2/43`; cuatro negativos cubren nivel,
+  Energy, familia y overflow. No existe conflicto aplicable documentado.
+- `CHECKED_DECIMAL_V1` conserva `1.5` y `1.7` exactamente, no redondea aportes
+  y trunca una sola vez en `visible-mana`. Application materializa diez
+  referencias; WPF y smoke reutilizan selección, contexto e intérpretes
+  genéricos sin handlers ni constantes factuales de Summoner en C#.
+- El dataset avanza a `2026-07-26.7` porque incorpora nueve JSON factuales
+  nuevos. Ruleset `1.0.0` y motor `0.2.0` permanecen sin cambios.
+- Vertical funcional de Mana de Magic Gladiator cerrada desde
+  `DR-MANA-MAGIC-GLADIATOR` hasta WPF.
+  `formula-mana-magic-gladiator` `1.0.0` nace ejecutable y `PUBLISHED` contra
+  schema `2.0.0`, aplica a Magic Gladiator/Duel Master y materializa exactamente
+  `8 + (lvl - 1) + ene * 2`.
+- `EVD-0021` sustenta Energy mínima 26 y `EVD-0026` autoriza expresión, alcance
+  y truncamiento. `DSP-0002` se conserva como conflicto resuelto aplicable: el
+  proyecto adopta 26 y no reescribe la guía actual de Webzen que publica 16.
+- Cuatro positivos reproducen 60/61/62/63 Mana y cuatro negativos cubren nivel,
+  Energy, familia y overflow. `CHECKED_INT64_V1` no desplaza Energy ni redondea
+  aportes; trunca una sola vez en `visible-mana`.
+- Application materializa once referencias; WPF y smoke reutilizan selección,
+  resolución contextual e intérprete genéricos sin handlers ni constantes
+  factuales de Magic Gladiator en C#.
+- El dataset avanza a `2026-07-26.8` porque incorpora nueve JSON factuales
+  nuevos. Ruleset `1.0.0` y motor `0.2.0` permanecen sin cambios.
+- Vertical funcional de Mana de Dark Lord cerrada desde
+  `DR-MANA-DARK-LORD` hasta WPF. `formula-mana-dark-lord` `1.0.0` nace
+  ejecutable y `PUBLISHED` contra schema `2.1.0`, aplica a Dark Lord/Lord
+  Emperor y materializa exactamente
+  `40 + (lvl - 1) + (ene - 15) * 1.5`.
+- `EVD-0021` sustenta Energy mínima 15 y `EVD-0026` autoriza expresión,
+  alcance, orden y truncamiento. Cuatro positivos conservan raw/visible
+  `40/40`, `41/41`, `41.5/41` y `42.5/42`; cuatro negativos cubren nivel,
+  Energy, familia y overflow. No existe conflicto aplicable documentado.
+- `CHECKED_DECIMAL_V1` conserva `1.5` exactamente, no redondea aportes y
+  trunca una sola vez en `visible-mana`. Application materializa doce
+  referencias; WPF y smoke reutilizan selección, contexto e intérpretes
+  genéricos sin handlers ni constantes factuales de Dark Lord en C#.
+- El dataset avanza a `2026-07-26.9` porque incorpora nueve JSON factuales
+  nuevos. Ruleset `1.0.0` y motor `0.2.0` permanecen sin cambios.
+- Vertical funcional de AG de Dark Wizard cerrada desde
+  `DR-AG-DARK-WIZARD` hasta WPF. `formula-ag-dark-wizard` `1.0.0` nace
+  ejecutable y `PUBLISHED` contra schema `2.1.0`, aplica a Dark Wizard/Soul
+  Master/Grand Master y materializa exactamente
+  `ene * 0.2 + vit * 0.3 + agi * 0.4 + str * 0.2`.
+- `EVD-0021` sustenta los mínimos Energy 30, Vitality 15, Agility 18 y
+  Strength 18; `EVD-0026` autoriza expresión, alcance y truncamiento. Cuatro
+  positivos conservan raw/visible `21.3/21`, `21.8/21`, `21.9/21` y
+  `22.4/22`; seis negativos cubren cada mínimo, familia y overflow.
+- `CHECKED_DECIMAL_V1` conserva `0.2`, `0.3` y `0.4` exactamente, no redondea
+  aportes y trunca una sola vez en `visible-ag`. La fórmula no consume nivel
+  ni dependencias. Application materializa trece referencias; WPF y smoke
+  reutilizan selección, contexto e intérpretes genéricos.
+- El dataset avanza a `2026-07-26.10` porque incorpora once JSON factuales
+  nuevos. Ruleset `1.0.0` y motor `0.2.0` permanecen sin cambios.
+- Vertical funcional de AG de Dark Knight cerrada desde
+  `DR-AG-DARK-KNIGHT` hasta WPF. `formula-ag-dark-knight` `1.0.0` nace
+  ejecutable y `PUBLISHED` contra schema `2.1.0`, aplica a Dark Knight/Blade
+  Knight/Blade Master y materializa exactamente
+  `ene + vit * 0.3 + agi * 0.2 + str * 0.15`.
+- `EVD-0021` sustenta los mínimos Energy 10, Vitality 25, Agility 20 y
+  Strength 28; `EVD-0026` autoriza expresión, alcance y truncamiento. Cuatro
+  positivos conservan raw/visible `25.70/25`, `27.00/27`, `26.05/26` y
+  `27.35/27`; seis negativos cubren cada mínimo, familia y overflow.
+- `CHECKED_DECIMAL_V1` conserva `0.3`, `0.2` y `0.15` exactamente, consume
+  Energy directamente, no redondea aportes y trunca una sola vez en
+  `visible-ag`. La fórmula no consume nivel ni dependencias. Application
+  materializa catorce referencias; WPF y smoke reutilizan selección, contexto
+  e intérpretes genéricos.
+- El dataset avanza a `2026-07-26.11` porque incorpora once JSON factuales
+  nuevos. Ruleset `1.0.0` y motor `0.2.0` permanecen sin cambios.
+- Vertical funcional de AG de Fairy Elf cerrada desde
+  `DR-AG-FAIRY-ELF` hasta WPF. `formula-ag-fairy-elf` `1.0.0` nace ejecutable
+  y `PUBLISHED` contra schema `2.1.0`, aplica a Fairy Elf/Muse Elf/High Elf y
+  materializa exactamente
+  `ene * 0.2 + vit * 0.3 + agi * 0.2 + str * 0.3`.
+- `EVD-0021` sustenta los mínimos Energy 15, Vitality 20, Agility 25 y
+  Strength 22; `EVD-0026` autoriza expresión, familia y truncamiento. Cuatro
+  positivos fijan raw/visible `20.6/20`, `21.1/21`, `21.1/21` y `21.6/21`;
+  seis negativos cubren los cuatro mínimos, familia y overflow.
+- `CHECKED_DECIMAL_V1` conserva `0.2` y `0.3` exactamente, no redondea aportes
+  y trunca una sola vez en `visible-ag`. La fórmula no consume nivel ni
+  dependencias. Application materializa quince referencias; WPF y smoke
+  reutilizan selección, contexto e intérpretes genéricos.
+- El dataset avanza a `2026-07-26.12` porque incorpora once JSON factuales
+  nuevos. Ruleset `1.0.0` y motor `0.2.0` permanecen sin cambios.
+- Vertical funcional de AG de Summoner cerrada desde `DR-AG-SUMMONER` hasta
+  WPF. `formula-ag-summoner` `1.0.0` nace ejecutable y `PUBLISHED` contra
+  schema `2.1.0`, aplica a Summoner/Bloody Summoner/Dimension Master y
+  materializa exactamente
+  `str * 0.2 + agi * 0.25 + vit * 0.3 + ene * 0.15`.
+- `EVD-0021` sustenta los mínimos Strength 21, Agility 21, Vitality 18 y
+  Energy 23; `EVD-0026` autoriza expresión, familia y truncamiento. Cuatro
+  positivos fijan raw/visible `18.30/18`, `18.75/18`, `18.75/18` y
+  `19.20/19`; cinco negativos cubren los cuatro mínimos y familia.
+- `CHECKED_DECIMAL_V1` conserva los cuatro coeficientes exactamente, no
+  redondea aportes y trunca una sola vez en `visible-ag`. No existe un control
+  de overflow válido que materializar: la suma de coeficientes `0.9` mantiene
+  la salida dentro de `INT64` para todo el dominio de inputs admitido.
+- La fórmula no consume nivel ni dependencias. Application materializa
+  dieciséis referencias; WPF y smoke reutilizan selección, contexto e
+  intérpretes genéricos.
+- El dataset avanza a `2026-07-28.1` porque incorpora diez JSON factuales
+  nuevos. Ruleset `1.0.0` y motor `0.2.0` permanecen sin cambios.
+- Vertical funcional de AG de Magic Gladiator cerrada desde
+  `DR-AG-MAGIC-GLADIATOR` hasta WPF. `formula-ag-magic-gladiator` `1.0.0`
+  nace ejecutable y `PUBLISHED` contra schema `2.1.0`, aplica a Magic
+  Gladiator/Duel Master y materializa exactamente
+  `ene * 0.15 + vit * 0.3 + agi * 0.25 + str * 0.2`.
+- `EVD-0021` sustenta los cuatro mínimos 26 y `EVD-0026` expresión, familia y
+  truncamiento. `DSP-0002` permanece resuelto a favor de Energy 26 y la
+  divergencia documental que publica 16 conserva su clasificación.
+- Cuatro positivos fijan raw/visible `23.40/23`, `23.85/23`, `23.85/23` y
+  `24.30/24`; cinco negativos cubren los cuatro mínimos y familia. No se
+  inventa overflow: la suma de coeficientes `0.9` mantiene la salida dentro de
+  `INT64` para todo el dominio admitido.
+- La fórmula no consume nivel ni dependencias. Application materializa
+  diecisiete referencias; WPF y smoke reutilizan selección, contexto e
+  intérprete decimal genéricos, sin constantes ni handlers factuales en C#.
+- El dataset avanza a `2026-07-28.2` porque incorpora diez JSON factuales
+  nuevos. Ruleset `1.0.0` y motor `0.2.0` permanecen sin cambios.
 - Alcance anterior retirado y documentación migrada a Season 4 global/inglesa.
 
 ## No iniciado
 
-- Motor de `DR-HP-DARK-WIZARD`; la definición canónica está `PUBLISHED`, pero
-  todavía no existe cálculo productivo.
-- IDs, contratos, casos de referencia y motor para los otros 23 claims
+- IDs, contratos, casos de referencia y motor para los otros 8 claims
   `VERIFIED` de `RES-0002` y para el resto del catálogo de EVD-0026. La decisión
   factual no sustituye esos gates ni define todavía precisión de dependencias
   intermedias.
@@ -394,28 +759,48 @@
 - El canal público de actualización y firma continúa como decisión posterior de
   distribución.
 
-## Verificación más reciente — 2026-07-25
+## Verificación más reciente — 2026-07-28
 
-- Schemas: 10/10 contratos y 20/20 fixtures estructuralmente legibles.
-- Validador integral: 10/10 fixtures válidos aceptados, 10/10 inválidos rechazados
-  y 9/9 registros canónicos válidos. Ejecuta además 7/7 casos de progresión,
-  rechaza 3/3 controles semánticos y valida 4/4 casos de fórmula más 4/4
-  controles negativos. La fórmula se informa `PUBLISHED` con cero errores. Sus
-  20/20 pruebas .NET aprueban también la
+- Schemas: 11/11 contratos y 22/22 fixtures estructuralmente legibles.
+- Validador integral: 11/11 fixtures válidos aceptados, 11/11 inválidos rechazados
+  y 26/26 registros canónicos válidos. Ejecuta además 7/7 casos de progresión,
+  rechaza 3/3 controles semánticos y valida 68 casos positivos y 76 controles
+  negativos de fórmula; las dieciocho definiciones se informan
+  `PUBLISHED`, sin errores. Sus 40/40 pruebas .NET aprueban también la
   ejecución repetida, los IDs estables, la retroactividad, la elegibilidad, los
   enlaces exactos 5+2 de las reglas publicadas y los contratos sintéticos de
-  fórmula/traza/caso, además de cuatro mutaciones del gate factual.
+  fórmula/traza/caso, cuatro mutaciones del gate factual y quince rechazos
+  estructurales/semánticos específicos del programa v2. Dos controles nuevos
+  fijan la equivalencia exacta de los casos y el rechazo de una identidad
+  compuesta de caso duplicada.
 - Solución .NET 10 de diez proyectos: restauración bloqueada y build Release
   aprobados con 0 advertencias y 0 errores; CLI del validador y formato
   verificados.
+- La restauración final dentro del sandbox falló sólo por el bloqueo de red a
+  `api.nuget.org` (`NU1301`/`NU1900`). La repetición autorizada del mismo
+  comando terminó correctamente; `dotnet format --verify-no-changes` no detectó
+  cambios en 114 archivos y la comprobación PowerShell aprobó 11 contratos/22
+  fixtures.
 - Persistencia SQLite: 18/18 pruebas de integración aprobadas en `win-x64`;
-  junto con 20/20 pruebas del validador, 27/27 del motor y 27/27 de Application,
-  la solución ejecuta 92/92 pruebas correctamente. Los seis casos nuevos
+  junto con 40/40 pruebas del validador, 56/56 del motor y 97/97 de Application,
+  la solución ejecuta 211/211 pruebas correctamente. Los seis casos de Data
   cubren la migración y el repositorio de borradores con payload/metadata,
   reemplazo, rollback, reapertura, lectura pura y contención tipada.
+  Microsoft Testing Platform mantiene los TheoryData dinámicos dentro de esas
+  pruebas de Application aunque ahora recorran 60 positivos, 66 negativos y
+  60 rutas contextuales de fórmula.
 - Motor de puntos: 7/7 casos positivos canónicos, 3/3 rechazos semánticos y
   2/2 controles de traza/publicación aprobados. Domain y Calculation Engine no
   incorporan paquetes externos ni referencias a Data, WPF o serialización.
+- Intérprete de fórmulas: 25/25 pruebas sintéticas aprobadas. Ejecuta las cinco
+  operaciones de `CHECKED_INT64_V1`, valida estado/aplicabilidad/inputs/bounds,
+  aplica el código de rango materializado, controla overflow y conserva orden,
+  outputs y provenance en la traza. Domain y Calculation Engine continúan sin
+  serialización, Application, Data o WPF en esta vertical.
+- Intérprete decimal: 4/4 pruebas sintéticas aprobadas. Conserva `1.5` y los
+  intermedios fraccionarios exactamente, no redondea aportes, trunca sólo en la
+  etapa declarada, rechaza operandos del modelo incorrecto y controla overflow
+  al convertir la salida visible a `INT64`.
 - Distribución de stats: 2/2 resultados sintéticos y 8/8 controles de error
   aprobados; incluyen negativos, conjunto exacto de stats, exceso, tres
   divergencias de origen y overflow. El resultado copia clase, ruleset,
@@ -433,7 +818,17 @@
   serialización, guardado/reemplazo, carga con recálculo y fallos cerrados por
   ausencia, identidad, dependencia o caché. El proyecto no incorpora paquetes
   externos ni referencia Data o WPF.
-- WPF/Application: el build copia 27 JSON canónicos a una ruta estable tanto en
+- Fórmulas en Application: 68/68 trazas positivas y 76/76 errores canónicos de
+  las diecisiete referencias ejecutables reproducidos por el camino archivo → adaptador →
+  catálogo → caso de uso → intérprete. El `1.0.0` histórico de Dark Wizard se
+  rechaza como no ejecutable y cuatro mutaciones
+  relacionales fallan cerradas antes del cálculo. La ejecución normal no lee
+  `reference-cases/`.
+- Contexto de fórmulas en Application: 68/68 positivos canónicos reproducidos por
+  snapshot → progresión → distribución → contexto → intérprete. Ocho pruebas
+  fijan preservación de bases/evidencias/source, los seis códigos de contexto,
+  overflow, inmutabilidad y fallos previos de las entradas de origen.
+- WPF/Application: el build copia 188 JSON canónicos a una ruta estable tanto en
   salida normal como publicada. El flujo de ventana obtiene clase/evolución y
   Hero Status desde el catálogo/regla, muestra el total junto con la traza y
   conserva ese presupuesto para distribuir sobre controles derivados de
@@ -443,9 +838,155 @@
   composition root aplica la migración de borradores, configura contención en
   2 s × 3 intentos con 150 ms entre reintentos y conecta guardado/carga por ID
   sin omitir la revalidación de Application.
+- Smoke WPF local posterior a la definición `1.1.0`: PASS en `win-x64`, SQLite
+  `3.53.3`, 451 archivos y 148.758.166 bytes. Ambas publicaciones conservaron
+  28/28 JSON y el hash
+  `sha256:369c9e19fcc337a08df86df5e7744a111bfe80f3aaf9b3bcb17ce715f0636279`;
+  progresión 7/7+3/3, distribución sintética, resets `2 × 100`, backup/restore
+  y borrador persistido siguieron aprobados. WPF empaqueta la fórmula `DRAFT`
+  pero no la materializa ni la ejecuta.
+- Smoke WPF local posterior a los ocho casos `1.1.0`: PASS en `win-x64`,
+  SQLite `3.53.3`, 459 archivos y 148.766.267 bytes. Ambas publicaciones
+  conservaron 36/36 JSON y el hash
+  `sha256:cfe267e51cf07532d5d1828fd524078bf832a122f367cf6381309e0d9010dbf7`;
+  progresión 7/7+3/3, distribución sintética, resets `2 × 100`,
+  backup/restore y borrador persistido siguieron aprobados. WPF empaqueta ambas
+  series, pero no materializa ni ejecuta fórmulas.
+- Smoke WPF local posterior a publicar `1.1.0`: PASS en `win-x64`, SQLite
+  `3.53.3`, 459 archivos y 148.766.271 bytes. Ambas publicaciones conservaron
+  36/36 JSON y el hash
+  `sha256:712afd0b572e68d9025a07f3a8eabc7ee4ac1f8496552d19b4c4172b68332efe`.
+  Progresión 7/7+3/3, distribución, resets, backup/restore y borrador persistido
+  continuaron aprobados; WPF no materializa ni ejecuta fórmulas.
+- Smoke WPF local posterior al intérprete genérico: PASS en `win-x64`, SQLite
+  `3.53.3`, 459 archivos y 148.808.995 bytes. Conservó 10 avisos legales,
+  36/36 JSON y el hash
+  `sha256:712afd0b572e68d9025a07f3a8eabc7ee4ac1f8496552d19b4c4172b68332efe`;
+  progresión 7/7+3/3, distribución, resets, backup/restore y borrador persistido
+  siguieron aprobados. El binario incluye el intérprete, pero WPF todavía no
+  materializa ni ejecuta fórmulas.
+- Smoke WPF local posterior al cierre funcional de HP: PASS en `win-x64`,
+  SQLite `3.53.3`, 459 archivos y 148.871.955 bytes. Conservó 10 avisos legales,
+  36/36 JSON y el hash existente del dataset; progresión 7/7+3/3,
+  distribución, resets, backup/restore y borrador persistido siguieron
+  aprobados. Ambas fases reprodujeron además 4/4 casos positivos de
+  `formula-hp-dark-wizard` `1.1.0` con resolución contextual y traza
+  aritmética.
+- Smoke WPF local posterior al cierre de HP de Dark Knight: PASS en `win-x64`,
+  SQLite `3.53.3`, 468 archivos y 148.884.866 bytes. Conservó 10 avisos legales,
+  45/45 JSON y el hash
+  `sha256:11a3d88ed670f998ba8ff3d5c149aa2f4017ae9ef1dd4a34994f35644a7024b3`;
+  progresión 7/7+3/3, distribución, resets, backup/restore y borrador persistido
+  siguieron aprobados. Ambas fases reprodujeron 8/8 positivos de
+  `formula-hp-dark-knight` `1.0.0` y `formula-hp-dark-wizard` `1.1.0`.
+- Smoke WPF local posterior al cierre de HP de Fairy Elf: PASS en `win-x64`,
+  SQLite `3.53.3`, 477 archivos y 148.896.977 bytes. Conservó 10 avisos legales,
+  54/54 JSON y el hash
+  `sha256:aa3c761e9c3a8a2739c2cf424175c5d5b2ee703793f1489d2b8ebbb823521afa`;
+  progresión 7/7+3/3, distribución, resets, backup/restore y borrador persistido
+  siguieron aprobados. Ambas fases reprodujeron 12/12 positivos de las tres
+  referencias ejecutables de HP.
+- Smoke WPF local posterior al cierre de HP de Summoner: PASS en `win-x64`,
+  SQLite `3.53.3`, 486 archivos y 148.908.207 bytes. Conservó 10 avisos legales,
+  63/63 JSON y el hash
+  `sha256:afb77b6daa3112da782dbcc68685f0f7e5bc3cbb1ae8f9bf3f6d1f80d0b61dc8`;
+  progresión 7/7+3/3, distribución, resets, backup/restore y borrador persistido
+  siguieron aprobados. Ambas fases reprodujeron 16/16 positivos de las cuatro
+  referencias ejecutables de HP.
+- Smoke WPF local posterior al cierre de HP de Magic Gladiator: PASS en
+  `win-x64`, SQLite `3.53.3`, 495 archivos y 148.920.099 bytes. Conservó 10
+  avisos legales, 72/72 JSON y el hash
+  `sha256:a15ce32bc9610539ca406bdcdb80bbe7049f1879f0222014c9c10e28e30ed7aa`;
+  progresión 7/7+3/3, distribución, resets, backup/restore y borrador persistido
+  siguieron aprobados. Ambas fases reprodujeron 20/20 positivos de las cinco
+  referencias ejecutables de HP.
+- Smoke WPF local posterior al cierre de HP de Dark Lord: PASS en `win-x64`,
+  SQLite `3.53.3`, 504 archivos y 148.940.709 bytes. Conservó 10 avisos legales,
+  81/81 JSON y el hash
+  `sha256:d7810c927ec692c161d0adcfcfa8cc6374d2213cac97805e9e77ec9d2ecefb32`;
+  progresión 7/7+3/3, distribución, resets, backup/restore y borrador persistido
+  siguieron aprobados. Ambas fases reprodujeron 24/24 positivos de las seis
+  referencias ejecutables de HP, incluidos los raw fraccionarios de Dark Lord.
+- Smoke WPF local posterior al cierre de Mana de Dark Wizard: PASS en
+  `win-x64`, SQLite `3.53.3`, 513 archivos y 148.956.244 bytes. Conservó 10
+  avisos legales, 90/90 JSON y el hash
+  `sha256:a663630cbf054bef3c71eeb969b0edcb2dc95ec686d6cb2663fee8a2c5af6089`;
+  progresión 7/7+3/3, distribución, resets, backup/restore y borrador persistido
+  siguieron aprobados. Ambas fases reprodujeron 28/28 positivos de las siete
+  referencias ejecutables de HP/Mana.
+- Smoke WPF local posterior al cierre de Mana de Dark Knight: PASS en
+  `win-x64`, SQLite `3.53.3`, 522 archivos y 148.967.275 bytes. Conservó 10
+  avisos legales, 99/99 JSON y el hash
+  `sha256:868ef53f5238066e928f51a56e2f375124c8d2f7b2a5fb6d75078c61c557c120`;
+  progresión 7/7+3/3, distribución, resets, backup/restore y borrador persistido
+  siguieron aprobados. Ambas fases reprodujeron 32/32 positivos de las ocho
+  referencias ejecutables de HP/Mana.
+- Smoke WPF local posterior al cierre de Mana de Fairy Elf: PASS en `win-x64`,
+  SQLite `3.53.3`, 531 archivos y 148.977.675 bytes. Conservó 10 avisos legales,
+  108/108 JSON y el hash
+  `sha256:78d8688b3b08a02b13ea9971fa45f90ff59612c6c5b1a2981cb102b82c1adc7e`;
+  progresión 7/7+3/3, distribución, resets, backup/restore y borrador persistido
+  siguieron aprobados. Ambas fases reprodujeron 36/36 positivos de las nueve
+  referencias ejecutables de HP/Mana.
+- Smoke WPF local posterior al cierre de Mana de Summoner: PASS en `win-x64`,
+  SQLite `3.53.3`, 540 archivos y 148.989.299 bytes. Conservó 10 avisos legales,
+  117/117 JSON y el hash
+  `sha256:7d0e75d9212837a9245a339253b9622ecff2ec4b157cb839606601c3ee73331b`;
+  progresión 7/7+3/3, distribución, resets, backup/restore y borrador persistido
+  siguieron aprobados. Ambas fases reprodujeron 40/40 positivos de las diez
+  referencias ejecutables de HP/Mana.
+- Smoke WPF local posterior al cierre de Mana de Magic Gladiator: PASS en
+  `win-x64`, SQLite `3.53.3`, 549 archivos y 149.001.252 bytes. Conservó 10
+  avisos legales, 126/126 JSON y el hash
+  `sha256:cff8d5726f433448ac7212a7a6e7465475024cc4346e904a649bcc2615e706f5`;
+  progresión 7/7+3/3, distribución, resets, backup/restore y borrador persistido
+  siguieron aprobados. Ambas fases reprodujeron 44/44 positivos de las once
+  referencias ejecutables de HP/Mana.
+- Smoke WPF local posterior al cierre de Mana de Dark Lord: PASS en `win-x64`,
+  SQLite `3.53.3`, 558 archivos y 149.012.089 bytes. Conservó 10 avisos legales,
+  135/135 JSON y el hash
+  `sha256:440b7fb4a1ef1bd5b57202323bf7cb447c3bf252abe81cf112f8832220e7817a`;
+  progresión 7/7+3/3, distribución, resets, backup/restore y borrador persistido
+  siguieron aprobados. Ambas fases reprodujeron 48/48 positivos de las doce
+  referencias ejecutables de HP/Mana.
+- Smoke WPF local posterior al cierre de AG de Dark Wizard: PASS en `win-x64`,
+  SQLite `3.53.3`, 569 archivos y 149.025.417 bytes. Conservó 10 avisos legales,
+  146/146 JSON y el hash
+  `sha256:469f18aec26813dcb75dab054df3df7b2469d730d76d532ed2ef8432711e4651`;
+  progresión 7/7+3/3, distribución, resets, backup/restore y borrador persistido
+  siguieron aprobados. Ambas fases reprodujeron 52/52 positivos de las trece
+  referencias ejecutables de HP/Mana/AG.
+- Smoke WPF local posterior al cierre de AG de Dark Knight: PASS en `win-x64`,
+  SQLite `3.53.3`, 580 archivos y 149.038.270 bytes. Conservó 10 avisos legales,
+  157/157 JSON y el hash
+  `sha256:67d6fd0e614d3072f214b7dc09f7295e2450d2b4b7c0cd24a91f70a14dad13ef`;
+  progresión 7/7+3/3, distribución, resets, backup/restore y borrador persistido
+  siguieron aprobados. Ambas fases reprodujeron 56/56 positivos de las catorce
+  referencias ejecutables de HP/Mana/AG.
+- Smoke WPF local posterior al cierre de AG de Fairy Elf: PASS en `win-x64`,
+  SQLite `3.53.3`, 591 archivos y 149.051.441 bytes. Conservó 10 avisos legales,
+  168/168 JSON y el hash
+  `sha256:432b6a062fbd5ed996a9d58dbfa32daafec5cf09c447dc7c40bb0ac98e645177`;
+  progresión 7/7+3/3, distribución, resets, backup/restore y borrador persistido
+  siguieron aprobados. Ambas fases reprodujeron 60/60 positivos de las quince
+  referencias ejecutables de HP/Mana/AG.
+- Smoke WPF local posterior al cierre de AG de Summoner: PASS en `win-x64`,
+  SQLite `3.53.3`, 601 archivos y 149.063.645 bytes. Conservó 10 avisos legales,
+  178/178 JSON y el hash
+  `sha256:6380346e97b61e31a6da3329b86f91954f2b120d880e751733e778f4cbb75f43`;
+  progresión 7/7+3/3, distribución, resets, backup/restore y borrador persistido
+  siguieron aprobados. Ambas fases reprodujeron 64/64 positivos de las
+  dieciséis referencias ejecutables de HP/Mana/AG.
+- Smoke WPF local posterior al cierre de AG de Magic Gladiator: PASS en
+  `win-x64`, SQLite `3.53.3`, 611 archivos y 149.076.719 bytes. Conservó 10
+  avisos legales, 188/188 JSON y el hash
+  `sha256:5246861cec04e5e618611091d365e7e0a4c03d8227013f84c13e93354253d901`;
+  progresión 7/7+3/3, distribución, resets, backup/restore y borrador persistido
+  siguieron aprobados. Ambas fases reprodujeron 68/68 positivos de las
+  diecisiete referencias ejecutables de HP/Mana/AG.
 - Json Everything fuente: 2 compilaciones independientes con SDK `10.0.301`,
   restore bloqueado de los tres proyectos fuente, hashes esperados para 3/3
-  DLL y SPDX contrastado. El harness actualizado ejecuta 2 × 20/20 fixtures y
+  DLL y SPDX contrastado. El harness actualizado ejecuta 2 × 22/22 fixtures y
   rechaza formatos inválidos: PASS.
 - Integración del validador: lock con sólo `Humanizer.Core 3.0.10`, tres DLL
   clasificados como referencias directas, aviso MIT presente y ausencia de
@@ -471,10 +1012,17 @@
 - Spike C#: 4/4 comprobaciones aprobadas con .NET SDK 10.0.301.
 - Node.js y `pwsh` no están disponibles en el `PATH`; la prueba de schemas se
   ejecuta con Windows PowerShell.
-- El motor incorpora sólo los datos factuales autorizados por EVD-0021: seis
-  clases y dos reglas de progresión canónicas publicadas con siete referencias
-  ejecutables. La definición de HP de Dark Wizard está `PUBLISHED` como dato,
-  pero HP, Mana, AG, SD, daño y defensa todavía no se ejecutan.
+- El motor incorpora sólo los datos factuales autorizados por los registros
+  cerrados: seis
+  clases y dos reglas de progresión canónicas publicadas con diecisiete referencias
+  ejecutables. HP de Dark Wizard, Dark Knight, Fairy Elf, Summoner, Magic
+  Gladiator y Dark Lord se
+  materializan y
+  ejecutan en Application/WPF con nivel y Vitality resueltos desde el estado validado.
+  Mana de Dark Wizard, Dark Knight, Fairy Elf, Summoner, Magic Gladiator y Dark
+  Lord también se ejecuta con nivel y Energy resueltos. AG de Dark Wizard, Dark
+  Knight, Fairy Elf y Summoner se ejecuta con los cuatro stats resueltos; el
+  resto de AG, SD, daño y defensa todavía no se ejecutan.
 - Licencia: texto Apache-2.0 contrastado con la publicación oficial; ADR-0005,
   `NOTICE` e inventario de terceros incorporados. La auditoría leyó metadatos
   `.nuspec` de todas las dependencias restauradas y el acuerdo incluido por la
@@ -482,8 +1030,12 @@
 - Investigación documental: `RES-0001` conserva 21 evidencias, 6/6 claims
   `VERIFIED` y dos conflictos resueltos. `RES-0002` queda `VERIFIED` con 24/24
   claims, once evidencias y dos conflictos resueltos.
-  EVD-0026 autoriza diseñar contratos y casos para su alcance exacto,
-  pero todavía no existen fórmulas productivas.
+  EVD-0026 autoriza diseñar contratos y casos para su alcance exacto; HP de Dark
+  Wizard, Dark Knight, Fairy Elf, Summoner, Magic Gladiator y Dark Lord, más
+  Mana de Dark Wizard, Dark Knight, Fairy Elf, Summoner, Magic Gladiator y Dark
+  Lord, más AG de Dark Wizard, Dark Knight, Fairy Elf y Summoner, ya son
+  productivos; los otros 8 claims siguen
+  pendientes.
   EVD-0014–EVD-0018 trazan stats, puntos, Marlon, contraste oficial y decisiones
   del propietario; EVD-0019/EVD-0020 trazan la presencia anterior de la matriz
   candidata y la búsqueda negativa de un original o snapshot contemporáneo;
@@ -493,7 +1045,8 @@
   aplicabilidad, mientras `EVD-0021` traza el mínimo canónico de Vitality. La
   estrategia de tres contratos, la definición JSON, los ocho casos y el gate
   semántico están implementados. La revisión de publicación no encontró
-  divergencias y la fórmula está `PUBLISHED`; todavía no existe motor.
+  divergencias y la fórmula está `PUBLISHED`; su versión ejecutable `1.1.0`
+  ya recorre Application y Calculation Engine.
 - Contraste técnico: 2 registros comunitarios nuevos y matriz completa para
   `WZ-CLM-001`–`WZ-CLM-010`; la auditoría concluyó que su independencia y
   procedencia global/inglesa no son demostrables con los artefactos disponibles.
@@ -576,7 +1129,7 @@
   hash y los commits declarados por los paquetes. Los 10 fixtures actuales pasan
   con la API evaluada, pero los binarios NuGet publicados fueron retirados. La
   compilación propia MIT integrada demuestra hashes idénticos entre dos rutas
-  fuente, 2 × 20/20 fixtures, formatos, SBOM, locks, auditoría y publicación
+  fuente, 2 × 22/22 fixtures, formatos, SBOM, locks, auditoría y publicación
   inspeccionada. Corvus 4.6.7 se conserva como contingencia sin asumir paridad.
 
 ## Decisión del propietario — 2026-07-18
@@ -635,3 +1188,12 @@
   `70 + (lvl - 1) + (vit - 18) * 2` y Mana como
   `40 + (lvl - 1) * 1.5 + (ene - 23) * 1.7`. SD trunca sus tres términos antes
   de sumarlos; `RES-0002` queda completamente verificado.
+
+## Decisión del propietario — 2026-07-25
+
+- `next-actions.md` debe definir tareas verticales más completas.
+- Cada primera prioridad combinará diseño restante, implementación,
+  integración, pruebas, documentación y smoke cuando puedan completarse de
+  forma coherente.
+- No se separará una misma capacidad en iteraciones exclusivamente documentales,
+  de código y de UI salvo que exista un gate técnico o factual real.

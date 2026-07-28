@@ -1,0 +1,35 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "ag-magic-gladiator-energy-vitality-step",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-ag-magic-gladiator", "version": "1.0.0" },
+  "context": {
+    "characterClassId": "class-magic-gladiator",
+    "evolutionId": "evolution-duel-master"
+  },
+  "inputs": { "energy": 27, "vitality": 27, "agility": 26, "strength": 26 },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-ag-magic-gladiator-energy-vitality-step",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": { "id": "formula-ag-magic-gladiator", "version": "1.0.0" },
+    "context": {
+      "characterClassId": "class-magic-gladiator",
+      "evolutionId": "evolution-duel-master"
+    },
+    "inputs": { "energy": 27, "vitality": 27, "agility": 26, "strength": 26 },
+    "steps": [
+      { "stepId": "energy-contribution", "value": 4.05 },
+      { "stepId": "vitality-contribution", "value": 8.1 },
+      { "stepId": "agility-contribution", "value": 6.50 },
+      { "stepId": "strength-contribution", "value": 5.2 },
+      { "stepId": "raw-ag", "value": 23.85 },
+      { "stepId": "visible-ag", "value": 23 }
+    ],
+    "rounding": { "mode": "TRUNCATE", "stage": "visible-ag", "decimalPlaces": 0 },
+    "rawOutput": 23.85,
+    "visibleOutput": 23,
+    "evidenceRefs": ["evd-0021", "evd-0026"],
+    "conflictIds": ["dsp-0002"]
+  }
+}
