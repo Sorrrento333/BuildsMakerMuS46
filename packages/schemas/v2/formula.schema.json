@@ -124,13 +124,6 @@
             "properties": {
               "executionModel": { "const": "CHECKED_INT64_V1" }
             }
-          },
-          "inputs": {
-            "items": {
-              "properties": {
-                "numericType": { "enum": ["INT32", "INT64"] }
-              }
-            }
           }
         }
       }
@@ -276,7 +269,7 @@
       ],
       "properties": {
         "id": { "$ref": "#/$defs/id" },
-        "numericType": { "enum": ["INT32", "INT64", "DECIMAL"] },
+        "numericType": { "enum": ["INT32", "INT64"] },
         "unit": { "type": "string", "minLength": 1 },
         "numericBounds": { "$ref": "#/$defs/numericBounds" },
         "rangeErrorCode": { "$ref": "#/$defs/id" },
@@ -339,7 +332,7 @@
       "properties": {
         "id": { "$ref": "#/$defs/id" },
         "operation": {
-          "enum": ["CONSTANT", "ADD", "SUBTRACT", "MULTIPLY", "DIVIDE", "APPLY_ROUNDING"]
+          "enum": ["CONSTANT", "ADD", "SUBTRACT", "MULTIPLY", "APPLY_ROUNDING"]
         },
         "operands": {
           "type": "array",
@@ -376,7 +369,7 @@
         {
           "if": {
             "properties": {
-              "operation": { "enum": ["SUBTRACT", "MULTIPLY", "DIVIDE"] }
+              "operation": { "enum": ["SUBTRACT", "MULTIPLY"] }
             },
             "required": ["operation"]
           },

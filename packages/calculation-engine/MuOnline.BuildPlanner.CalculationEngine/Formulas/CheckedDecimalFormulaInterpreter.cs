@@ -156,16 +156,9 @@ public static class CheckedDecimalFormulaInterpreter
         foreach (var inputDefinition in definition.Inputs)
         {
             var value = request.Inputs[inputDefinition.Id];
-            var isIntegral = value == decimal.Truncate(value);
-            var matchesNumericType = inputDefinition.NumericType switch
-            {
-                FormulaNumericType.Signed32Bit =>
-                    isIntegral && value is >= int.MinValue and <= int.MaxValue,
-                FormulaNumericType.Signed64Bit =>
-                    isIntegral && value is >= long.MinValue and <= long.MaxValue,
-                FormulaNumericType.ExactBase10 => true,
-                _ => false,
-            };
+            var matchesNumericType =
+                inputDefinition.NumericType != FormulaNumericType.Signed32Bit ||
+                value is >= int.MinValue and <= int.MaxValue;
             if (!matchesNumericType ||
                 !inputDefinition.NumericBounds.Contains(value))
             {
@@ -179,7 +172,7 @@ public static class CheckedDecimalFormulaInterpreter
     private static decimal EvaluateStep(
         CheckedIntegerFormulaStep step,
         FormulaDefinition definition,
-        IReadOnlyDictionary<string, decimal> inputs,
+        IReadOnlyDictionary<string, long> inputs,
         IReadOnlyDictionary<string, decimal> valuesByStep) =>
         step.Operation switch
         {
@@ -199,8 +192,6 @@ public static class CheckedDecimalFormulaInterpreter
                     inputs,
                     valuesByStep,
                     static (left, right) => checked(left * right)),
-            CheckedIntegerOperation.Divide =>
-                EvaluateDivide(step, inputs, valuesByStep),
             CheckedIntegerOperation.ApplyRounding =>
                 EvaluateRounding(step, definition, inputs, valuesByStep),
             _ => throw InvalidProgram(
@@ -220,7 +211,7 @@ public static class CheckedDecimalFormulaInterpreter
 
     private static decimal EvaluateAdd(
         CheckedIntegerFormulaStep step,
-        IReadOnlyDictionary<string, decimal> inputs,
+        IReadOnlyDictionary<string, long> inputs,
         IReadOnlyDictionary<string, decimal> valuesByStep)
     {
         if (step.Operands.Length < 2)
@@ -241,7 +232,7 @@ public static class CheckedDecimalFormulaInterpreter
 
     private static decimal EvaluateBinary(
         CheckedIntegerFormulaStep step,
-        IReadOnlyDictionary<string, decimal> inputs,
+        IReadOnlyDictionary<string, long> inputs,
         IReadOnlyDictionary<string, decimal> valuesByStep,
         Func<decimal, decimal, decimal> operation)
     {
@@ -256,38 +247,17 @@ public static class CheckedDecimalFormulaInterpreter
             ResolveOperand(step.Operands[1], inputs, valuesByStep));
     }
 
-    private static decimal EvaluateDivide(
-        CheckedIntegerFormulaStep step,
-        IReadOnlyDictionary<string, decimal> inputs,
-        IReadOnlyDictionary<string, decimal> valuesByStep)
-    {
-        if (step.Operands.Length != 2)
-        {
-            throw InvalidProgram(
-                $"DIVIDE step '{step.Id}' requires exactly two operands.");
-        }
-
-        var divisor = ResolveOperand(step.Operands[1], inputs, valuesByStep);
-        if (divisor == 0)
-        {
-            throw InvalidProgram(
-                $"DIVIDE step '{step.Id}' cannot divide by zero.");
-        }
-
-        return checked(
-            ResolveOperand(step.Operands[0], inputs, valuesByStep) / divisor);
-    }
-
     private static decimal EvaluateRounding(
         CheckedIntegerFormulaStep step,
         FormulaDefinition definition,
-        IReadOnlyDictionary<string, decimal> inputs,
+        IReadOnlyDictionary<string, long> inputs,
         IReadOnlyDictionary<string, decimal> valuesByStep)
     {
-        if (step.Operands is not [FormulaStepOperand])
+        if (step.Id != definition.Rounding.StageId ||
+            step.Operands is not [FormulaStepOperand])
         {
             throw InvalidProgram(
-                $"APPLY_ROUNDING step '{step.Id}' requires exactly one step operand.");
+                $"APPLY_ROUNDING step '{step.Id}' does not match the rounding definition.");
         }
 
         var value = ResolveOperand(step.Operands[0], inputs, valuesByStep);
@@ -332,7 +302,7 @@ public static class CheckedDecimalFormulaInterpreter
 
     private static decimal ResolveOperand(
         CheckedIntegerOperand operand,
-        IReadOnlyDictionary<string, decimal> inputs,
+        IReadOnlyDictionary<string, long> inputs,
         IReadOnlyDictionary<string, decimal> valuesByStep) =>
         operand switch
         {

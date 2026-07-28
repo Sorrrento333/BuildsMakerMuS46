@@ -219,25 +219,20 @@ internal static class PublicationSmokeRunner
             var characterClass = progressionCatalog.Classes.Single(
                 item => item.Id == referenceCase.CharacterClassId);
             var levelInput = formula.Inputs.SingleOrDefault(
-                input =>
-                    input.Source.Kind == FormulaInputSourceKind.ContextValue &&
-                    input.Source.ValueId == "character-level");
+                input => input.Source.ValueId == "character-level");
             var allocations = characterClass.StatIds.ToDictionary(
                 statId => statId,
                 _ => 0L,
                 StringComparer.Ordinal);
             foreach (var statInput in formula.Inputs.Where(
-                         input =>
-                             input.Source.Kind ==
-                                 FormulaInputSourceKind.ContextValue &&
-                             input.Source.ValueId!.StartsWith(
+                         input => input.Source.ValueId.StartsWith(
                              "resolved-",
                              StringComparison.Ordinal)))
             {
-                var statId = statInput.Source.ValueId!["resolved-".Length..];
-                allocations[statId] = checked((long)(
+                var statId = statInput.Source.ValueId["resolved-".Length..];
+                allocations[statId] = checked(
                     referenceCase.Inputs[statInput.Id] -
-                    characterClass.BaseStats[statId].BaseValue));
+                    characterClass.BaseStats[statId].BaseValue);
             }
 
             var configuredPoints = allocations.Values.Aggregate(
@@ -254,20 +249,11 @@ internal static class PublicationSmokeRunner
                     []),
                 new ResetPointInputs(1, configuredPoints),
                 allocations);
-            var directDependencyTrace = result.DependencyTrace.Where(
-                item => item.ConsumerFormulaReference == formula.Reference);
             if (result.Formula.RawOutput != referenceCase.RawOutput ||
                 result.Formula.VisibleOutput != referenceCase.VisibleOutput ||
                 !result.Formula.Trace.Steps.SequenceEqual(referenceCase.Steps) ||
-                result.ContextTrace.Length + directDependencyTrace.Count() !=
-                    formula.Inputs.Length ||
+                result.ContextTrace.Length != formula.Inputs.Length ||
                 result.ContextTrace.Any(
-                    item =>
-                        !referenceCase.Inputs.TryGetValue(
-                            item.InputId,
-                            out var expectedInput) ||
-                        item.ResolvedValue != expectedInput) ||
-                directDependencyTrace.Any(
                     item =>
                         !referenceCase.Inputs.TryGetValue(
                             item.InputId,
@@ -517,7 +503,7 @@ internal static class PublicationSmokeRunner
                         RequiredString(formulaRef, "version")),
                     RequiredString(context, "characterClassId"),
                     RequiredString(context, "evolutionId"),
-                    ReadDecimalValues(element.GetProperty("inputs")),
+                    ReadLongValues(element.GetProperty("inputs")),
                     expectedTrace.GetProperty("rawOutput").GetDecimal(),
                     expectedTrace.GetProperty("visibleOutput").GetInt64(),
                     expectedTrace.GetProperty("steps")
@@ -531,10 +517,10 @@ internal static class PublicationSmokeRunner
             .ToArray();
     }
 
-    private static Dictionary<string, decimal> ReadDecimalValues(JsonElement element) =>
+    private static Dictionary<string, long> ReadLongValues(JsonElement element) =>
         element.EnumerateObject().ToDictionary(
             property => property.Name,
-            property => property.Value.GetDecimal(),
+            property => property.Value.GetInt64(),
             StringComparer.Ordinal);
 
     private static string RequiredString(JsonElement element, string propertyName) =>
@@ -652,7 +638,7 @@ internal static class PublicationSmokeRunner
         FormulaReference FormulaReference,
         string CharacterClassId,
         string EvolutionId,
-        IReadOnlyDictionary<string, decimal> Inputs,
+        IReadOnlyDictionary<string, long> Inputs,
         decimal RawOutput,
         long VisibleOutput,
         IReadOnlyList<FormulaCalculationTraceStep> Steps);

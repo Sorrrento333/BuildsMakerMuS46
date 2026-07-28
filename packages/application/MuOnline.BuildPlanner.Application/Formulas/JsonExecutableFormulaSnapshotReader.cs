@@ -119,26 +119,19 @@ public sealed class JsonExecutableFormulaSnapshotReader
                 $"'{expectedExecutionModel}'.");
         }
 
-        var dependencies = strategyElement.TryGetProperty(
+        if (strategyElement.TryGetProperty(
                 "dependencyFormulaRefs",
-                out var dependencyElements)
-            ? dependencyElements
-                .EnumerateArray()
-                .Select(ParseReference)
-                .ToArray()
-            : [];
+                out var dependencies) &&
+            dependencies.GetArrayLength() != 0)
+        {
+            throw Incoherent(
+                "Formula dependencies are not supported by the first executable vertical.");
+        }
 
         var inputs = element.GetProperty("inputs")
             .EnumerateArray()
             .Select(ParseInput)
             .ToArray();
-        if (executionModel == CheckedIntegerFormulaProgram.ModelId &&
-            inputs.Any(input =>
-                input.NumericType == FormulaNumericType.ExactBase10))
-        {
-            throw Invalid(
-                "CHECKED_INT64_V1 cannot consume DECIMAL inputs.");
-        }
         var inputIds = inputs
             .Select(input => input.Id)
             .ToHashSet(StringComparer.Ordinal);
@@ -177,32 +170,17 @@ public sealed class JsonExecutableFormulaSnapshotReader
             rounding,
             trace,
             StringArray(element, "evidenceRefs"),
-            OptionalStringArray(element, "conflictIds"),
-            dependencies);
+            OptionalStringArray(element, "conflictIds"));
     }
 
     private static FormulaInputDefinition ParseInput(JsonElement element)
     {
         var source = element.GetProperty("source");
         var sourceKind = RequiredString(source, "kind");
-        FormulaInputSource parsedSource;
-        if (sourceKind == "CONTEXT_VALUE")
+        if (sourceKind != "CONTEXT_VALUE")
         {
-            parsedSource = new FormulaInputSource(
-                FormulaInputSourceKind.ContextValue,
-                RequiredString(source, "valueId"));
-        }
-        else if (sourceKind == "FORMULA_OUTPUT")
-        {
-            parsedSource = new FormulaInputSource(
-                new FormulaReference(
-                    RequiredString(source, "formulaId"),
-                    RequiredString(source, "formulaVersion")),
-                ParseOutputStage(RequiredString(source, "outputStage")));
-        }
-        else
-        {
-            throw Invalid($"Unsupported formula input source kind '{sourceKind}'.");
+            throw Incoherent(
+                "Formula-output inputs require dependencies, which are not supported yet.");
         }
 
         return new FormulaInputDefinition(
@@ -211,7 +189,9 @@ public sealed class JsonExecutableFormulaSnapshotReader
             RequiredString(element, "unit"),
             ParseBounds(element.GetProperty("numericBounds")),
             RequiredString(element, "rangeErrorCode"),
-            parsedSource);
+            new FormulaInputSource(
+                FormulaInputSourceKind.ContextValue,
+                RequiredString(source, "valueId")));
     }
 
     private static FormulaNumericBounds ParseBounds(JsonElement element)
@@ -341,9 +321,6 @@ public sealed class JsonExecutableFormulaSnapshotReader
             CheckedIntegerOperation.Add => operands.Length >= 2,
             CheckedIntegerOperation.Subtract or
             CheckedIntegerOperation.Multiply => operands.Length == 2,
-            CheckedIntegerOperation.Divide =>
-                executionModel == CheckedDecimalFormulaProgram.ModelId &&
-                operands.Length == 2,
             CheckedIntegerOperation.ApplyRounding =>
                 operands is [FormulaStepOperand],
             _ => false,
@@ -495,68 +472,6 @@ public sealed class JsonExecutableFormulaSnapshotReader
                     $"Formula '{formula.Reference.Id}' version " +
                     $"'{formula.Reference.Version}' has incoherent applicability.");
             }
-
-            foreach (var dependencyReference in formula.DependencyFormulaRefs)
-            {
-                var dependency = formulas.SingleOrDefault(
-                    candidate => candidate.Reference == dependencyReference)
-                    ?? throw Incoherent(
-                        $"Formula '{formula.Reference.Id}' version " +
-                        $"'{formula.Reference.Version}' references unavailable " +
-                        $"dependency '{dependencyReference.Id}' version " +
-                        $"'{dependencyReference.Version}'.");
-                if (dependency.RulesetId != formula.RulesetId ||
-                    dependency.Applicability.CharacterClassId !=
-                        formula.Applicability.CharacterClassId ||
-                    formula.Applicability.EvolutionIds.Any(
-                        evolutionId =>
-                            !dependency.Applicability.EvolutionIds.Contains(
-                                evolutionId)))
-                {
-                    throw Incoherent(
-                        $"Formula dependency '{dependencyReference.Id}' version " +
-                        $"'{dependencyReference.Version}' has incompatible applicability.");
-                }
-            }
-        }
-
-        ValidateDependencyGraph(formulas);
-    }
-
-    private static void ValidateDependencyGraph(FormulaDefinition[] formulas)
-    {
-        var byReference = formulas.ToDictionary(
-            formula => formula.Reference,
-            formula => formula);
-        var completed = new HashSet<FormulaReference>();
-        var active = new HashSet<FormulaReference>();
-
-        foreach (var formula in formulas)
-        {
-            Visit(formula);
-        }
-
-        void Visit(FormulaDefinition formula)
-        {
-            if (completed.Contains(formula.Reference))
-            {
-                return;
-            }
-
-            if (!active.Add(formula.Reference))
-            {
-                throw Incoherent(
-                    $"Formula dependency cycle detected at '{formula.Reference.Id}' " +
-                    $"version '{formula.Reference.Version}'.");
-            }
-
-            foreach (var dependencyReference in formula.DependencyFormulaRefs)
-            {
-                Visit(byReference[dependencyReference]);
-            }
-
-            active.Remove(formula.Reference);
-            completed.Add(formula.Reference);
         }
     }
 
@@ -586,16 +501,7 @@ public sealed class JsonExecutableFormulaSnapshotReader
         {
             "INT32" => FormulaNumericType.Signed32Bit,
             "INT64" => FormulaNumericType.Signed64Bit,
-            "DECIMAL" => FormulaNumericType.ExactBase10,
             _ => throw Invalid($"Unknown formula numeric type '{value}'."),
-        };
-
-    private static FormulaOutputStage ParseOutputStage(string value) =>
-        value switch
-        {
-            "RAW" => FormulaOutputStage.Raw,
-            "VISIBLE" => FormulaOutputStage.Visible,
-            _ => throw Invalid($"Unknown formula output stage '{value}'."),
         };
 
     private static FormulaBoundsClassification ParseBoundsClassification(
@@ -614,7 +520,6 @@ public sealed class JsonExecutableFormulaSnapshotReader
             "ADD" => CheckedIntegerOperation.Add,
             "SUBTRACT" => CheckedIntegerOperation.Subtract,
             "MULTIPLY" => CheckedIntegerOperation.Multiply,
-            "DIVIDE" => CheckedIntegerOperation.Divide,
             "APPLY_ROUNDING" => CheckedIntegerOperation.ApplyRounding,
             _ => throw Invalid($"Unknown formula operation '{value}'."),
         };
@@ -690,11 +595,6 @@ public sealed class JsonExecutableFormulaSnapshotReader
                         $"'{propertyName}' cannot contain null values."))
                 .ToArray()
             : [];
-
-    private static FormulaReference ParseReference(JsonElement element) =>
-        new(
-            RequiredString(element, "id"),
-            RequiredString(element, "version"));
 
     private static FormulaSnapshotException Invalid(string message) =>
         new(FormulaSnapshotErrorCodes.SnapshotInvalid, message);

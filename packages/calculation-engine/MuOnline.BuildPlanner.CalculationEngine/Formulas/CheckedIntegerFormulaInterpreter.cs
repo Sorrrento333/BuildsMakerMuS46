@@ -138,16 +138,9 @@ public static class CheckedIntegerFormulaInterpreter
         foreach (var inputDefinition in definition.Inputs)
         {
             var value = request.Inputs[inputDefinition.Id];
-            var isIntegral = value == decimal.Truncate(value);
-            var matchesNumericType = inputDefinition.NumericType switch
-            {
-                FormulaNumericType.Signed32Bit =>
-                    isIntegral && value is >= int.MinValue and <= int.MaxValue,
-                FormulaNumericType.Signed64Bit =>
-                    isIntegral && value is >= long.MinValue and <= long.MaxValue,
-                FormulaNumericType.ExactBase10 => false,
-                _ => false,
-            };
+            var matchesNumericType =
+                inputDefinition.NumericType != FormulaNumericType.Signed32Bit ||
+                value is >= int.MinValue and <= int.MaxValue;
             if (!matchesNumericType ||
                 !inputDefinition.NumericBounds.Contains(value))
             {
@@ -161,7 +154,7 @@ public static class CheckedIntegerFormulaInterpreter
     private static long EvaluateStep(
         CheckedIntegerFormulaStep step,
         FormulaDefinition definition,
-        IReadOnlyDictionary<string, decimal> inputs,
+        IReadOnlyDictionary<string, long> inputs,
         IReadOnlyDictionary<string, long> valuesByStep) =>
         step.Operation switch
         {
@@ -200,7 +193,7 @@ public static class CheckedIntegerFormulaInterpreter
 
     private static long EvaluateAdd(
         CheckedIntegerFormulaStep step,
-        IReadOnlyDictionary<string, decimal> inputs,
+        IReadOnlyDictionary<string, long> inputs,
         IReadOnlyDictionary<string, long> valuesByStep)
     {
         if (step.Operands.Length < 2)
@@ -221,7 +214,7 @@ public static class CheckedIntegerFormulaInterpreter
 
     private static long EvaluateBinary(
         CheckedIntegerFormulaStep step,
-        IReadOnlyDictionary<string, decimal> inputs,
+        IReadOnlyDictionary<string, long> inputs,
         IReadOnlyDictionary<string, long> valuesByStep,
         Func<long, long, long> operation)
     {
@@ -239,13 +232,14 @@ public static class CheckedIntegerFormulaInterpreter
     private static long EvaluateRounding(
         CheckedIntegerFormulaStep step,
         FormulaDefinition definition,
-        IReadOnlyDictionary<string, decimal> inputs,
+        IReadOnlyDictionary<string, long> inputs,
         IReadOnlyDictionary<string, long> valuesByStep)
     {
-        if (step.Operands is not [FormulaStepOperand])
+        if (step.Id != definition.Rounding.StageId ||
+            step.Operands is not [FormulaStepOperand])
         {
             throw InvalidProgram(
-                $"APPLY_ROUNDING step '{step.Id}' requires exactly one step operand.");
+                $"APPLY_ROUNDING step '{step.Id}' does not match the rounding definition.");
         }
 
         // CHECKED_INT64_V1 has integral intermediates, so every declared
@@ -255,12 +249,12 @@ public static class CheckedIntegerFormulaInterpreter
 
     private static long ResolveOperand(
         CheckedIntegerOperand operand,
-        IReadOnlyDictionary<string, decimal> inputs,
+        IReadOnlyDictionary<string, long> inputs,
         IReadOnlyDictionary<string, long> valuesByStep) =>
         operand switch
         {
             FormulaInputOperand input when inputs.TryGetValue(input.InputId, out var value) =>
-                checked((long)value),
+                value,
             FormulaInputOperand input =>
                 throw InvalidProgram(
                     $"Program references unavailable input '{input.InputId}'."),
