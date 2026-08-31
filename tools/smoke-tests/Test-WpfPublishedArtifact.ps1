@@ -224,10 +224,12 @@ if ($initialReport.SyntheticResetCount -ne 2 -or
 }
 if (-not $initialReport.PublishedFormulaContextVerified -or
     -not $replacementReport.PublishedFormulaContextVerified -or
-    $initialReport.PublishedFormulaCount -ne 17 -or
-    $replacementReport.PublishedFormulaCount -ne 17 -or
-    $initialReport.PublishedFormulaReferences.Count -ne 17 -or
-    $replacementReport.PublishedFormulaReferences.Count -ne 17 -or
+    $initialReport.PublishedFormulaCount -ne 30 -or
+    $replacementReport.PublishedFormulaCount -ne 30 -or
+    $initialReport.PublishedFormulaReferences.Count -ne 30 -or
+    $replacementReport.PublishedFormulaReferences.Count -ne 30 -or
+    $initialReport.PublishedFormulaReferences -notcontains
+        "formula-ag-dark-lord@1.0.0" -or
     $initialReport.PublishedFormulaReferences -notcontains
         "formula-ag-dark-knight@1.0.0" -or
     $initialReport.PublishedFormulaReferences -notcontains
@@ -238,6 +240,16 @@ if (-not $initialReport.PublishedFormulaContextVerified -or
         "formula-ag-magic-gladiator@1.0.0" -or
     $initialReport.PublishedFormulaReferences -notcontains
         "formula-ag-summoner@1.0.0" -or
+    $initialReport.PublishedFormulaReferences -notcontains
+        "formula-defense-dark-knight@1.0.0" -or
+    $initialReport.PublishedFormulaReferences -notcontains
+        "formula-defense-dark-wizard@1.0.0" -or
+    $initialReport.PublishedFormulaReferences -notcontains
+        "formula-defense-fairy-elf@1.0.0" -or
+    $initialReport.PublishedFormulaReferences -notcontains
+        "formula-defense-magic-gladiator@1.0.0" -or
+    $initialReport.PublishedFormulaReferences -notcontains
+        "formula-defense-summoner@1.0.0" -or
     $initialReport.PublishedFormulaReferences -notcontains
         "formula-hp-dark-knight@1.0.0" -or
     $initialReport.PublishedFormulaReferences -notcontains
@@ -262,10 +274,20 @@ if (-not $initialReport.PublishedFormulaContextVerified -or
         "formula-mana-magic-gladiator@1.0.0" -or
     $initialReport.PublishedFormulaReferences -notcontains
         "formula-mana-summoner@1.0.0" -or
+    $initialReport.PublishedFormulaReferences -notcontains
+        "formula-sd-dark-knight@1.0.0" -or
+    $initialReport.PublishedFormulaReferences -notcontains
+        "formula-sd-dark-wizard@1.0.0" -or
+    $initialReport.PublishedFormulaReferences -notcontains
+        "formula-sd-fairy-elf@1.0.0" -or
+    $initialReport.PublishedFormulaReferences -notcontains
+        "formula-sd-magic-gladiator@1.0.0" -or
+    $initialReport.PublishedFormulaReferences -notcontains
+        "formula-sd-summoner@1.0.0" -or
     ($replacementReport.PublishedFormulaReferences -join "|") -ne
         ($initialReport.PublishedFormulaReferences -join "|") -or
-    $initialReport.ApprovedPublishedFormulaCaseCount -ne 68 -or
-    $replacementReport.ApprovedPublishedFormulaCaseCount -ne 68) {
+    $initialReport.ApprovedPublishedFormulaCaseCount -ne 120 -or
+    $replacementReport.ApprovedPublishedFormulaCaseCount -ne 120) {
     throw "The published artifact did not reproduce all contextual and arithmetic formula traces."
 }
 if (-not $initialReport.BuildDraftPersistenceVerified -or

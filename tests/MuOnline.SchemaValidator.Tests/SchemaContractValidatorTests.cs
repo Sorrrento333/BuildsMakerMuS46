@@ -26,10 +26,17 @@ public sealed class SchemaContractValidatorTests
     private static readonly string[] ExpectedFormulaIdentities =
     [
         "formula-ag-dark-knight@1.0.0",
+        "formula-ag-dark-lord@1.0.0",
         "formula-ag-dark-wizard@1.0.0",
         "formula-ag-fairy-elf@1.0.0",
         "formula-ag-magic-gladiator@1.0.0",
         "formula-ag-summoner@1.0.0",
+        "formula-defense-dark-knight@1.0.0",
+        "formula-defense-dark-lord@1.0.0",
+        "formula-defense-dark-wizard@1.0.0",
+        "formula-defense-fairy-elf@1.0.0",
+        "formula-defense-magic-gladiator@1.0.0",
+        "formula-defense-summoner@1.0.0",
         "formula-hp-dark-knight@1.0.0",
         "formula-hp-dark-lord@1.0.0",
         "formula-hp-dark-wizard@1.0.0",
@@ -43,6 +50,230 @@ public sealed class SchemaContractValidatorTests
         "formula-mana-fairy-elf@1.0.0",
         "formula-mana-magic-gladiator@1.0.0",
         "formula-mana-summoner@1.0.0",
+        "formula-sd-dark-knight@1.0.0",
+        "formula-sd-dark-lord@1.0.0",
+        "formula-sd-dark-wizard@1.0.0",
+        "formula-sd-fairy-elf@1.0.0",
+        "formula-sd-magic-gladiator@1.0.0",
+        "formula-sd-summoner@1.0.0",
+    ];
+
+    private static readonly string[] ExpectedDarkKnightDefensePositiveFormulaCaseIds =
+    [
+        "defense-dark-knight-base",
+        "defense-dark-knight-blade-master-step",
+        "defense-dark-knight-fraction-step",
+        "defense-dark-knight-integer-step",
+    ];
+
+    private static readonly string[] ExpectedDarkKnightDefenseNegativeFormulaCaseIds =
+    [
+        "defense-dark-knight-agility-below-base",
+        "defense-dark-knight-invalid-family",
+    ];
+
+    private static readonly string[] ExpectedDarkKnightSdPositiveFormulaCaseIds =
+    [
+        "sd-dark-knight-base",
+        "sd-dark-knight-combined-step",
+        "sd-dark-knight-level-step",
+        "sd-dark-knight-raw-defense-boundary",
+    ];
+
+    private static readonly string[] ExpectedDarkKnightSdNegativeFormulaCaseIds =
+    [
+        "sd-dark-knight-agility-below-base",
+        "sd-dark-knight-energy-below-base",
+        "sd-dark-knight-invalid-family",
+        "sd-dark-knight-invalid-level",
+        "sd-dark-knight-overflow",
+        "sd-dark-knight-strength-below-base",
+        "sd-dark-knight-vitality-below-base",
+    ];
+
+    private static readonly string[] ExpectedDarkLordDefensePositiveFormulaCaseIds =
+    [
+        "defense-dark-lord-base",
+        "defense-dark-lord-fraction-step",
+        "defense-dark-lord-integer-step",
+        "defense-dark-lord-lord-emperor-step",
+    ];
+
+    private static readonly string[] ExpectedDarkLordDefenseNegativeFormulaCaseIds =
+    [
+        "defense-dark-lord-agility-below-base",
+        "defense-dark-lord-invalid-family",
+    ];
+
+    private static readonly string[] ExpectedDarkLordSdPositiveFormulaCaseIds =
+    [
+        "sd-dark-lord-base",
+        "sd-dark-lord-combined-step",
+        "sd-dark-lord-level-step",
+        "sd-dark-lord-raw-defense-boundary",
+    ];
+
+    private static readonly string[] ExpectedDarkLordSdNegativeFormulaCaseIds =
+    [
+        "sd-dark-lord-agility-below-base",
+        "sd-dark-lord-command-below-base",
+        "sd-dark-lord-energy-below-base",
+        "sd-dark-lord-invalid-family",
+        "sd-dark-lord-invalid-level",
+        "sd-dark-lord-overflow",
+        "sd-dark-lord-strength-below-base",
+        "sd-dark-lord-vitality-below-base",
+    ];
+
+    private static readonly string[] ExpectedFairyElfDefensePositiveFormulaCaseIds =
+    [
+        "defense-fairy-elf-base",
+        "defense-fairy-elf-fraction-step",
+        "defense-fairy-elf-high-elf-step",
+        "defense-fairy-elf-integer-step",
+    ];
+
+    private static readonly string[] ExpectedFairyElfDefenseNegativeFormulaCaseIds =
+    [
+        "defense-fairy-elf-agility-below-base",
+        "defense-fairy-elf-invalid-family",
+    ];
+
+    private static readonly string[] ExpectedFairyElfSdPositiveFormulaCaseIds =
+    [
+        "sd-fairy-elf-base",
+        "sd-fairy-elf-combined-step",
+        "sd-fairy-elf-level-step",
+        "sd-fairy-elf-raw-defense-boundary",
+    ];
+
+    private static readonly string[] ExpectedFairyElfSdNegativeFormulaCaseIds =
+    [
+        "sd-fairy-elf-agility-below-base",
+        "sd-fairy-elf-energy-below-base",
+        "sd-fairy-elf-invalid-family",
+        "sd-fairy-elf-invalid-level",
+        "sd-fairy-elf-overflow",
+        "sd-fairy-elf-strength-below-base",
+        "sd-fairy-elf-vitality-below-base",
+    ];
+
+    private static readonly string[] ExpectedMagicGladiatorDefensePositiveFormulaCaseIds =
+    [
+        "defense-magic-gladiator-base",
+        "defense-magic-gladiator-duel-master-step",
+        "defense-magic-gladiator-fraction-step",
+        "defense-magic-gladiator-integer-step",
+    ];
+
+    private static readonly string[] ExpectedMagicGladiatorDefenseNegativeFormulaCaseIds =
+    [
+        "defense-magic-gladiator-agility-below-base",
+        "defense-magic-gladiator-invalid-family",
+    ];
+
+    private static readonly string[] ExpectedMagicGladiatorSdPositiveFormulaCaseIds =
+    [
+        "sd-magic-gladiator-base",
+        "sd-magic-gladiator-combined-step",
+        "sd-magic-gladiator-level-step",
+        "sd-magic-gladiator-raw-defense-boundary",
+    ];
+
+    private static readonly string[] ExpectedMagicGladiatorSdNegativeFormulaCaseIds =
+    [
+        "sd-magic-gladiator-agility-below-base",
+        "sd-magic-gladiator-energy-below-base",
+        "sd-magic-gladiator-invalid-family",
+        "sd-magic-gladiator-invalid-level",
+        "sd-magic-gladiator-overflow",
+        "sd-magic-gladiator-strength-below-base",
+        "sd-magic-gladiator-vitality-below-base",
+    ];
+
+    private static readonly string[] ExpectedSummonerDefensePositiveFormulaCaseIds =
+    [
+        "defense-summoner-base",
+        "defense-summoner-dimension-master-step",
+        "defense-summoner-fraction-step",
+        "defense-summoner-integer-step",
+    ];
+
+    private static readonly string[] ExpectedSummonerDefenseNegativeFormulaCaseIds =
+    [
+        "defense-summoner-agility-below-base",
+        "defense-summoner-invalid-family",
+    ];
+
+    private static readonly string[] ExpectedSummonerSdPositiveFormulaCaseIds =
+    [
+        "sd-summoner-base",
+        "sd-summoner-dimension-master-step",
+        "sd-summoner-level-step",
+        "sd-summoner-stat-step",
+    ];
+
+    private static readonly string[] ExpectedSummonerSdNegativeFormulaCaseIds =
+    [
+        "sd-summoner-agility-below-base",
+        "sd-summoner-energy-below-base",
+        "sd-summoner-invalid-family",
+        "sd-summoner-invalid-level",
+        "sd-summoner-overflow",
+        "sd-summoner-strength-below-base",
+        "sd-summoner-vitality-below-base",
+    ];
+
+    private static readonly string[] ExpectedDarkWizardDefensePositiveFormulaCaseIds =
+    [
+        "defense-dark-wizard-base",
+        "defense-dark-wizard-fraction-step",
+        "defense-dark-wizard-grand-master-step",
+        "defense-dark-wizard-integer-step",
+    ];
+
+    private static readonly string[] ExpectedDarkWizardDefenseNegativeFormulaCaseIds =
+    [
+        "defense-dark-wizard-agility-below-base",
+        "defense-dark-wizard-invalid-family",
+    ];
+
+    private static readonly string[] ExpectedDarkWizardSdPositiveFormulaCaseIds =
+    [
+        "sd-dark-wizard-base",
+        "sd-dark-wizard-combined-step",
+        "sd-dark-wizard-level-step",
+        "sd-dark-wizard-raw-defense-boundary",
+    ];
+
+    private static readonly string[] ExpectedDarkWizardSdNegativeFormulaCaseIds =
+    [
+        "sd-dark-wizard-agility-below-base",
+        "sd-dark-wizard-energy-below-base",
+        "sd-dark-wizard-invalid-family",
+        "sd-dark-wizard-invalid-level",
+        "sd-dark-wizard-overflow",
+        "sd-dark-wizard-strength-below-base",
+        "sd-dark-wizard-vitality-below-base",
+    ];
+
+    private static readonly string[] ExpectedDarkLordAgPositiveFormulaCaseIds =
+    [
+        "ag-dark-lord-agility-strength-command-step",
+        "ag-dark-lord-base",
+        "ag-dark-lord-combined-step",
+        "ag-dark-lord-energy-vitality-step",
+    ];
+
+    private static readonly string[] ExpectedDarkLordAgNegativeFormulaCaseIds =
+    [
+        "ag-dark-lord-agility-below-base",
+        "ag-dark-lord-command-below-base",
+        "ag-dark-lord-energy-below-base",
+        "ag-dark-lord-invalid-family",
+        "ag-dark-lord-overflow",
+        "ag-dark-lord-strength-below-base",
+        "ag-dark-lord-vitality-below-base",
     ];
 
     private static readonly string[] ExpectedDarkWizardAgPositiveFormulaCaseIds =
@@ -566,6 +797,7 @@ public sealed class SchemaContractValidatorTests
         formula["schemaVersion"] = "2.1.0";
         formula["strategy"]!["executionModel"] = "CHECKED_DECIMAL_V1";
         formula["strategy"]!["steps"]![0]!["operands"]![0]!["value"] = 1.5m;
+        formula["inputs"]![0]!["numericType"] = "DECIMAL";
 
         Assert.True(ValidateNode(repositoryRoot, "formula-v2", formula));
 
@@ -650,7 +882,7 @@ public sealed class SchemaContractValidatorTests
     {
         var results = SchemaContractValidator.ValidateRulesetRecords(FindRepositoryRoot());
 
-        Assert.Equal(26, results.Count);
+        Assert.Equal(39, results.Count);
         Assert.All(results, result => Assert.True(
             result.ActualValidity,
             $"{result.RecordId} does not match {result.ContractName}."));
@@ -692,6 +924,19 @@ public sealed class SchemaContractValidatorTests
                 "2.1.0",
                 "2.1.0",
                 "2.1.0",
+                "2.1.0",
+                "2.1.0",
+                "2.1.0",
+                "2.1.0",
+                "2.1.0",
+                "2.1.0",
+                "2.1.0",
+                "2.1.0",
+                "2.1.0",
+                "2.1.0",
+                "2.1.0",
+                "2.1.0",
+                "2.1.0",
             ],
             results
                 .Where(result => result.ContractName == "formula")
@@ -705,7 +950,23 @@ public sealed class SchemaContractValidatorTests
         var results = FormulaReferenceCaseValidator.ValidateRepository(
             FindRepositoryRoot());
 
-        Assert.Equal(18, results.Count);
+        Assert.Equal(31, results.Count);
+
+        var darkLordAg = Assert.Single(
+            results,
+            result =>
+                result.FormulaId == "formula-ag-dark-lord" &&
+                result.FormulaVersion == "1.0.0");
+        Assert.Equal("PUBLISHED", darkLordAg.Status);
+        Assert.Equal(
+            ExpectedDarkLordAgPositiveFormulaCaseIds,
+            darkLordAg.PositiveCaseIds);
+        Assert.Equal(
+            ExpectedDarkLordAgNegativeFormulaCaseIds,
+            darkLordAg.NegativeCaseIds);
+        Assert.True(
+            darkLordAg.IsValid,
+            $"{darkLordAg.FormulaId}: {string.Join(" | ", darkLordAg.Errors)}");
 
         var darkKnightAg = Assert.Single(
             results,
@@ -723,6 +984,70 @@ public sealed class SchemaContractValidatorTests
             darkKnightAg.IsValid,
             $"{darkKnightAg.FormulaId}: {string.Join(" | ", darkKnightAg.Errors)}");
 
+        var darkKnightDefense = Assert.Single(
+            results,
+            result =>
+                result.FormulaId == "formula-defense-dark-knight" &&
+                result.FormulaVersion == "1.0.0");
+        Assert.Equal("PUBLISHED", darkKnightDefense.Status);
+        Assert.Equal(
+            ExpectedDarkKnightDefensePositiveFormulaCaseIds,
+            darkKnightDefense.PositiveCaseIds);
+        Assert.Equal(
+            ExpectedDarkKnightDefenseNegativeFormulaCaseIds,
+            darkKnightDefense.NegativeCaseIds);
+        Assert.True(
+            darkKnightDefense.IsValid,
+            $"{darkKnightDefense.FormulaId}: {string.Join(" | ", darkKnightDefense.Errors)}");
+
+        var darkKnightSd = Assert.Single(
+            results,
+            result =>
+                result.FormulaId == "formula-sd-dark-knight" &&
+                result.FormulaVersion == "1.0.0");
+        Assert.Equal("PUBLISHED", darkKnightSd.Status);
+        Assert.Equal(
+            ExpectedDarkKnightSdPositiveFormulaCaseIds,
+            darkKnightSd.PositiveCaseIds);
+        Assert.Equal(
+            ExpectedDarkKnightSdNegativeFormulaCaseIds,
+            darkKnightSd.NegativeCaseIds);
+        Assert.True(
+            darkKnightSd.IsValid,
+            $"{darkKnightSd.FormulaId}: {string.Join(" | ", darkKnightSd.Errors)}");
+
+        var darkLordDefense = Assert.Single(
+            results,
+            result =>
+                result.FormulaId == "formula-defense-dark-lord" &&
+                result.FormulaVersion == "1.0.0");
+        Assert.Equal("PUBLISHED", darkLordDefense.Status);
+        Assert.Equal(
+            ExpectedDarkLordDefensePositiveFormulaCaseIds,
+            darkLordDefense.PositiveCaseIds);
+        Assert.Equal(
+            ExpectedDarkLordDefenseNegativeFormulaCaseIds,
+            darkLordDefense.NegativeCaseIds);
+        Assert.True(
+            darkLordDefense.IsValid,
+            $"{darkLordDefense.FormulaId}: {string.Join(" | ", darkLordDefense.Errors)}");
+
+        var darkLordSd = Assert.Single(
+            results,
+            result =>
+                result.FormulaId == "formula-sd-dark-lord" &&
+                result.FormulaVersion == "1.0.0");
+        Assert.Equal("PUBLISHED", darkLordSd.Status);
+        Assert.Equal(
+            ExpectedDarkLordSdPositiveFormulaCaseIds,
+            darkLordSd.PositiveCaseIds);
+        Assert.Equal(
+            ExpectedDarkLordSdNegativeFormulaCaseIds,
+            darkLordSd.NegativeCaseIds);
+        Assert.True(
+            darkLordSd.IsValid,
+            $"{darkLordSd.FormulaId}: {string.Join(" | ", darkLordSd.Errors)}");
+
         var darkWizardAg = Assert.Single(
             results,
             result =>
@@ -738,6 +1063,102 @@ public sealed class SchemaContractValidatorTests
         Assert.True(
             darkWizardAg.IsValid,
             $"{darkWizardAg.FormulaId}: {string.Join(" | ", darkWizardAg.Errors)}");
+
+        var darkWizardDefense = Assert.Single(
+            results,
+            result =>
+                result.FormulaId == "formula-defense-dark-wizard" &&
+                result.FormulaVersion == "1.0.0");
+        Assert.Equal("PUBLISHED", darkWizardDefense.Status);
+        Assert.Equal(
+            ExpectedDarkWizardDefensePositiveFormulaCaseIds,
+            darkWizardDefense.PositiveCaseIds);
+        Assert.Equal(
+            ExpectedDarkWizardDefenseNegativeFormulaCaseIds,
+            darkWizardDefense.NegativeCaseIds);
+        Assert.True(
+            darkWizardDefense.IsValid,
+            $"{darkWizardDefense.FormulaId}: {string.Join(" | ", darkWizardDefense.Errors)}");
+
+        var darkWizardSd = Assert.Single(
+            results,
+            result =>
+                result.FormulaId == "formula-sd-dark-wizard" &&
+                result.FormulaVersion == "1.0.0");
+        Assert.Equal("PUBLISHED", darkWizardSd.Status);
+        Assert.Equal(
+            ExpectedDarkWizardSdPositiveFormulaCaseIds,
+            darkWizardSd.PositiveCaseIds);
+        Assert.Equal(
+            ExpectedDarkWizardSdNegativeFormulaCaseIds,
+            darkWizardSd.NegativeCaseIds);
+        Assert.True(
+            darkWizardSd.IsValid,
+            $"{darkWizardSd.FormulaId}: {string.Join(" | ", darkWizardSd.Errors)}");
+
+        var fairyElfDefense = Assert.Single(
+            results,
+            result =>
+                result.FormulaId == "formula-defense-fairy-elf" &&
+                result.FormulaVersion == "1.0.0");
+        Assert.Equal("PUBLISHED", fairyElfDefense.Status);
+        Assert.Equal(
+            ExpectedFairyElfDefensePositiveFormulaCaseIds,
+            fairyElfDefense.PositiveCaseIds);
+        Assert.Equal(
+            ExpectedFairyElfDefenseNegativeFormulaCaseIds,
+            fairyElfDefense.NegativeCaseIds);
+        Assert.True(
+            fairyElfDefense.IsValid,
+            $"{fairyElfDefense.FormulaId}: {string.Join(" | ", fairyElfDefense.Errors)}");
+
+        var fairyElfSd = Assert.Single(
+            results,
+            result =>
+                result.FormulaId == "formula-sd-fairy-elf" &&
+                result.FormulaVersion == "1.0.0");
+        Assert.Equal("PUBLISHED", fairyElfSd.Status);
+        Assert.Equal(
+            ExpectedFairyElfSdPositiveFormulaCaseIds,
+            fairyElfSd.PositiveCaseIds);
+        Assert.Equal(
+            ExpectedFairyElfSdNegativeFormulaCaseIds,
+            fairyElfSd.NegativeCaseIds);
+        Assert.True(
+            fairyElfSd.IsValid,
+            $"{fairyElfSd.FormulaId}: {string.Join(" | ", fairyElfSd.Errors)}");
+
+        var magicGladiatorDefense = Assert.Single(
+            results,
+            result =>
+                result.FormulaId == "formula-defense-magic-gladiator" &&
+                result.FormulaVersion == "1.0.0");
+        Assert.Equal("PUBLISHED", magicGladiatorDefense.Status);
+        Assert.Equal(
+            ExpectedMagicGladiatorDefensePositiveFormulaCaseIds,
+            magicGladiatorDefense.PositiveCaseIds);
+        Assert.Equal(
+            ExpectedMagicGladiatorDefenseNegativeFormulaCaseIds,
+            magicGladiatorDefense.NegativeCaseIds);
+        Assert.True(
+            magicGladiatorDefense.IsValid,
+            $"{magicGladiatorDefense.FormulaId}: {string.Join(" | ", magicGladiatorDefense.Errors)}");
+
+        var magicGladiatorSd = Assert.Single(
+            results,
+            result =>
+                result.FormulaId == "formula-sd-magic-gladiator" &&
+                result.FormulaVersion == "1.0.0");
+        Assert.Equal("PUBLISHED", magicGladiatorSd.Status);
+        Assert.Equal(
+            ExpectedMagicGladiatorSdPositiveFormulaCaseIds,
+            magicGladiatorSd.PositiveCaseIds);
+        Assert.Equal(
+            ExpectedMagicGladiatorSdNegativeFormulaCaseIds,
+            magicGladiatorSd.NegativeCaseIds);
+        Assert.True(
+            magicGladiatorSd.IsValid,
+            $"{magicGladiatorSd.FormulaId}: {string.Join(" | ", magicGladiatorSd.Errors)}");
 
         var fairyElfAg = Assert.Single(
             results,
@@ -786,6 +1207,38 @@ public sealed class SchemaContractValidatorTests
         Assert.True(
             summonerAg.IsValid,
             $"{summonerAg.FormulaId}: {string.Join(" | ", summonerAg.Errors)}");
+
+        var summonerDefense = Assert.Single(
+            results,
+            result =>
+                result.FormulaId == "formula-defense-summoner" &&
+                result.FormulaVersion == "1.0.0");
+        Assert.Equal("PUBLISHED", summonerDefense.Status);
+        Assert.Equal(
+            ExpectedSummonerDefensePositiveFormulaCaseIds,
+            summonerDefense.PositiveCaseIds);
+        Assert.Equal(
+            ExpectedSummonerDefenseNegativeFormulaCaseIds,
+            summonerDefense.NegativeCaseIds);
+        Assert.True(
+            summonerDefense.IsValid,
+            $"{summonerDefense.FormulaId}: {string.Join(" | ", summonerDefense.Errors)}");
+
+        var summonerSd = Assert.Single(
+            results,
+            result =>
+                result.FormulaId == "formula-sd-summoner" &&
+                result.FormulaVersion == "1.0.0");
+        Assert.Equal("PUBLISHED", summonerSd.Status);
+        Assert.Equal(
+            ExpectedSummonerSdPositiveFormulaCaseIds,
+            summonerSd.PositiveCaseIds);
+        Assert.Equal(
+            ExpectedSummonerSdNegativeFormulaCaseIds,
+            summonerSd.NegativeCaseIds);
+        Assert.True(
+            summonerSd.IsValid,
+            $"{summonerSd.FormulaId}: {string.Join(" | ", summonerSd.Errors)}");
 
         var published = Assert.Single(
             results,
@@ -1178,7 +1631,7 @@ public sealed class SchemaContractValidatorTests
                 .ValidateRepository(temporaryRoot)
                 .ToArray();
 
-            Assert.Equal(18, results.Length);
+            Assert.Equal(31, results.Length);
             Assert.All(results, result => Assert.False(result.IsValid));
             Assert.All(
                 results,

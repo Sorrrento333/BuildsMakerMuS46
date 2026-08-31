@@ -8,6 +8,7 @@ public enum CheckedIntegerOperation
     Add,
     Subtract,
     Multiply,
+    Divide,
     ApplyRounding,
 }
 

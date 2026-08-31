@@ -324,7 +324,7 @@ public static class SchemaContractValidator
 
         var programStepIds = new List<string>();
         var priorStepIds = new HashSet<string>(StringComparer.Ordinal);
-        JsonElement? roundingStep = null;
+        var hasAnyRoundingStep = false;
 
         foreach (var step in instance
                      .GetProperty("strategy")
@@ -371,16 +371,11 @@ public static class SchemaContractValidator
             programStepIds.Add(stepId);
             if (step.GetProperty("operation").GetString() == "APPLY_ROUNDING")
             {
-                if (roundingStep is not null)
-                {
-                    return false;
-                }
-
-                roundingStep = step;
+                hasAnyRoundingStep = true;
             }
         }
 
-        if (roundingStep is null)
+        if (!hasAnyRoundingStep)
         {
             return false;
         }
@@ -398,9 +393,21 @@ public static class SchemaContractValidator
             .GetProperty("rounding")
             .GetProperty("stage")
             .GetString();
-        var roundingStepValue = roundingStep.Value;
-        var roundingStepId = roundingStepValue.GetProperty("id").GetString();
-        var roundedStepId = roundingStepValue
+        var visibleRoundingStep = instance
+            .GetProperty("strategy")
+            .GetProperty("steps")
+            .EnumerateArray()
+            .FirstOrDefault(step => step.GetProperty("id").GetString() ==
+                visibleOutputStepId);
+        if (visibleRoundingStep.ValueKind == JsonValueKind.Undefined ||
+            visibleRoundingStep.GetProperty("operation").GetString() !=
+                "APPLY_ROUNDING")
+        {
+            return false;
+        }
+
+        var roundingStepId = visibleRoundingStep.GetProperty("id").GetString();
+        var roundedStepId = visibleRoundingStep
             .GetProperty("operands")[0]
             .GetProperty("stepId")
             .GetString();

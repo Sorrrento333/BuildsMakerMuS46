@@ -1,0 +1,25 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "defense-dark-knight-blade-master-step",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-defense-dark-knight", "version": "1.0.0" },
+  "context": { "characterClassId": "class-dark-knight", "evolutionId": "evolution-blade-master" },
+  "inputs": { "agility": 23 },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-defense-dark-knight-blade-master-step",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": { "id": "formula-defense-dark-knight", "version": "1.0.0" },
+    "context": { "characterClassId": "class-dark-knight", "evolutionId": "evolution-blade-master" },
+    "inputs": { "agility": 23 },
+    "steps": [
+      { "stepId": "raw-defense", "value": 7.6666666666666666666666666667 },
+      { "stepId": "visible-defense", "value": 7 }
+    ],
+    "rounding": { "mode": "TRUNCATE", "stage": "visible-defense", "decimalPlaces": 0 },
+    "rawOutput": 7.6666666666666666666666666667,
+    "visibleOutput": 7,
+    "evidenceRefs": ["evd-0021", "evd-0026"],
+    "conflictIds": []
+  }
+}

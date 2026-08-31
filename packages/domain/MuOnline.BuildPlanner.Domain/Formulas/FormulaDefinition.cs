@@ -23,12 +23,19 @@ public enum FormulaNumericType
 {
     Signed32Bit,
     Signed64Bit,
+    ExactBase10,
 }
 
 public enum FormulaInputSourceKind
 {
     ContextValue,
     FormulaOutput,
+}
+
+public enum FormulaOutputStage
+{
+    Raw,
+    Visible,
 }
 
 public enum FormulaBoundsClassification
@@ -144,7 +151,7 @@ public sealed class FormulaNumericBounds
 
     public ImmutableArray<string> EvidenceRefs { get; }
 
-    public bool Contains(long value) =>
+    public bool Contains(decimal value) =>
         (Minimum is null ||
             (MinimumInclusive ? value >= Minimum.Value : value > Minimum.Value)) &&
         (Maximum is null ||
@@ -208,14 +215,35 @@ public sealed record FormulaInputSource
 {
     public FormulaInputSource(FormulaInputSourceKind kind, string valueId)
     {
+        if (kind != FormulaInputSourceKind.ContextValue)
+        {
+            throw new ArgumentException(
+                "The value-ID constructor is only valid for context sources.",
+                nameof(kind));
+        }
+
         ArgumentException.ThrowIfNullOrWhiteSpace(valueId);
         Kind = kind;
         ValueId = valueId;
     }
 
+    public FormulaInputSource(
+        FormulaReference formulaReference,
+        FormulaOutputStage outputStage)
+    {
+        ArgumentNullException.ThrowIfNull(formulaReference);
+        Kind = FormulaInputSourceKind.FormulaOutput;
+        FormulaReference = formulaReference;
+        OutputStage = outputStage;
+    }
+
     public FormulaInputSourceKind Kind { get; }
 
-    public string ValueId { get; }
+    public string? ValueId { get; }
+
+    public FormulaReference? FormulaReference { get; }
+
+    public FormulaOutputStage? OutputStage { get; }
 }
 
 public sealed record FormulaOutputDefinition
@@ -331,7 +359,8 @@ public sealed class FormulaDefinition
         FormulaRoundingDefinition rounding,
         FormulaTraceDefinition trace,
         IEnumerable<string> evidenceRefs,
-        IEnumerable<string>? conflictIds = null)
+        IEnumerable<string>? conflictIds = null,
+        IEnumerable<FormulaReference>? dependencyFormulaRefs = null)
     {
         ArgumentNullException.ThrowIfNull(reference);
         ArgumentException.ThrowIfNullOrWhiteSpace(rulesetId);
@@ -379,6 +408,23 @@ public sealed class FormulaDefinition
         Trace = trace;
         EvidenceRefs = CopyIds(evidenceRefs);
         ConflictIds = CopyIds(conflictIds);
+        DependencyFormulaRefs = (dependencyFormulaRefs ?? [])
+            .Distinct()
+            .ToImmutableArray();
+
+        var inputDependencyRefs = Inputs
+            .Where(input => input.Source.Kind == FormulaInputSourceKind.FormulaOutput)
+            .Select(input => input.Source.FormulaReference
+                ?? throw new ArgumentException(
+                    "Formula-output inputs require an exact formula reference.",
+                    nameof(inputs)))
+            .ToImmutableHashSet();
+        if (!inputDependencyRefs.SetEquals(DependencyFormulaRefs))
+        {
+            throw new ArgumentException(
+                "Declared dependencies must exactly match formula-output input sources.",
+                nameof(dependencyFormulaRefs));
+        }
     }
 
     public FormulaReference Reference { get; }
@@ -404,6 +450,8 @@ public sealed class FormulaDefinition
     public ImmutableArray<string> EvidenceRefs { get; }
 
     public ImmutableArray<string> ConflictIds { get; }
+
+    public ImmutableArray<FormulaReference> DependencyFormulaRefs { get; }
 
     private static ImmutableArray<string> CopyIds(IEnumerable<string>? ids)
     {

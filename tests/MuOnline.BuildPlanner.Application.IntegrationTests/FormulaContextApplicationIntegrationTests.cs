@@ -49,6 +49,9 @@ public sealed class FormulaContextApplicationIntegrationTests
                 File.ReadAllText(executablePath));
             var expectedSources = formulaDocument.RootElement.GetProperty("inputs")
                 .EnumerateArray()
+                .Where(input =>
+                    RequiredString(input.GetProperty("source"), "kind") ==
+                    "CONTEXT_VALUE")
                 .ToDictionary(
                     input => RequiredString(input, "id"),
                     input => RequiredString(input.GetProperty("source"), "valueId"),
@@ -56,9 +59,13 @@ public sealed class FormulaContextApplicationIntegrationTests
 
             Assert.Equal(
                 expectedSources,
-                definition.Inputs.ToDictionary(
+                definition.Inputs
+                    .Where(input =>
+                        input.Source.Kind ==
+                        FormulaInputSourceKind.ContextValue)
+                    .ToDictionary(
                     input => input.Id,
-                    input => input.Source.ValueId,
+                    input => input.Source.ValueId!,
                     StringComparer.Ordinal));
         }
     }
@@ -86,14 +93,17 @@ public sealed class FormulaContextApplicationIntegrationTests
                 _ => 0L,
                 StringComparer.Ordinal);
             foreach (var statInput in formula.Inputs.Where(
-                         input => input.Source.ValueId.StartsWith(
+                         input =>
+                             input.Source.Kind ==
+                                 FormulaInputSourceKind.ContextValue &&
+                             input.Source.ValueId!.StartsWith(
                              "resolved-",
                              StringComparison.Ordinal)))
             {
-                var statId = statInput.Source.ValueId["resolved-".Length..];
-                allocations[statId] = checked(
+                var statId = statInput.Source.ValueId!["resolved-".Length..];
+                allocations[statId] = checked((long)(
                     referenceCase.Inputs[statInput.Id] -
-                    characterClass.BaseStats[statId].BaseValue);
+                    characterClass.BaseStats[statId].BaseValue));
             }
 
             var result = useCase.Execute(
@@ -115,11 +125,23 @@ public sealed class FormulaContextApplicationIntegrationTests
             Assert.Equal(referenceCase.RawOutput, result.Formula.RawOutput);
             Assert.Equal(referenceCase.VisibleOutput, result.Formula.VisibleOutput);
             Assert.Equal(referenceCase.Steps, result.Formula.Trace.Steps);
+            var resolvedInputs = result.ContextTrace
+                .Select(item => KeyValuePair.Create(
+                    item.InputId,
+                    (decimal)item.ResolvedValue))
+                .Concat(result.DependencyTrace.Select(
+                    item => KeyValuePair.Create(item.InputId, item.ResolvedValue)))
+                .ToDictionary(item => item.Key, item => item.Value, StringComparer.Ordinal);
             Assert.Equal(
-                formula.Inputs.Select(input => input.Id),
-                result.ContextTrace.Select(item => item.InputId));
+                referenceCase.Inputs.OrderBy(item => item.Key, StringComparer.Ordinal),
+                resolvedInputs.OrderBy(item => item.Key, StringComparer.Ordinal));
             Assert.All(
                 result.ContextTrace,
+                item => Assert.Equal(
+                    referenceCase.Inputs[item.InputId],
+                    item.ResolvedValue));
+            Assert.All(
+                result.DependencyTrace,
                 item => Assert.Equal(
                     referenceCase.Inputs[item.InputId],
                     item.ResolvedValue));
@@ -127,7 +149,7 @@ public sealed class FormulaContextApplicationIntegrationTests
     }
 
     [Fact]
-    public void ContextResolverFailsClosedForUnknownAndUnsupportedSources()
+    public void ContextResolverFailsClosedForUnknownContextSource()
     {
         var fixture = CreateCanonicalState();
         var formula = fixture.Formula;
@@ -147,23 +169,6 @@ public sealed class FormulaContextApplicationIntegrationTests
             FormulaContextErrorCodes.ValueNotResolvable,
             unknownException.Code);
 
-        var unsupported = CopyFormula(
-            formula,
-            formula.Inputs.Select(input =>
-                input.Id == formula.Inputs[0].Id
-                    ? CopyInput(
-                        input,
-                        new FormulaInputSource(
-                            FormulaInputSourceKind.FormulaOutput,
-                            "dependency-output"))
-                    : input));
-        var unsupportedException = Assert.Throws<FormulaContextException>(
-            () => FormulaContextValueResolver.Resolve(
-                unsupported,
-                fixture.State));
-        Assert.Equal(
-            FormulaContextErrorCodes.SourceNotSupported,
-            unsupportedException.Code);
     }
 
     [Fact]
@@ -198,14 +203,87 @@ public sealed class FormulaContextApplicationIntegrationTests
     }
 
     [Fact]
+    public void ProductCompositionSelectsRawAndVisibleDependencyOutputsExactly()
+    {
+        var progressionCatalog =
+            new JsonProgressionRulesetSnapshotReader().Read(CanonicalSnapshotRoot);
+        var characterClass = progressionCatalog.Classes.Single(
+            item => item.Id == "class-dark-wizard");
+        var evolutionId = characterClass.EvolutionIds.First();
+        var sourceReference = new FormulaReference(
+            "formula-synthetic-dependency-source",
+            "1.0.0");
+        var consumerReference = new FormulaReference(
+            "formula-synthetic-dependency-consumer",
+            "1.0.0");
+        var applicability = new FormulaApplicability(
+            characterClass.Id,
+            characterClass.EvolutionIds);
+        var source = CreateSyntheticSourceFormula(
+            sourceReference,
+            applicability);
+        var consumer = CreateSyntheticConsumerFormula(
+            consumerReference,
+            sourceReference,
+            applicability);
+        var useCase = new CalculateCharacterFormulaUseCase(
+            progressionCatalog,
+            new ExecutableFormulaCatalog(
+                progressionCatalog.RulesetId,
+                [source, consumer]));
+        var allocations = characterClass.StatIds.ToDictionary(
+            statId => statId,
+            _ => 0L,
+            StringComparer.Ordinal);
+        allocations["agility"] = 1;
+
+        var result = useCase.Execute(
+            consumerReference,
+            new ProgressionPointBudgetRequest(
+                characterClass.Id,
+                evolutionId,
+                1,
+                []),
+            new ResetPointInputs(1, 1),
+            allocations);
+
+        Assert.Equal(18.5m, result.Formula.RawOutput);
+        Assert.Equal(18, result.Formula.VisibleOutput);
+        Assert.Collection(
+            result.DependencyTrace,
+            raw =>
+            {
+                Assert.Equal(consumerReference, raw.ConsumerFormulaReference);
+                Assert.Equal("raw-dependency", raw.InputId);
+                Assert.Equal(FormulaOutputStage.Raw, raw.OutputStage);
+                Assert.Equal(9.5m, raw.ResolvedValue);
+                Assert.Equal(9.5m, raw.FormulaTrace.RawOutput);
+                Assert.Equal(9, raw.FormulaTrace.VisibleOutput);
+                Assert.Single(raw.ContextTrace);
+                Assert.Equal("agility", raw.ContextTrace[0].StatId);
+                Assert.Equal(19, raw.ContextTrace[0].ResolvedValue);
+            },
+            visible =>
+            {
+                Assert.Equal("visible-dependency", visible.InputId);
+                Assert.Equal(FormulaOutputStage.Visible, visible.OutputStage);
+                Assert.Equal(9m, visible.ResolvedValue);
+                Assert.Equal(sourceReference, visible.FormulaReference);
+            });
+        Assert.Empty(result.ContextTrace);
+    }
+
+    [Fact]
     public void ContextResolverDistinguishesMissingBaseAndAllocation()
     {
         var fixture = CreateCanonicalState();
         var statInput = fixture.Formula.Inputs.Single(
-            input => input.Source.ValueId.StartsWith(
+            input =>
+                input.Source.Kind == FormulaInputSourceKind.ContextValue &&
+                input.Source.ValueId!.StartsWith(
                 "resolved-",
                 StringComparison.Ordinal));
-        var statId = statInput.Source.ValueId["resolved-".Length..];
+        var statId = statInput.Source.ValueId!["resolved-".Length..];
         var classWithoutBase = new CharacterProgressionDefinition(
             fixture.State.CharacterClass.Id,
             fixture.State.CharacterClass.RulesetId,
@@ -263,10 +341,12 @@ public sealed class FormulaContextApplicationIntegrationTests
             _ => 0L,
             StringComparer.Ordinal);
         var statInput = formula.Inputs.Single(
-            input => input.Source.ValueId.StartsWith(
+            input =>
+                input.Source.Kind == FormulaInputSourceKind.ContextValue &&
+                input.Source.ValueId!.StartsWith(
                 "resolved-",
                 StringComparison.Ordinal));
-        allocations[statInput.Source.ValueId["resolved-".Length..]] = long.MaxValue;
+        allocations[statInput.Source.ValueId!["resolved-".Length..]] = long.MaxValue;
 
         var exception = Assert.Throws<FormulaContextException>(
             () => new CalculateCharacterFormulaUseCase(
@@ -420,7 +500,8 @@ public sealed class FormulaContextApplicationIntegrationTests
             source.Rounding,
             source.Trace,
             source.EvidenceRefs,
-            source.ConflictIds);
+            source.ConflictIds,
+            source.DependencyFormulaRefs);
 
     private static FormulaInputDefinition CopyInput(
         FormulaInputDefinition source,
@@ -432,6 +513,115 @@ public sealed class FormulaContextApplicationIntegrationTests
             source.NumericBounds,
             source.RangeErrorCode,
             inputSource);
+
+    private static FormulaDefinition CreateSyntheticSourceFormula(
+        FormulaReference reference,
+        FormulaApplicability applicability) =>
+        new(
+            reference,
+            "mu-s4-global-reference",
+            FormulaStatus.Published,
+            FormulaConfidence.Unverified,
+            applicability,
+            [
+                new FormulaInputDefinition(
+                    "agility",
+                    FormulaNumericType.Signed64Bit,
+                    "synthetic-stat",
+                    TechnicalMinimum(0),
+                    "synthetic-input-out-of-range",
+                    new FormulaInputSource(
+                        FormulaInputSourceKind.ContextValue,
+                        "resolved-agility")),
+            ],
+            new FormulaOutputDefinition("synthetic-source", "synthetic-point"),
+            new CheckedDecimalFormulaProgram(
+            [
+                new CheckedIntegerFormulaStep(
+                    "raw-source",
+                    CheckedIntegerOperation.Multiply,
+                    [
+                        new FormulaInputOperand("agility"),
+                        new FormulaDecimalLiteralOperand(0.5m),
+                    ]),
+                new CheckedIntegerFormulaStep(
+                    "visible-source",
+                    CheckedIntegerOperation.ApplyRounding,
+                    [new FormulaStepOperand("raw-source")]),
+            ]),
+            new FormulaRoundingDefinition(
+                FormulaRoundingMode.Truncate,
+                "visible-source",
+                0),
+            new FormulaTraceDefinition(
+                ["raw-source", "visible-source"],
+                "raw-source",
+                "visible-source"),
+            ["evidence-synthetic"]);
+
+    private static FormulaDefinition CreateSyntheticConsumerFormula(
+        FormulaReference reference,
+        FormulaReference sourceReference,
+        FormulaApplicability applicability) =>
+        new(
+            reference,
+            "mu-s4-global-reference",
+            FormulaStatus.Published,
+            FormulaConfidence.Unverified,
+            applicability,
+            [
+                new FormulaInputDefinition(
+                    "raw-dependency",
+                    FormulaNumericType.ExactBase10,
+                    "synthetic-point",
+                    TechnicalMinimum(0),
+                    "synthetic-input-out-of-range",
+                    new FormulaInputSource(
+                        sourceReference,
+                        FormulaOutputStage.Raw)),
+                new FormulaInputDefinition(
+                    "visible-dependency",
+                    FormulaNumericType.Signed64Bit,
+                    "synthetic-point",
+                    TechnicalMinimum(0),
+                    "synthetic-input-out-of-range",
+                    new FormulaInputSource(
+                        sourceReference,
+                        FormulaOutputStage.Visible)),
+            ],
+            new FormulaOutputDefinition("synthetic-consumer", "synthetic-point"),
+            new CheckedDecimalFormulaProgram(
+            [
+                new CheckedIntegerFormulaStep(
+                    "raw-consumer",
+                    CheckedIntegerOperation.Add,
+                    [
+                        new FormulaInputOperand("raw-dependency"),
+                        new FormulaInputOperand("visible-dependency"),
+                    ]),
+                new CheckedIntegerFormulaStep(
+                    "visible-consumer",
+                    CheckedIntegerOperation.ApplyRounding,
+                    [new FormulaStepOperand("raw-consumer")]),
+            ]),
+            new FormulaRoundingDefinition(
+                FormulaRoundingMode.Truncate,
+                "visible-consumer",
+                0),
+            new FormulaTraceDefinition(
+                ["raw-consumer", "visible-consumer"],
+                "raw-consumer",
+                "visible-consumer"),
+            ["evidence-synthetic"],
+            dependencyFormulaRefs: [sourceReference]);
+
+    private static FormulaNumericBounds TechnicalMinimum(long minimum) =>
+        new(
+            minimum,
+            true,
+            null,
+            false,
+            FormulaBoundsClassification.Technical);
 
     private static PositiveFormulaCase[] LoadPositiveCases()
     {
@@ -493,10 +683,10 @@ public sealed class FormulaContextApplicationIntegrationTests
             .Select(formula => formula.Reference)
             .ToHashSet();
 
-    private static Dictionary<string, long> ReadValues(JsonElement element) =>
+    private static Dictionary<string, decimal> ReadValues(JsonElement element) =>
         element.EnumerateObject().ToDictionary(
             property => property.Name,
-            property => property.Value.GetInt64(),
+            property => property.Value.GetDecimal(),
             StringComparer.Ordinal);
 
     private static string RequiredString(JsonElement element, string propertyName) =>
@@ -538,7 +728,7 @@ public sealed class FormulaContextApplicationIntegrationTests
         FormulaReference Reference,
         string CharacterClassId,
         string EvolutionId,
-        IReadOnlyDictionary<string, long> Inputs,
+        IReadOnlyDictionary<string, decimal> Inputs,
         decimal RawOutput,
         long VisibleOutput,
         IReadOnlyList<FormulaCalculationTraceStep> Steps);

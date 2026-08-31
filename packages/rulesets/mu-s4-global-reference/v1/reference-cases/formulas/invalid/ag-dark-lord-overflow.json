@@ -1,0 +1,18 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "ag-dark-lord-overflow",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-ag-dark-lord", "version": "1.0.0" },
+  "context": {
+    "characterClassId": "class-dark-lord",
+    "evolutionId": "evolution-dark-lord"
+  },
+  "inputs": {
+    "energy": 9223372036854775807,
+    "vitality": 9223372036854775807,
+    "agility": 9223372036854775807,
+    "strength": 9223372036854775807,
+    "command": 9223372036854775807
+  },
+  "expectedErrorCode": "formula-arithmetic-overflow"
+}

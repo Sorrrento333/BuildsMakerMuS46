@@ -10,7 +10,7 @@ public sealed record FormulaReferenceCase(
     string Id,
     FormulaReference FormulaReference,
     FormulaCalculationContext Context,
-    IReadOnlyDictionary<string, long> Inputs,
+    IReadOnlyDictionary<string, decimal> Inputs,
     ExpectedFormulaTrace? ExpectedTrace,
     string? ExpectedErrorCode);
 
@@ -18,7 +18,7 @@ public sealed record ExpectedFormulaTrace(
     string RulesetId,
     FormulaReference FormulaReference,
     FormulaCalculationContext Context,
-    IReadOnlyDictionary<string, long> Inputs,
+    IReadOnlyDictionary<string, decimal> Inputs,
     IReadOnlyList<FormulaCalculationTraceStep> Steps,
     FormulaRoundingDefinition Rounding,
     decimal RawOutput,
@@ -121,7 +121,7 @@ public sealed class FormulaApplicationIntegrationTests
         using var historicalDocument = JsonDocument.Parse(
             File.ReadAllText(historicalPath));
 
-        Assert.Equal(17, catalog.Formulas.Length);
+        Assert.Equal(30, catalog.Formulas.Length);
         Assert.Equal(
             [
                 "2.0.0",
@@ -131,6 +131,19 @@ public sealed class FormulaApplicationIntegrationTests
                 "2.0.0",
                 "2.0.0",
                 "2.0.0",
+                "2.1.0",
+                "2.1.0",
+                "2.1.0",
+                "2.1.0",
+                "2.1.0",
+                "2.1.0",
+                "2.1.0",
+                "2.1.0",
+                "2.1.0",
+                "2.1.0",
+                "2.1.0",
+                "2.1.0",
+                "2.1.0",
                 "2.1.0",
                 "2.1.0",
                 "2.1.0",
@@ -217,6 +230,30 @@ public sealed class FormulaApplicationIntegrationTests
     }
 
     [Fact]
+    public void ReaderRejectsDivideForIntegerExecutionModel()
+    {
+        using var snapshot = TemporaryFormulaSnapshot.CopyFrom(
+            CanonicalSnapshotRoot);
+        UpdateExecutableFormula(snapshot.FormulasDirectory, root =>
+        {
+            var steps = root["strategy"]?["steps"]?.AsArray()
+                ?? throw new InvalidDataException("Steps array expected.");
+            var binaryStep = steps
+                .Select(item => item?.AsObject())
+                .First(step => step?["operation"]?.GetValue<string>() == "MULTIPLY")
+                ?? throw new InvalidDataException("Binary step expected.");
+            binaryStep["operation"] = "DIVIDE";
+        });
+
+        var exception = Assert.Throws<FormulaSnapshotException>(
+            () => ReadCatalog(snapshot.Root));
+
+        Assert.Equal(
+            FormulaSnapshotErrorCodes.ReferenceIncoherent,
+            exception.Code);
+    }
+
+    [Fact]
     public void ReaderFailsClosedWhenExactFormulaReferenceIsDuplicated()
     {
         using var snapshot = TemporaryFormulaSnapshot.CopyFrom(
@@ -231,6 +268,68 @@ public sealed class FormulaApplicationIntegrationTests
 
         Assert.Equal(
             FormulaSnapshotErrorCodes.DuplicateReference,
+            exception.Code);
+    }
+
+    [Fact]
+    public void ReaderMaterializesExactRawFormulaDependency()
+    {
+        using var snapshot = TemporaryFormulaSnapshot.CopyFrom(
+            CanonicalSnapshotRoot);
+        var consumerReference = AddDependencyConsumer(snapshot.FormulasDirectory);
+
+        var consumer = ReadCatalog(snapshot.Root).Resolve(consumerReference);
+        var input = consumer.Inputs.Single(
+            item => item.Source.Kind == FormulaInputSourceKind.FormulaOutput);
+
+        Assert.Equal(FormulaNumericType.ExactBase10, input.NumericType);
+        Assert.Equal(
+            new FormulaReference("formula-ag-dark-wizard", "1.0.0"),
+            input.Source.FormulaReference);
+        Assert.Equal(FormulaOutputStage.Raw, input.Source.OutputStage);
+        Assert.Equal(
+            consumer.DependencyFormulaRefs,
+            [input.Source.FormulaReference!]);
+    }
+
+    [Fact]
+    public void ReaderFailsClosedForFormulaDependencyCycle()
+    {
+        using var snapshot = TemporaryFormulaSnapshot.CopyFrom(
+            CanonicalSnapshotRoot);
+        var consumerReference = AddDependencyConsumer(snapshot.FormulasDirectory);
+        var sourcePath = Path.Combine(
+            snapshot.FormulasDirectory,
+            "ag-dark-wizard.json");
+        var source = JsonNode.Parse(File.ReadAllText(sourcePath))?.AsObject()
+            ?? throw new InvalidDataException("Formula object expected.");
+        var sourceInput = source["inputs"]?[0]?.AsObject()
+            ?? throw new InvalidDataException("Formula input expected.");
+        sourceInput["numericType"] = "DECIMAL";
+        sourceInput["source"] = new JsonObject
+        {
+            ["kind"] = "FORMULA_OUTPUT",
+            ["formulaId"] = consumerReference.Id,
+            ["formulaVersion"] = consumerReference.Version,
+            ["outputStage"] = "RAW",
+        };
+        var sourceStrategy = source["strategy"]?.AsObject()
+            ?? throw new InvalidDataException("Formula strategy expected.");
+        sourceStrategy["dependencyFormulaRefs"] = new JsonArray(
+            new JsonObject
+            {
+                ["id"] = consumerReference.Id,
+                ["version"] = consumerReference.Version,
+            });
+        File.WriteAllText(
+            sourcePath,
+            source.ToJsonString(new JsonSerializerOptions { WriteIndented = true }));
+
+        var exception = Assert.Throws<FormulaSnapshotException>(
+            () => ReadCatalog(snapshot.Root));
+
+        Assert.Equal(
+            FormulaSnapshotErrorCodes.ReferenceIncoherent,
             exception.Code);
     }
 
@@ -287,7 +386,21 @@ public sealed class FormulaApplicationIntegrationTests
                         RequiredString(root, "id"),
                         RequiredString(root, "version")));
             })
-            .Where(item => item.SchemaVersion == "2.0.0")
+            .Where(item =>
+                item.SchemaVersion == "2.0.0" ||
+                item.Reference.Id is
+                    "formula-defense-dark-knight" or
+                    "formula-defense-dark-lord" or
+                    "formula-defense-dark-wizard" or
+                    "formula-defense-fairy-elf" or
+                    "formula-defense-magic-gladiator" or
+                    "formula-defense-summoner" or
+                    "formula-sd-dark-knight" or
+                    "formula-sd-dark-lord" or
+                    "formula-sd-dark-wizard" or
+                    "formula-sd-fairy-elf" or
+                    "formula-sd-magic-gladiator" or
+                    "formula-sd-summoner")
             .Select(item => item.Reference)
             .ToHashSet();
 
@@ -348,11 +461,11 @@ public sealed class FormulaApplicationIntegrationTests
             RequiredString(element, "characterClassId"),
             RequiredString(element, "evolutionId"));
 
-    private static Dictionary<string, long> ParseValues(
+    private static Dictionary<string, decimal> ParseValues(
         JsonElement element) =>
         element.EnumerateObject().ToDictionary(
             property => property.Name,
-            property => property.Value.GetInt64(),
+            property => property.Value.GetDecimal(),
             StringComparer.Ordinal);
 
     private static FormulaRoundingMode ParseRoundingMode(string value) =>
@@ -390,6 +503,43 @@ public sealed class FormulaApplicationIntegrationTests
         File.WriteAllText(
             path,
             root.ToJsonString(new JsonSerializerOptions { WriteIndented = true }));
+    }
+
+    private static FormulaReference AddDependencyConsumer(
+        string formulasDirectory)
+    {
+        var sourcePath = Path.Combine(formulasDirectory, "ag-dark-wizard.json");
+        var consumer = JsonNode.Parse(File.ReadAllText(sourcePath))?.AsObject()
+            ?? throw new InvalidDataException("Formula object expected.");
+        var reference = new FormulaReference(
+            "formula-synthetic-dependency-consumer",
+            "1.0.0");
+        consumer["id"] = reference.Id;
+        consumer["version"] = reference.Version;
+        consumer["purpose"] = "Synthetic dependency contract test.";
+        var input = consumer["inputs"]?[0]?.AsObject()
+            ?? throw new InvalidDataException("Formula input expected.");
+        input["numericType"] = "DECIMAL";
+        input["source"] = new JsonObject
+        {
+            ["kind"] = "FORMULA_OUTPUT",
+            ["formulaId"] = "formula-ag-dark-wizard",
+            ["formulaVersion"] = "1.0.0",
+            ["outputStage"] = "RAW",
+        };
+        var strategy = consumer["strategy"]?.AsObject()
+            ?? throw new InvalidDataException("Formula strategy expected.");
+        strategy["dependencyFormulaRefs"] = new JsonArray(
+            new JsonObject
+            {
+                ["id"] = "formula-ag-dark-wizard",
+                ["version"] = "1.0.0",
+            });
+        File.WriteAllText(
+            Path.Combine(formulasDirectory, "synthetic-dependency-consumer.json"),
+            consumer.ToJsonString(
+                new JsonSerializerOptions { WriteIndented = true }));
+        return reference;
     }
 
     private static string FindExecutableFormulaPath(string formulasDirectory) =>

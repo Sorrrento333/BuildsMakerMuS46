@@ -68,6 +68,58 @@ public sealed class CheckedDecimalFormulaInterpreterTests
         Assert.Equal(FormulaCalculationErrorCodes.ProgramInvalid, exception.Code);
     }
 
+    [Fact]
+    public void ExactDecimalProgramDividesWithoutReplacingTheDivisorWithACoefficient()
+    {
+        var definition = CreateDefinition(
+            new CheckedDecimalFormulaProgram(
+            [
+                new(
+                    "raw-hp",
+                    CheckedIntegerOperation.Divide,
+                    [
+                        new FormulaInputOperand("character-level"),
+                        new FormulaDecimalLiteralOperand(30m),
+                    ]),
+                new(
+                    "visible-hp",
+                    CheckedIntegerOperation.ApplyRounding,
+                    [new FormulaStepOperand("raw-hp")]),
+            ]),
+            ["raw-hp", "visible-hp"],
+            "raw-hp");
+
+        var result = CheckedDecimalFormulaInterpreter.Calculate(
+            definition,
+            Request(level: 1, vitality: 20));
+
+        Assert.Equal(1m / 30m, result.RawOutput);
+        Assert.Equal(0, result.VisibleOutput);
+
+        var zeroDivisorDefinition = CreateDefinition(
+            new CheckedDecimalFormulaProgram(
+            [
+                new(
+                    "raw-hp",
+                    CheckedIntegerOperation.Divide,
+                    [
+                        new FormulaInputOperand("character-level"),
+                        new FormulaDecimalLiteralOperand(0m),
+                    ]),
+                new(
+                    "visible-hp",
+                    CheckedIntegerOperation.ApplyRounding,
+                    [new FormulaStepOperand("raw-hp")]),
+            ]),
+            ["raw-hp", "visible-hp"],
+            "raw-hp");
+        var exception = Assert.Throws<FormulaCalculationException>(
+            () => CheckedDecimalFormulaInterpreter.Calculate(
+                zeroDivisorDefinition,
+                Request(level: 1, vitality: 20)));
+        Assert.Equal(FormulaCalculationErrorCodes.ProgramInvalid, exception.Code);
+    }
+
     private static FormulaCalculationResult Calculate(long level, long vitality) =>
         CheckedDecimalFormulaInterpreter.Calculate(
             CreateDefinition(CreateProgram()),
@@ -178,4 +230,151 @@ public sealed class CheckedDecimalFormulaInterpreterTests
                 CheckedIntegerOperation.ApplyRounding,
                 [new FormulaStepOperand("raw-hp")]),
         ]);
+
+    [Fact]
+    public void MultiTruncateProgramTruncatesEachTermBeforeSumming()
+    {
+        var result = CalculateSummonerSd(level: 1, strength: 21, agility: 21,
+            vitality: 18, energy: 23, defense: 7);
+
+        Assert.Equal(102m, result.RawOutput);
+        Assert.Equal(102, result.VisibleOutput);
+        Assert.Equal(
+            [
+                83m, 99.6m, 99m, 3.5m, 3m, 1m,
+                0.0333333333333333333333333333m, 0m, 102m, 102m,
+            ],
+            result.Trace.Steps.Select(step => step.Value));
+        Assert.All(
+            SupersetOf(
+                result.Trace.Steps,
+                ["stat-term", "defense-term", "level-term"]),
+            step => Assert.Equal(0, step.Value % 1m));
+    }
+
+    private static IEnumerable<FormulaCalculationTraceStep> SupersetOf(
+        IEnumerable<FormulaCalculationTraceStep> steps,
+        params string[] ids) =>
+        steps.Where(step => ids.Contains(step.StepId));
+
+    private static FormulaCalculationResult CalculateSummonerSd(
+        long level, long strength, long agility, long vitality,
+        long energy, long defense) =>
+        CheckedDecimalFormulaInterpreter.Calculate(
+            CreateSummonerSdDefinition(),
+            new FormulaCalculationRequest(
+                new FormulaCalculationContext(
+                    "class-synthetic", "evolution-synthetic"),
+                new Dictionary<string, long>
+                {
+                    ["character-level"] = level,
+                    ["strength"] = strength,
+                    ["agility"] = agility,
+                    ["vitality"] = vitality,
+                    ["energy"] = energy,
+                    ["defense"] = defense,
+                }));
+
+    private static FormulaDefinition CreateSummonerSdDefinition() =>
+        new(
+            new FormulaReference("formula-synthetic-summoner-sd", "0.1.0"),
+            "ruleset-synthetic",
+            FormulaStatus.Published,
+            FormulaConfidence.Unverified,
+            new FormulaApplicability(
+                "class-synthetic",
+                ["evolution-synthetic"]),
+            [
+                Input("character-level", FormulaNumericType.Signed32Bit, 1),
+                Input("strength", FormulaNumericType.Signed64Bit, 21),
+                Input("agility", FormulaNumericType.Signed64Bit, 21),
+                Input("vitality", FormulaNumericType.Signed64Bit, 18),
+                Input("energy", FormulaNumericType.Signed64Bit, 23),
+                Input("defense", FormulaNumericType.Signed64Bit, 0),
+            ],
+            new FormulaOutputDefinition("sd", "sd-point"),
+            new CheckedDecimalFormulaProgram(
+            [
+                new(
+                    "stat-sum",
+                    CheckedIntegerOperation.Add,
+                    [
+                        new FormulaInputOperand("strength"),
+                        new FormulaInputOperand("agility"),
+                        new FormulaInputOperand("vitality"),
+                        new FormulaInputOperand("energy"),
+                    ]),
+                new(
+                    "stat-product",
+                    CheckedIntegerOperation.Multiply,
+                    [
+                        new FormulaStepOperand("stat-sum"),
+                        new FormulaDecimalLiteralOperand(1.2m),
+                    ]),
+                new(
+                    "stat-term",
+                    CheckedIntegerOperation.ApplyRounding,
+                    [new FormulaStepOperand("stat-product")]),
+                new(
+                    "defense-product",
+                    CheckedIntegerOperation.Divide,
+                    [
+                        new FormulaInputOperand("defense"),
+                        new FormulaDecimalLiteralOperand(2m),
+                    ]),
+                new(
+                    "defense-term",
+                    CheckedIntegerOperation.ApplyRounding,
+                    [new FormulaStepOperand("defense-product")]),
+                new(
+                    "level-square",
+                    CheckedIntegerOperation.Multiply,
+                    [
+                        new FormulaInputOperand("character-level"),
+                        new FormulaInputOperand("character-level"),
+                    ]),
+                new(
+                    "level-product",
+                    CheckedIntegerOperation.Divide,
+                    [
+                        new FormulaStepOperand("level-square"),
+                        new FormulaDecimalLiteralOperand(30m),
+                    ]),
+                new(
+                    "level-term",
+                    CheckedIntegerOperation.ApplyRounding,
+                    [new FormulaStepOperand("level-product")]),
+                new(
+                    "raw-sd",
+                    CheckedIntegerOperation.Add,
+                    [
+                        new FormulaStepOperand("stat-term"),
+                        new FormulaStepOperand("defense-term"),
+                        new FormulaStepOperand("level-term"),
+                    ]),
+                new(
+                    "visible-sd",
+                    CheckedIntegerOperation.ApplyRounding,
+                    [new FormulaStepOperand("raw-sd")]),
+            ]),
+            new FormulaRoundingDefinition(
+                FormulaRoundingMode.Truncate,
+                "visible-sd",
+                decimalPlaces: 0),
+            new FormulaTraceDefinition(
+                [
+                    "stat-sum",
+                    "stat-product",
+                    "stat-term",
+                    "defense-product",
+                    "defense-term",
+                    "level-square",
+                    "level-product",
+                    "level-term",
+                    "raw-sd",
+                    "visible-sd",
+                ],
+                "raw-sd",
+                "visible-sd"),
+            ["evidence-synthetic"]);
 }

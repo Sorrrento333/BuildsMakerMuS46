@@ -619,6 +619,16 @@ public partial class MainWindow : Window
                 : $"- {item.InputId} ← {item.ContextValueId}: " +
                   $"{item.BaseValue} + {item.Allocation} = {item.ResolvedValue} " +
                   $"[CHECKED_ADD; {string.Join(", ", item.EvidenceRefs)}]"));
+        if (result.DependencyTrace.Length != 0)
+        {
+            lines.Add("Traza de dependencias:");
+            lines.AddRange(result.DependencyTrace.Select(item =>
+                $"- {item.ConsumerFormulaReference.Id}.{item.InputId} ← " +
+                $"{item.FormulaReference.Id} " +
+                $"v{item.FormulaReference.Version} [{item.OutputStage}]: " +
+                item.ResolvedValue));
+        }
+
         lines.Add("Traza aritmética:");
         lines.AddRange(formula.Trace.Steps.Select(
             step => $"- {step.StepId}: {step.Value}"));
@@ -642,6 +652,10 @@ public partial class MainWindow : Window
             "falta una asignación validada requerida.",
         FormulaContextErrorCodes.ArithmeticOverflow =>
             "la suma comprobada de base y asignación excede el rango permitido.",
+        FormulaContextErrorCodes.DependencyCycle =>
+            "las fórmulas dependientes forman un ciclo.",
+        FormulaContextErrorCodes.DependencyIncoherent =>
+            "una dependencia no declara una referencia y etapa de salida coherentes.",
         _ => "se produjo un error de contexto no reconocido.",
     };
 

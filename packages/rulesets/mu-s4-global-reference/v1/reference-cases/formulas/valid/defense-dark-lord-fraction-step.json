@@ -1,0 +1,25 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "defense-dark-lord-fraction-step",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-defense-dark-lord", "version": "1.0.0" },
+  "context": { "characterClassId": "class-dark-lord", "evolutionId": "evolution-dark-lord" },
+  "inputs": { "agility": 22 },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-defense-dark-lord-fraction-step",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": { "id": "formula-defense-dark-lord", "version": "1.0.0" },
+    "context": { "characterClassId": "class-dark-lord", "evolutionId": "evolution-dark-lord" },
+    "inputs": { "agility": 22 },
+    "steps": [
+      { "stepId": "raw-defense", "value": 3.1428571428571428571428571429 },
+      { "stepId": "visible-defense", "value": 3 }
+    ],
+    "rounding": { "mode": "TRUNCATE", "stage": "visible-defense", "decimalPlaces": 0 },
+    "rawOutput": 3.1428571428571428571428571429,
+    "visibleOutput": 3,
+    "evidenceRefs": ["evd-0021", "evd-0026"],
+    "conflictIds": []
+  }
+}

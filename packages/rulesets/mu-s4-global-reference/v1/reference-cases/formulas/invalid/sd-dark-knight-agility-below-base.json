@@ -1,0 +1,16 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "sd-dark-knight-agility-below-base",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-sd-dark-knight", "version": "1.0.0" },
+  "context": { "characterClassId": "class-dark-knight", "evolutionId": "evolution-dark-knight" },
+  "inputs": {
+    "character-level": 1,
+    "strength": 28,
+    "agility": 19,
+    "vitality": 25,
+    "energy": 10,
+    "defense": 6.3333333333333333333333333333
+  },
+  "expectedErrorCode": "formula-stat-below-base"
+}

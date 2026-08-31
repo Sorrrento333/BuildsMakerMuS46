@@ -42,13 +42,13 @@ El comando valida siete contratos `1.0.0`, los contratos `formula`,
 `examples/valid`, rechaza los once de `examples/invalid` y devuelve un código
 distinto de cero si alguna expectativa no se cumple. También valida contra
 `character-class.schema.json`, `progression-rule.schema.json` y
-`formula.schema.json` los diecisiete registros canónicos de
+`formula.schema.json` los veintinueve registros canónicos de
 `packages/rulesets/mu-s4-global-reference/v1`; estos registros no son fixtures
 sintéticos. Además ejecuta siete casos de referencia
 factuales de progresión y exige el rechazo de tres controles semánticos
-inválidos. El gate de fórmula valida cuarenta casos factuales positivos y
-cuarenta controles negativos entre el histórico y las nueve definiciones
-ejecutables, sin
+inválidos. El gate de fórmula valida ochenta y cuatro casos factuales positivos
+y noventa y seis controles negativos entre la definición histórica y las
+veinte definiciones ejecutables, sin
 ejecutar un cálculo productivo. Esta comprobación
 pertenece al tooling de validación y no constituye el motor. Las pruebas de
 contrato se ejecutan con:
@@ -79,6 +79,11 @@ ninguno de esos fixtures materializa una fórmula de MU Online. La primera
 definición factual y sus casos viven separadamente en el ruleset canónico.
 
 `v2/formula.schema.json` admite `2.0.0` y su evolución compatible `2.1.0`.
+Los inputs de `2.1.0` pueden declarar `DECIMAL` para consumir sin pérdida una
+salida `RAW`. `FORMULA_OUTPUT` conserva referencia/version exactas y etapa
+obligatoria `RAW`/`VISIBLE`; Application rechaza dependencias ausentes,
+incompatibles o cíclicas. `CHECKED_DECIMAL_V1` admite además `DIVIDE` binario
+con divisor no nulo; `CHECKED_INT64_V1` lo rechaza.
 `2.0.0` sustituye la estrategia textual por un `PROGRAM` con modelo
 `CHECKED_INT64_V1`. Admite inputs `INT32`/`INT64`, literales `INT64` y
 exclusivamente `CONSTANT`, `ADD`, `SUBTRACT`, `MULTIPLY` y

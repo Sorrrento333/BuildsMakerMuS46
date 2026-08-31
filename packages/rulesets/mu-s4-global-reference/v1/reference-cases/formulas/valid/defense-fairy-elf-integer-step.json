@@ -1,0 +1,25 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "defense-fairy-elf-integer-step",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-defense-fairy-elf", "version": "1.0.0" },
+  "context": { "characterClassId": "class-fairy-elf", "evolutionId": "evolution-muse-elf" },
+  "inputs": { "agility": 30 },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-defense-fairy-elf-integer-step",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": { "id": "formula-defense-fairy-elf", "version": "1.0.0" },
+    "context": { "characterClassId": "class-fairy-elf", "evolutionId": "evolution-muse-elf" },
+    "inputs": { "agility": 30 },
+    "steps": [
+      { "stepId": "raw-defense", "value": 3 },
+      { "stepId": "visible-defense", "value": 3 }
+    ],
+    "rounding": { "mode": "TRUNCATE", "stage": "visible-defense", "decimalPlaces": 0 },
+    "rawOutput": 3,
+    "visibleOutput": 3,
+    "evidenceRefs": ["evd-0021", "evd-0026"],
+    "conflictIds": []
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "defense-summoner-base",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-defense-summoner", "version": "1.0.0" },
+  "context": { "characterClassId": "class-summoner", "evolutionId": "evolution-summoner" },
+  "inputs": { "agility": 21 },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-defense-summoner-base",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": { "id": "formula-defense-summoner", "version": "1.0.0" },
+    "context": { "characterClassId": "class-summoner", "evolutionId": "evolution-summoner" },
+    "inputs": { "agility": 21 },
+    "steps": [
+      { "stepId": "raw-defense", "value": 7 },
+      { "stepId": "visible-defense", "value": 7 }
+    ],
+    "rounding": { "mode": "TRUNCATE", "stage": "visible-defense", "decimalPlaces": 0 },
+    "rawOutput": 7,
+    "visibleOutput": 7,
+    "evidenceRefs": ["evd-0021", "evd-0026", "evd-0032"],
+    "conflictIds": []
+  }
+}

@@ -15,10 +15,11 @@ La sección de borrador local guarda y carga por ID a través de los casos de us
 de Application; una carga recalcula antes de repoblar la pantalla.
 Después de distribuir, la pantalla obtiene del catálogo las fórmulas publicadas
 aplicables, ofrece una selección genérica por referencia exacta y ejecuta
-`CalculateCharacterFormulaUseCase`. Muestra HP y Mana para las seis familias,
-y AG para Dark Wizard, con traza
-contextual de los valores realmente consumidos más traza
-aritmética. WPF no construye inputs contextuales ni duplica IDs, bases,
+`CalculateCharacterFormulaUseCase`. Muestra HP, Mana y AG para las seis
+familias, más Defense y SD para Dark Wizard, Dark Knight y Fairy Elf, con traza
+contextual de los valores realmente consumidos, traza de dependencias
+`RAW`/`VISIBLE` cuando corresponda y traza aritmética. WPF no
+construye inputs contextuales o derivados ni duplica IDs, bases,
 expresiones o constantes de las fórmulas.
 
 ## Publicación inicial
@@ -30,8 +31,8 @@ No se consideran soportados `win-arm64`, otros sistemas operativos ni single-fil
 La base productiva se ubica en
 `%LOCALAPPDATA%\MuOnline.BuildPlanner\build-planner.sqlite`. Al iniciar, la
 composición aplica `SqliteBuildDraftMigrations.All` antes de crear el repositorio.
-Declara ruleset `1.0.0`, dataset `2026-07-28.2`, motor `0.2.0` y calcula el hash
-SHA-256 sobre las rutas relativas y bytes exactos de los 188 JSON publicados.
+Declara ruleset `1.0.0`, dataset `2026-07-29.4`, motor `0.2.0` y calcula el hash
+SHA-256 sobre las rutas relativas y bytes exactos de los 315 JSON publicados.
 
 ```powershell
 dotnet restore MUOnline.BuildPlanner.slnx --locked-mode
@@ -59,7 +60,7 @@ dotnet publish apps/desktop/MuOnline.BuildPlanner.App/MuOnline.BuildPlanner.App.
 - configuración sintética `2 × 100 = 200` y distribución de esos puntos sobre
   los stats materializados, con total, gasto, remanente y conjunto de
   asignaciones verificados en ambas fases.
-- reproducción de los 56 casos positivos de las fórmulas publicadas mediante
+- reproducción de los 120 casos positivos de las fórmulas publicadas mediante
   snapshot → progresión → distribución → contexto → intérprete, incluida la
   igualdad de las trazas contextual y aritmética en ambas fases;
 - guardado y carga revalidada de un borrador sintético mediante los casos de uso
@@ -77,6 +78,62 @@ Los reportes JSON y binarios quedan bajo `artifacts/`, ignorado por Git.
 powershell.exe -NoProfile -ExecutionPolicy Bypass `
   -File tools/smoke-tests/Test-WpfPublishedArtifact.ps1
 ```
+
+Verificación local del 2026-07-29 después de cerrar Defense/SD de Summoner:
+cierre del último claim `VERIFIED` de `RES-0002`. Aprobados 315/315 JSON
+(30 fórmulas publicadas y 120 casos contextuales, incluida la semántica de
+truncamientos independientes de SD de Summoner con `defense = agi / 3`). El
+build Release y las 320/320 pruebas pasan con 0 advertencias/0 errores. El
+smoke WPF `win-x64` requiere una ejecución del mantenedor para capturar el
+hash, el conteo de archivos y los bytes del dataset `2026-07-29.4`.
+
+Verificación local del 2026-07-29 después de cerrar Defense/SD de Dark Lord:
+PASS en `win-x64`, SQLite `3.53.3`, 719 archivos y 149.231.704 bytes. Conservó
+10 avisos legales y 296/296 JSON, reprodujo progresión 7/7+3/3, distribución,
+resets, backup/restore y borrador, y ejecutó 112/112 casos positivos de las
+veintiocho referencias publicadas con trazas contextual, de dependencia y
+aritmética en ambas fases. El dataset `2026-07-29.3` produjo
+`sha256:06114f61777a993cba3dacd4ddf45aba95bd7cc92be6b85dd51973c36d266eb4`.
+
+Verificación local del 2026-07-29 después de cerrar Defense/SD de Magic
+Gladiator: PASS en `win-x64`, SQLite `3.53.3`, 699 archivos y 149.206.594 bytes.
+Conservó 10 avisos legales y 276/276 JSON, reprodujo progresión 7/7+3/3,
+distribución, resets, backup/restore y borrador, y ejecutó 104/104 casos
+positivos de las veintiséis referencias publicadas con trazas contextual, de
+dependencia y aritmética en ambas fases. El dataset `2026-07-29.2` produjo
+`sha256:64cfcd9cefe4056ea8ae7878a0cb71fb56e03178c14bdec78d2df1bb89beae78`.
+
+Verificación local del 2026-07-29 después de cerrar Defense/SD de Fairy Elf:
+PASS en `win-x64`, SQLite `3.53.3`, 680 archivos y 149.182.482 bytes. Conservó
+10 avisos legales y 257/257 JSON, reprodujo progresión 7/7+3/3, distribución,
+resets, backup/restore y borrador, y ejecutó 96/96 casos positivos de las
+veinticuatro referencias publicadas con trazas contextual, de dependencia y
+aritmética en ambas fases. El dataset `2026-07-29.1` produjo
+`sha256:a070bd16d1a1a2b60a9b81eeb393d160ac28039c2293e6ff25ebb7c4d2ffa66a`.
+
+Verificación local del 2026-07-28 después de cerrar Defense/SD de Dark Knight:
+PASS en `win-x64`, SQLite `3.53.3`, 661 archivos y 149.159.173 bytes. Conservó
+10 avisos legales y 238/238 JSON, reprodujo progresión 7/7+3/3, distribución,
+resets, backup/restore y borrador, y ejecutó 88/88 casos positivos de las
+veintidós referencias publicadas con trazas contextual, de dependencia y
+aritmética en ambas fases. El dataset `2026-07-28.5` produjo
+`sha256:ee9d68d056bb2d917b784dd62dd320e1228c62983df37621efddf257dabbfcc7`.
+
+Verificación local del 2026-07-28 después de cerrar Defense/SD de Dark Wizard:
+PASS en `win-x64`, SQLite `3.53.3`, 642 archivos y 149.134.500 bytes. Conservó
+10 avisos legales y 219/219 JSON, reprodujo progresión 7/7+3/3, distribución,
+resets, backup/restore y borrador, y ejecutó 80/80 casos positivos de las veinte
+referencias publicadas con trazas contextual, de dependencia y aritmética en
+ambas fases. El dataset `2026-07-28.4` produjo
+`sha256:5ed158fe25450520d7a1eddd23edb451b00ab9f19c1d3c46f4e065474dd5082e`.
+
+Verificación local del 2026-07-28 después de cerrar AG de Dark Lord:
+PASS en `win-x64`, SQLite `3.53.3`, 623 archivos y 149.091.558 bytes. Conservó
+10 avisos legales y 200/200 JSON, reprodujo progresión 7/7+3/3, distribución,
+resets, backup/restore y borrador, y ejecutó 72/72 casos positivos de las
+dieciocho referencias publicadas con resolución contextual en ambas fases. El
+dataset `2026-07-28.3` produjo el hash
+`sha256:66e83b7bef261a6d310e4c5933522a6387aaab56ce7f50a396df1df2988e47eb`.
 
 Verificación local del 2026-07-28 después de cerrar AG de Magic Gladiator:
 PASS en `win-x64`, SQLite `3.53.3`, 611 archivos y 149.076.719 bytes. Conservó

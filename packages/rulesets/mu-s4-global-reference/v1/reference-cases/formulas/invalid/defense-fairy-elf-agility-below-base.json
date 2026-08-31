@@ -1,0 +1,9 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "defense-fairy-elf-agility-below-base",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-defense-fairy-elf", "version": "1.0.0" },
+  "context": { "characterClassId": "class-fairy-elf", "evolutionId": "evolution-fairy-elf" },
+  "inputs": { "agility": 24 },
+  "expectedErrorCode": "formula-stat-below-base"
+}

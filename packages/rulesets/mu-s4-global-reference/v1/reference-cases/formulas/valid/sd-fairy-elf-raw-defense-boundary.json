@@ -1,0 +1,44 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "sd-fairy-elf-raw-defense-boundary",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-sd-fairy-elf", "version": "1.0.0" },
+  "context": { "characterClassId": "class-fairy-elf", "evolutionId": "evolution-muse-elf" },
+  "inputs": {
+    "character-level": 1,
+    "strength": 22,
+    "agility": 27,
+    "vitality": 20,
+    "energy": 15,
+    "defense": 2.7
+  },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-sd-fairy-elf-raw-defense-boundary",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": { "id": "formula-sd-fairy-elf", "version": "1.0.0" },
+    "context": { "characterClassId": "class-fairy-elf", "evolutionId": "evolution-muse-elf" },
+    "inputs": {
+      "character-level": 1,
+      "strength": 22,
+      "agility": 27,
+      "vitality": 20,
+      "energy": 15,
+      "defense": 2.7
+    },
+    "steps": [
+      { "stepId": "stat-sum", "value": 84 },
+      { "stepId": "stat-contribution", "value": 100.8 },
+      { "stepId": "defense-contribution", "value": 1.35 },
+      { "stepId": "level-square", "value": 1 },
+      { "stepId": "level-contribution", "value": 0.0333333333333333333333333333 },
+      { "stepId": "raw-sd", "value": 102.18333333333333333333333333 },
+      { "stepId": "visible-sd", "value": 102 }
+    ],
+    "rounding": { "mode": "TRUNCATE", "stage": "visible-sd", "decimalPlaces": 0 },
+    "rawOutput": 102.18333333333333333333333333,
+    "visibleOutput": 102,
+    "evidenceRefs": ["evd-0021", "evd-0026", "evd-0034"],
+    "conflictIds": []
+  }
+}

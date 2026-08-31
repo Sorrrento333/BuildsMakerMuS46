@@ -1,0 +1,36 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "ag-dark-lord-base",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-ag-dark-lord", "version": "1.0.0" },
+  "context": {
+    "characterClassId": "class-dark-lord",
+    "evolutionId": "evolution-dark-lord"
+  },
+  "inputs": { "energy": 15, "vitality": 20, "agility": 20, "strength": 26, "command": 25 },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-ag-dark-lord-base",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": { "id": "formula-ag-dark-lord", "version": "1.0.0" },
+    "context": {
+      "characterClassId": "class-dark-lord",
+      "evolutionId": "evolution-dark-lord"
+    },
+    "inputs": { "energy": 15, "vitality": 20, "agility": 20, "strength": 26, "command": 25 },
+    "steps": [
+      { "stepId": "energy-contribution", "value": 2.25 },
+      { "stepId": "vitality-contribution", "value": 2.0 },
+      { "stepId": "agility-contribution", "value": 4.0 },
+      { "stepId": "strength-contribution", "value": 7.8 },
+      { "stepId": "command-contribution", "value": 7.5 },
+      { "stepId": "raw-ag", "value": 23.55 },
+      { "stepId": "visible-ag", "value": 23 }
+    ],
+    "rounding": { "mode": "TRUNCATE", "stage": "visible-ag", "decimalPlaces": 0 },
+    "rawOutput": 23.55,
+    "visibleOutput": 23,
+    "evidenceRefs": ["evd-0021", "evd-0026"],
+    "conflictIds": []
+  }
+}

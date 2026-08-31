@@ -1,0 +1,50 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "sd-dark-wizard-level-step",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-sd-dark-wizard", "version": "1.0.0" },
+  "context": {
+    "characterClassId": "class-dark-wizard",
+    "evolutionId": "evolution-soul-master"
+  },
+  "inputs": {
+    "character-level": 2,
+    "strength": 18,
+    "agility": 18,
+    "vitality": 15,
+    "energy": 30,
+    "defense": 4.5
+  },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-sd-dark-wizard-level-step",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": { "id": "formula-sd-dark-wizard", "version": "1.0.0" },
+    "context": {
+      "characterClassId": "class-dark-wizard",
+      "evolutionId": "evolution-soul-master"
+    },
+    "inputs": {
+      "character-level": 2,
+      "strength": 18,
+      "agility": 18,
+      "vitality": 15,
+      "energy": 30,
+      "defense": 4.5
+    },
+    "steps": [
+      { "stepId": "stat-sum", "value": 81 },
+      { "stepId": "stat-contribution", "value": 97.2 },
+      { "stepId": "defense-contribution", "value": 2.25 },
+      { "stepId": "level-square", "value": 4 },
+      { "stepId": "level-contribution", "value": 0.1333333333333333333333333333 },
+      { "stepId": "raw-sd", "value": 99.58333333333333333333333333 },
+      { "stepId": "visible-sd", "value": 99 }
+    ],
+    "rounding": { "mode": "TRUNCATE", "stage": "visible-sd", "decimalPlaces": 0 },
+    "rawOutput": 99.58333333333333333333333333,
+    "visibleOutput": 99,
+    "evidenceRefs": ["evd-0021", "evd-0026", "evd-0033"],
+    "conflictIds": []
+  }
+}

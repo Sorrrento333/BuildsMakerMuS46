@@ -4,6 +4,139 @@
 
 ### Added
 
+- Vertical funcional de Defense y SD de Summoner, que materializa el último
+  claim `VERIFIED` de `RES-0002`.
+  `formula-defense-summoner` y `formula-sd-summoner` `1.0.0` nacen
+  `PUBLISHED` contra schema `2.1.0`, trazan `EVD-0021`, `EVD-0026`, `EVD-0032`
+  y `EVD-0034`, y conservan el conflicto resuelto `DSP-0004`.
+- Defense conserva `agility / 3` sobre los mínimos STR 21/AGI 21/VIT 18/ENE 23.
+  SD conserva los tres truncamientos independientes
+  `trunc((str+agi+vit+ene)*1.2) + trunc(defense/2) + trunc((lvl*lvl)/30)`,
+  consumiendo Defense `RAW` por `FORMULA_OUTPUT`.
+- `CHECKED_DECIMAL_V1` y el gate `SchemaContractValidator` aceptan por primera
+  vez varios pasos intermedios `APPLY_ROUNDING`; el último paso visible sigue
+  siendo el redondeo que consume `rawOutputStepId`. El intérprete entero se
+  relaja de forma inocua.
+- Defense enlaza cuatro positivos y dos controles; SD enlaza cuatro positivos y
+  siete controles. `sd-summoner-base` fija SD visible 102 y discrimina la
+  semántica de truncamientos independientes (a plena precisión sería 103). No
+  existe frontera RAW/VISIBLE para Summoner (con `agi / 3`),
+  `trunc(RAW/2) == trunc(VISIBLE/2)`; no se fabrica ninguna.
+- Application y WPF materializan treinta fórmulas ejecutables reutilizando la
+  resolución genérica de dependencias, sin handlers ni constantes de Summoner
+  en C#. El smoke `win-x64` espera 30 fórmulas y 120 casos contextuales; el
+  dataset avanza a `2026-07-29.4` (hash capturado por el smoke de publicación).
+- Vertical funcional de Defense y SD de Dark Lord.
+  `formula-defense-dark-lord` y `formula-sd-dark-lord` `1.0.0` nacen
+  `PUBLISHED` contra schema `2.1.0`, trazan `EVD-0021`, `EVD-0026` y
+  `EVD-0034`, y conservan `agility / 7`, Command y la expresión autorizada de
+  SD.
+- Defense enlaza cuatro positivos y dos controles; SD enlaza cuatro positivos y
+  ocho controles. `sd-dark-lord-raw-defense-boundary` demuestra SD visible 135
+  con Defense `RAW=3.571428571…`, frente a 134 con `VISIBLE=3`.
+- Application resuelve la dependencia y Command por las rutas genéricas; WPF y
+  smoke no incorporan handlers ni constantes factuales de Dark Lord en C#.
+- El smoke `win-x64` pasa con SQLite `3.53.3`, 719 archivos, 149.231.704 bytes,
+  10 avisos, 296 JSON, veintiocho fórmulas y 112 casos contextuales. El dataset
+  avanza a `2026-07-29.3` con hash
+  `sha256:06114f61777a993cba3dacd4ddf45aba95bd7cc92be6b85dd51973c36d266eb4`.
+- Vertical funcional de Defense y SD de Magic Gladiator.
+  `formula-defense-magic-gladiator` y `formula-sd-magic-gladiator` `1.0.0`
+  nacen `PUBLISHED` contra schema `2.1.0`, trazan `EVD-0021`, `EVD-0026` y
+  `EVD-0034`, y conservan `agility / 5` y la expresión de SD autorizada.
+- Defense enlaza cuatro positivos y dos controles; SD enlaza cuatro positivos y
+  siete controles. `sd-magic-gladiator-raw-defense-boundary` demuestra SD
+  visible 130 con Defense `RAW=5.6`, frente a 129 con `VISIBLE=5`.
+- SD conserva `DSP-0002`, resuelto a favor de Energy 26. Application, WPF y
+  smoke reutilizan la resolución genérica de dependencias sin handlers ni
+  constantes factuales de Magic Gladiator en C#.
+- El smoke `win-x64` pasa con SQLite `3.53.3`, 699 archivos, 149.206.594 bytes,
+  10 avisos, 276 JSON, veintiséis fórmulas y 104 casos contextuales. El dataset
+  avanza a `2026-07-29.2` con hash
+  `sha256:64cfcd9cefe4056ea8ae7878a0cb71fb56e03178c14bdec78d2df1bb89beae78`.
+- Vertical funcional de Defense y SD de Fairy Elf.
+  `formula-defense-fairy-elf` y `formula-sd-fairy-elf` `1.0.0` nacen
+  `PUBLISHED` contra schema `2.1.0`, trazan `EVD-0021`, `EVD-0026` y
+  `EVD-0034`, y conservan `agility / 10` y la expresión de SD autorizada.
+- Defense enlaza cuatro positivos y dos controles; SD enlaza cuatro positivos
+  y siete controles. `sd-fairy-elf-raw-defense-boundary` demuestra SD visible
+  102 con Defense `RAW=2.7`, frente a 101 con `VISIBLE=2`.
+- Application, WPF y smoke reutilizan la resolución genérica de dependencias.
+  El smoke `win-x64` pasa con SQLite `3.53.3`, 680 archivos, 149.182.482 bytes,
+  10 avisos, 257 JSON, veinticuatro fórmulas y 96 casos contextuales. El dataset
+  avanza a `2026-07-29.1` con hash
+  `sha256:a070bd16d1a1a2b60a9b81eeb393d160ac28039c2293e6ff25ebb7c4d2ffa66a`.
+- Decisión factual `EVD-0034`: Dark Knight, Fairy Elf, Magic Gladiator, Dark
+  Lord y Summoner consumirán Defense `RAW` en sus fórmulas de SD. Un cambio
+  futuro requiere nueva evidencia, versión y casos; no reescribe la decisión.
+- Vertical funcional de Defense y SD de Dark Knight.
+  `formula-defense-dark-knight` y `formula-sd-dark-knight` `1.0.0` nacen
+  `PUBLISHED` contra schema `2.1.0`, trazan `EVD-0021`, `EVD-0026` y
+  `EVD-0034`, y conservan `agility / 3` y la expresión de SD autorizada.
+- Defense enlaza cuatro positivos y dos controles; SD enlaza cuatro positivos y
+  siete controles. `sd-dark-knight-raw-defense-boundary` demuestra SD visible
+  107 con Defense `RAW=7.6666…`, frente a 106 con `VISIBLE=7`.
+- Application, WPF y smoke reutilizan la resolución genérica de dependencias.
+  El smoke `win-x64` pasa con SQLite `3.53.3`, 661 archivos, 149.159.173 bytes,
+  10 avisos, 238 JSON, veintidós fórmulas y 88 casos contextuales. El dataset
+  avanza a `2026-07-28.5` con hash
+  `sha256:ee9d68d056bb2d917b784dd62dd320e1228c62983df37621efddf257dabbfcc7`.
+- Decisión factual `EVD-0033`: SD de Dark Wizard consume la salida `RAW` de
+  `defense = agi / 4`. La decisión queda limitada a esa familia y dependencia;
+  no se infiere una política para otros atributos.
+- Vertical funcional de Defense y SD de Dark Wizard. Las definiciones
+  `formula-defense-dark-wizard` y `formula-sd-dark-wizard` `1.0.0` nacen
+  `PUBLISHED` contra schema `2.1.0`, conservan `EVD-0021`, `EVD-0026` y
+  `EVD-0033`, y no añaden conflictos ni handlers factuales en C#.
+- Defense enlaza cuatro positivos `4.5/4`, `4.75/4`, `5/5`, `5.25/5` y dos
+  controles negativos. SD enlaza cuatro positivos y siete controles; el caso
+  `sd-dark-wizard-raw-defense-boundary` demuestra SD visible 101 con Defense
+  `RAW=4.75`, frente a 100 si se consumiera indebidamente `VISIBLE=4`.
+- Operación genérica `DIVIDE` limitada a `CHECKED_DECIMAL_V1`, con aridad
+  binaria, divisor no nulo, aritmética comprobada y rechazo en el modelo
+  entero. Las divisiones por 4, 2 y 30 se conservan declarativamente sin
+  aproximar `1/30`.
+- Application, WPF y smoke resuelven la dependencia exacta sobre el mismo
+  estado validado y preservan la traza productora. El smoke `win-x64` pasa con
+  SQLite `3.53.3`, 642 archivos, 149.134.500 bytes, 10 avisos, 219 JSON,
+  veinte fórmulas y 80 casos contextuales. El dataset avanza a
+  `2026-07-28.4` con hash
+  `sha256:5ed158fe25450520d7a1eddd23edb451b00ab9f19c1d3c46f4e065474dd5082e`.
+- Resolución productiva genérica de dependencias `FORMULA_OUTPUT` por
+  ID/version exactos y etapa `RAW`/`VISIBLE`. Application ejecuta el grafo sobre
+  el mismo estado validado, reutiliza resultados, rechaza ciclos y expone una
+  traza de dependencia separada.
+- Los inputs/trazas admiten precisión decimal exacta y `DECIMAL` para que una
+  salida `RAW` fraccionaria no se convierta ni trunque implícitamente.
+  `INT32`/`INT64` conservan integralidad/rango y `CHECKED_INT64_V1` rechaza
+  inputs decimales.
+- Pruebas exclusivamente sintéticas fijan selección simultánea `9.5 RAW`/`9
+  VISIBLE`, consumo `18.5/18`, materialización JSON y rechazo de ciclos.
+  `DR-SD-DARK-WIZARD` permanece sin publicar porque `EVD-0026` no decide aún
+  qué etapa de defensa consume; el gate queda trazado sin inventar la regla.
+- Smoke WPF `win-x64` aprobado con SQLite `3.53.3`, 623 archivos,
+  149.109.346 bytes, 10 avisos legales, 200 JSON, 18 fórmulas publicadas y
+  72 casos contextuales. El dataset permanece `2026-07-28.3`.
+- Vertical funcional de AG de Dark Lord desde el claim `VERIFIED`
+  `DR-AG-DARK-LORD` hasta WPF. `formula-ag-dark-lord` `1.0.0` nace
+  `PUBLISHED` contra schema `2.1.0`, aplica a Dark Lord/Lord Emperor y conserva
+  `EVD-0021`/`EVD-0026` sin añadir evidencia ni conflictos.
+- Cuatro casos positivos reproducen raw/visible
+  `23.55/23`, `23.80/23`, `24.35/24` y `24.60/24`; siete negativos cubren los
+  cinco stats por debajo de su base, familia y overflow. El programa
+  materializa exactamente
+  `ene * 0.15 + vit * 0.1 + agi * 0.2 + str * 0.3 + cmd * 0.3`.
+- `CHECKED_DECIMAL_V1` conserva los coeficientes exactamente, no redondea
+  aportes y trunca una sola vez en `visible-ag`. `resolved-command` recorre la
+  ruta contextual genérica y el control de overflow demuestra el límite real
+  producido por una suma de coeficientes de `1.05`.
+- Contrato técnico `dark-lord-ag-formula-contract.md` y bitácora de `RES-0002`
+  para identidad, aplicabilidad, cinco inputs/límites, siete pasos,
+  truncamiento, casos y ausencia explícita de conflictos.
+- Smoke WPF `win-x64` aprobado con SQLite `3.53.3`, 623 archivos,
+  149.091.558 bytes y 10 avisos legales. El dataset avanza a `2026-07-28.3`,
+  contiene 200 JSON y produce
+  `sha256:66e83b7bef261a6d310e4c5933522a6387aaab56ce7f50a396df1df2988e47eb`.
 - Vertical funcional de AG de Magic Gladiator desde el claim `VERIFIED`
   `DR-AG-MAGIC-GLADIATOR` hasta WPF. `formula-ag-magic-gladiator` `1.0.0`
   nace `PUBLISHED` contra schema `2.1.0`, aplica a Magic Gladiator/Duel Master

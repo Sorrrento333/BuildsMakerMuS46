@@ -125,37 +125,37 @@ claims:
     class_id: class-dark-wizard
     statement: "La fórmula de SD para la familia Dark Wizard está identificada."
     status: VERIFIED
-    evidence: [EVD-0026]
+    evidence: [EVD-0026, EVD-0033]
   - id: DR-SD-DARK-KNIGHT
     attribute: sd
     class_id: class-dark-knight
     statement: "La fórmula de SD para la familia Dark Knight está identificada."
     status: VERIFIED
-    evidence: [EVD-0026]
+    evidence: [EVD-0026, EVD-0034]
   - id: DR-SD-FAIRY-ELF
     attribute: sd
     class_id: class-fairy-elf
     statement: "La fórmula de SD para la familia Fairy Elf está identificada."
     status: VERIFIED
-    evidence: [EVD-0026]
+    evidence: [EVD-0026, EVD-0034]
   - id: DR-SD-SUMMONER
     attribute: sd
     class_id: class-summoner
     statement: "La fórmula de SD para la familia Summoner está identificada."
     status: VERIFIED
-    evidence: [EVD-0027, EVD-0028, EVD-0029, EVD-0032]
+    evidence: [EVD-0027, EVD-0028, EVD-0029, EVD-0032, EVD-0034]
   - id: DR-SD-MAGIC-GLADIATOR
     attribute: sd
     class_id: class-magic-gladiator
     statement: "La fórmula de SD para la familia Magic Gladiator está identificada."
     status: VERIFIED
-    evidence: [EVD-0026]
+    evidence: [EVD-0026, EVD-0034]
   - id: DR-SD-DARK-LORD
     attribute: sd
     class_id: class-dark-lord
     statement: "La fórmula de SD para la familia Dark Lord está identificada."
     status: VERIFIED
-    evidence: [EVD-0026]
+    evidence: [EVD-0026, EVD-0034]
 conflicts:
   - id: DSP-0003
     statement: "MU Online Fanz publica +1 HP por punto de Stamina para Dark Wizard, mientras StrategyWiki e InfinityMU publican +2 HP por punto de Vitality."
@@ -174,7 +174,7 @@ conflicts:
 test_plan: "Crear IDs y contratos de fórmula antes del motor. Para cada uno de los 24 recursos VERIFIED se exigirán casos aprobados por familia, bordes de nivel/stats, dependencias explícitas y sus puntos de truncamiento. SD de Summoner debe incluir el caso nivel 1/stats 21/21/18/23 = 102 y trazas separadas de sus tres términos."
 conclusion: "RES-0002 queda VERIFIED con 24/24 claims. EVD-0026 fija las fórmulas Season 4 global/inglés de cinco familias y AG de Summoner; EVD-0030 fija HP de Summoner; EVD-0031 fija Mana; EVD-0032 fija SD como trunc((str + agi + vit + ene) * 1.2) + trunc(defense / 2) + trunc((lvl * lvl) / 30), con defense = agi / 3. El caso inicial produce 99 + 3 + 0 = 102 y resuelve DSP-0004 por decisión del propietario. La verificación factual autoriza diseñar contratos y casos, pero no omitir esos gates ni copiar fórmulas directamente al motor."
 reviewed_by: ["project-owner"]
-last_reviewed_at: "2026-07-24"
+last_reviewed_at: "2026-07-28"
 ```
 
 ## Alcance y límites
@@ -610,7 +610,144 @@ recurso ausente a partir de los coeficientes de otras familias.
 - Condición de uso: autoriza diseñar contrato y casos de referencia; no permite
   omitir esos gates ni copiar la expresión directamente al motor.
 
+### EVD-0033 — Etapa de Defense consumida por SD de Dark Wizard
+
+- Fuente: decisión explícita del propietario comunicada el 2026-07-28.
+- Pregunta cerrada: si `DR-SD-DARK-WIZARD` consume la salida `RAW` o `VISIBLE`
+  de `defense = agi / 4`.
+- Decisión: consumir `RAW`, es decir, el cociente decimal previo al truncamiento
+  visible de Defense.
+- Alcance: exclusivamente `formula-sd-dark-wizard` dentro de
+  `mu-s4-global-reference`; no decide la etapa de dependencias de otras
+  familias o atributos.
+- Clasificación: `VERIFIED` como axioma del ruleset por decisión explícita del
+  propietario.
+- Consecuencia: SD puede depender por referencia exacta de
+  `formula-defense-dark-wizard` `1.0.0` con `outputStage: RAW`. Defense conserva
+  a la vez su propia salida visible truncada para presentación.
+- Condición de uso: autoriza cerrar contrato, casos y ejecución de Defense/SD
+  de Dark Wizard; no altera la clasificación individual de `EVD-0021` o
+  `EVD-0026`.
+
+### EVD-0034 — Etapa de Defense para las fórmulas de SD restantes
+
+- Fuente: decisión explícita del propietario comunicada el 2026-07-28.
+- Pregunta cerrada: si las fórmulas de SD todavía no materializadas consumen la
+  salida `RAW` o `VISIBLE` de su fórmula Defense de la misma familia.
+- Decisión: consumir `RAW`, es decir, el valor decimal anterior al truncamiento
+  de la salida visible de Defense.
+- Alcance: `DR-SD-DARK-KNIGHT`, `DR-SD-FAIRY-ELF`,
+  `DR-SD-MAGIC-GLADIATOR`, `DR-SD-DARK-LORD` y `DR-SD-SUMMONER` dentro de
+  `mu-s4-global-reference`. `EVD-0033` continúa siendo la decisión específica
+  ya aplicada a Dark Wizard.
+- Clasificación: `VERIFIED` como axioma del ruleset por decisión explícita del
+  propietario.
+- Consecuencia: cada SD del alcance debe depender por referencia exacta de la
+  versión publicada de Defense de su propia familia con `outputStage: RAW`.
+  Esta decisión no cambia las reglas particulares de evaluación o truncamiento
+  ya fijadas para cada fórmula, incluida `EVD-0032` para Summoner.
+- Evolución: si la observación futura demuestra que una familia requiere
+  `VISIBLE`, el cambio deberá registrarse como nueva evidencia y nueva versión
+  de fórmula con casos que hagan visible la diferencia; no se reescribe
+  silenciosamente esta decisión.
+- Condición de uso: autoriza materializar una vertical Defense/SD por vez,
+  manteniendo fórmula, versión, etapa, traza productora y casos explícitos.
+
 ## Bitácora de investigación
+
+### 2026-07-29 — Materialización productiva de Defense y SD de Dark Lord
+
+- `formula-defense-dark-lord` y `formula-sd-dark-lord` `1.0.0` se
+  materializan `PUBLISHED` exclusivamente desde `EVD-0021`, `EVD-0026` y
+  `EVD-0034`.
+- Defense conserva `agility / 7` y enlaza cuatro positivos y dos controles.
+- SD conserva Command en la suma de stats y enlaza cuatro positivos. Su frontera
+  fija Agility 25, Defense `RAW=3.571428571…`/`VISIBLE=3` y SD
+  `135.019047619…/135`, frente a 134 si consumiera la salida visible.
+- Ocho controles cubren nivel, los cinco stats bajo base, familia y overflow.
+  No se añadió evidencia, conflicto ni truncamiento intermedio.
+
+### 2026-07-29 — Materialización productiva de Defense y SD de Magic Gladiator
+
+- `formula-defense-magic-gladiator` y `formula-sd-magic-gladiator` `1.0.0` se
+  materializan `PUBLISHED` exclusivamente desde `EVD-0021`, `EVD-0026` y
+  `EVD-0034`.
+- Defense conserva `agility / 5` y enlaza cuatro positivos y dos controles.
+- SD enlaza cuatro positivos; su frontera fija Agility 28, Defense
+  `RAW=5.6`/`VISIBLE=5` y SD `130.033333…/130`, frente a 129 si consumiera la
+  salida visible.
+- Siete controles cubren nivel, los cuatro stats, familia y overflow.
+  `DSP-0002` permanece resuelto y trazado porque SD consume Energy 26; no se
+  añadió evidencia, conflicto ni truncamiento intermedio.
+
+### 2026-07-29 — Materialización productiva de Defense y SD de Fairy Elf
+
+- `formula-defense-fairy-elf` y `formula-sd-fairy-elf` `1.0.0` se
+  materializan `PUBLISHED` exclusivamente desde `EVD-0021`, `EVD-0026` y,
+  para la etapa de dependencia, `EVD-0034`.
+- Defense conserva `agility / 10`, enlaza cuatro positivos `2.5/2`, `2.6/2`,
+  `3/3` y `3.5/3`, y dos controles para Agility bajo base y familia.
+- SD enlaza cuatro positivos. `sd-fairy-elf-raw-defense-boundary` fija nivel 1,
+  Agility 27, Defense `RAW=2.7`/`VISIBLE=2` y SD
+  `RAW=102.183333…`/`VISIBLE=102`; consumir Defense visible produciría 101.
+- Siete controles de SD cubren nivel, los cuatro stats bajo base, familia y
+  overflow. No se añadió evidencia, conflicto ni redondeo intermedio; las
+  fórmulas conservan `conflictIds: []`.
+
+### 2026-07-28 — Materialización productiva de Defense y SD de Dark Knight
+
+- `EVD-0034` registra la decisión del propietario para las cinco familias de SD
+  pendientes: todas consumen la salida `RAW` de su Defense de la misma familia.
+- `formula-defense-dark-knight` y `formula-sd-dark-knight` `1.0.0` se
+  materializan `PUBLISHED` exclusivamente desde `EVD-0021`, `EVD-0026` y,
+  para la etapa de dependencia, `EVD-0034`.
+- Defense enlaza cuatro positivos que conservan `agility / 3`, incluido el
+  cociente periódico decimal, y dos controles para Agility bajo base y familia.
+- SD enlaza cuatro positivos. El caso
+  `sd-dark-knight-raw-defense-boundary` fija nivel 1, Agility 23,
+  Defense `RAW=7.6666…`/`VISIBLE=7` y SD `107.0666…/107`; consumir Defense
+  visible produciría 106 y queda rechazado.
+- Siete controles de SD cubren nivel, los cuatro stats bajo base, familia y
+  overflow. No se añadió un conflicto inexistente ni se modificaron las reglas
+  particulares todavía pendientes de otras familias.
+
+### 2026-07-28 — Materialización productiva de Defense y SD de Dark Wizard
+
+- `EVD-0033` registra la elección explícita del propietario: SD consume la
+  salida `RAW` de `defense = agi / 4`.
+- `formula-defense-dark-wizard` y `formula-sd-dark-wizard` `1.0.0` se
+  materializan `PUBLISHED` exclusivamente desde `EVD-0021`, `EVD-0026` y,
+  para la etapa de dependencia, `EVD-0033`.
+- Defense enlaza cuatro positivos `4.5/4`, `4.75/4`, `5/5` y `5.25/5`; dos
+  controles cubren Agility bajo base y familia ajena.
+- SD enlaza cuatro positivos. El caso
+  `sd-dark-wizard-raw-defense-boundary` fija nivel 4, Agility 19,
+  Defense `RAW=4.75`/`VISIBLE=4` y SD `101.3083…/101`; consumir Defense visible
+  produciría 100 y queda rechazado por el caso.
+- Siete controles de SD cubren nivel, los cuatro stats bajo base, familia y
+  overflow de salida. No se añadió un conflicto inexistente.
+- `DIVIDE` se incorpora sólo a `CHECKED_DECIMAL_V1` para conservar las
+  divisiones escritas por 4, 2 y 30 sin sustituir `1/30` por una constante
+  aproximada. La dependencia conserva referencia, etapa, valor y traza
+  productora.
+
+### 2026-07-28 — Materialización productiva de AG de Dark Lord
+
+- No se añadió evidencia, fórmula ni claim, y no se reclasificó ninguna fuente.
+- `DR-AG-DARK-LORD` se materializó exclusivamente desde `EVD-0021` y
+  `EVD-0026` como `formula-ag-dark-lord` `1.0.0`, ejecutable y `PUBLISHED`.
+- `EVD-0021` sustenta los mínimos factuales Energy 15, Vitality 20, Agility 20,
+  Strength 26 y Command 25; los máximos de tipos permanecen límites técnicos.
+- Cuatro positivos fijan resultados crudos/visibles
+  `23.55/23`, `23.80/23`, `24.35/24` y `24.60/24`. Siete controles cubren los
+  cinco stats por debajo de su base, familia y overflow.
+- `CHECKED_DECIMAL_V1` conserva `0.15`, `0.1`, `0.2` y `0.3` exactamente, no
+  redondea aportes y trunca una sola vez en `visible-ag`. El overflow es
+  alcanzable: la suma de coeficientes `1.05` aplicada a cinco entradas
+  `Int64.MaxValue` supera la salida `INT64`.
+- La fórmula no consume nivel ni dependencias. `resolved-command` usa la misma
+  ruta contextual genérica que los otros stats. No existe conflicto aplicable
+  conocido y la traza conserva `conflictIds: []`.
 
 ### 2026-07-28 — Materialización productiva de AG de Magic Gladiator
 

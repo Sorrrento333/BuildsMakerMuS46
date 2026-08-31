@@ -1,0 +1,25 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "defense-magic-gladiator-base",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-defense-magic-gladiator", "version": "1.0.0" },
+  "context": { "characterClassId": "class-magic-gladiator", "evolutionId": "evolution-magic-gladiator" },
+  "inputs": { "agility": 26 },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-defense-magic-gladiator-base",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": { "id": "formula-defense-magic-gladiator", "version": "1.0.0" },
+    "context": { "characterClassId": "class-magic-gladiator", "evolutionId": "evolution-magic-gladiator" },
+    "inputs": { "agility": 26 },
+    "steps": [
+      { "stepId": "raw-defense", "value": 5.2 },
+      { "stepId": "visible-defense", "value": 5 }
+    ],
+    "rounding": { "mode": "TRUNCATE", "stage": "visible-defense", "decimalPlaces": 0 },
+    "rawOutput": 5.2,
+    "visibleOutput": 5,
+    "evidenceRefs": ["evd-0021", "evd-0026"],
+    "conflictIds": []
+  }
+}

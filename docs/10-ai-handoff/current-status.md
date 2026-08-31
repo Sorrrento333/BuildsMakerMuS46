@@ -741,14 +741,140 @@
   intérprete decimal genéricos, sin constantes ni handlers factuales en C#.
 - El dataset avanza a `2026-07-28.2` porque incorpora diez JSON factuales
   nuevos. Ruleset `1.0.0` y motor `0.2.0` permanecen sin cambios.
-- Alcance anterior retirado y documentación migrada a Season 4 global/inglesa.
+- Vertical funcional de AG de Dark Lord cerrada desde
+  `DR-AG-DARK-LORD` hasta WPF. `formula-ag-dark-lord` `1.0.0` nace ejecutable
+  y `PUBLISHED` contra schema `2.1.0`, aplica a Dark Lord/Lord Emperor y
+  materializa exactamente
+  `ene * 0.15 + vit * 0.1 + agi * 0.2 + str * 0.3 + cmd * 0.3`.
+- `EVD-0021` sustenta los mínimos Energy 15, Vitality 20, Agility 20, Strength
+  26 y Command 25; `EVD-0026` autoriza expresión, familia y truncamiento.
+  Cuatro positivos fijan raw/visible `23.55/23`, `23.80/23`, `24.35/24` y
+  `24.60/24`; siete negativos cubren los cinco mínimos, familia y overflow.
+- `CHECKED_DECIMAL_V1` conserva los coeficientes exactamente, no redondea
+  aportes y trunca una sola vez en `visible-ag`. La suma `1.05` hace alcanzable
+  el overflow para cinco entradas `Int64.MaxValue`, por lo que se conserva como
+  control real. No existe conflicto aplicable documentado.
+- La fórmula no consume nivel ni dependencias. Application materializa
+  dieciocho referencias; `resolved-command` recorre la resolución contextual
+  genérica y WPF/smoke reutilizan selección e intérprete decimal sin handlers
+  ni constantes factuales en C#.
+- El dataset avanza a `2026-07-28.3` porque incorpora doce JSON factuales
+  nuevos. Ruleset `1.0.0` y motor `0.2.0` permanecen sin cambios.
+- Dependencias ejecutables entre fórmulas implementadas de forma genérica.
+  `FORMULA_OUTPUT` conserva referencia ID/version y etapa `RAW`/`VISIBLE`;
+  Application ejecuta el grafo con el mismo estado validado, reutiliza
+  resultados, rechaza ciclos y entrega una traza separada. Los mapas de inputs
+  y trazas conservan `System.Decimal`; `DECIMAL` habilita salidas crudas
+  fraccionarias en `CHECKED_DECIMAL_V1` sin relajar `INT32`/`INT64`.
+- La primera prioridad de SD de Dark Wizard alcanzó un gate factual real.
+  `EVD-0026` no declara si `defense = agi / 4` se consume `RAW` o `VISIBLE`;
+  ambas etapas pueden divergir. No se crearon fórmulas, IDs, casos ni datos
+  factuales de defensa/SD. `RES-0002` y el diseño técnico registran la decisión
+  exacta pendiente.
+- `EVD-0033` resuelve el gate por decisión explícita del propietario:
+  `DR-SD-DARK-WIZARD` consume la salida `RAW` de
+  `formula-defense-dark-wizard` `1.0.0`. La decisión no se extiende a otras
+  familias ni reclasifica `EVD-0021`/`EVD-0026`.
+- Vertical funcional de Defense/SD de Dark Wizard cerrada.
+  `formula-defense-dark-wizard` y `formula-sd-dark-wizard` `1.0.0` nacen
+  `PUBLISHED` contra schema `2.1.0`; la segunda declara
+  `FORMULA_OUTPUT` por referencia exacta y `outputStage: RAW`.
+- Defense conserva `agility / 4` como división decimal y publica cuatro casos
+  `4.5/4`, `4.75/4`, `5/5` y `5.25/5`, más dos controles negativos. SD conserva
+  `(str + agi + vit + ene) * 1.2 + defense / 2 + (lvl * lvl) / 30`, cuatro
+  positivos y siete controles.
+- El caso `sd-dark-wizard-raw-defense-boundary` fija nivel 4/Agility 19:
+  Defense `RAW=4.75`, `VISIBLE=4` y SD `101.3083…/101`; consumir `VISIBLE`
+  produciría 100 y queda cubierto como regresión factual.
+- `DIVIDE` binario se incorpora exclusivamente a `CHECKED_DECIMAL_V1`, exige
+  dos operandos, rechaza divisor cero y permanece inválido para
+  `CHECKED_INT64_V1`. Así las divisiones por 4, 2 y 30 quedan declaradas sin
+  aproximar `1/30`.
+- Application y WPF materializan veinte fórmulas ejecutables y resuelven
+  Defense/SD sobre el mismo estado validado, con trazas contextual, de
+  dependencia y aritmética. El dataset avanza a `2026-07-28.4`, 219 JSON y
+  `sha256:5ed158fe25450520d7a1eddd23edb451b00ab9f19c1d3c46f4e065474dd5082e`.
+- `EVD-0034` registra la decisión del propietario para los cinco claims de SD
+  que estaban pendientes: todos consumen la salida `RAW` de su Defense de la
+  misma familia. Una revisión futura exige nueva evidencia, versión y casos.
+- Vertical funcional de Defense/SD de Dark Knight cerrada.
+  `formula-defense-dark-knight` y `formula-sd-dark-knight` `1.0.0` nacen
+  `PUBLISHED` contra schema `2.1.0`, con dependencia exacta
+  `FORMULA_OUTPUT`/`RAW`.
+- Defense conserva `agility / 3`; SD conserva
+  `(str + agi + vit + ene) * 1.2 + defense / 2 + (lvl * lvl) / 30`.
+  Cada fórmula enlaza cuatro positivos; sus controles negativos son dos y siete.
+  `sd-dark-knight-raw-defense-boundary` fija Defense `RAW=7.6666…`,
+  `VISIBLE=7` y SD `107.0666…/107`, frente a 106 con la etapa incorrecta.
+- Application y WPF materializan veintidós fórmulas ejecutables. El dataset
+  avanza a `2026-07-28.5`, 238 JSON y
+  `sha256:ee9d68d056bb2d917b784dd62dd320e1228c62983df37621efddf257dabbfcc7`.
+- Vertical funcional de Defense/SD de Fairy Elf cerrada.
+  `formula-defense-fairy-elf` y `formula-sd-fairy-elf` `1.0.0` nacen
+  `PUBLISHED` contra schema `2.1.0`, con dependencia exacta
+  `FORMULA_OUTPUT`/`RAW` autorizada por `EVD-0034`.
+- Defense conserva `agility / 10`; SD conserva
+  `(str + agi + vit + ene) * 1.2 + defense / 2 + (lvl * lvl) / 30`.
+  Cada fórmula enlaza cuatro positivos; sus controles negativos son dos y siete.
+  `sd-fairy-elf-raw-defense-boundary` fija Defense `RAW=2.7`, `VISIBLE=2` y SD
+  `102.183333…/102`, frente a 101 con la etapa incorrecta.
+- Application y WPF materializan veinticuatro fórmulas ejecutables. El dataset
+  avanza a `2026-07-29.1`, 257 JSON y
+  `sha256:a070bd16d1a1a2b60a9b81eeb393d160ac28039c2293e6ff25ebb7c4d2ffa66a`.
+- Vertical funcional de Defense/SD de Magic Gladiator cerrada.
+  `formula-defense-magic-gladiator` y `formula-sd-magic-gladiator` `1.0.0`
+  nacen `PUBLISHED` contra schema `2.1.0` y enlazadas mediante
+  `FORMULA_OUTPUT`/`RAW` conforme a `EVD-0034`.
+- Defense conserva `agility / 5`; SD conserva
+  `(str + agi + vit + ene) * 1.2 + defense / 2 + (lvl * lvl) / 30`.
+  Cada fórmula enlaza cuatro positivos; sus controles negativos son dos y siete.
+  `sd-magic-gladiator-raw-defense-boundary` fija Defense `RAW=5.6`,
+  `VISIBLE=5` y SD `130.033333…/130`, frente a 129 con la etapa incorrecta.
+- SD conserva `DSP-0002` porque consume Energy; el conflicto permanece resuelto
+  a favor del mínimo factual 26. No se añadió evidencia ni se alteró su
+  clasificación.
+- Application y WPF materializan veintiséis fórmulas ejecutables. El dataset
+  avanza a `2026-07-29.2`, 276 JSON y
+  `sha256:64cfcd9cefe4056ea8ae7878a0cb71fb56e03178c14bdec78d2df1bb89beae78`.
+- Vertical funcional de Defense/SD de Dark Lord cerrada.
+  `formula-defense-dark-lord` y `formula-sd-dark-lord` `1.0.0` nacen
+  `PUBLISHED` contra schema `2.1.0` y enlazadas mediante
+  `FORMULA_OUTPUT`/`RAW` conforme a `EVD-0034`.
+- Defense conserva `agility / 7`; SD conserva
+  `(str + agi + vit + ene + cmd) * 1.2 + defense / 2 + (lvl * lvl) / 30`.
+  Cada fórmula enlaza cuatro positivos; sus controles negativos son dos y ocho.
+  `sd-dark-lord-raw-defense-boundary` fija Defense `RAW=3.571428571…`,
+  `VISIBLE=3` y SD `135.019047619…/135`, frente a 134 con la etapa incorrecta.
+- Application y WPF resuelven Command por la ruta contextual genérica y
+  materializan veintiocho fórmulas ejecutables. El dataset avanza a
+  `2026-07-29.3`, 296 JSON y
+  `sha256:06114f61777a993cba3dacd4ddf45aba95bd7cc92be6b85dd51973c36d266eb4`.
+- Vertical funcional de Defense/SD de Summoner cerrada.
+  `formula-defense-summoner` y `formula-sd-summoner` `1.0.0` nacen
+  `PUBLISHED` contra schema `2.1.0` y enlazadas mediante
+  `FORMULA_OUTPUT`/`RAW` conforme a `EVD-0034`. Esta vertical cierra el único
+  claim `VERIFIED` de `RES-0002` que quedaba sin materializar; `RES-0002`
+  alcanza así 24/24 claims productivos.
+- Defense conserva `agility / 3` sobre los mínimos `EVD-0021`: STR 21, AGI 21,
+  VIT 18, ENE 23. SD conserva
+  `trunc((str + agi + vit + ene) * 1.2) + trunc(defense / 2) + trunc((lvl * lvl) / 30)`
+  con los tres truncamientos independientes fijados por `EVD-0032`, antes de
+  sumar, consumiendo Defense `RAW`.
+- `CHECKED_DECIMAL_V1` admite por primera vez varios pasos intermedios
+  `APPLY_ROUNDING`: el gate (`SchemaContractValidator`), el reader de
+  Application y el intérprete decimal aceptan truncamientos repetidos, siempre
+  que el último paso visible sea el redondeo que consume `rawOutputStepId`.
+  El intérprete entero se relaja de forma inocua (intermedios integrales).
+- Cada fórmula enlaza cuatro positivos; los controles negativos son dos y siete.
+  `sd-summoner-base` fija SD 102 (y discrimina la semántica de truncamientos
+  independientes: truncar a plena precisión daría 103). No existe un caso
+  frontera RAW/VISIBLE para Summoner porque, con `agi / 3`, siempre se cumple
+  `trunc(RAW/2) == trunc(VISIBLE/2)`; no se fabrica ninguno.
+- Application y WPF materializan treinta fórmulas ejecutables. El dataset avanza
+  a `2026-07-29.4` (hash capturado por el smoke de publicación pendiente).
 
 ## No iniciado
 
-- IDs, contratos, casos de referencia y motor para los otros 8 claims
-  `VERIFIED` de `RES-0002` y para el resto del catálogo de EVD-0026. La decisión
-  factual no sustituye esos gates ni define todavía precisión de dependencias
-  intermedias.
 - Schemas restantes (`ruleset`, quests, ítems, skills, escenarios y
   trazas); el validador integral/CI ya cubre el contrato de progresión.
 - Builds completas, resto del motor de cálculo y flujos de UI
@@ -759,13 +885,48 @@
 - El canal público de actualización y firma continúa como decisión posterior de
   distribución.
 
-## Verificación más reciente — 2026-07-28
+## Verificación más reciente — 2026-07-29
 
+- Cierre de Defense/SD de Summoner: restauración y build Release aprobados con
+  0 advertencias/0 errores; 320/320 pruebas pasan: 40 validator, 58 motor,
+  204 Application y 18 Data. CLI del validador: las treinta fórmulas `PUBLISHED`
+  pasan sin errores, incluidos `formula-defense-summoner` (4 positivos/2
+  controles) y `formula-sd-summoner` (4 positivos/7 controles).
+- `CHECKED_DECIMAL_V1` y el gate aceptan múltiples pasos intermedios
+  `APPLY_ROUNDING`; `sd-summoner-base` fija SD 102 y discrimina la semántica de
+  truncamientos independientes. Dataset `2026-07-29.4` con 315 JSON; el hash,
+  conteo de archivos y bytes del smoke `win-x64` (30 fórmulas, 120 casos)
+  quedan por capturar en la ejecución del mantenedor.
+- Cierre de Defense/SD de Dark Lord: restauración bloqueada y build Release
+  aprobados con 0 advertencias/0 errores; 302/302 pruebas pasan:
+  40 validator, 57 motor, 187 Application y 18 Data. Los 18 casos nuevos
+  reproducen ocho trazas positivas y diez errores canónicos.
+- Comprobación estructural: 11 contratos/22 fixtures, 37 registros canónicos,
+  progresión 7/7+3/3 y veintinueve identidades de fórmula aprobados. El gate
+  factual cubre 116 positivos y 133 controles negativos.
+- Smoke WPF `win-x64`: PASS con SQLite `3.53.3`, 719 archivos,
+  149.231.704 bytes, 10 avisos legales, 296 JSON, dataset `2026-07-29.3`,
+  veintiocho fórmulas y 112 casos contextuales. El hash es
+  `sha256:06114f61777a993cba3dacd4ddf45aba95bd7cc92be6b85dd51973c36d266eb4`.
+- Cierre de Defense/SD de Fairy Elf: restauración bloqueada y build Release
+  aprobados con 0 advertencias/0 errores; 267/267 pruebas pasan:
+  40 validator, 57 motor, 152 Application y 18 Data. La cobertura nueva fija
+  los 17 casos directos de Defense/SD y la composición factual con dependencia
+  `RAW`.
+- Comprobación estructural: 11 contratos/22 fixtures aprobados. El CLI acepta
+  11 válidos, rechaza 11 inválidos, valida 33 registros canónicos, progresión
+  7/7+3/3 y veinticinco identidades de fórmula sin errores. El gate factual
+  cubre 100 positivos y 114 controles negativos.
+- Smoke WPF `win-x64`: PASS con SQLite `3.53.3`, 680 archivos,
+  149.182.482 bytes, 10 avisos legales y 257 JSON. Conserva dataset
+  `2026-07-29.1`, 24 fórmulas ejecutables y 96 casos contextuales, incluido SD
+  sobre Defense `RAW`. `dotnet format --verify-no-changes` y
+  `git diff --check` pasan.
 - Schemas: 11/11 contratos y 22/22 fixtures estructuralmente legibles.
 - Validador integral: 11/11 fixtures válidos aceptados, 11/11 inválidos rechazados
-  y 26/26 registros canónicos válidos. Ejecuta además 7/7 casos de progresión,
-  rechaza 3/3 controles semánticos y valida 68 casos positivos y 76 controles
-  negativos de fórmula; las dieciocho definiciones se informan
+  y 33/33 registros canónicos válidos. Ejecuta además 7/7 casos de progresión,
+  rechaza 3/3 controles semánticos y valida 100 casos positivos y 114 controles
+  negativos de fórmula; las veinticinco identidades se informan
   `PUBLISHED`, sin errores. Sus 40/40 pruebas .NET aprueban también la
   ejecución repetida, los IDs estables, la retroactividad, la elegibilidad, los
   enlaces exactos 5+2 de las reglas publicadas y los contratos sintéticos de
@@ -782,8 +943,8 @@
   cambios en 114 archivos y la comprobación PowerShell aprobó 11 contratos/22
   fixtures.
 - Persistencia SQLite: 18/18 pruebas de integración aprobadas en `win-x64`;
-  junto con 40/40 pruebas del validador, 56/56 del motor y 97/97 de Application,
-  la solución ejecuta 211/211 pruebas correctamente. Los seis casos de Data
+  junto con 40/40 pruebas del validador, 57/57 del motor y 152/152 de Application,
+  la solución ejecuta 267/267 pruebas correctamente. Los seis casos de Data
   cubren la migración y el repositorio de borradores con payload/metadata,
   reemplazo, rollback, reapertura, lectura pura y contención tipada.
   Microsoft Testing Platform mantiene los TheoryData dinámicos dentro de esas
@@ -797,10 +958,11 @@
   aplica el código de rango materializado, controla overflow y conserva orden,
   outputs y provenance en la traza. Domain y Calculation Engine continúan sin
   serialización, Application, Data o WPF en esta vertical.
-- Intérprete decimal: 4/4 pruebas sintéticas aprobadas. Conserva `1.5` y los
+- Intérprete decimal: 5/5 pruebas sintéticas aprobadas. Conserva `1.5` y los
   intermedios fraccionarios exactamente, no redondea aportes, trunca sólo en la
-  etapa declarada, rechaza operandos del modelo incorrecto y controla overflow
-  al convertir la salida visible a `INT64`.
+  etapa declarada, divide por el divisor declarado, rechaza divisor cero y
+  operandos del modelo incorrecto, y controla overflow al convertir la salida
+  visible a `INT64`.
 - Distribución de stats: 2/2 resultados sintéticos y 8/8 controles de error
   aprobados; incluyen negativos, conjunto exacto de stats, exceso, tres
   divergencias de origen y overflow. El resultado copia clase, ruleset,
@@ -818,17 +980,18 @@
   serialización, guardado/reemplazo, carga con recálculo y fallos cerrados por
   ausencia, identidad, dependencia o caché. El proyecto no incorpora paquetes
   externos ni referencia Data o WPF.
-- Fórmulas en Application: 68/68 trazas positivas y 76/76 errores canónicos de
-  las diecisiete referencias ejecutables reproducidos por el camino archivo → adaptador →
-  catálogo → caso de uso → intérprete. El `1.0.0` histórico de Dark Wizard se
-  rechaza como no ejecutable y cuatro mutaciones
+- Fórmulas en Application: 112/112 trazas positivas y 129/129 errores canónicos
+  recorren directamente archivo → adaptador → catálogo → caso de uso →
+  intérprete para las referencias enteras y la nueva vertical Defense/SD. El
+  `1.0.0` histórico de Dark Wizard se rechaza como no ejecutable y las mutaciones
   relacionales fallan cerradas antes del cálculo. La ejecución normal no lee
   `reference-cases/`.
-- Contexto de fórmulas en Application: 68/68 positivos canónicos reproducidos por
+- Contexto de fórmulas en Application: 112/112 positivos canónicos reproducidos por
   snapshot → progresión → distribución → contexto → intérprete. Ocho pruebas
   fijan preservación de bases/evidencias/source, los seis códigos de contexto,
-  overflow, inmutabilidad y fallos previos de las entradas de origen.
-- WPF/Application: el build copia 188 JSON canónicos a una ruta estable tanto en
+  overflow, inmutabilidad, fallos previos de las entradas de origen y la
+  dependencia `RAW` de Defense en SD.
+- WPF/Application: el build copia 296 JSON canónicos a una ruta estable tanto en
   salida normal como publicada. El flujo de ventana obtiene clase/evolución y
   Hero Status desde el catálogo/regla, muestra el total junto con la traza y
   conserva ese presupuesto para distribuir sobre controles derivados de
@@ -984,6 +1147,21 @@
   progresión 7/7+3/3, distribución, resets, backup/restore y borrador persistido
   siguieron aprobados. Ambas fases reprodujeron 68/68 positivos de las
   diecisiete referencias ejecutables de HP/Mana/AG.
+- Smoke WPF local posterior al cierre de AG de Dark Lord: PASS en `win-x64`,
+  SQLite `3.53.3`, 623 archivos y 149.091.558 bytes. Conservó 10 avisos legales,
+  200/200 JSON y el hash
+  `sha256:66e83b7bef261a6d310e4c5933522a6387aaab56ce7f50a396df1df2988e47eb`;
+  progresión 7/7+3/3, distribución, resets, backup/restore y borrador persistido
+  siguieron aprobados. Ambas fases reprodujeron 72/72 positivos de las
+  dieciocho referencias ejecutables de HP/Mana/AG.
+- Smoke WPF local posterior al cierre de Defense/SD de Fairy Elf: PASS en
+  `win-x64`, SQLite `3.53.3`, 680 archivos y 149.182.482 bytes. Conservó 10
+  avisos legales, 257/257 JSON y el hash
+  `sha256:a070bd16d1a1a2b60a9b81eeb393d160ac28039c2293e6ff25ebb7c4d2ffa66a`;
+  progresión 7/7+3/3, distribución, resets, backup/restore y borrador persistido
+  siguieron aprobados. Ambas fases reprodujeron 96/96 positivos de las
+  veinticuatro referencias ejecutables, incluida la dependencia Defense `RAW`
+  de Fairy Elf.
 - Json Everything fuente: 2 compilaciones independientes con SDK `10.0.301`,
   restore bloqueado de los tres proyectos fuente, hashes esperados para 3/3
   DLL y SPDX contrastado. El harness actualizado ejecuta 2 × 22/22 fixtures y
@@ -1014,15 +1192,18 @@
   ejecuta con Windows PowerShell.
 - El motor incorpora sólo los datos factuales autorizados por los registros
   cerrados: seis
-  clases y dos reglas de progresión canónicas publicadas con diecisiete referencias
+  clases y dos reglas de progresión canónicas publicadas con treinta referencias
   ejecutables. HP de Dark Wizard, Dark Knight, Fairy Elf, Summoner, Magic
   Gladiator y Dark Lord se
   materializan y
   ejecutan en Application/WPF con nivel y Vitality resueltos desde el estado validado.
   Mana de Dark Wizard, Dark Knight, Fairy Elf, Summoner, Magic Gladiator y Dark
   Lord también se ejecuta con nivel y Energy resueltos. AG de Dark Wizard, Dark
-  Knight, Fairy Elf y Summoner se ejecuta con los cuatro stats resueltos; el
-  resto de AG, SD, daño y defensa todavía no se ejecutan.
+  Knight, Fairy Elf, Summoner y Magic Gladiator se ejecuta con sus cuatro stats
+  resueltos; AG de Dark Lord añade Command por la misma ruta contextual.
+  Defense y SD de Dark Wizard, Dark Knight, Fairy Elf, Magic Gladiator, Dark
+  Lord y Summoner se ejecutan con dependencia `RAW`; daño y el
+  resto de Defense todavía no se ejecutan.
 - Licencia: texto Apache-2.0 contrastado con la publicación oficial; ADR-0005,
   `NOTICE` e inventario de terceros incorporados. La auditoría leyó metadatos
   `.nuspec` de todas las dependencias restauradas y el acuerdo incluido por la
@@ -1033,9 +1214,9 @@
   EVD-0026 autoriza diseñar contratos y casos para su alcance exacto; HP de Dark
   Wizard, Dark Knight, Fairy Elf, Summoner, Magic Gladiator y Dark Lord, más
   Mana de Dark Wizard, Dark Knight, Fairy Elf, Summoner, Magic Gladiator y Dark
-  Lord, más AG de Dark Wizard, Dark Knight, Fairy Elf y Summoner, ya son
-  productivos; los otros 8 claims siguen
-  pendientes.
+  Lord, más AG de las seis familias y SD de todas las familias (Dark
+  Wizard/Dark Knight/Fairy Elf/Magic Gladiator/Dark Lord/Summoner), ya son
+  productivos; `RES-0002` queda completamente materializado (24/24).
   EVD-0014–EVD-0018 trazan stats, puntos, Marlon, contraste oficial y decisiones
   del propietario; EVD-0019/EVD-0020 trazan la presencia anterior de la matriz
   candidata y la búsqueda negativa de un original o snapshot contemporáneo;

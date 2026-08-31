@@ -1,0 +1,9 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "sd-summoner-invalid-level",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-sd-summoner", "version": "1.0.0" },
+  "context": { "characterClassId": "class-summoner", "evolutionId": "evolution-summoner" },
+  "inputs": { "character-level": 0, "strength": 21, "agility": 21, "vitality": 18, "energy": 23, "defense": 7 },
+  "expectedErrorCode": "formula-level-out-of-range"
+}

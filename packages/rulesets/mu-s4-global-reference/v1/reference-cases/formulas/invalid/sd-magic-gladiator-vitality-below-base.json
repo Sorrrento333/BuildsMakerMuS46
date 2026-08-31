@@ -1,0 +1,9 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "sd-magic-gladiator-vitality-below-base",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-sd-magic-gladiator", "version": "1.0.0" },
+  "context": { "characterClassId": "class-magic-gladiator", "evolutionId": "evolution-magic-gladiator" },
+  "inputs": { "character-level": 1, "strength": 26, "agility": 26, "vitality": 25, "energy": 26, "defense": 5.2 },
+  "expectedErrorCode": "formula-stat-below-base"
+}

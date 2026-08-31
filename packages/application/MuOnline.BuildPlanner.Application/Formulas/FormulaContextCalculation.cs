@@ -15,6 +15,9 @@ public static class FormulaContextErrorCodes
     public const string BaseStatMissing = "formula-context-base-stat-missing";
     public const string AllocationMissing = "formula-context-allocation-missing";
     public const string ArithmeticOverflow = "formula-context-arithmetic-overflow";
+    public const string DependencyCycle = "formula-context-dependency-cycle";
+    public const string DependencyIncoherent =
+        "formula-context-dependency-incoherent";
 }
 
 public sealed class FormulaContextException : Exception
@@ -167,13 +170,16 @@ public sealed class CharacterFormulaCalculationResult
     public CharacterFormulaCalculationResult(
         ResolvedCharacterState state,
         IEnumerable<FormulaContextResolutionTraceEntry> contextTrace,
+        IEnumerable<FormulaDependencyResolutionTraceEntry> dependencyTrace,
         FormulaCalculationResult formula)
     {
         ArgumentNullException.ThrowIfNull(state);
         ArgumentNullException.ThrowIfNull(contextTrace);
+        ArgumentNullException.ThrowIfNull(dependencyTrace);
         ArgumentNullException.ThrowIfNull(formula);
         State = state;
         ContextTrace = contextTrace.ToImmutableArray();
+        DependencyTrace = dependencyTrace.ToImmutableArray();
         Formula = formula;
     }
 
@@ -181,8 +187,19 @@ public sealed class CharacterFormulaCalculationResult
 
     public ImmutableArray<FormulaContextResolutionTraceEntry> ContextTrace { get; }
 
+    public ImmutableArray<FormulaDependencyResolutionTraceEntry> DependencyTrace { get; }
+
     public FormulaCalculationResult Formula { get; }
 }
+
+public sealed record FormulaDependencyResolutionTraceEntry(
+    FormulaReference ConsumerFormulaReference,
+    string InputId,
+    FormulaReference FormulaReference,
+    FormulaOutputStage OutputStage,
+    decimal ResolvedValue,
+    ImmutableArray<FormulaContextResolutionTraceEntry> ContextTrace,
+    FormulaCalculationTrace FormulaTrace);
 
 public static class FormulaContextValueResolver
 {
@@ -190,7 +207,7 @@ public static class FormulaContextValueResolver
     private const string ResolvedStatPrefix = "resolved-";
 
     public static (
-        ImmutableDictionary<string, long> Inputs,
+        ImmutableDictionary<string, decimal> Inputs,
         ImmutableArray<FormulaContextResolutionTraceEntry> Trace)
         Resolve(
             FormulaDefinition formula,
@@ -200,7 +217,7 @@ public static class FormulaContextValueResolver
         ArgumentNullException.ThrowIfNull(state);
 
         EnsureStateMatchesFormula(formula, state);
-        var inputs = ImmutableDictionary.CreateBuilder<string, long>(
+        var inputs = ImmutableDictionary.CreateBuilder<string, decimal>(
             StringComparer.Ordinal);
         var trace = ImmutableArray.CreateBuilder<FormulaContextResolutionTraceEntry>();
 
@@ -208,18 +225,20 @@ public static class FormulaContextValueResolver
         {
             if (input.Source.Kind != FormulaInputSourceKind.ContextValue)
             {
-                throw Error(
-                    FormulaContextErrorCodes.SourceNotSupported,
-                    $"Formula input '{input.Id}' uses unsupported source kind '{input.Source.Kind}'.");
+                continue;
             }
 
-            if (input.Source.ValueId == CharacterLevelValueId)
+            var contextValueId = input.Source.ValueId
+                ?? throw Error(
+                    FormulaContextErrorCodes.SourceNotSupported,
+                    $"Formula input '{input.Id}' has no context value ID.");
+            if (contextValueId == CharacterLevelValueId)
             {
                 var level = state.ProgressionRequest.Level;
                 inputs.Add(input.Id, level);
                 trace.Add(new FormulaContextResolutionTraceEntry(
                     input.Id,
-                    input.Source.ValueId,
+                    contextValueId,
                     level,
                     state.CharacterClass.RulesetId,
                     state.CharacterClass.Id,
@@ -229,22 +248,22 @@ public static class FormulaContextValueResolver
                 continue;
             }
 
-            if (!input.Source.ValueId.StartsWith(
+            if (!contextValueId.StartsWith(
                     ResolvedStatPrefix,
                     StringComparison.Ordinal))
             {
                 throw Error(
                     FormulaContextErrorCodes.ValueNotResolvable,
-                    $"Context value '{input.Source.ValueId}' cannot be resolved from the character state.");
+                    $"Context value '{contextValueId}' cannot be resolved from the character state.");
             }
 
-            var statId = input.Source.ValueId[ResolvedStatPrefix.Length..];
+            var statId = contextValueId[ResolvedStatPrefix.Length..];
             if (string.IsNullOrWhiteSpace(statId) ||
                 !state.CharacterClass.StatIds.Contains(statId))
             {
                 throw Error(
                     FormulaContextErrorCodes.ValueNotResolvable,
-                    $"Context value '{input.Source.ValueId}' does not identify a stat available to the character class.");
+                    $"Context value '{contextValueId}' does not identify a stat available to the character class.");
             }
 
             if (!state.CharacterClass.BaseStats.TryGetValue(
@@ -280,7 +299,7 @@ public static class FormulaContextValueResolver
             inputs.Add(input.Id, resolvedValue);
             trace.Add(new FormulaContextResolutionTraceEntry(
                 input.Id,
-                input.Source.ValueId,
+                contextValueId,
                 resolvedValue,
                 state.CharacterClass.RulesetId,
                 state.CharacterClass.Id,
@@ -366,21 +385,115 @@ public sealed class CalculateCharacterFormulaUseCase
             budget,
             distribution,
             characterClass);
-        var resolved = FormulaContextValueResolver.Resolve(formula, state);
-        var formulaResult = _formulaUseCase.Execute(
-            reference,
-            new FormulaCalculationRequest(
-                new FormulaCalculationContext(
-                    progressionRequest.ClassId,
-                    progressionRequest.EvolutionId),
-                resolved.Inputs));
+        var evaluation = EvaluateFormula(
+            formula,
+            state,
+            new Dictionary<FormulaReference, FormulaCalculationResult>(),
+            new HashSet<FormulaReference>());
 
         return new CharacterFormulaCalculationResult(
             state,
-            resolved.Trace,
-            formulaResult);
+            evaluation.ContextTrace,
+            evaluation.DependencyTrace,
+            evaluation.Formula);
+    }
+
+    private EvaluationResult EvaluateFormula(
+        FormulaDefinition formula,
+        ResolvedCharacterState state,
+        IDictionary<FormulaReference, FormulaCalculationResult> cache,
+        ISet<FormulaReference> active)
+    {
+        if (!active.Add(formula.Reference))
+        {
+            throw Error(
+                FormulaContextErrorCodes.DependencyCycle,
+                $"Formula dependency cycle detected at '{formula.Reference.Id}' " +
+                $"version '{formula.Reference.Version}'.");
+        }
+
+        try
+        {
+            var resolvedContext = FormulaContextValueResolver.Resolve(formula, state);
+            var inputs = resolvedContext.Inputs.ToBuilder();
+            var contextTrace = resolvedContext.Trace.ToBuilder();
+            var dependencyTrace =
+                ImmutableArray.CreateBuilder<FormulaDependencyResolutionTraceEntry>();
+
+            foreach (var input in formula.Inputs.Where(
+                         item =>
+                             item.Source.Kind == FormulaInputSourceKind.FormulaOutput))
+            {
+                var dependencyReference = input.Source.FormulaReference
+                    ?? throw Error(
+                        FormulaContextErrorCodes.DependencyIncoherent,
+                        $"Formula input '{input.Id}' has no dependency reference.");
+                var outputStage = input.Source.OutputStage
+                    ?? throw Error(
+                        FormulaContextErrorCodes.DependencyIncoherent,
+                        $"Formula input '{input.Id}' has no dependency output stage.");
+                var dependency = _formulaCatalog.Resolve(dependencyReference);
+                FormulaCalculationResult dependencyResult;
+                ImmutableArray<FormulaContextResolutionTraceEntry>
+                    dependencyContextTrace = [];
+                ImmutableArray<FormulaDependencyResolutionTraceEntry>
+                    nestedDependencyTrace = [];
+                if (!cache.TryGetValue(dependencyReference, out dependencyResult!))
+                {
+                    var evaluatedDependency = EvaluateFormula(
+                        dependency,
+                        state,
+                        cache,
+                        active);
+                    dependencyResult = evaluatedDependency.Formula;
+                    dependencyContextTrace = evaluatedDependency.ContextTrace;
+                    nestedDependencyTrace = evaluatedDependency.DependencyTrace;
+                    cache.Add(dependencyReference, dependencyResult);
+                }
+
+                dependencyTrace.AddRange(nestedDependencyTrace);
+                var selectedValue = outputStage switch
+                {
+                    FormulaOutputStage.Raw => dependencyResult.RawOutput,
+                    FormulaOutputStage.Visible => dependencyResult.VisibleOutput,
+                    _ => throw Error(
+                        FormulaContextErrorCodes.DependencyIncoherent,
+                        $"Formula input '{input.Id}' selects an unknown output stage."),
+                };
+                inputs.Add(input.Id, selectedValue);
+                dependencyTrace.Add(new FormulaDependencyResolutionTraceEntry(
+                    formula.Reference,
+                    input.Id,
+                    dependencyReference,
+                    outputStage,
+                    selectedValue,
+                    dependencyContextTrace,
+                    dependencyResult.Trace));
+            }
+
+            var formulaResult = _formulaUseCase.Execute(
+                formula.Reference,
+                new FormulaCalculationRequest(
+                    new FormulaCalculationContext(
+                        state.ProgressionRequest.ClassId,
+                        state.ProgressionRequest.EvolutionId),
+                    inputs));
+            return new EvaluationResult(
+                formulaResult,
+                contextTrace.ToImmutable(),
+                dependencyTrace.ToImmutable());
+        }
+        finally
+        {
+            active.Remove(formula.Reference);
+        }
     }
 
     private static FormulaContextException Error(string code, string message) =>
         new(code, message);
+
+    private sealed record EvaluationResult(
+        FormulaCalculationResult Formula,
+        ImmutableArray<FormulaContextResolutionTraceEntry> ContextTrace,
+        ImmutableArray<FormulaDependencyResolutionTraceEntry> DependencyTrace);
 }
