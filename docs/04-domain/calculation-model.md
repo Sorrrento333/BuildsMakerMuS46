@@ -60,11 +60,14 @@ es `99 + 3 + 0 = 102`. El claim queda `VERIFIED`, pendiente todavía de ID,
 contrato y casos ejecutables antes de entrar al motor.
 
 El valor visible trunca la parte decimal. No se aprobó ningún redondeo
-intermedio adicional: las dependencias como `defense`, `mana` y `AG` deberán
-declarar en su contrato si consumen el valor anterior o posterior al truncamiento
-visible. Cada fórmula entra incrementalmente al schema, ruleset y Calculation
-Engine sólo después de fijar ID, dependencias, casos y trazas; las seis fórmulas
-de HP, las seis de Mana y AG de Dark Wizard ya completaron ese gate.
+intermedio adicional: las dependencias como `defense`, `mana` y `AG` deben
+declarar si consumen `RAW` o `VISIBLE`. El modelo productivo ya conserva ambas
+etapas mediante referencias exactas y traza separada, según
+`formula-output-dependency-resolution-design.md`. `EVD-0033` decide
+exclusivamente que SD de Dark Wizard consume Defense `RAW`; no establece una
+regla global para otras familias. Cada fórmula entra incrementalmente sólo
+después de fijar ID, dependencias, casos y trazas; las seis de HP, Mana y AG, y
+Defense/SD de Dark Wizard, Dark Knight y Fairy Elf ya completaron ese gate.
 
 El primer diseño previo a esa vertical está en
 `dark-wizard-hp-formula-contract.md`. Propone `formula-hp-dark-wizard` `1.0.0`,
@@ -100,7 +103,7 @@ Calculation Engine incorpora intérpretes puros que:
 1. exige una definición `PUBLISHED` y aplicable;
 2. valida el conjunto exacto de inputs y sus límites;
 3. ejecuta en orden `CONSTANT`, `ADD`, `SUBTRACT`, `MULTIPLY` y
-   `APPLY_ROUNDING`;
+   `APPLY_ROUNDING`; `CHECKED_DECIMAL_V1` admite además `DIVIDE`;
 4. usa aritmética comprobada de 64 bits;
 5. devuelve raw/visible output y una traza construida sólo con valores
    efectivamente calculados.
@@ -113,8 +116,8 @@ Application completa el gate independiente con
 `CalculatePublishedFormulaUseCase`. El adaptador materializa schemas
 `2.0.0`/`2.1.0`, indexa por referencia exacta, valida las relaciones entre clases,
 evoluciones, inputs, programa, traza y redondeo, y no lee casos durante la
-ejecución normal. La regresión de integración reproduce desde archivos los 68
-positivos y 76 controles negativos de las diecisiete fórmulas ejecutables. El
+ejecución normal. La regresión de integración reproduce desde archivos los
+casos canónicos de las veintiséis fórmulas ejecutables. El
 `1.0.0` histórico de Dark Wizard permanece válido como historia pero produce
 `formula-not-executable`.
 
@@ -147,6 +150,14 @@ La primera vertical de AG se documenta en
 `dark-wizard-ag-formula-contract.md`; consume exclusivamente los cuatro stats
 resueltos, conserva `0.2`, `0.3` y `0.4` con `CHECKED_DECIMAL_V1` y trunca una
 sola vez en `visible-ag`.
+
+La primera vertical con dependencia factual se documenta en
+`dark-wizard-defense-sd-formula-contract.md`.
+`formula-defense-dark-wizard` conserva `agility / 4` mediante `DIVIDE`, y
+`formula-sd-dark-wizard` consume su salida `RAW` por decisión `EVD-0033`.
+Las divisiones por 2 y 30 permanecen operaciones declaradas; no se sustituye
+`1/30` por una constante aproximada. Application conserva la traza productora
+y WPF reutiliza la selección genérica existente.
 
 ## Primera vertical implementada: presupuesto por progresión
 

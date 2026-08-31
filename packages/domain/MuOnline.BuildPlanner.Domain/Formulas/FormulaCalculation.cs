@@ -22,11 +22,21 @@ public sealed class FormulaCalculationRequest
     public FormulaCalculationRequest(
         FormulaCalculationContext context,
         IEnumerable<KeyValuePair<string, long>> inputs)
+        : this(
+            context,
+            inputs.Select(input =>
+                new KeyValuePair<string, decimal>(input.Key, input.Value)))
+    {
+    }
+
+    public FormulaCalculationRequest(
+        FormulaCalculationContext context,
+        IEnumerable<KeyValuePair<string, decimal>> inputs)
     {
         ArgumentNullException.ThrowIfNull(context);
         ArgumentNullException.ThrowIfNull(inputs);
 
-        var inputBuilder = ImmutableDictionary.CreateBuilder<string, long>(
+        var inputBuilder = ImmutableDictionary.CreateBuilder<string, decimal>(
             StringComparer.Ordinal);
         foreach (var input in inputs)
         {
@@ -45,7 +55,7 @@ public sealed class FormulaCalculationRequest
 
     public FormulaCalculationContext Context { get; }
 
-    public ImmutableDictionary<string, long> Inputs { get; }
+    public ImmutableDictionary<string, decimal> Inputs { get; }
 }
 
 public sealed record FormulaCalculationTraceStep
@@ -68,7 +78,7 @@ public sealed class FormulaCalculationTrace
         string rulesetId,
         FormulaReference formulaReference,
         FormulaCalculationContext context,
-        IEnumerable<KeyValuePair<string, long>> inputs,
+        IEnumerable<KeyValuePair<string, decimal>> inputs,
         IEnumerable<FormulaCalculationTraceStep> steps,
         FormulaRoundingDefinition rounding,
         decimal rawOutput,
@@ -105,7 +115,7 @@ public sealed class FormulaCalculationTrace
 
     public FormulaCalculationContext Context { get; }
 
-    public ImmutableDictionary<string, long> Inputs { get; }
+    public ImmutableDictionary<string, decimal> Inputs { get; }
 
     public ImmutableArray<FormulaCalculationTraceStep> Steps { get; }
 

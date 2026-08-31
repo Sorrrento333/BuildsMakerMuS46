@@ -255,6 +255,8 @@ pérdida. El mismo contrato mayor admite ahora `schemaVersion: 2.1.0` con
 - los literales se materializan con `System.Decimal`, sin conversión binaria;
 - inputs y output publicados permanecen `INT32`/`INT64`;
 - suma, resta y multiplicación usan aritmética comprobada;
+- `DIVIDE` binario queda disponible sólo para `CHECKED_DECIMAL_V1`; conserva
+  divisores declarados y rechaza división por cero como programa inválido;
 - la traza conserva valores decimales exactos;
 - `APPLY_ROUNDING` sigue siendo la única etapa autorizada de redondeo;
 - una salida redondeada fuera de `INT64` produce
@@ -263,6 +265,26 @@ pérdida. El mismo contrato mayor admite ahora `schemaVersion: 2.1.0` con
 `2.0.0` continúa exigiendo `CHECKED_INT64_V1`; las cinco definiciones existentes
 no se reescriben. No se añadieron operaciones, dependencias ni handlers
 factuales.
+
+## Resolución productiva de dependencias — 2026-07-28
+
+La estructura `FORMULA_OUTPUT` aprobada se implementa sin cambiar su forma:
+referencia ID/version exactas y selección obligatoria `RAW` o `VISIBLE`.
+Application ejecuta el grafo contra el mismo estado validado, conserva la traza
+productora, reutiliza resultados y rechaza referencias ausentes,
+aplicabilidad incompatible y ciclos.
+
+Los mapas de input/traza pasan a precisión decimal exacta. `DECIMAL` se admite
+como extensión compatible para inputs derivados de `CHECKED_DECIMAL_V1`;
+`INT32`/`INT64` siguen requiriendo integralidad y rango. El output permanece
+`INT64`. Ver
+`../04-domain/formula-output-dependency-resolution-design.md`.
+
+La implementación técnica no decidió el gate factual. `EVD-0033` selecciona
+`RAW` para `DR-SD-DARK-WIZARD`; `EVD-0034` selecciona la misma etapa para los
+cinco claims de SD que seguían pendientes. Ambas decisiones habilitan
+definiciones/casos sin cambiar la forma del contrato. Un cambio futuro exige
+nueva evidencia, versión y casos, no una mutación silenciosa.
 
 ## Consecuencias
 

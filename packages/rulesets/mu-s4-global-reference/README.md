@@ -61,6 +61,31 @@ declarar confianza y enlazar la evidencia que autoriza su uso.
   `formula-ag-magic-gladiator` `1.0.0` conserva exactamente `0.15`, `0.3`,
   `0.25` y `0.2`, aplica a Magic Gladiator/Duel Master, conserva `DSP-0002` y
   enlaza cuatro positivos con truncamiento únicamente en la salida.
+  `formula-ag-dark-lord` `1.0.0` consume también `resolved-command`, conserva
+  exactamente `0.15`, `0.1`, `0.2` y `0.3`, aplica a Dark Lord/Lord Emperor y
+  enlaza cuatro positivos con truncamiento únicamente en la salida.
+  `formula-defense-dark-wizard` `1.0.0` conserva `agility / 4` con salida
+  decimal `RAW` y salida visible truncada; enlaza cuatro positivos.
+  `formula-sd-dark-wizard` `1.0.0` enlaza Defense por referencia exacta y
+  consume su etapa `RAW` conforme a `EVD-0033`. Conserva las divisiones por 2 y
+  30 como operaciones y enlaza cuatro positivos.
+  `formula-defense-dark-knight` `1.0.0` conserva `agility / 3` con salida
+  decimal `RAW` y visible truncada; enlaza cuatro positivos.
+  `formula-sd-dark-knight` `1.0.0` consume esa salida `RAW` conforme a
+  `EVD-0034`, conserva las divisiones por 2 y 30 y enlaza cuatro positivos.
+  `formula-defense-fairy-elf` `1.0.0` conserva `agility / 10` con salida
+  decimal `RAW` y visible truncada; enlaza cuatro positivos.
+  `formula-sd-fairy-elf` `1.0.0` consume esa salida `RAW` conforme a
+  `EVD-0034`, conserva las divisiones por 2 y 30 y enlaza cuatro positivos.
+  `formula-defense-magic-gladiator` `1.0.0` conserva `agility / 5` con salida
+  decimal `RAW` y visible truncada; enlaza cuatro positivos.
+  `formula-sd-magic-gladiator` `1.0.0` consume esa salida `RAW` conforme a
+  `EVD-0034`, conserva `DSP-0002`, las divisiones por 2 y 30 y cuatro positivos.
+  `formula-defense-dark-lord` `1.0.0` conserva `agility / 7` con salida
+  decimal `RAW` y visible truncada; enlaza cuatro positivos.
+  `formula-sd-dark-lord` `1.0.0` consume esa salida `RAW` conforme a
+  `EVD-0034`, incorpora Command a la suma de stats, conserva las divisiones por
+  2 y 30 y enlaza cuatro positivos.
 - `reference-cases/progression/valid/`: siete casos factuales versionados para
   los bordes aprobados de nivel 1/220/221/230 y MG/DL en nivel 220.
 - `reference-cases/progression/invalid/`: tres controles técnicos que deben
@@ -70,15 +95,21 @@ declarar confianza y enlazar la evidencia que autoriza su uso.
   y cuatro casos positivos propios para Dark Knight, Fairy Elf, Summoner,
   Magic Gladiator, Dark Lord, Mana de Dark Wizard, Mana de Dark Knight,
   Mana de Fairy Elf, Mana de Summoner, Mana de Magic Gladiator, Mana de Dark
-  Lord, AG de Dark Wizard, AG de Dark Knight, AG de Fairy Elf y AG de
-  Summoner, siempre por referencia exacta.
+  Lord, AG de Dark Wizard, AG de Dark Knight, AG de Fairy Elf, AG de
+  Summoner, AG de Magic Gladiator, AG de Dark Lord, y Defense/SD de Dark
+  Wizard, Dark Knight, Fairy Elf, Magic Gladiator y Dark Lord, siempre por
+  referencia exacta.
 - `reference-cases/formulas/invalid/`: controles de nivel, Vitality, familia y
   overflow por cada referencia de HP, más nivel, Energy, familia y overflow
   para Mana. AG de Dark Wizard, Dark Knight y Fairy Elf cubren los cuatro
   mínimos de stats, familia y overflow. AG de Summoner y Magic Gladiator
   cubren los cuatro mínimos y familia; no se inventa un overflow imposible
-  dentro de sus dominios válidos. Los controles nunca se enlazan desde
-  `testCaseRefs`.
+  dentro de sus dominios válidos. AG de Dark Lord cubre sus cinco mínimos,
+  familia y overflow real de salida por la suma de coeficientes `1.05`.
+  Defense de Dark Wizard, Dark Knight, Fairy Elf, Magic Gladiator y Dark Lord
+  cubre Agility bajo base y familia; cada SD cubre nivel, sus stats, familia y
+  overflow. Dark Lord incluye el control adicional de Command bajo base. Los
+  controles nunca se enlazan desde `testCaseRefs`.
 
 Los IDs usan prefijos de tipo (`class-`, `evolution-`, `progression-`,
 `quest-`) y son referencias estables; los nombres visibles no se usan como
@@ -95,8 +126,9 @@ final de `EVD-0031`. Mana de Magic Gladiator conserva Energy mínima 26 desde
 resuelto `DSP-0002`. Mana de Dark Lord conserva Energy mínima 15 desde
 `EVD-0021` y la expresión y truncamiento de `EVD-0026`. AG de Dark Wizard
 conserva los cuatro mínimos canónicos desde `EVD-0021` y la expresión y
-truncamiento de `EVD-0026`. AG de Dark Knight, Fairy Elf y Summoner conservan
-del mismo modo sus mínimos canónicos, expresión y truncamiento. HP de Summoner
+truncamiento de `EVD-0026`. AG de Dark Knight, Fairy Elf, Summoner, Magic
+Gladiator y Dark Lord conservan del mismo modo sus mínimos canónicos, expresión
+y truncamiento; Dark Lord añade Command 25 por `EVD-0021`. HP de Summoner
 conserva `EVD-0027`–`EVD-0030` y la autoridad final de `EVD-0030`. Las evidencias
 externas y los conflictos
 conservan su clasificación original en el registro de investigación.

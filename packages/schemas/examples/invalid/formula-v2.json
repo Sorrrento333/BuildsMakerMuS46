@@ -12,7 +12,7 @@
   "inputs": [
     {
       "id": "input-synthetic",
-      "numericType": "DECIMAL",
+      "numericType": "FLOAT",
       "unit": "synthetic-unit",
       "numericBounds": {
         "minimum": 0,

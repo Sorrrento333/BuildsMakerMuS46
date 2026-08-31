@@ -36,10 +36,11 @@ Al cargar, Application vuelve a fallar cerrado si los archivos no forman un
 único ruleset coherente o contienen una regla distinta de `PUBLISHED`.
 
 El adaptador de fórmulas exige identidades compuestas únicas, aplicabilidad
-resoluble contra una clase y sus evoluciones, inputs contextuales, aridades y
+resoluble contra una clase y sus evoluciones, inputs contextuales o derivados,
+aridades y
 referencias hacia atrás coherentes, igualdad exacta programa/traza, salida
-visible producida por el paso de redondeo y ausencia de dependencias en esta
-primera vertical. Los fallos del snapshot usan códigos
+visible producida por el paso de redondeo, y dependencias exactas, compatibles
+y acíclicas. Los fallos del snapshot usan códigos
 `formula-snapshot-*`. Solicitar una referencia histórica o ausente produce
 `formula-not-executable` antes de invocar el motor. Los casos de referencia no
 se leen durante la ejecución normal.
@@ -52,24 +53,30 @@ quests se leen del snapshot canónico versionado. La distribución conserva los
 códigos tipados de Domain y falla con `budget-source-mismatch` si el presupuesto
 no resuelve a una única clase del mismo ruleset.
 
-Las pruebas de integración leen las diecisiete definiciones ejecutables y sus
-144 casos: comparan 68/68 resultados y trazas, reproducen 76/76
-códigos de error y
+Las pruebas de integración leen las veintiocho definiciones ejecutables. Los
+casos de Defense/SD de Dark Wizard, Dark Knight, Fairy Elf, Magic Gladiator y
+Dark Lord añaden cobertura
+directa de sus ocho positivos y nueve controles por familia; la composición
+contextual recorre todos los positivos y conserva la dependencia `RAW`.
+También
 demuestran que el `1.0.0` histórico de Dark Wizard no es ejecutable. No copian
-constantes, inputs ni resultados de HP, Mana o AG a C#.
+constantes, inputs ni resultados de HP, Mana, AG, Defense o SD a C#.
 
 La resolución productiva de `CONTEXT_VALUE` está implementada según
 `../../docs/04-domain/formula-context-value-resolution-design.md`.
 `ResolvedCharacterState` conserva copias inmutables de solicitud, presupuesto y
 distribución; `FormulaContextValueResolver` obtiene `character-level` de la
 solicitud validada y cada `resolved-{statId}` mediante suma `Int64` comprobada
-de base canónica más asignación. Devuelve una traza contextual separada y usa
-seis códigos `formula-context-*`. Data y borradores no cambiaron.
+de base canónica más asignación. Devuelve una traza contextual separada.
+`FORMULA_OUTPUT` se resuelve por referencia exacta y etapa `RAW`/`VISIBLE`,
+conserva precisión decimal y expone otra traza. El snapshot y la ejecución
+rechazan referencias incoherentes y ciclos. Data y borradores no cambiaron.
 
-Ocho pruebas comparan bases/evidencias y `source.valueId` con los JSON,
-reproducen 68/68 casos positivos por la ruta productiva y cubren mismatch,
+Las pruebas comparan bases/evidencias y sources con los JSON,
+reproducen 112/112 casos positivos por la ruta productiva y cubren mismatch,
 fuentes/valores no resolubles, base/asignación ausentes, overflow,
-inmutabilidad y fallos previos de progresión/distribución.
+inmutabilidad, fallos previos de progresión/distribución y dependencias
+sintéticas `RAW`/`VISIBLE`.
 
 ## Borradores de build
 

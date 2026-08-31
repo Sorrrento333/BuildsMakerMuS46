@@ -55,21 +55,36 @@ multiplicación. Una prueba adicional dentro de ese conjunto muta las
 colecciones del llamador después de construir definición y solicitud para
 demostrar que Domain conserva copias inmutables.
 
-Cuatro pruebas sintéticas adicionales cubren `CHECKED_DECIMAL_V1`: conservación
+Cinco pruebas sintéticas adicionales cubren `CHECKED_DECIMAL_V1`: conservación
 exacta de `1.5`, ausencia de redondeo intermedio, truncamiento final, operandos
-incoherentes y overflow al convertir la salida publicada a `INT64`.
+incoherentes, `DIVIDE` por un divisor declarado y overflow al convertir la
+salida publicada a `INT64`.
 
-Esta cobertura no lee la fórmula ni los casos de HP y por tanto no constituye
+Esta cobertura no lee fórmulas ni casos factuales y por tanto no constituye
 regresión factual. El gate independiente de Application ya materializa
-`formula` `2.0.0`/`2.1.0`, ejecuta desde archivos 68/68 positivos y 76/76 negativos
-entre Dark Wizard `1.1.0`, Dark Knight `1.0.0`, Fairy Elf `1.0.0` y Summoner
+`formula` `2.0.0`/`2.1.0` y ejecuta desde archivos los casos de
+Dark Wizard `1.1.0`, Dark Knight `1.0.0`, Fairy Elf `1.0.0` y Summoner
 `1.0.0`, Magic Gladiator `1.0.0`, Dark Lord `1.0.0` y Mana de Dark Wizard
 `1.0.0`, Dark Knight `1.0.0`, Fairy Elf `1.0.0`, Summoner `1.0.0`, Magic
 Gladiator `1.0.0`, Dark Lord `1.0.0`, AG de Dark Wizard `1.0.0`, AG de Dark
-Knight `1.0.0` y AG de Fairy Elf `1.0.0`, y rechaza
-el `1.0.0` histórico de
-Dark Wizard como no ejecutable. Las trazas se comparan campo por campo,
+Knight `1.0.0`, AG de Fairy Elf `1.0.0`, AG de Summoner `1.0.0`, AG de Magic
+  Gladiator `1.0.0`, AG de Dark Lord `1.0.0`, Defense/SD de Dark Wizard `1.0.0`,
+  Defense/SD de Dark Knight `1.0.0`, Defense/SD de Fairy Elf `1.0.0`,
+  Defense/SD de Magic Gladiator `1.0.0` y Defense/SD de Dark Lord `1.0.0`; también
+rechaza el `1.0.0` histórico de Dark Wizard como no ejecutable. Las trazas se
+comparan campo por campo,
 incluidos contexto, inputs, pasos, redondeo, outputs, evidencias y conflictos.
+
+Las dependencias usan casos sintéticos para demostrar
+referencia/version exactas, selección diferente de `RAW` y `VISIBLE`,
+preservación decimal, traza separada y rechazo de ciclos. La vertical factual
+añade `sd-dark-wizard-raw-defense-boundary`, que fija `RAW=4.75`,
+`VISIBLE=4` y SD visible 101; `EVD-0033` es la autoridad de esa selección.
+`sd-dark-knight-raw-defense-boundary` fija `RAW=7.6666…`, `VISIBLE=7` y SD
+visible 107; `EVD-0034` es la autoridad de esa selección.
+`sd-fairy-elf-raw-defense-boundary` fija `RAW=2.7`, `VISIBLE=2` y SD visible
+102, frente a 101 si se consumiera la etapa visible; `EVD-0034` es también la
+autoridad de esta selección.
 
 Los casos de fórmula tendrán contrato propio. Un positivo compondrá mediante
 `$ref` una traza completa y un negativo conservará sólo el código de error
@@ -89,12 +104,19 @@ operaciones permitidas, la unión cerrada de operandos, sus aridades, orden de
 referencias, compatibilidad de bounds con `INT32` y correspondencia exacta entre
 programa y traza.
 
-La suite factual lee las dieciocho definiciones —una histórica y diecisiete
+La suite factual lee las veintinueve definiciones —una histórica y veintiocho
 ejecutables— y sus casos desde el ruleset. Las doce referencias HP/Mana
 conservan cuatro positivos y cuatro negativos; AG de Dark Wizard, Dark Knight y
 Fairy Elf conservan cuatro positivos y seis negativos cada una para cubrir cada
 mínimo factual. AG de Summoner y Magic Gladiator conservan cuatro positivos y
 cinco negativos cada una porque su dominio válido no puede desbordar la salida.
+AG de Dark Lord conserva cuatro positivos y siete negativos para cubrir sus
+cinco mínimos, familia y el overflow alcanzable con una suma de coeficientes de
+`1.05`.
+Defense/SD de Dark Wizard, Dark Knight, Fairy Elf y Magic Gladiator conservan
+ocho positivos y nueve negativos por familia. Dark Lord conserva ocho positivos
+y diez negativos porque SD consume también Command; cada frontera distingue
+explícitamente `RAW` de `VISIBLE`.
 No duplica
 resultados ni constantes del juego en C#.
 El gate exige
@@ -164,13 +186,15 @@ Sobre un presupuesto positivo ya reproducido, genera todas las asignaciones
 desde los `StatIds` materializados, configura dos resets de 100 puntos y
 verifica producto 200, presupuesto combinado, gasto, remanente y conjunto exacto
 en ambas fases. Este control no publica una regla factual de resets.
-El mismo smoke carga las quince definiciones ejecutables y sus positivos, deriva
+El mismo smoke carga las veinticuatro definiciones ejecutables y sus positivos, deriva
 el nivel técnico de composición cuando la fórmula no lo consume y las
 asignaciones desde cada JSON y la base materializada, y reproduce 24/24
 casos de HP más 4/4 casos de Mana de Dark Wizard, 4/4 de Mana de Dark Knight y
 4/4 de Mana de Fairy Elf, 4/4 de Mana de Summoner y 4/4 de Mana de Magic
 Gladiator, 4/4 de Mana de Dark Lord, 4/4 de AG de Dark Wizard, 4/4 de AG de
-Dark Knight y 4/4 de AG de Fairy Elf,
+Dark Knight, 4/4 de AG de Fairy Elf, 4/4 de AG de Summoner, 4/4 de AG de Magic
+Gladiator y 4/4 de AG de Dark Lord, más 8/8 de Defense/SD para Dark Wizard,
+Dark Knight, Fairy Elf, Magic Gladiator y Dark Lord,
 con trazas contextual y aritmética antes y después del reemplazo.
 
 El contrato de distribución de stats conserva fixtures estructurales

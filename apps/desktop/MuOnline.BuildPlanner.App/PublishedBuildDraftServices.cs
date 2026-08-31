@@ -16,7 +16,7 @@ internal sealed record PublishedBuildDraftServices(
 {
     private const string DatabaseFileName = "build-planner.sqlite";
     private const string RulesetVersion = "1.0.0";
-    private const string DatasetVersion = "2026-07-28.2";
+    private const string DatasetVersion = "2026-07-29.4";
     private const string EngineVersion = "0.2.0";
 
     public static PublishedBuildDraftServices CreateDefault()
