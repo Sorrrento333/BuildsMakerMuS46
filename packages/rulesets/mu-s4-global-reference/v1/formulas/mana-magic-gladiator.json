@@ -1,0 +1,171 @@
+{
+  "schemaVersion": "2.0.0",
+  "id": "formula-mana-magic-gladiator",
+  "version": "1.0.0",
+  "rulesetId": "mu-s4-global-reference",
+  "status": "PUBLISHED",
+  "confidence": "VERIFIED",
+  "purpose": "Calculate visible base Mana for the Magic Gladiator family before equipment, options, buffs, private profiles, or undeclared modifiers.",
+  "applicability": {
+    "characterClassId": "class-magic-gladiator",
+    "evolutionIds": [
+      "evolution-magic-gladiator",
+      "evolution-duel-master"
+    ]
+  },
+  "inputs": [
+    {
+      "id": "character-level",
+      "numericType": "INT32",
+      "unit": "level",
+      "numericBounds": {
+        "minimum": 1,
+        "minimumInclusive": true,
+        "maximum": 2147483647,
+        "maximumInclusive": true,
+        "classification": "TECHNICAL"
+      },
+      "rangeErrorCode": "formula-level-out-of-range",
+      "source": {
+        "kind": "CONTEXT_VALUE",
+        "valueId": "character-level"
+      }
+    },
+    {
+      "id": "energy",
+      "numericType": "INT64",
+      "unit": "stat-point",
+      "numericBounds": {
+        "minimum": 26,
+        "minimumInclusive": true,
+        "classification": "FACTUAL",
+        "evidenceRefs": ["evd-0021"]
+      },
+      "rangeErrorCode": "formula-stat-below-base",
+      "source": {
+        "kind": "CONTEXT_VALUE",
+        "valueId": "resolved-energy"
+      }
+    }
+  ],
+  "output": {
+    "id": "mana",
+    "numericType": "INT64",
+    "unit": "mana-point"
+  },
+  "strategy": {
+    "kind": "PROGRAM",
+    "executionModel": "CHECKED_INT64_V1",
+    "steps": [
+      {
+        "id": "base",
+        "operation": "CONSTANT",
+        "operands": [
+          {
+            "kind": "LITERAL",
+            "value": 8
+          }
+        ]
+      },
+      {
+        "id": "level-offset",
+        "operation": "SUBTRACT",
+        "operands": [
+          {
+            "kind": "INPUT",
+            "inputId": "character-level"
+          },
+          {
+            "kind": "LITERAL",
+            "value": 1
+          }
+        ]
+      },
+      {
+        "id": "energy-contribution",
+        "operation": "MULTIPLY",
+        "operands": [
+          {
+            "kind": "INPUT",
+            "inputId": "energy"
+          },
+          {
+            "kind": "LITERAL",
+            "value": 2
+          }
+        ]
+      },
+      {
+        "id": "raw-mana",
+        "operation": "ADD",
+        "operands": [
+          {
+            "kind": "STEP",
+            "stepId": "base"
+          },
+          {
+            "kind": "STEP",
+            "stepId": "level-offset"
+          },
+          {
+            "kind": "STEP",
+            "stepId": "energy-contribution"
+          }
+        ]
+      },
+      {
+        "id": "visible-mana",
+        "operation": "APPLY_ROUNDING",
+        "operands": [
+          {
+            "kind": "STEP",
+            "stepId": "raw-mana"
+          }
+        ]
+      }
+    ],
+    "dependencyFormulaRefs": []
+  },
+  "rounding": {
+    "mode": "TRUNCATE",
+    "stage": "visible-mana",
+    "decimalPlaces": 0
+  },
+  "trace": {
+    "stepIds": [
+      "base",
+      "level-offset",
+      "energy-contribution",
+      "raw-mana",
+      "visible-mana"
+    ],
+    "rawOutputStepId": "raw-mana",
+    "visibleOutputStepId": "visible-mana"
+  },
+  "constraints": [
+    "Resolve class and evolution applicability before evaluating arithmetic.",
+    "Use checked integer subtraction, multiplication, and addition.",
+    "Do not introduce an Energy offset or intermediate rounding.",
+    "Truncate raw-mana toward zero exactly once at visible-mana."
+  ],
+  "evidenceRefs": ["evd-0021", "evd-0026"],
+  "conflictIds": ["dsp-0002"],
+  "testCaseRefs": [
+    {
+      "id": "mana-magic-gladiator-base",
+      "version": "1.0.0"
+    },
+    {
+      "id": "mana-magic-gladiator-level-step",
+      "version": "1.0.0"
+    },
+    {
+      "id": "mana-magic-gladiator-energy-step",
+      "version": "1.0.0"
+    },
+    {
+      "id": "mana-magic-gladiator-combined-step",
+      "version": "1.0.0"
+    }
+  ]
+}

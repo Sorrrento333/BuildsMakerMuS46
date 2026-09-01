@@ -1,0 +1,208 @@
+{
+  "schemaVersion": "2.1.0",
+  "id": "formula-sd-dark-lord",
+  "version": "1.0.0",
+  "rulesetId": "mu-s4-global-reference",
+  "status": "PUBLISHED",
+  "confidence": "VERIFIED",
+  "purpose": "Calculate visible base SD for the Dark Lord family before equipment, options, buffs, private profiles, or undeclared modifiers.",
+  "applicability": {
+    "characterClassId": "class-dark-lord",
+    "evolutionIds": ["evolution-dark-lord", "evolution-lord-emperor"]
+  },
+  "inputs": [
+    {
+      "id": "character-level",
+      "numericType": "INT32",
+      "unit": "level",
+      "numericBounds": {
+        "minimum": 1,
+        "minimumInclusive": true,
+        "maximum": 2147483647,
+        "maximumInclusive": true,
+        "classification": "TECHNICAL"
+      },
+      "rangeErrorCode": "formula-level-out-of-range",
+      "source": { "kind": "CONTEXT_VALUE", "valueId": "character-level" }
+    },
+    {
+      "id": "strength",
+      "numericType": "INT64",
+      "unit": "stat-point",
+      "numericBounds": {
+        "minimum": 26,
+        "minimumInclusive": true,
+        "classification": "FACTUAL",
+        "evidenceRefs": ["evd-0021"]
+      },
+      "rangeErrorCode": "formula-stat-below-base",
+      "source": { "kind": "CONTEXT_VALUE", "valueId": "resolved-strength" }
+    },
+    {
+      "id": "agility",
+      "numericType": "INT64",
+      "unit": "stat-point",
+      "numericBounds": {
+        "minimum": 20,
+        "minimumInclusive": true,
+        "classification": "FACTUAL",
+        "evidenceRefs": ["evd-0021"]
+      },
+      "rangeErrorCode": "formula-stat-below-base",
+      "source": { "kind": "CONTEXT_VALUE", "valueId": "resolved-agility" }
+    },
+    {
+      "id": "vitality",
+      "numericType": "INT64",
+      "unit": "stat-point",
+      "numericBounds": {
+        "minimum": 20,
+        "minimumInclusive": true,
+        "classification": "FACTUAL",
+        "evidenceRefs": ["evd-0021"]
+      },
+      "rangeErrorCode": "formula-stat-below-base",
+      "source": { "kind": "CONTEXT_VALUE", "valueId": "resolved-vitality" }
+    },
+    {
+      "id": "energy",
+      "numericType": "INT64",
+      "unit": "stat-point",
+      "numericBounds": {
+        "minimum": 15,
+        "minimumInclusive": true,
+        "classification": "FACTUAL",
+        "evidenceRefs": ["evd-0021"]
+      },
+      "rangeErrorCode": "formula-stat-below-base",
+      "source": { "kind": "CONTEXT_VALUE", "valueId": "resolved-energy" }
+    },
+    {
+      "id": "command",
+      "numericType": "INT64",
+      "unit": "stat-point",
+      "numericBounds": {
+        "minimum": 25,
+        "minimumInclusive": true,
+        "classification": "FACTUAL",
+        "evidenceRefs": ["evd-0021"]
+      },
+      "rangeErrorCode": "formula-stat-below-base",
+      "source": { "kind": "CONTEXT_VALUE", "valueId": "resolved-command" }
+    },
+    {
+      "id": "defense",
+      "numericType": "DECIMAL",
+      "unit": "defense-point",
+      "numericBounds": {
+        "minimum": 0,
+        "minimumInclusive": true,
+        "classification": "TECHNICAL"
+      },
+      "rangeErrorCode": "formula-dependency-out-of-range",
+      "source": {
+        "kind": "FORMULA_OUTPUT",
+        "formulaId": "formula-defense-dark-lord",
+        "formulaVersion": "1.0.0",
+        "outputStage": "RAW"
+      }
+    }
+  ],
+  "output": { "id": "sd", "numericType": "INT64", "unit": "sd-point" },
+  "strategy": {
+    "kind": "PROGRAM",
+    "executionModel": "CHECKED_DECIMAL_V1",
+    "steps": [
+      {
+        "id": "stat-sum",
+        "operation": "ADD",
+        "operands": [
+          { "kind": "INPUT", "inputId": "strength" },
+          { "kind": "INPUT", "inputId": "agility" },
+          { "kind": "INPUT", "inputId": "vitality" },
+          { "kind": "INPUT", "inputId": "energy" },
+          { "kind": "INPUT", "inputId": "command" }
+        ]
+      },
+      {
+        "id": "stat-contribution",
+        "operation": "MULTIPLY",
+        "operands": [
+          { "kind": "STEP", "stepId": "stat-sum" },
+          { "kind": "LITERAL", "value": 1.2 }
+        ]
+      },
+      {
+        "id": "defense-contribution",
+        "operation": "DIVIDE",
+        "operands": [
+          { "kind": "INPUT", "inputId": "defense" },
+          { "kind": "LITERAL", "value": 2 }
+        ]
+      },
+      {
+        "id": "level-square",
+        "operation": "MULTIPLY",
+        "operands": [
+          { "kind": "INPUT", "inputId": "character-level" },
+          { "kind": "INPUT", "inputId": "character-level" }
+        ]
+      },
+      {
+        "id": "level-contribution",
+        "operation": "DIVIDE",
+        "operands": [
+          { "kind": "STEP", "stepId": "level-square" },
+          { "kind": "LITERAL", "value": 30 }
+        ]
+      },
+      {
+        "id": "raw-sd",
+        "operation": "ADD",
+        "operands": [
+          { "kind": "STEP", "stepId": "stat-contribution" },
+          { "kind": "STEP", "stepId": "defense-contribution" },
+          { "kind": "STEP", "stepId": "level-contribution" }
+        ]
+      },
+      {
+        "id": "visible-sd",
+        "operation": "APPLY_ROUNDING",
+        "operands": [{ "kind": "STEP", "stepId": "raw-sd" }]
+      }
+    ],
+    "dependencyFormulaRefs": [
+      { "id": "formula-defense-dark-lord", "version": "1.0.0" }
+    ]
+  },
+  "rounding": { "mode": "TRUNCATE", "stage": "visible-sd", "decimalPlaces": 0 },
+  "trace": {
+    "stepIds": [
+      "stat-sum",
+      "stat-contribution",
+      "defense-contribution",
+      "level-square",
+      "level-contribution",
+      "raw-sd",
+      "visible-sd"
+    ],
+    "rawOutputStepId": "raw-sd",
+    "visibleOutputStepId": "visible-sd"
+  },
+  "constraints": [
+    "Resolve class and evolution applicability before evaluating arithmetic.",
+    "Resolve formula-defense-dark-lord version 1.0.0 from the same validated character state.",
+    "Consume the RAW decimal defense output selected by owner decision EVD-0034.",
+    "Preserve the written divisions by 2 and 30 through checked decimal DIVIDE steps.",
+    "Do not round any contribution or raw-sd before visible-sd.",
+    "Truncate raw-sd toward zero exactly once at visible-sd."
+  ],
+  "evidenceRefs": ["evd-0021", "evd-0026", "evd-0034"],
+  "conflictIds": [],
+  "testCaseRefs": [
+    { "id": "sd-dark-lord-base", "version": "1.0.0" },
+    { "id": "sd-dark-lord-level-step", "version": "1.0.0" },
+    { "id": "sd-dark-lord-raw-defense-boundary", "version": "1.0.0" },
+    { "id": "sd-dark-lord-combined-step", "version": "1.0.0" }
+  ]
+}

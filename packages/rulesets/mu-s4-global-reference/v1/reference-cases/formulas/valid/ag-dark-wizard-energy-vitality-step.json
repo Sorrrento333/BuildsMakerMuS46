@@ -1,0 +1,35 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "ag-dark-wizard-energy-vitality-step",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-ag-dark-wizard", "version": "1.0.0" },
+  "context": {
+    "characterClassId": "class-dark-wizard",
+    "evolutionId": "evolution-soul-master"
+  },
+  "inputs": { "energy": 31, "vitality": 16, "agility": 18, "strength": 18 },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-ag-dark-wizard-energy-vitality-step",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": { "id": "formula-ag-dark-wizard", "version": "1.0.0" },
+    "context": {
+      "characterClassId": "class-dark-wizard",
+      "evolutionId": "evolution-soul-master"
+    },
+    "inputs": { "energy": 31, "vitality": 16, "agility": 18, "strength": 18 },
+    "steps": [
+      { "stepId": "energy-contribution", "value": 6.2 },
+      { "stepId": "vitality-contribution", "value": 4.8 },
+      { "stepId": "agility-contribution", "value": 7.2 },
+      { "stepId": "strength-contribution", "value": 3.6 },
+      { "stepId": "raw-ag", "value": 21.8 },
+      { "stepId": "visible-ag", "value": 21 }
+    ],
+    "rounding": { "mode": "TRUNCATE", "stage": "visible-ag", "decimalPlaces": 0 },
+    "rawOutput": 21.8,
+    "visibleOutput": 21,
+    "evidenceRefs": ["evd-0021", "evd-0026"],
+    "conflictIds": []
+  }
+}

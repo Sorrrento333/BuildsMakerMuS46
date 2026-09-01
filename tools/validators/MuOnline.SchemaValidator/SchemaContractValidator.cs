@@ -17,24 +17,33 @@ public sealed record FixtureValidationResult(
 public sealed record RulesetRecordValidationResult(
     string ContractName,
     string RecordId,
+    string RecordVersion,
+    string SchemaVersion,
     bool ActualValidity,
     string SchemaPath,
     string RecordPath);
 
 public static class SchemaContractValidator
 {
-    private static readonly string[] ContractNames =
+    private sealed record ContractDefinition(
+        string Name,
+        string SchemaVersionDirectory,
+        string SchemaFileName,
+        string FixtureFileName);
+
+    private static readonly ContractDefinition[] Contracts =
     [
-        "evidence",
-        "formula",
-        "calculation-trace",
-        "formula-test-case",
-        "character-class",
-        "progression-rule",
-        "stat-distribution",
-        "build-draft",
-        "server-profile",
-        "build",
+        new("evidence", "v1", "evidence", "evidence"),
+        new("formula", "v1", "formula", "formula"),
+        new("formula-v2", "v2", "formula", "formula-v2"),
+        new("calculation-trace", "v1", "calculation-trace", "calculation-trace"),
+        new("formula-test-case", "v1", "formula-test-case", "formula-test-case"),
+        new("character-class", "v1", "character-class", "character-class"),
+        new("progression-rule", "v1", "progression-rule", "progression-rule"),
+        new("stat-distribution", "v1", "stat-distribution", "stat-distribution"),
+        new("build-draft", "v1", "build-draft", "build-draft"),
+        new("server-profile", "v1", "server-profile", "server-profile"),
+        new("build", "v1", "build", "build"),
     ];
 
     public static IReadOnlyList<FixtureValidationResult> ValidateRepository(string repositoryRoot)
@@ -42,34 +51,37 @@ public static class SchemaContractValidator
         ArgumentException.ThrowIfNullOrWhiteSpace(repositoryRoot);
 
         var fullRoot = Path.GetFullPath(repositoryRoot);
-        var schemaRoot = Path.Combine(fullRoot, "packages", "schemas", "v1");
+        var schemaRoot = Path.Combine(fullRoot, "packages", "schemas");
         var fixtureRoot = Path.Combine(fullRoot, "packages", "schemas", "examples");
-        var results = new List<FixtureValidationResult>(ContractNames.Length * 2);
+        var results = new List<FixtureValidationResult>(Contracts.Length * 2);
         var buildOptions = new BuildOptions
         {
             SchemaRegistry = new SchemaRegistry(),
         };
 
-        foreach (var contractName in ContractNames)
+        foreach (var contract in Contracts)
         {
-            var schemaPath = Path.Combine(schemaRoot, $"{contractName}.schema.json");
+            var schemaPath = Path.Combine(
+                schemaRoot,
+                contract.SchemaVersionDirectory,
+                $"{contract.SchemaFileName}.schema.json");
             EnsureFileExists(schemaPath, "Schema");
             var schema = JsonSchema.FromFile(schemaPath, buildOptions);
 
             results.Add(ValidateFixture(
-                contractName,
+                contract.Name,
                 "valid",
                 expectedValidity: true,
                 schemaPath,
                 schema,
-                Path.Combine(fixtureRoot, "valid", $"{contractName}.json")));
+                Path.Combine(fixtureRoot, "valid", $"{contract.FixtureFileName}.json")));
             results.Add(ValidateFixture(
-                contractName,
+                contract.Name,
                 "invalid",
                 expectedValidity: false,
                 schemaPath,
                 schema,
-                Path.Combine(fixtureRoot, "invalid", $"{contractName}.json")));
+                Path.Combine(fixtureRoot, "invalid", $"{contract.FixtureFileName}.json")));
         }
 
         return results;
@@ -83,7 +95,9 @@ public static class SchemaContractValidator
         ArgumentException.ThrowIfNullOrWhiteSpace(repositoryRoot);
         ArgumentException.ThrowIfNullOrWhiteSpace(contractName);
 
-        if (!ContractNames.Contains(contractName, StringComparer.Ordinal))
+        var requestedContract = Contracts.SingleOrDefault(
+            contract => contract.Name == contractName);
+        if (requestedContract is null)
         {
             throw new ArgumentOutOfRangeException(
                 nameof(contractName),
@@ -94,23 +108,23 @@ public static class SchemaContractValidator
         var schemaRoot = Path.Combine(
             Path.GetFullPath(repositoryRoot),
             "packages",
-            "schemas",
-            "v1");
+            "schemas");
         var buildOptions = new BuildOptions
         {
             SchemaRegistry = new SchemaRegistry(),
         };
         JsonSchema? requestedSchema = null;
 
-        foreach (var currentContractName in ContractNames)
+        foreach (var currentContract in Contracts)
         {
             var schemaPath = Path.Combine(
                 schemaRoot,
-                $"{currentContractName}.schema.json");
+                currentContract.SchemaVersionDirectory,
+                $"{currentContract.SchemaFileName}.schema.json");
             EnsureFileExists(schemaPath, "Schema");
             var schema = JsonSchema.FromFile(schemaPath, buildOptions);
 
-            if (currentContractName == contractName)
+            if (currentContract == requestedContract)
             {
                 requestedSchema = schema;
             }
@@ -134,7 +148,7 @@ public static class SchemaContractValidator
         ArgumentException.ThrowIfNullOrWhiteSpace(repositoryRoot);
 
         var fullRoot = Path.GetFullPath(repositoryRoot);
-        var schemaRoot = Path.Combine(fullRoot, "packages", "schemas", "v1");
+        var schemaRoot = Path.Combine(fullRoot, "packages", "schemas");
         var rulesetRoot = Path.Combine(
             fullRoot,
             "packages",
@@ -151,13 +165,6 @@ public static class SchemaContractValidator
 
         foreach (var recordSet in recordSets)
         {
-            var schemaPath = Path.Combine(
-                schemaRoot,
-                $"{recordSet.ContractName}.schema.json");
-            EnsureFileExists(schemaPath, "Schema");
-            var schema = JsonSchema.FromFile(
-                schemaPath,
-                new BuildOptions { SchemaRegistry = new SchemaRegistry() });
             var recordDirectory = Path.Combine(rulesetRoot, recordSet.DirectoryName);
 
             if (!Directory.Exists(recordDirectory))
@@ -170,27 +177,75 @@ public static class SchemaContractValidator
                          .Order(StringComparer.Ordinal))
             {
                 using var instance = JsonDocument.Parse(File.ReadAllText(recordPath));
-                var evaluation = schema.Evaluate(
-                    instance.RootElement,
-                    new EvaluationOptions
+                var schemaVersion = instance.RootElement
+                    .GetProperty("schemaVersion")
+                    .GetString()!;
+                var contractName = recordSet.ContractName == "formula"
+                    ? schemaVersion switch
                     {
-                        OutputFormat = OutputFormat.List,
-                        RequireFormatValidation = true,
-                    });
+                        "1.1.0" => "formula",
+                        "2.0.0" => "formula-v2",
+                        "2.1.0" => "formula-v2",
+                        _ => string.Empty,
+                    }
+                    : recordSet.ContractName;
+                var schemaVersionDirectory = contractName == "formula-v2" ? "v2" : "v1";
+                var schemaFileName = recordSet.ContractName;
+                var schemaPath = Path.Combine(
+                    schemaRoot,
+                    schemaVersionDirectory,
+                    $"{schemaFileName}.schema.json");
                 var recordId = instance.RootElement.TryGetProperty("id", out var idElement)
                     ? idElement.GetString() ?? Path.GetFileNameWithoutExtension(recordPath)
                     : Path.GetFileNameWithoutExtension(recordPath);
+                var recordVersion = instance.RootElement.TryGetProperty(
+                    "version",
+                    out var versionElement)
+                    ? versionElement.GetString() ?? string.Empty
+                    : string.Empty;
+                var actualValidity = false;
+
+                if (contractName.Length > 0)
+                {
+                    EnsureFileExists(schemaPath, "Schema");
+                    var schema = JsonSchema.FromFile(
+                        schemaPath,
+                        new BuildOptions { SchemaRegistry = new SchemaRegistry() });
+                    var evaluation = schema.Evaluate(
+                        instance.RootElement,
+                        new EvaluationOptions
+                        {
+                            OutputFormat = OutputFormat.List,
+                            RequireFormatValidation = true,
+                        });
+                    actualValidity = evaluation.IsValid &&
+                        MatchesContractSemantics(contractName, instance.RootElement);
+                }
 
                 results.Add(new RulesetRecordValidationResult(
                     recordSet.ContractName,
                     recordId,
-                    evaluation.IsValid,
+                    recordVersion,
+                    schemaVersion,
+                    actualValidity,
                     schemaPath,
                     recordPath));
             }
         }
 
-        return results;
+        var duplicateIdentities = results
+            .GroupBy(
+                result => (result.ContractName, result.RecordId, result.RecordVersion))
+            .Where(group => group.Count() > 1)
+            .Select(group => group.Key)
+            .ToHashSet();
+
+        return results
+            .Select(result => duplicateIdentities.Contains(
+                    (result.ContractName, result.RecordId, result.RecordVersion))
+                ? result with { ActualValidity = false }
+                : result)
+            .ToArray();
     }
 
     private static FixtureValidationResult ValidateFixture(
@@ -226,6 +281,11 @@ public static class SchemaContractValidator
         string contractName,
         JsonElement instance)
     {
+        if (contractName == "formula-v2")
+        {
+            return MatchesExecutableFormulaSemantics(instance);
+        }
+
         if (contractName != "formula")
         {
             return true;
@@ -244,6 +304,152 @@ public static class SchemaContractValidator
         return stepIds.Contains(rawOutputStepId, StringComparer.Ordinal) &&
                stepIds.Contains(visibleOutputStepId, StringComparer.Ordinal) &&
                stepIds[^1] == visibleOutputStepId;
+    }
+
+    private static bool MatchesExecutableFormulaSemantics(JsonElement instance)
+    {
+        var executionModel = instance
+            .GetProperty("strategy")
+            .GetProperty("executionModel")
+            .GetString();
+        var inputIds = new HashSet<string>(StringComparer.Ordinal);
+        foreach (var input in instance.GetProperty("inputs").EnumerateArray())
+        {
+            var inputId = input.GetProperty("id").GetString()!;
+            if (!inputIds.Add(inputId) || !HasCoherentBounds(input))
+            {
+                return false;
+            }
+        }
+
+        var programStepIds = new List<string>();
+        var priorStepIds = new HashSet<string>(StringComparer.Ordinal);
+        var hasAnyRoundingStep = false;
+
+        foreach (var step in instance
+                     .GetProperty("strategy")
+                     .GetProperty("steps")
+                     .EnumerateArray())
+        {
+            var stepId = step.GetProperty("id").GetString()!;
+            if (priorStepIds.Contains(stepId))
+            {
+                return false;
+            }
+
+            foreach (var operand in step.GetProperty("operands").EnumerateArray())
+            {
+                var kind = operand.GetProperty("kind").GetString();
+                if (kind == "LITERAL")
+                {
+                    var literal = operand.GetProperty("value");
+                    var literalMatchesModel =
+                        executionModel == "CHECKED_INT64_V1"
+                            ? literal.TryGetInt64(out _)
+                            : executionModel == "CHECKED_DECIMAL_V1" &&
+                              literal.TryGetDecimal(out _);
+                    if (!literalMatchesModel)
+                    {
+                        return false;
+                    }
+                }
+
+                if (kind == "INPUT" &&
+                    !inputIds.Contains(operand.GetProperty("inputId").GetString()!))
+                {
+                    return false;
+                }
+
+                if (kind == "STEP" &&
+                    !priorStepIds.Contains(operand.GetProperty("stepId").GetString()!))
+                {
+                    return false;
+                }
+            }
+
+            priorStepIds.Add(stepId);
+            programStepIds.Add(stepId);
+            if (step.GetProperty("operation").GetString() == "APPLY_ROUNDING")
+            {
+                hasAnyRoundingStep = true;
+            }
+        }
+
+        if (!hasAnyRoundingStep)
+        {
+            return false;
+        }
+
+        var trace = instance.GetProperty("trace");
+        var traceStepIds = trace
+            .GetProperty("stepIds")
+            .EnumerateArray()
+            .Select(step => step.GetString()!)
+            .ToArray();
+        var rawOutputStepId = trace.GetProperty("rawOutputStepId").GetString()!;
+        var visibleOutputStepId =
+            trace.GetProperty("visibleOutputStepId").GetString()!;
+        var roundingStage = instance
+            .GetProperty("rounding")
+            .GetProperty("stage")
+            .GetString();
+        var visibleRoundingStep = instance
+            .GetProperty("strategy")
+            .GetProperty("steps")
+            .EnumerateArray()
+            .FirstOrDefault(step => step.GetProperty("id").GetString() ==
+                visibleOutputStepId);
+        if (visibleRoundingStep.ValueKind == JsonValueKind.Undefined ||
+            visibleRoundingStep.GetProperty("operation").GetString() !=
+                "APPLY_ROUNDING")
+        {
+            return false;
+        }
+
+        var roundingStepId = visibleRoundingStep.GetProperty("id").GetString();
+        var roundedStepId = visibleRoundingStep
+            .GetProperty("operands")[0]
+            .GetProperty("stepId")
+            .GetString();
+
+        return programStepIds.SequenceEqual(traceStepIds, StringComparer.Ordinal) &&
+               programStepIds[^1] == visibleOutputStepId &&
+               rawOutputStepId != visibleOutputStepId &&
+               roundingStepId == visibleOutputStepId &&
+               roundingStage == visibleOutputStepId &&
+               roundedStepId == rawOutputStepId;
+    }
+
+    private static bool HasCoherentBounds(JsonElement input)
+    {
+        var bounds = input.GetProperty("numericBounds");
+        var hasMinimum = bounds.TryGetProperty("minimum", out var minimum);
+        var hasMaximum = bounds.TryGetProperty("maximum", out var maximum);
+
+        if (hasMinimum && hasMaximum)
+        {
+            var minimumValue = minimum.GetInt64();
+            var maximumValue = maximum.GetInt64();
+            if (minimumValue > maximumValue)
+            {
+                return false;
+            }
+
+            if (minimumValue == maximumValue &&
+                (!bounds.GetProperty("minimumInclusive").GetBoolean() ||
+                 !bounds.GetProperty("maximumInclusive").GetBoolean()))
+            {
+                return false;
+            }
+        }
+
+        if (input.GetProperty("numericType").GetString() != "INT32")
+        {
+            return true;
+        }
+
+        return (!hasMinimum || minimum.GetInt64() >= int.MinValue) &&
+               (!hasMaximum || maximum.GetInt64() <= int.MaxValue);
     }
 
     private static void EnsureFileExists(string path, string kind)

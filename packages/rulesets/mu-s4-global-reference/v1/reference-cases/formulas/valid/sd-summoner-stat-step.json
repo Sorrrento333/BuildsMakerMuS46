@@ -1,0 +1,33 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "sd-summoner-stat-step",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-sd-summoner", "version": "1.0.0" },
+  "context": { "characterClassId": "class-summoner", "evolutionId": "evolution-bloody-summoner" },
+  "inputs": { "character-level": 10, "strength": 22, "agility": 22, "vitality": 19, "energy": 24, "defense": 7.3333333333333333333333333333 },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-sd-summoner-stat-step",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": { "id": "formula-sd-summoner", "version": "1.0.0" },
+    "context": { "characterClassId": "class-summoner", "evolutionId": "evolution-bloody-summoner" },
+    "inputs": { "character-level": 10, "strength": 22, "agility": 22, "vitality": 19, "energy": 24, "defense": 7.3333333333333333333333333333 },
+    "steps": [
+      { "stepId": "stat-sum", "value": 87 },
+      { "stepId": "stat-product", "value": 104.4 },
+      { "stepId": "stat-term", "value": 104 },
+      { "stepId": "defense-product", "value": 3.6666666666666666666666666666 },
+      { "stepId": "defense-term", "value": 3 },
+      { "stepId": "level-square", "value": 100 },
+      { "stepId": "level-product", "value": 3.3333333333333333333333333333 },
+      { "stepId": "level-term", "value": 3 },
+      { "stepId": "raw-sd", "value": 110 },
+      { "stepId": "visible-sd", "value": 110 }
+    ],
+    "rounding": { "mode": "TRUNCATE", "stage": "visible-sd", "decimalPlaces": 0 },
+    "rawOutput": 110,
+    "visibleOutput": 110,
+    "evidenceRefs": ["evd-0021", "evd-0026", "evd-0032", "evd-0034"],
+    "conflictIds": ["dsp-0004"]
+  }
+}

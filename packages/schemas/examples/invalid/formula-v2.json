@@ -1,0 +1,57 @@
+{
+  "schemaVersion": "2.0.0",
+  "id": "formula-synthetic-program-invalid",
+  "version": "0.1.0",
+  "rulesetId": "ruleset-synthetic",
+  "status": "DRAFT",
+  "confidence": "UNVERIFIED",
+  "applicability": {
+    "characterClassId": "class-synthetic",
+    "evolutionIds": ["evolution-synthetic"]
+  },
+  "inputs": [
+    {
+      "id": "input-synthetic",
+      "numericType": "FLOAT",
+      "unit": "synthetic-unit",
+      "numericBounds": {
+        "minimum": 0,
+        "minimumInclusive": true,
+        "classification": "TECHNICAL"
+      },
+      "source": {
+        "kind": "CONTEXT_VALUE",
+        "valueId": "context-synthetic-value"
+      }
+    }
+  ],
+  "output": {
+    "id": "output-synthetic",
+    "numericType": "INT64",
+    "unit": "synthetic-unit"
+  },
+  "strategy": {
+    "kind": "PROGRAM",
+    "executionModel": "CHECKED_INT64_V1",
+    "steps": [
+      {
+        "id": "visible-output",
+        "operation": "APPLY_ROUNDING",
+        "operands": []
+      }
+    ],
+    "definition": "input-synthetic"
+  },
+  "rounding": {
+    "mode": "NONE",
+    "stage": "visible-output"
+  },
+  "trace": {
+    "stepIds": ["visible-output"],
+    "rawOutputStepId": "missing-raw-output",
+    "visibleOutputStepId": "visible-output"
+  },
+  "evidenceRefs": [],
+  "conflictIds": [],
+  "testCaseRefs": []
+}

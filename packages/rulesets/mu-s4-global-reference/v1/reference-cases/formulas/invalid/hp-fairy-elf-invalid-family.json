@@ -1,0 +1,18 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "hp-fairy-elf-invalid-family",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": {
+    "id": "formula-hp-fairy-elf",
+    "version": "1.0.0"
+  },
+  "context": {
+    "characterClassId": "class-dark-wizard",
+    "evolutionId": "evolution-dark-wizard"
+  },
+  "inputs": {
+    "character-level": 1,
+    "vitality": 15
+  },
+  "expectedErrorCode": "formula-not-applicable"
+}

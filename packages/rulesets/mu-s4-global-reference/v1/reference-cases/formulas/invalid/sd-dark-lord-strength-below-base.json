@@ -1,0 +1,9 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "sd-dark-lord-strength-below-base",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-sd-dark-lord", "version": "1.0.0" },
+  "context": { "characterClassId": "class-dark-lord", "evolutionId": "evolution-dark-lord" },
+  "inputs": { "character-level": 1, "strength": 25, "agility": 20, "vitality": 20, "energy": 15, "command": 25, "defense": 2.8571428571428571428571428571 },
+  "expectedErrorCode": "formula-stat-below-base"
+}

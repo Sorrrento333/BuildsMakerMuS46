@@ -1,0 +1,80 @@
+{
+  "schemaVersion": "2.1.0",
+  "id": "formula-defense-dark-wizard",
+  "version": "1.0.0",
+  "rulesetId": "mu-s4-global-reference",
+  "status": "PUBLISHED",
+  "confidence": "VERIFIED",
+  "purpose": "Calculate visible base defense for the Dark Wizard family before equipment, options, buffs, private profiles, or undeclared modifiers.",
+  "applicability": {
+    "characterClassId": "class-dark-wizard",
+    "evolutionIds": ["evolution-dark-wizard", "evolution-soul-master", "evolution-grand-master"]
+  },
+  "inputs": [
+    {
+      "id": "agility",
+      "numericType": "INT64",
+      "unit": "stat-point",
+      "numericBounds": {
+        "minimum": 18,
+        "minimumInclusive": true,
+        "classification": "FACTUAL",
+        "evidenceRefs": ["evd-0021"]
+      },
+      "rangeErrorCode": "formula-stat-below-base",
+      "source": {
+        "kind": "CONTEXT_VALUE",
+        "valueId": "resolved-agility"
+      }
+    }
+  ],
+  "output": {
+    "id": "defense",
+    "numericType": "INT64",
+    "unit": "defense-point"
+  },
+  "strategy": {
+    "kind": "PROGRAM",
+    "executionModel": "CHECKED_DECIMAL_V1",
+    "steps": [
+      {
+        "id": "raw-defense",
+        "operation": "DIVIDE",
+        "operands": [
+          { "kind": "INPUT", "inputId": "agility" },
+          { "kind": "LITERAL", "value": 4 }
+        ]
+      },
+      {
+        "id": "visible-defense",
+        "operation": "APPLY_ROUNDING",
+        "operands": [{ "kind": "STEP", "stepId": "raw-defense" }]
+      }
+    ],
+    "dependencyFormulaRefs": []
+  },
+  "rounding": {
+    "mode": "TRUNCATE",
+    "stage": "visible-defense",
+    "decimalPlaces": 0
+  },
+  "trace": {
+    "stepIds": ["raw-defense", "visible-defense"],
+    "rawOutputStepId": "raw-defense",
+    "visibleOutputStepId": "visible-defense"
+  },
+  "constraints": [
+    "Resolve class and evolution applicability before evaluating arithmetic.",
+    "Divide Agility by the exact literal 4 using checked decimal arithmetic.",
+    "Do not round raw-defense before visible-defense.",
+    "Truncate raw-defense toward zero exactly once at visible-defense."
+  ],
+  "evidenceRefs": ["evd-0021", "evd-0026"],
+  "conflictIds": [],
+  "testCaseRefs": [
+    { "id": "defense-dark-wizard-base", "version": "1.0.0" },
+    { "id": "defense-dark-wizard-fraction-step", "version": "1.0.0" },
+    { "id": "defense-dark-wizard-integer-step", "version": "1.0.0" },
+    { "id": "defense-dark-wizard-grand-master-step", "version": "1.0.0" }
+  ]
+}

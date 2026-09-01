@@ -1,0 +1,65 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "mana-dark-wizard-combined-step",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": {
+    "id": "formula-mana-dark-wizard",
+    "version": "1.0.0"
+  },
+  "context": {
+    "characterClassId": "class-dark-wizard",
+    "evolutionId": "evolution-grand-master"
+  },
+  "inputs": {
+    "character-level": 2,
+    "energy": 31
+  },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-mana-dark-wizard-combined-step",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": {
+      "id": "formula-mana-dark-wizard",
+      "version": "1.0.0"
+    },
+    "context": {
+      "characterClassId": "class-dark-wizard",
+      "evolutionId": "evolution-grand-master"
+    },
+    "inputs": {
+      "character-level": 2,
+      "energy": 31
+    },
+    "steps": [
+      {
+        "stepId": "level-offset",
+        "value": 1
+      },
+      {
+        "stepId": "level-contribution",
+        "value": 2
+      },
+      {
+        "stepId": "energy-contribution",
+        "value": 62
+      },
+      {
+        "stepId": "raw-mana",
+        "value": 64
+      },
+      {
+        "stepId": "visible-mana",
+        "value": 64
+      }
+    ],
+    "rounding": {
+      "mode": "TRUNCATE",
+      "stage": "visible-mana",
+      "decimalPlaces": 0
+    },
+    "rawOutput": 64,
+    "visibleOutput": 64,
+    "evidenceRefs": ["evd-0021", "evd-0026"],
+    "conflictIds": []
+  }
+}

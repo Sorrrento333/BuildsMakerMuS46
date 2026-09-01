@@ -1,0 +1,12 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "ag-magic-gladiator-energy-below-base",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-ag-magic-gladiator", "version": "1.0.0" },
+  "context": {
+    "characterClassId": "class-magic-gladiator",
+    "evolutionId": "evolution-magic-gladiator"
+  },
+  "inputs": { "energy": 25, "vitality": 26, "agility": 26, "strength": 26 },
+  "expectedErrorCode": "formula-stat-below-base"
+}

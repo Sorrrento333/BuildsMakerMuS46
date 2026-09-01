@@ -1,0 +1,30 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "sd-dark-lord-raw-defense-boundary",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-sd-dark-lord", "version": "1.0.0" },
+  "context": { "characterClassId": "class-dark-lord", "evolutionId": "evolution-dark-lord" },
+  "inputs": { "character-level": 1, "strength": 26, "agility": 25, "vitality": 20, "energy": 15, "command": 25, "defense": 3.5714285714285714285714285714 },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-sd-dark-lord-raw-defense-boundary",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": { "id": "formula-sd-dark-lord", "version": "1.0.0" },
+    "context": { "characterClassId": "class-dark-lord", "evolutionId": "evolution-dark-lord" },
+    "inputs": { "character-level": 1, "strength": 26, "agility": 25, "vitality": 20, "energy": 15, "command": 25, "defense": 3.5714285714285714285714285714 },
+    "steps": [
+      { "stepId": "stat-sum", "value": 111 },
+      { "stepId": "stat-contribution", "value": 133.2 },
+      { "stepId": "defense-contribution", "value": 1.7857142857142857142857142857 },
+      { "stepId": "level-square", "value": 1 },
+      { "stepId": "level-contribution", "value": 0.0333333333333333333333333333 },
+      { "stepId": "raw-sd", "value": 135.01904761904761904761904762 },
+      { "stepId": "visible-sd", "value": 135 }
+    ],
+    "rounding": { "mode": "TRUNCATE", "stage": "visible-sd", "decimalPlaces": 0 },
+    "rawOutput": 135.01904761904761904761904762,
+    "visibleOutput": 135,
+    "evidenceRefs": ["evd-0021", "evd-0026", "evd-0034"],
+    "conflictIds": []
+  }
+}

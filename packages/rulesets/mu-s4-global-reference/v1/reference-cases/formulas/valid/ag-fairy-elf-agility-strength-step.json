@@ -1,0 +1,35 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "ag-fairy-elf-agility-strength-step",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-ag-fairy-elf", "version": "1.0.0" },
+  "context": {
+    "characterClassId": "class-fairy-elf",
+    "evolutionId": "evolution-muse-elf"
+  },
+  "inputs": { "energy": 15, "vitality": 20, "agility": 26, "strength": 23 },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-ag-fairy-elf-agility-strength-step",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": { "id": "formula-ag-fairy-elf", "version": "1.0.0" },
+    "context": {
+      "characterClassId": "class-fairy-elf",
+      "evolutionId": "evolution-muse-elf"
+    },
+    "inputs": { "energy": 15, "vitality": 20, "agility": 26, "strength": 23 },
+    "steps": [
+      { "stepId": "energy-contribution", "value": 3.0 },
+      { "stepId": "vitality-contribution", "value": 6.0 },
+      { "stepId": "agility-contribution", "value": 5.2 },
+      { "stepId": "strength-contribution", "value": 6.9 },
+      { "stepId": "raw-ag", "value": 21.1 },
+      { "stepId": "visible-ag", "value": 21 }
+    ],
+    "rounding": { "mode": "TRUNCATE", "stage": "visible-ag", "decimalPlaces": 0 },
+    "rawOutput": 21.1,
+    "visibleOutput": 21,
+    "evidenceRefs": ["evd-0021", "evd-0026"],
+    "conflictIds": []
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "ag-summoner-vitality-energy-step",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-ag-summoner", "version": "1.0.0" },
+  "context": {
+    "characterClassId": "class-summoner",
+    "evolutionId": "evolution-bloody-summoner"
+  },
+  "inputs": { "strength": 21, "agility": 21, "vitality": 19, "energy": 24 },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-ag-summoner-vitality-energy-step",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": { "id": "formula-ag-summoner", "version": "1.0.0" },
+    "context": {
+      "characterClassId": "class-summoner",
+      "evolutionId": "evolution-bloody-summoner"
+    },
+    "inputs": { "strength": 21, "agility": 21, "vitality": 19, "energy": 24 },
+    "steps": [
+      { "stepId": "strength-contribution", "value": 4.2 },
+      { "stepId": "agility-contribution", "value": 5.25 },
+      { "stepId": "vitality-contribution", "value": 5.7 },
+      { "stepId": "energy-contribution", "value": 3.60 },
+      { "stepId": "raw-ag", "value": 18.75 },
+      { "stepId": "visible-ag", "value": 18 }
+    ],
+    "rounding": { "mode": "TRUNCATE", "stage": "visible-ag", "decimalPlaces": 0 },
+    "rawOutput": 18.75,
+    "visibleOutput": 18,
+    "evidenceRefs": ["evd-0021", "evd-0026"],
+    "conflictIds": []
+  }
+}

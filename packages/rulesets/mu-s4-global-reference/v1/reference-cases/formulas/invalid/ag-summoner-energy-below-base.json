@@ -1,0 +1,12 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "ag-summoner-energy-below-base",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-ag-summoner", "version": "1.0.0" },
+  "context": {
+    "characterClassId": "class-summoner",
+    "evolutionId": "evolution-summoner"
+  },
+  "inputs": { "strength": 21, "agility": 21, "vitality": 18, "energy": 22 },
+  "expectedErrorCode": "formula-stat-below-base"
+}

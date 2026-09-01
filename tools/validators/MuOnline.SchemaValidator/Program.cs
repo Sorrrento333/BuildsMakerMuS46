@@ -31,6 +31,7 @@ foreach (var result in rulesetResults)
     var status = result.ActualValidity ? "PASS" : "FAIL";
     Console.WriteLine(
         $"{status}: {result.ContractName} ruleset record '{result.RecordId}' " +
+        $"version={result.RecordVersion}, schemaVersion={result.SchemaVersion}, " +
         $"actual valid={result.ActualValidity}");
 }
 

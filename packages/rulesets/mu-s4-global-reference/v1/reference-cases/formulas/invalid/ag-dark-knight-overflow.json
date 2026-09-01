@@ -1,0 +1,17 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "ag-dark-knight-overflow",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-ag-dark-knight", "version": "1.0.0" },
+  "context": {
+    "characterClassId": "class-dark-knight",
+    "evolutionId": "evolution-dark-knight"
+  },
+  "inputs": {
+    "energy": 9223372036854775807,
+    "vitality": 9223372036854775807,
+    "agility": 9223372036854775807,
+    "strength": 9223372036854775807
+  },
+  "expectedErrorCode": "formula-arithmetic-overflow"
+}

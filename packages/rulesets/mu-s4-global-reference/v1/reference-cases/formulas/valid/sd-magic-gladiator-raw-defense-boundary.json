@@ -1,0 +1,30 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "sd-magic-gladiator-raw-defense-boundary",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-sd-magic-gladiator", "version": "1.0.0" },
+  "context": { "characterClassId": "class-magic-gladiator", "evolutionId": "evolution-magic-gladiator" },
+  "inputs": { "character-level": 1, "strength": 26, "agility": 28, "vitality": 26, "energy": 26, "defense": 5.6 },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-sd-magic-gladiator-raw-defense-boundary",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": { "id": "formula-sd-magic-gladiator", "version": "1.0.0" },
+    "context": { "characterClassId": "class-magic-gladiator", "evolutionId": "evolution-magic-gladiator" },
+    "inputs": { "character-level": 1, "strength": 26, "agility": 28, "vitality": 26, "energy": 26, "defense": 5.6 },
+    "steps": [
+      { "stepId": "stat-sum", "value": 106 },
+      { "stepId": "stat-contribution", "value": 127.2 },
+      { "stepId": "defense-contribution", "value": 2.8 },
+      { "stepId": "level-square", "value": 1 },
+      { "stepId": "level-contribution", "value": 0.0333333333333333333333333333 },
+      { "stepId": "raw-sd", "value": 130.03333333333333333333333333 },
+      { "stepId": "visible-sd", "value": 130 }
+    ],
+    "rounding": { "mode": "TRUNCATE", "stage": "visible-sd", "decimalPlaces": 0 },
+    "rawOutput": 130.03333333333333333333333333,
+    "visibleOutput": 130,
+    "evidenceRefs": ["evd-0021", "evd-0026", "evd-0034"],
+    "conflictIds": ["dsp-0002"]
+  }
+}

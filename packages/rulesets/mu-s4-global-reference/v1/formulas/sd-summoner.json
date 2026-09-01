@@ -1,0 +1,214 @@
+{
+  "schemaVersion": "2.1.0",
+  "id": "formula-sd-summoner",
+  "version": "1.0.0",
+  "rulesetId": "mu-s4-global-reference",
+  "status": "PUBLISHED",
+  "confidence": "VERIFIED",
+  "purpose": "Calculate visible base SD for the Summoner family before equipment, options, buffs, private profiles, or undeclared modifiers.",
+  "applicability": {
+    "characterClassId": "class-summoner",
+    "evolutionIds": ["evolution-summoner", "evolution-bloody-summoner", "evolution-dimension-master"]
+  },
+  "inputs": [
+    {
+      "id": "character-level",
+      "numericType": "INT32",
+      "unit": "level",
+      "numericBounds": {
+        "minimum": 1,
+        "minimumInclusive": true,
+        "maximum": 2147483647,
+        "maximumInclusive": true,
+        "classification": "TECHNICAL"
+      },
+      "rangeErrorCode": "formula-level-out-of-range",
+      "source": { "kind": "CONTEXT_VALUE", "valueId": "character-level" }
+    },
+    {
+      "id": "strength",
+      "numericType": "INT64",
+      "unit": "stat-point",
+      "numericBounds": {
+        "minimum": 21,
+        "minimumInclusive": true,
+        "classification": "FACTUAL",
+        "evidenceRefs": ["evd-0021"]
+      },
+      "rangeErrorCode": "formula-stat-below-base",
+      "source": { "kind": "CONTEXT_VALUE", "valueId": "resolved-strength" }
+    },
+    {
+      "id": "agility",
+      "numericType": "INT64",
+      "unit": "stat-point",
+      "numericBounds": {
+        "minimum": 21,
+        "minimumInclusive": true,
+        "classification": "FACTUAL",
+        "evidenceRefs": ["evd-0021"]
+      },
+      "rangeErrorCode": "formula-stat-below-base",
+      "source": { "kind": "CONTEXT_VALUE", "valueId": "resolved-agility" }
+    },
+    {
+      "id": "vitality",
+      "numericType": "INT64",
+      "unit": "stat-point",
+      "numericBounds": {
+        "minimum": 18,
+        "minimumInclusive": true,
+        "classification": "FACTUAL",
+        "evidenceRefs": ["evd-0021"]
+      },
+      "rangeErrorCode": "formula-stat-below-base",
+      "source": { "kind": "CONTEXT_VALUE", "valueId": "resolved-vitality" }
+    },
+    {
+      "id": "energy",
+      "numericType": "INT64",
+      "unit": "stat-point",
+      "numericBounds": {
+        "minimum": 23,
+        "minimumInclusive": true,
+        "classification": "FACTUAL",
+        "evidenceRefs": ["evd-0021"]
+      },
+      "rangeErrorCode": "formula-stat-below-base",
+      "source": { "kind": "CONTEXT_VALUE", "valueId": "resolved-energy" }
+    },
+    {
+      "id": "defense",
+      "numericType": "DECIMAL",
+      "unit": "defense-point",
+      "numericBounds": {
+        "minimum": 0,
+        "minimumInclusive": true,
+        "classification": "TECHNICAL"
+      },
+      "rangeErrorCode": "formula-dependency-out-of-range",
+      "source": {
+        "kind": "FORMULA_OUTPUT",
+        "formulaId": "formula-defense-summoner",
+        "formulaVersion": "1.0.0",
+        "outputStage": "RAW"
+      }
+    }
+  ],
+  "output": { "id": "sd", "numericType": "INT64", "unit": "sd-point" },
+  "strategy": {
+    "kind": "PROGRAM",
+    "executionModel": "CHECKED_DECIMAL_V1",
+    "steps": [
+      {
+        "id": "stat-sum",
+        "operation": "ADD",
+        "operands": [
+          { "kind": "INPUT", "inputId": "strength" },
+          { "kind": "INPUT", "inputId": "agility" },
+          { "kind": "INPUT", "inputId": "vitality" },
+          { "kind": "INPUT", "inputId": "energy" }
+        ]
+      },
+      {
+        "id": "stat-product",
+        "operation": "MULTIPLY",
+        "operands": [
+          { "kind": "STEP", "stepId": "stat-sum" },
+          { "kind": "LITERAL", "value": 1.2 }
+        ]
+      },
+      {
+        "id": "stat-term",
+        "operation": "APPLY_ROUNDING",
+        "operands": [{ "kind": "STEP", "stepId": "stat-product" }]
+      },
+      {
+        "id": "defense-product",
+        "operation": "DIVIDE",
+        "operands": [
+          { "kind": "INPUT", "inputId": "defense" },
+          { "kind": "LITERAL", "value": 2 }
+        ]
+      },
+      {
+        "id": "defense-term",
+        "operation": "APPLY_ROUNDING",
+        "operands": [{ "kind": "STEP", "stepId": "defense-product" }]
+      },
+      {
+        "id": "level-square",
+        "operation": "MULTIPLY",
+        "operands": [
+          { "kind": "INPUT", "inputId": "character-level" },
+          { "kind": "INPUT", "inputId": "character-level" }
+        ]
+      },
+      {
+        "id": "level-product",
+        "operation": "DIVIDE",
+        "operands": [
+          { "kind": "STEP", "stepId": "level-square" },
+          { "kind": "LITERAL", "value": 30 }
+        ]
+      },
+      {
+        "id": "level-term",
+        "operation": "APPLY_ROUNDING",
+        "operands": [{ "kind": "STEP", "stepId": "level-product" }]
+      },
+      {
+        "id": "raw-sd",
+        "operation": "ADD",
+        "operands": [
+          { "kind": "STEP", "stepId": "stat-term" },
+          { "kind": "STEP", "stepId": "defense-term" },
+          { "kind": "STEP", "stepId": "level-term" }
+        ]
+      },
+      {
+        "id": "visible-sd",
+        "operation": "APPLY_ROUNDING",
+        "operands": [{ "kind": "STEP", "stepId": "raw-sd" }]
+      }
+    ],
+    "dependencyFormulaRefs": [
+      { "id": "formula-defense-summoner", "version": "1.0.0" }
+    ]
+  },
+  "rounding": { "mode": "TRUNCATE", "stage": "visible-sd", "decimalPlaces": 0 },
+  "trace": {
+    "stepIds": [
+      "stat-sum",
+      "stat-product",
+      "stat-term",
+      "defense-product",
+      "defense-term",
+      "level-square",
+      "level-product",
+      "level-term",
+      "raw-sd",
+      "visible-sd"
+    ],
+    "rawOutputStepId": "raw-sd",
+    "visibleOutputStepId": "visible-sd"
+  },
+  "constraints": [
+    "Resolve class and evolution applicability before evaluating arithmetic.",
+    "Resolve formula-defense-summoner version 1.0.0 from the same validated character state.",
+    "Consume the RAW decimal defense output selected by owner decision EVD-0034.",
+    "Truncate the stat term alone before summing, per EVD-0032.",
+    "Truncate the defense term alone before summing, per EVD-0032.",
+    "Truncate the level term alone before summing, per EVD-0032.",
+    "Do not truncate any step between these declared term truncations.",
+    "Truncate raw-sd toward zero exactly once at visible-sd."
+  ],
+  "evidenceRefs": ["evd-0021", "evd-0026", "evd-0032", "evd-0034"],
+  "conflictIds": ["dsp-0004"],
+  "testCaseRefs": [
+    { "id": "sd-summoner-base", "version": "1.0.0" },
+    { "id": "sd-summoner-level-step", "version": "1.0.0" },
+    { "id": "sd-summoner-stat-step", "version": "1.0.0" },
+    { "id": "sd-summoner-dimension-master-step", "version": "1.0.0" }
+  ]
+}

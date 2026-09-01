@@ -1,0 +1,12 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "mana-fairy-elf-invalid-level",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-mana-fairy-elf", "version": "1.0.0" },
+  "context": {
+    "characterClassId": "class-fairy-elf",
+    "evolutionId": "evolution-fairy-elf"
+  },
+  "inputs": { "character-level": 0, "energy": 15 },
+  "expectedErrorCode": "formula-level-out-of-range"
+}

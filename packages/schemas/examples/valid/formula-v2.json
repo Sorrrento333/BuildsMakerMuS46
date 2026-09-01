@@ -1,0 +1,99 @@
+{
+  "schemaVersion": "2.0.0",
+  "id": "formula-synthetic-program",
+  "version": "0.1.0",
+  "rulesetId": "ruleset-synthetic",
+  "status": "DRAFT",
+  "confidence": "UNVERIFIED",
+  "purpose": "Exercise the executable formula contract without game data.",
+  "applicability": {
+    "characterClassId": "class-synthetic",
+    "evolutionIds": ["evolution-synthetic"]
+  },
+  "inputs": [
+    {
+      "id": "input-synthetic",
+      "numericType": "INT32",
+      "unit": "synthetic-unit",
+      "numericBounds": {
+        "minimum": 0,
+        "minimumInclusive": true,
+        "maximum": 100,
+        "maximumInclusive": true,
+        "classification": "TECHNICAL"
+      },
+      "rangeErrorCode": "synthetic-input-out-of-range",
+      "source": {
+        "kind": "CONTEXT_VALUE",
+        "valueId": "context-synthetic-value"
+      }
+    }
+  ],
+  "output": {
+    "id": "output-synthetic",
+    "numericType": "INT64",
+    "unit": "synthetic-unit"
+  },
+  "strategy": {
+    "kind": "PROGRAM",
+    "executionModel": "CHECKED_INT64_V1",
+    "steps": [
+      {
+        "id": "constant-contribution",
+        "operation": "CONSTANT",
+        "operands": [
+          { "kind": "LITERAL", "value": 10 }
+        ]
+      },
+      {
+        "id": "adjusted-input",
+        "operation": "SUBTRACT",
+        "operands": [
+          { "kind": "INPUT", "inputId": "input-synthetic" },
+          { "kind": "LITERAL", "value": 1 }
+        ]
+      },
+      {
+        "id": "input-contribution",
+        "operation": "MULTIPLY",
+        "operands": [
+          { "kind": "STEP", "stepId": "adjusted-input" },
+          { "kind": "LITERAL", "value": 2 }
+        ]
+      },
+      {
+        "id": "raw-output",
+        "operation": "ADD",
+        "operands": [
+          { "kind": "STEP", "stepId": "constant-contribution" },
+          { "kind": "STEP", "stepId": "input-contribution" }
+        ]
+      },
+      {
+        "id": "visible-output",
+        "operation": "APPLY_ROUNDING",
+        "operands": [
+          { "kind": "STEP", "stepId": "raw-output" }
+        ]
+      }
+    ]
+  },
+  "rounding": {
+    "mode": "NONE",
+    "stage": "visible-output"
+  },
+  "trace": {
+    "stepIds": [
+      "constant-contribution",
+      "adjusted-input",
+      "input-contribution",
+      "raw-output",
+      "visible-output"
+    ],
+    "rawOutputStepId": "raw-output",
+    "visibleOutputStepId": "visible-output"
+  },
+  "evidenceRefs": [],
+  "conflictIds": [],
+  "testCaseRefs": []
+}

@@ -1,0 +1,428 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.mu46.local/v2/formula.schema.json",
+  "title": "ExecutableFormulaDefinition",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "id",
+    "version",
+    "rulesetId",
+    "status",
+    "confidence",
+    "applicability",
+    "inputs",
+    "output",
+    "strategy",
+    "rounding",
+    "trace",
+    "evidenceRefs",
+    "testCaseRefs"
+  ],
+  "properties": {
+    "schemaVersion": { "enum": ["2.0.0", "2.1.0"] },
+    "id": { "$ref": "#/$defs/id" },
+    "version": { "$ref": "#/$defs/semver" },
+    "rulesetId": { "$ref": "#/$defs/id" },
+    "status": { "enum": ["DRAFT", "REVIEWED", "PUBLISHED", "DEPRECATED"] },
+    "confidence": { "$ref": "#/$defs/confidence" },
+    "purpose": { "type": "string", "minLength": 1 },
+    "applicability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["characterClassId", "evolutionIds"],
+      "properties": {
+        "characterClassId": { "$ref": "#/$defs/id" },
+        "evolutionIds": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/id" }
+        }
+      }
+    },
+    "inputs": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/inputQuantity" }
+    },
+    "output": { "$ref": "#/$defs/outputQuantity" },
+    "strategy": { "$ref": "#/$defs/checkedNumberProgram" },
+    "modifierOrder": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "flat_before",
+          "percent_additive",
+          "percent_multiplicative",
+          "flat_after",
+          "override",
+          "cap",
+          "floor",
+          "chance"
+        ]
+      }
+    },
+    "rounding": { "$ref": "#/$defs/rounding" },
+    "trace": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["stepIds", "rawOutputStepId", "visibleOutputStepId"],
+      "properties": {
+        "stepIds": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/id" }
+        },
+        "rawOutputStepId": { "$ref": "#/$defs/id" },
+        "visibleOutputStepId": { "$ref": "#/$defs/id" }
+      }
+    },
+    "constraints": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "evidenceRefs": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/id" }
+    },
+    "conflictIds": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/id" }
+    },
+    "testCaseRefs": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/versionedRef" }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": { "status": { "const": "PUBLISHED" } },
+        "required": ["status"]
+      },
+      "then": {
+        "properties": {
+          "evidenceRefs": { "minItems": 1 },
+          "testCaseRefs": { "minItems": 1 }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": { "schemaVersion": { "const": "2.0.0" } },
+        "required": ["schemaVersion"]
+      },
+      "then": {
+        "properties": {
+          "strategy": {
+            "properties": {
+              "executionModel": { "const": "CHECKED_INT64_V1" }
+            }
+          },
+          "inputs": {
+            "items": {
+              "properties": {
+                "numericType": { "enum": ["INT32", "INT64"] }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": { "schemaVersion": { "const": "2.1.0" } },
+        "required": ["schemaVersion"]
+      },
+      "then": {
+        "properties": {
+          "strategy": {
+            "properties": {
+              "executionModel": { "const": "CHECKED_DECIMAL_V1" }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+    },
+    "semver": {
+      "type": "string",
+      "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)$"
+    },
+    "confidence": {
+      "enum": ["UNVERIFIED", "PARTIAL", "VERIFIED", "DISPUTED", "DEPRECATED"]
+    },
+    "versionedRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "version"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "version": { "$ref": "#/$defs/semver" }
+      }
+    },
+    "rounding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode", "stage"],
+      "properties": {
+        "mode": {
+          "enum": ["NONE", "FLOOR", "CEILING", "TRUNCATE", "HALF_UP", "HALF_EVEN"]
+        },
+        "stage": { "$ref": "#/$defs/id" },
+        "decimalPlaces": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "numericBounds": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["classification"],
+      "properties": {
+        "minimum": {
+          "type": "integer",
+          "minimum": -9223372036854775808,
+          "maximum": 9223372036854775807
+        },
+        "minimumInclusive": { "type": "boolean" },
+        "maximum": {
+          "type": "integer",
+          "minimum": -9223372036854775808,
+          "maximum": 9223372036854775807
+        },
+        "maximumInclusive": { "type": "boolean" },
+        "classification": { "enum": ["TECHNICAL", "FACTUAL"] },
+        "evidenceRefs": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/id" }
+        }
+      },
+      "allOf": [
+        {
+          "anyOf": [
+            { "required": ["minimum"] },
+            { "required": ["maximum"] }
+          ]
+        },
+        {
+          "if": { "required": ["minimum"] },
+          "then": { "required": ["minimumInclusive"] },
+          "else": { "not": { "required": ["minimumInclusive"] } }
+        },
+        {
+          "if": { "required": ["maximum"] },
+          "then": { "required": ["maximumInclusive"] },
+          "else": { "not": { "required": ["maximumInclusive"] } }
+        },
+        {
+          "if": {
+            "properties": { "classification": { "const": "FACTUAL" } },
+            "required": ["classification"]
+          },
+          "then": {
+            "required": ["evidenceRefs"],
+            "properties": { "evidenceRefs": { "minItems": 1 } }
+          }
+        }
+      ]
+    },
+    "contextValueSource": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "valueId"],
+      "properties": {
+        "kind": { "const": "CONTEXT_VALUE" },
+        "valueId": { "$ref": "#/$defs/id" }
+      }
+    },
+    "formulaOutputSource": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "formulaId", "formulaVersion", "outputStage"],
+      "properties": {
+        "kind": { "const": "FORMULA_OUTPUT" },
+        "formulaId": { "$ref": "#/$defs/id" },
+        "formulaVersion": { "$ref": "#/$defs/semver" },
+        "outputStage": { "enum": ["RAW", "VISIBLE"] }
+      }
+    },
+    "inputSource": {
+      "oneOf": [
+        { "$ref": "#/$defs/contextValueSource" },
+        { "$ref": "#/$defs/formulaOutputSource" }
+      ]
+    },
+    "inputQuantity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "numericType",
+        "unit",
+        "numericBounds",
+        "rangeErrorCode",
+        "source"
+      ],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "numericType": { "enum": ["INT32", "INT64", "DECIMAL"] },
+        "unit": { "type": "string", "minLength": 1 },
+        "numericBounds": { "$ref": "#/$defs/numericBounds" },
+        "rangeErrorCode": { "$ref": "#/$defs/id" },
+        "source": { "$ref": "#/$defs/inputSource" }
+      }
+    },
+    "outputQuantity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "numericType", "unit"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "numericType": { "const": "INT64" },
+        "unit": { "type": "string", "minLength": 1 },
+        "numericBounds": { "$ref": "#/$defs/numericBounds" }
+      }
+    },
+    "inputOperand": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "inputId"],
+      "properties": {
+        "kind": { "const": "INPUT" },
+        "inputId": { "$ref": "#/$defs/id" }
+      }
+    },
+    "stepOperand": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "stepId"],
+      "properties": {
+        "kind": { "const": "STEP" },
+        "stepId": { "$ref": "#/$defs/id" }
+      }
+    },
+    "literalOperand": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "value"],
+      "properties": {
+        "kind": { "const": "LITERAL" },
+        "value": {
+          "type": "number",
+          "minimum": -79228162514264337593543950335,
+          "maximum": 79228162514264337593543950335
+        }
+      }
+    },
+    "operand": {
+      "oneOf": [
+        { "$ref": "#/$defs/inputOperand" },
+        { "$ref": "#/$defs/stepOperand" },
+        { "$ref": "#/$defs/literalOperand" }
+      ]
+    },
+    "programStep": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "operation", "operands"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "operation": {
+          "enum": ["CONSTANT", "ADD", "SUBTRACT", "MULTIPLY", "DIVIDE", "APPLY_ROUNDING"]
+        },
+        "operands": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/operand" }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "operation": { "const": "CONSTANT" } },
+            "required": ["operation"]
+          },
+          "then": {
+            "properties": {
+              "operands": {
+                "minItems": 1,
+                "maxItems": 1,
+                "items": { "$ref": "#/$defs/literalOperand" }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": { "operation": { "const": "ADD" } },
+            "required": ["operation"]
+          },
+          "then": {
+            "properties": {
+              "operands": { "minItems": 2 }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "operation": { "enum": ["SUBTRACT", "MULTIPLY", "DIVIDE"] }
+            },
+            "required": ["operation"]
+          },
+          "then": {
+            "properties": {
+              "operands": { "minItems": 2, "maxItems": 2 }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": { "operation": { "const": "APPLY_ROUNDING" } },
+            "required": ["operation"]
+          },
+          "then": {
+            "properties": {
+              "operands": {
+                "minItems": 1,
+                "maxItems": 1,
+                "items": { "$ref": "#/$defs/stepOperand" }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "checkedNumberProgram": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "executionModel", "steps"],
+      "properties": {
+        "kind": { "const": "PROGRAM" },
+        "executionModel": {
+          "enum": ["CHECKED_INT64_V1", "CHECKED_DECIMAL_V1"]
+        },
+        "steps": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/programStep" }
+        },
+        "dependencyFormulaRefs": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/versionedRef" }
+        }
+      }
+    }
+  }
+}

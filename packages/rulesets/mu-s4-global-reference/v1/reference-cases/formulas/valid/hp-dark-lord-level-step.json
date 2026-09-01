@@ -1,0 +1,35 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "hp-dark-lord-level-step",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-hp-dark-lord", "version": "1.0.0" },
+  "context": {
+    "characterClassId": "class-dark-lord",
+    "evolutionId": "evolution-dark-lord"
+  },
+  "inputs": { "character-level": 2, "vitality": 20 },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-hp-dark-lord-level-step",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": { "id": "formula-hp-dark-lord", "version": "1.0.0" },
+    "context": {
+      "characterClassId": "class-dark-lord",
+      "evolutionId": "evolution-dark-lord"
+    },
+    "inputs": { "character-level": 2, "vitality": 20 },
+    "steps": [
+      { "stepId": "base", "value": 50 },
+      { "stepId": "level-offset", "value": 1 },
+      { "stepId": "level-contribution", "value": 1.5 },
+      { "stepId": "vitality-contribution", "value": 40 },
+      { "stepId": "raw-hp", "value": 91.5 },
+      { "stepId": "visible-hp", "value": 91 }
+    ],
+    "rounding": { "mode": "TRUNCATE", "stage": "visible-hp", "decimalPlaces": 0 },
+    "rawOutput": 91.5,
+    "visibleOutput": 91,
+    "evidenceRefs": ["evd-0021", "evd-0026"],
+    "conflictIds": []
+  }
+}

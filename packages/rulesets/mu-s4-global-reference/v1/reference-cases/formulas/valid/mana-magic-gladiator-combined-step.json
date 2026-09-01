@@ -1,0 +1,65 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "mana-magic-gladiator-combined-step",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": {
+    "id": "formula-mana-magic-gladiator",
+    "version": "1.0.0"
+  },
+  "context": {
+    "characterClassId": "class-magic-gladiator",
+    "evolutionId": "evolution-duel-master"
+  },
+  "inputs": {
+    "character-level": 2,
+    "energy": 27
+  },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-mana-magic-gladiator-combined-step",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": {
+      "id": "formula-mana-magic-gladiator",
+      "version": "1.0.0"
+    },
+    "context": {
+      "characterClassId": "class-magic-gladiator",
+      "evolutionId": "evolution-duel-master"
+    },
+    "inputs": {
+      "character-level": 2,
+      "energy": 27
+    },
+    "steps": [
+      {
+        "stepId": "base",
+        "value": 8
+      },
+      {
+        "stepId": "level-offset",
+        "value": 1
+      },
+      {
+        "stepId": "energy-contribution",
+        "value": 54
+      },
+      {
+        "stepId": "raw-mana",
+        "value": 63
+      },
+      {
+        "stepId": "visible-mana",
+        "value": 63
+      }
+    ],
+    "rounding": {
+      "mode": "TRUNCATE",
+      "stage": "visible-mana",
+      "decimalPlaces": 0
+    },
+    "rawOutput": 63,
+    "visibleOutput": 63,
+    "evidenceRefs": ["evd-0021", "evd-0026"],
+    "conflictIds": ["dsp-0002"]
+  }
+}

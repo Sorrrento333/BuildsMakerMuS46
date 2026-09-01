@@ -222,6 +222,74 @@ if ($initialReport.SyntheticResetCount -ne 2 -or
         $initialReport.SyntheticTotalDistributablePoints) {
     throw "The configurable reset contribution was not preserved."
 }
+if (-not $initialReport.PublishedFormulaContextVerified -or
+    -not $replacementReport.PublishedFormulaContextVerified -or
+    $initialReport.PublishedFormulaCount -ne 30 -or
+    $replacementReport.PublishedFormulaCount -ne 30 -or
+    $initialReport.PublishedFormulaReferences.Count -ne 30 -or
+    $replacementReport.PublishedFormulaReferences.Count -ne 30 -or
+    $initialReport.PublishedFormulaReferences -notcontains
+        "formula-ag-dark-lord@1.0.0" -or
+    $initialReport.PublishedFormulaReferences -notcontains
+        "formula-ag-dark-knight@1.0.0" -or
+    $initialReport.PublishedFormulaReferences -notcontains
+        "formula-ag-dark-wizard@1.0.0" -or
+    $initialReport.PublishedFormulaReferences -notcontains
+        "formula-ag-fairy-elf@1.0.0" -or
+    $initialReport.PublishedFormulaReferences -notcontains
+        "formula-ag-magic-gladiator@1.0.0" -or
+    $initialReport.PublishedFormulaReferences -notcontains
+        "formula-ag-summoner@1.0.0" -or
+    $initialReport.PublishedFormulaReferences -notcontains
+        "formula-defense-dark-knight@1.0.0" -or
+    $initialReport.PublishedFormulaReferences -notcontains
+        "formula-defense-dark-wizard@1.0.0" -or
+    $initialReport.PublishedFormulaReferences -notcontains
+        "formula-defense-fairy-elf@1.0.0" -or
+    $initialReport.PublishedFormulaReferences -notcontains
+        "formula-defense-magic-gladiator@1.0.0" -or
+    $initialReport.PublishedFormulaReferences -notcontains
+        "formula-defense-summoner@1.0.0" -or
+    $initialReport.PublishedFormulaReferences -notcontains
+        "formula-hp-dark-knight@1.0.0" -or
+    $initialReport.PublishedFormulaReferences -notcontains
+        "formula-hp-dark-lord@1.0.0" -or
+    $initialReport.PublishedFormulaReferences -notcontains
+        "formula-hp-fairy-elf@1.0.0" -or
+    $initialReport.PublishedFormulaReferences -notcontains
+        "formula-hp-dark-wizard@1.1.0" -or
+    $initialReport.PublishedFormulaReferences -notcontains
+        "formula-hp-summoner@1.0.0" -or
+    $initialReport.PublishedFormulaReferences -notcontains
+        "formula-hp-magic-gladiator@1.0.0" -or
+    $initialReport.PublishedFormulaReferences -notcontains
+        "formula-mana-dark-knight@1.0.0" -or
+    $initialReport.PublishedFormulaReferences -notcontains
+        "formula-mana-dark-wizard@1.0.0" -or
+    $initialReport.PublishedFormulaReferences -notcontains
+        "formula-mana-fairy-elf@1.0.0" -or
+    $initialReport.PublishedFormulaReferences -notcontains
+        "formula-mana-dark-lord@1.0.0" -or
+    $initialReport.PublishedFormulaReferences -notcontains
+        "formula-mana-magic-gladiator@1.0.0" -or
+    $initialReport.PublishedFormulaReferences -notcontains
+        "formula-mana-summoner@1.0.0" -or
+    $initialReport.PublishedFormulaReferences -notcontains
+        "formula-sd-dark-knight@1.0.0" -or
+    $initialReport.PublishedFormulaReferences -notcontains
+        "formula-sd-dark-wizard@1.0.0" -or
+    $initialReport.PublishedFormulaReferences -notcontains
+        "formula-sd-fairy-elf@1.0.0" -or
+    $initialReport.PublishedFormulaReferences -notcontains
+        "formula-sd-magic-gladiator@1.0.0" -or
+    $initialReport.PublishedFormulaReferences -notcontains
+        "formula-sd-summoner@1.0.0" -or
+    ($replacementReport.PublishedFormulaReferences -join "|") -ne
+        ($initialReport.PublishedFormulaReferences -join "|") -or
+    $initialReport.ApprovedPublishedFormulaCaseCount -ne 120 -or
+    $replacementReport.ApprovedPublishedFormulaCaseCount -ne 120) {
+    throw "The published artifact did not reproduce all contextual and arithmetic formula traces."
+}
 if (-not $initialReport.BuildDraftPersistenceVerified -or
     -not $replacementReport.BuildDraftPersistenceVerified -or
     $initialReport.BuildDraftId -ne "publication-smoke-draft" -or
@@ -277,6 +345,7 @@ Write-Output "Verified legal files: $($requiredLegalFiles.Count)"
 Write-Output "Progression cases: $($initialReport.ApprovedProgressionCaseCount) approved, $($initialReport.RejectedProgressionCaseCount) rejected"
 Write-Output "Synthetic stat distribution: $($initialReport.SyntheticStatDistributionStatCount) stats, $($initialReport.SyntheticStatDistributionSpentPoints) spent"
 Write-Output "Reset configuration: $($initialReport.SyntheticResetCount) x $($initialReport.SyntheticPointsPerReset) = $($initialReport.SyntheticResetPoints)"
+Write-Output "Published formulas: $($initialReport.PublishedFormulaReferences -join ', '), $($initialReport.ApprovedPublishedFormulaCaseCount) contextual cases"
 Write-Output "Build draft: $($initialReport.BuildDraftId), dataset $($initialReport.BuildDraftDatasetVersion)"
 Write-Output "Ruleset files: $($initialRulesetFiles.Count)"
 Write-Output "Artifacts: $runRoot"

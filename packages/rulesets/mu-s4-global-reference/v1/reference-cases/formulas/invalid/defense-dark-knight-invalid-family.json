@@ -1,0 +1,9 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "defense-dark-knight-invalid-family",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-defense-dark-knight", "version": "1.0.0" },
+  "context": { "characterClassId": "class-dark-wizard", "evolutionId": "evolution-dark-wizard" },
+  "inputs": { "agility": 20 },
+  "expectedErrorCode": "formula-not-applicable"
+}

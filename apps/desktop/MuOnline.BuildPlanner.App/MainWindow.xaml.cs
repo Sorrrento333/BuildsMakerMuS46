@@ -1,8 +1,10 @@
 using System.Windows;
 using System.Windows.Controls;
 using MuOnline.BuildPlanner.Application.Builds;
+using MuOnline.BuildPlanner.Application.Formulas;
 using MuOnline.BuildPlanner.Application.Progression;
 using MuOnline.BuildPlanner.Application.Stats;
+using MuOnline.BuildPlanner.Domain.Formulas;
 using MuOnline.BuildPlanner.Domain.Progression;
 using MuOnline.BuildPlanner.Domain.Stats;
 
@@ -13,11 +15,16 @@ public partial class MainWindow : Window
     private readonly ProgressionRulesetCatalog _catalog;
     private readonly CalculateProgressionPointBudgetUseCase _useCase;
     private readonly CalculateStatDistributionUseCase _statDistributionUseCase;
+    private readonly ExecutableFormulaCatalog _formulaCatalog;
+    private readonly CalculateCharacterFormulaUseCase _characterFormulaUseCase;
     private readonly SaveBuildDraftUseCase _saveBuildDraftUseCase;
     private readonly LoadBuildDraftUseCase _loadBuildDraftUseCase;
     private readonly Dictionary<string, TextBox> _allocationInputs =
         new(StringComparer.Ordinal);
     private ProgressionPointBudgetResult? _currentBudget;
+    private ProgressionPointBudgetRequest? _currentProgressionRequest;
+    private StatDistributionResult? _currentDistribution;
+    private bool _isUpdatingFormulaSelection;
 
     public MainWindow()
         : this(PublishedBuildDraftServices.CreateDefault())
@@ -31,6 +38,9 @@ public partial class MainWindow : Window
         _catalog = PublishedProgressionRuleset.Catalog;
         _useCase = PublishedProgressionRuleset.CreateUseCase();
         _statDistributionUseCase = PublishedProgressionRuleset.CreateStatDistributionUseCase();
+        _formulaCatalog = PublishedProgressionRuleset.FormulaCatalog;
+        _characterFormulaUseCase =
+            PublishedProgressionRuleset.CreateCharacterFormulaUseCase();
         _saveBuildDraftUseCase = buildDraftServices.SaveUseCase;
         _loadBuildDraftUseCase = buildDraftServices.LoadUseCase;
 
@@ -103,15 +113,19 @@ public partial class MainWindow : Window
 
         try
         {
-            var result = _useCase.Execute(new ProgressionPointBudgetRequest(
+            var request = new ProgressionPointBudgetRequest(
                 selectedClass.Id,
                 selectedEvolution.Id,
                 level,
-                completedQuestIds));
+                completedQuestIds);
+            var result = _useCase.Execute(request);
             _currentBudget = result;
+            _currentProgressionRequest = request;
+            _currentDistribution = null;
             DistributeStatsButton.IsEnabled = true;
             DistributionResultTextBox.Text =
                 "Presupuesto calculado. Ingresa las asignaciones y distribuye los puntos.";
+            InvalidateFormulaResult();
             ResultTextBox.Text = FormatResult(result);
         }
         catch (ProgressionPointBudgetException exception)
@@ -155,7 +169,9 @@ public partial class MainWindow : Window
                 _currentBudget,
                 resetInputs,
                 allocations);
+            _currentDistribution = result;
             DistributionResultTextBox.Text = FormatDistributionResult(result);
+            ConfigureAndCalculateApplicableFormula();
         }
         catch (StatDistributionException exception)
         {
@@ -293,6 +309,8 @@ public partial class MainWindow : Window
         if (_currentBudget is not null)
         {
             DistributionResultTextBox.Clear();
+            _currentDistribution = null;
+            InvalidateFormulaResult();
         }
     }
 
@@ -389,15 +407,15 @@ public partial class MainWindow : Window
                 System.Globalization.CultureInfo.InvariantCulture);
         }
 
-        _currentBudget = _useCase.Execute(new ProgressionPointBudgetRequest(
+        _currentProgressionRequest = new ProgressionPointBudgetRequest(
             draft.ProgressionInputs.CharacterClassId,
             draft.ProgressionInputs.EvolutionId,
             draft.ProgressionInputs.Level,
-            draft.ProgressionInputs.CompletedQuestIds));
+            draft.ProgressionInputs.CompletedQuestIds);
+        _currentBudget = _useCase.Execute(_currentProgressionRequest);
         DistributeStatsButton.IsEnabled = true;
         ResultTextBox.Text = FormatResult(_currentBudget);
-        DistributionResultTextBox.Text = FormatDistributionResult(
-            new StatDistributionResult(
+        _currentDistribution = new StatDistributionResult(
                 draft.StatDistribution.RulesetId,
                 draft.StatDistribution.CharacterClassId,
                 draft.StatDistribution.ProgressionRule.Id,
@@ -410,18 +428,24 @@ public partial class MainWindow : Window
                 draft.StatDistribution.TotalDistributablePoints,
                 draft.StatDistribution.Allocations,
                 draft.StatDistribution.SpentPoints,
-                draft.StatDistribution.RemainingPoints));
+                draft.StatDistribution.RemainingPoints);
+        DistributionResultTextBox.Text = FormatDistributionResult(
+            _currentDistribution);
+        ConfigureAndCalculateApplicableFormula();
     }
 
     private void InvalidateCurrentBudget()
     {
         _currentBudget = null;
+        _currentProgressionRequest = null;
+        _currentDistribution = null;
         if (DistributeStatsButton is not null)
         {
             DistributeStatsButton.IsEnabled = false;
         }
 
         DistributionResultTextBox?.Clear();
+        InvalidateFormulaResult();
     }
 
     private void ResetInputChanged(object sender, TextChangedEventArgs e)
@@ -452,8 +476,192 @@ public partial class MainWindow : Window
         }
 
         DistributionResultTextBox?.Clear();
+        _currentDistribution = null;
+        InvalidateFormulaResult();
         BuildDraftResultTextBox?.Clear();
     }
+
+    private void ConfigureAndCalculateApplicableFormula()
+    {
+        if (_currentProgressionRequest is null ||
+            _currentBudget is null ||
+            _currentDistribution is null)
+        {
+            FormulaResultTextBox.Text =
+                "Distribuye los puntos antes de calcular atributos derivados.";
+            return;
+        }
+
+        var options = _formulaCatalog.Formulas
+            .Where(formula =>
+                formula.Applicability.CharacterClassId ==
+                    _currentProgressionRequest.ClassId &&
+                formula.Applicability.EvolutionIds.Contains(
+                    _currentProgressionRequest.EvolutionId))
+            .OrderBy(formula => formula.Output.Id, StringComparer.Ordinal)
+            .ThenBy(formula => formula.Reference.Id, StringComparer.Ordinal)
+            .ThenBy(formula => formula.Reference.Version, StringComparer.Ordinal)
+            .Select(formula => new FormulaSelectionOption(
+                formula.Reference,
+                $"{formula.Output.Id} — {formula.Reference.Id} " +
+                $"v{formula.Reference.Version}"))
+            .ToArray();
+        if (options.Length == 0)
+        {
+            InvalidateFormulaSelection();
+            FormulaResultTextBox.Text =
+                "No hay una fórmula derivada publicada para esta clase y evolución.";
+            return;
+        }
+
+        var previousReference =
+            (FormulaComboBox.SelectedItem as FormulaSelectionOption)?.Reference;
+        _isUpdatingFormulaSelection = true;
+        try
+        {
+            FormulaComboBox.ItemsSource = options;
+            FormulaComboBox.SelectedItem = options.FirstOrDefault(
+                option => option.Reference == previousReference) ?? options[0];
+        }
+        finally
+        {
+            _isUpdatingFormulaSelection = false;
+        }
+
+        CalculateAndDisplaySelectedFormula();
+    }
+
+    private void FormulaSelectionChanged(
+        object sender,
+        SelectionChangedEventArgs e)
+    {
+        if (!_isUpdatingFormulaSelection)
+        {
+            CalculateAndDisplaySelectedFormula();
+        }
+    }
+
+    private void CalculateAndDisplaySelectedFormula()
+    {
+        if (_currentProgressionRequest is null ||
+            _currentDistribution is null ||
+            FormulaComboBox.SelectedItem is not FormulaSelectionOption selected)
+        {
+            return;
+        }
+
+        try
+        {
+            var result = _characterFormulaUseCase.Execute(
+                selected.Reference,
+                _currentProgressionRequest,
+                _currentDistribution.ResetInputs,
+                _currentDistribution.Allocations);
+            FormulaResultTextBox.Text = FormatFormulaResult(result);
+        }
+        catch (FormulaContextException exception)
+        {
+            FormulaResultTextBox.Text =
+                $"No se pudo resolver el contexto ({exception.Code}): " +
+                TranslateFormulaContextError(exception.Code);
+        }
+        catch (FormulaCalculationException exception)
+        {
+            FormulaResultTextBox.Text =
+                $"No se pudo calcular ({exception.Code}): {exception.Message}";
+        }
+        catch (FormulaExecutionException exception)
+        {
+            FormulaResultTextBox.Text =
+                $"No se pudo ejecutar ({exception.Code}): {exception.Message}";
+        }
+    }
+
+    private void InvalidateFormulaResult()
+    {
+        InvalidateFormulaSelection();
+        FormulaResultTextBox?.Clear();
+    }
+
+    private void InvalidateFormulaSelection()
+    {
+        if (FormulaComboBox is null)
+        {
+            return;
+        }
+
+        _isUpdatingFormulaSelection = true;
+        try
+        {
+            FormulaComboBox.ItemsSource = null;
+        }
+        finally
+        {
+            _isUpdatingFormulaSelection = false;
+        }
+    }
+
+    private static string FormatFormulaResult(
+        CharacterFormulaCalculationResult result)
+    {
+        var formula = result.Formula;
+        var lines = new List<string>
+        {
+            $"{formula.OutputId}: {formula.VisibleOutput}",
+            $"Fórmula: {formula.Trace.FormulaReference.Id} " +
+            $"v{formula.Trace.FormulaReference.Version}",
+            "Traza contextual:",
+        };
+        lines.AddRange(result.ContextTrace.Select(item =>
+            item.Kind == FormulaContextResolutionKind.CharacterLevel
+                ? $"- {item.InputId} ← {item.ContextValueId}: " +
+                  $"{item.ResolvedValue} (nivel validado)"
+                : $"- {item.InputId} ← {item.ContextValueId}: " +
+                  $"{item.BaseValue} + {item.Allocation} = {item.ResolvedValue} " +
+                  $"[CHECKED_ADD; {string.Join(", ", item.EvidenceRefs)}]"));
+        if (result.DependencyTrace.Length != 0)
+        {
+            lines.Add("Traza de dependencias:");
+            lines.AddRange(result.DependencyTrace.Select(item =>
+                $"- {item.ConsumerFormulaReference.Id}.{item.InputId} ← " +
+                $"{item.FormulaReference.Id} " +
+                $"v{item.FormulaReference.Version} [{item.OutputStage}]: " +
+                item.ResolvedValue));
+        }
+
+        lines.Add("Traza aritmética:");
+        lines.AddRange(formula.Trace.Steps.Select(
+            step => $"- {step.StepId}: {step.Value}"));
+        lines.Add(
+            $"Salida cruda: {formula.RawOutput}; visible: {formula.VisibleOutput}; " +
+            $"redondeo: {formula.Trace.Rounding.Mode}.");
+        return string.Join(Environment.NewLine, lines);
+    }
+
+    private static string TranslateFormulaContextError(string code) => code switch
+    {
+        FormulaContextErrorCodes.StateMismatch =>
+            "el estado validado no coincide con la fórmula solicitada.",
+        FormulaContextErrorCodes.SourceNotSupported =>
+            "la fórmula usa una fuente de input todavía no soportada.",
+        FormulaContextErrorCodes.ValueNotResolvable =>
+            "un valor contextual no puede obtenerse del estado validado.",
+        FormulaContextErrorCodes.BaseStatMissing =>
+            "falta el valor base canónico requerido.",
+        FormulaContextErrorCodes.AllocationMissing =>
+            "falta una asignación validada requerida.",
+        FormulaContextErrorCodes.ArithmeticOverflow =>
+            "la suma comprobada de base y asignación excede el rango permitido.",
+        FormulaContextErrorCodes.DependencyCycle =>
+            "las fórmulas dependientes forman un ciclo.",
+        FormulaContextErrorCodes.DependencyIncoherent =>
+            "una dependencia no declara una referencia y etapa de salida coherentes.",
+        _ => "se produjo un error de contexto no reconocido.",
+    };
+
+    private sealed record FormulaSelectionOption(
+        FormulaReference Reference,
+        string DisplayName);
 
     private bool TryReadResetInputs(
         out ResetPointInputs resetInputs,

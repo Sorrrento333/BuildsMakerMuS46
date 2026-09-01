@@ -1,0 +1,169 @@
+{
+  "schemaVersion": "2.1.0",
+  "id": "formula-ag-summoner",
+  "version": "1.0.0",
+  "rulesetId": "mu-s4-global-reference",
+  "status": "PUBLISHED",
+  "confidence": "VERIFIED",
+  "purpose": "Calculate visible base AG for the Summoner family before equipment, options, buffs, private profiles, or undeclared modifiers.",
+  "applicability": {
+    "characterClassId": "class-summoner",
+    "evolutionIds": ["evolution-summoner", "evolution-bloody-summoner", "evolution-dimension-master"]
+  },
+  "inputs": [
+    {
+      "id": "strength",
+      "numericType": "INT64",
+      "unit": "stat-point",
+      "numericBounds": {
+        "minimum": 21,
+        "minimumInclusive": true,
+        "classification": "FACTUAL",
+        "evidenceRefs": ["evd-0021"]
+      },
+      "rangeErrorCode": "formula-stat-below-base",
+      "source": {
+        "kind": "CONTEXT_VALUE",
+        "valueId": "resolved-strength"
+      }
+    },
+    {
+      "id": "agility",
+      "numericType": "INT64",
+      "unit": "stat-point",
+      "numericBounds": {
+        "minimum": 21,
+        "minimumInclusive": true,
+        "classification": "FACTUAL",
+        "evidenceRefs": ["evd-0021"]
+      },
+      "rangeErrorCode": "formula-stat-below-base",
+      "source": {
+        "kind": "CONTEXT_VALUE",
+        "valueId": "resolved-agility"
+      }
+    },
+    {
+      "id": "vitality",
+      "numericType": "INT64",
+      "unit": "stat-point",
+      "numericBounds": {
+        "minimum": 18,
+        "minimumInclusive": true,
+        "classification": "FACTUAL",
+        "evidenceRefs": ["evd-0021"]
+      },
+      "rangeErrorCode": "formula-stat-below-base",
+      "source": {
+        "kind": "CONTEXT_VALUE",
+        "valueId": "resolved-vitality"
+      }
+    },
+    {
+      "id": "energy",
+      "numericType": "INT64",
+      "unit": "stat-point",
+      "numericBounds": {
+        "minimum": 23,
+        "minimumInclusive": true,
+        "classification": "FACTUAL",
+        "evidenceRefs": ["evd-0021"]
+      },
+      "rangeErrorCode": "formula-stat-below-base",
+      "source": {
+        "kind": "CONTEXT_VALUE",
+        "valueId": "resolved-energy"
+      }
+    }
+  ],
+  "output": {
+    "id": "ag",
+    "numericType": "INT64",
+    "unit": "ag-point"
+  },
+  "strategy": {
+    "kind": "PROGRAM",
+    "executionModel": "CHECKED_DECIMAL_V1",
+    "steps": [
+      {
+        "id": "strength-contribution",
+        "operation": "MULTIPLY",
+        "operands": [
+          { "kind": "INPUT", "inputId": "strength" },
+          { "kind": "LITERAL", "value": 0.2 }
+        ]
+      },
+      {
+        "id": "agility-contribution",
+        "operation": "MULTIPLY",
+        "operands": [
+          { "kind": "INPUT", "inputId": "agility" },
+          { "kind": "LITERAL", "value": 0.25 }
+        ]
+      },
+      {
+        "id": "vitality-contribution",
+        "operation": "MULTIPLY",
+        "operands": [
+          { "kind": "INPUT", "inputId": "vitality" },
+          { "kind": "LITERAL", "value": 0.3 }
+        ]
+      },
+      {
+        "id": "energy-contribution",
+        "operation": "MULTIPLY",
+        "operands": [
+          { "kind": "INPUT", "inputId": "energy" },
+          { "kind": "LITERAL", "value": 0.15 }
+        ]
+      },
+      {
+        "id": "raw-ag",
+        "operation": "ADD",
+        "operands": [
+          { "kind": "STEP", "stepId": "strength-contribution" },
+          { "kind": "STEP", "stepId": "agility-contribution" },
+          { "kind": "STEP", "stepId": "vitality-contribution" },
+          { "kind": "STEP", "stepId": "energy-contribution" }
+        ]
+      },
+      {
+        "id": "visible-ag",
+        "operation": "APPLY_ROUNDING",
+        "operands": [{ "kind": "STEP", "stepId": "raw-ag" }]
+      }
+    ],
+    "dependencyFormulaRefs": []
+  },
+  "rounding": {
+    "mode": "TRUNCATE",
+    "stage": "visible-ag",
+    "decimalPlaces": 0
+  },
+  "trace": {
+    "stepIds": [
+      "strength-contribution",
+      "agility-contribution",
+      "vitality-contribution",
+      "energy-contribution",
+      "raw-ag",
+      "visible-ag"
+    ],
+    "rawOutputStepId": "raw-ag",
+    "visibleOutputStepId": "visible-ag"
+  },
+  "constraints": [
+    "Resolve class and evolution applicability before evaluating arithmetic.",
+    "Represent 0.2, 0.25, 0.3 and 0.15 exactly as base-10 decimals and use checked decimal arithmetic.",
+    "Do not round any stat contribution or raw-ag before visible-ag.",
+    "Truncate raw-ag toward zero exactly once at visible-ag."
+  ],
+  "evidenceRefs": ["evd-0021", "evd-0026"],
+  "conflictIds": [],
+  "testCaseRefs": [
+    { "id": "ag-summoner-base", "version": "1.0.0" },
+    { "id": "ag-summoner-strength-agility-step", "version": "1.0.0" },
+    { "id": "ag-summoner-vitality-energy-step", "version": "1.0.0" },
+    { "id": "ag-summoner-combined-step", "version": "1.0.0" }
+  ]
+}

@@ -1,0 +1,134 @@
+{
+  "schemaVersion": "2.1.0",
+  "id": "formula-mana-dark-lord",
+  "version": "1.0.0",
+  "rulesetId": "mu-s4-global-reference",
+  "status": "PUBLISHED",
+  "confidence": "VERIFIED",
+  "purpose": "Calculate visible base Mana for the Dark Lord family before equipment, options, buffs, private profiles, or undeclared modifiers.",
+  "applicability": {
+    "characterClassId": "class-dark-lord",
+    "evolutionIds": ["evolution-dark-lord", "evolution-lord-emperor"]
+  },
+  "inputs": [
+    {
+      "id": "character-level",
+      "numericType": "INT32",
+      "unit": "level",
+      "numericBounds": {
+        "minimum": 1,
+        "minimumInclusive": true,
+        "maximum": 2147483647,
+        "maximumInclusive": true,
+        "classification": "TECHNICAL"
+      },
+      "rangeErrorCode": "formula-level-out-of-range",
+      "source": {
+        "kind": "CONTEXT_VALUE",
+        "valueId": "character-level"
+      }
+    },
+    {
+      "id": "energy",
+      "numericType": "INT64",
+      "unit": "stat-point",
+      "numericBounds": {
+        "minimum": 15,
+        "minimumInclusive": true,
+        "classification": "FACTUAL",
+        "evidenceRefs": ["evd-0021"]
+      },
+      "rangeErrorCode": "formula-stat-below-base",
+      "source": {
+        "kind": "CONTEXT_VALUE",
+        "valueId": "resolved-energy"
+      }
+    }
+  ],
+  "output": {
+    "id": "mana",
+    "numericType": "INT64",
+    "unit": "mana-point"
+  },
+  "strategy": {
+    "kind": "PROGRAM",
+    "executionModel": "CHECKED_DECIMAL_V1",
+    "steps": [
+      {
+        "id": "base",
+        "operation": "CONSTANT",
+        "operands": [{ "kind": "LITERAL", "value": 40 }]
+      },
+      {
+        "id": "level-offset",
+        "operation": "SUBTRACT",
+        "operands": [
+          { "kind": "INPUT", "inputId": "character-level" },
+          { "kind": "LITERAL", "value": 1 }
+        ]
+      },
+      {
+        "id": "energy-offset",
+        "operation": "SUBTRACT",
+        "operands": [
+          { "kind": "INPUT", "inputId": "energy" },
+          { "kind": "LITERAL", "value": 15 }
+        ]
+      },
+      {
+        "id": "energy-contribution",
+        "operation": "MULTIPLY",
+        "operands": [
+          { "kind": "STEP", "stepId": "energy-offset" },
+          { "kind": "LITERAL", "value": 1.5 }
+        ]
+      },
+      {
+        "id": "raw-mana",
+        "operation": "ADD",
+        "operands": [
+          { "kind": "STEP", "stepId": "base" },
+          { "kind": "STEP", "stepId": "level-offset" },
+          { "kind": "STEP", "stepId": "energy-contribution" }
+        ]
+      },
+      {
+        "id": "visible-mana",
+        "operation": "APPLY_ROUNDING",
+        "operands": [{ "kind": "STEP", "stepId": "raw-mana" }]
+      }
+    ],
+    "dependencyFormulaRefs": []
+  },
+  "rounding": {
+    "mode": "TRUNCATE",
+    "stage": "visible-mana",
+    "decimalPlaces": 0
+  },
+  "trace": {
+    "stepIds": [
+      "base",
+      "level-offset",
+      "energy-offset",
+      "energy-contribution",
+      "raw-mana",
+      "visible-mana"
+    ],
+    "rawOutputStepId": "raw-mana",
+    "visibleOutputStepId": "visible-mana"
+  },
+  "constraints": [
+    "Resolve class and evolution applicability before evaluating arithmetic.",
+    "Represent 1.5 exactly as a base-10 decimal and use checked decimal arithmetic.",
+    "Do not round the energy contribution or raw-mana before visible-mana.",
+    "Truncate raw-mana toward zero exactly once at visible-mana."
+  ],
+  "evidenceRefs": ["evd-0021", "evd-0026"],
+  "conflictIds": [],
+  "testCaseRefs": [
+    { "id": "mana-dark-lord-base", "version": "1.0.0" },
+    { "id": "mana-dark-lord-level-step", "version": "1.0.0" },
+    { "id": "mana-dark-lord-energy-step", "version": "1.0.0" },
+    { "id": "mana-dark-lord-combined-step", "version": "1.0.0" }
+  ]
+}

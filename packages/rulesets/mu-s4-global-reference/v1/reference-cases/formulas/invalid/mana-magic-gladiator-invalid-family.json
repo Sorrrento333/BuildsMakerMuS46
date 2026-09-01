@@ -1,0 +1,18 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "mana-magic-gladiator-invalid-family",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": {
+    "id": "formula-mana-magic-gladiator",
+    "version": "1.0.0"
+  },
+  "context": {
+    "characterClassId": "class-dark-knight",
+    "evolutionId": "evolution-dark-knight"
+  },
+  "inputs": {
+    "character-level": 1,
+    "energy": 10
+  },
+  "expectedErrorCode": "formula-not-applicable"
+}

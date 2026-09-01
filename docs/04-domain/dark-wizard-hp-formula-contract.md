@@ -183,3 +183,16 @@ los cuatro positivos, manteniendo separados los cuatro controles negativos. La
 La futura implementación del motor deberá leer constantes, alcance y casos
 desde el snapshot. No podrá duplicar `30`, `2`, los IDs de evolución ni los
 resultados manuales directamente en WPF o en el código de prueba productivo.
+
+El diseño de esa vertical está cerrado en
+`dark-wizard-hp-execution-vertical-design.md`. Concluye que
+`strategy.definition` `1.1.0` no es ejecutable de forma cerrada: no enlaza los
+aliases con inputs ni los pasos con operaciones y obligaría a interpretar texto
+libre. La fórmula publicada `1.0.0` permanece inmutable; el siguiente gate es un
+contrato estructurado `formula.schema.json` `2.0.0` y una nueva versión de
+fórmula antes de escribir el evaluador. Ambos ya están materializados: la nueva
+definición `1.1.0` está `PUBLISHED` y enlaza cuatro positivos de una serie
+propia de ocho casos que conserva exactamente las expectativas aprobadas. El
+gate demuestra la coexistencia por identidad compuesta y el rechazo de
+duplicados. La revisión de publicación independiente no encontró divergencias y
+cambió únicamente `status`; todavía no existe ejecución productiva.

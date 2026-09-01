@@ -1,0 +1,51 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "hp-magic-gladiator-level-step",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": {
+    "id": "formula-hp-magic-gladiator",
+    "version": "1.0.0"
+  },
+  "context": {
+    "characterClassId": "class-magic-gladiator",
+    "evolutionId": "evolution-magic-gladiator"
+  },
+  "inputs": {
+    "character-level": 2,
+    "vitality": 26
+  },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-hp-magic-gladiator-level-step",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": {
+      "id": "formula-hp-magic-gladiator",
+      "version": "1.0.0"
+    },
+    "context": {
+      "characterClassId": "class-magic-gladiator",
+      "evolutionId": "evolution-magic-gladiator"
+    },
+    "inputs": {
+      "character-level": 2,
+      "vitality": 26
+    },
+    "steps": [
+      { "stepId": "base", "value": 58 },
+      { "stepId": "level-offset", "value": 1 },
+      { "stepId": "level-contribution", "value": 1 },
+      { "stepId": "vitality-contribution", "value": 52 },
+      { "stepId": "raw-hp", "value": 111 },
+      { "stepId": "visible-hp", "value": 111 }
+    ],
+    "rounding": {
+      "mode": "TRUNCATE",
+      "stage": "visible-hp",
+      "decimalPlaces": 0
+    },
+    "rawOutput": 111,
+    "visibleOutput": 111,
+    "evidenceRefs": ["evd-0021", "evd-0026"],
+    "conflictIds": []
+  }
+}

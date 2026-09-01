@@ -1,0 +1,19 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "sd-dark-wizard-invalid-level",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-sd-dark-wizard", "version": "1.0.0" },
+  "context": {
+    "characterClassId": "class-dark-wizard",
+    "evolutionId": "evolution-dark-wizard"
+  },
+  "inputs": {
+    "character-level": 0,
+    "strength": 18,
+    "agility": 18,
+    "vitality": 15,
+    "energy": 30,
+    "defense": 4.5
+  },
+  "expectedErrorCode": "formula-level-out-of-range"
+}

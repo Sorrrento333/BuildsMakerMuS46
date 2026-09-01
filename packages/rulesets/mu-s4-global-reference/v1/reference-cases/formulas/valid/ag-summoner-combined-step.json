@@ -1,0 +1,35 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "ag-summoner-combined-step",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-ag-summoner", "version": "1.0.0" },
+  "context": {
+    "characterClassId": "class-summoner",
+    "evolutionId": "evolution-dimension-master"
+  },
+  "inputs": { "strength": 22, "agility": 22, "vitality": 19, "energy": 24 },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-ag-summoner-combined-step",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": { "id": "formula-ag-summoner", "version": "1.0.0" },
+    "context": {
+      "characterClassId": "class-summoner",
+      "evolutionId": "evolution-dimension-master"
+    },
+    "inputs": { "strength": 22, "agility": 22, "vitality": 19, "energy": 24 },
+    "steps": [
+      { "stepId": "strength-contribution", "value": 4.4 },
+      { "stepId": "agility-contribution", "value": 5.50 },
+      { "stepId": "vitality-contribution", "value": 5.7 },
+      { "stepId": "energy-contribution", "value": 3.60 },
+      { "stepId": "raw-ag", "value": 19.20 },
+      { "stepId": "visible-ag", "value": 19 }
+    ],
+    "rounding": { "mode": "TRUNCATE", "stage": "visible-ag", "decimalPlaces": 0 },
+    "rawOutput": 19.20,
+    "visibleOutput": 19,
+    "evidenceRefs": ["evd-0021", "evd-0026"],
+    "conflictIds": []
+  }
+}

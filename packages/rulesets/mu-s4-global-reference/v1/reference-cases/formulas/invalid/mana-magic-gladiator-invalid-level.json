@@ -1,0 +1,18 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "mana-magic-gladiator-invalid-level",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": {
+    "id": "formula-mana-magic-gladiator",
+    "version": "1.0.0"
+  },
+  "context": {
+    "characterClassId": "class-magic-gladiator",
+    "evolutionId": "evolution-magic-gladiator"
+  },
+  "inputs": {
+    "character-level": 0,
+    "energy": 26
+  },
+  "expectedErrorCode": "formula-level-out-of-range"
+}

@@ -17,7 +17,7 @@ $artifactRoot = Join-Path $RepositoryRoot "artifacts/json-everything-source-buil
 $sourceRoot = Join-Path $artifactRoot "source"
 $repeatSourceRoot = Join-Path $artifactRoot "source-repeat"
 $firstHashes = @{}
-$expectedFixtureCount = 20
+$expectedFixtureCount = 22
 
 function Invoke-Checked {
     param([string]$FilePath, [string[]]$Arguments, [string]$WorkingDirectory)

@@ -1,0 +1,9 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "defense-summoner-agility-below-base",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-defense-summoner", "version": "1.0.0" },
+  "context": { "characterClassId": "class-summoner", "evolutionId": "evolution-summoner" },
+  "inputs": { "agility": 20 },
+  "expectedErrorCode": "formula-stat-below-base"
+}

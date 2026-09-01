@@ -1,0 +1,35 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "mana-fairy-elf-energy-step",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-mana-fairy-elf", "version": "1.0.0" },
+  "context": {
+    "characterClassId": "class-fairy-elf",
+    "evolutionId": "evolution-fairy-elf"
+  },
+  "inputs": { "character-level": 1, "energy": 16 },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-mana-fairy-elf-energy-step",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": { "id": "formula-mana-fairy-elf", "version": "1.0.0" },
+    "context": {
+      "characterClassId": "class-fairy-elf",
+      "evolutionId": "evolution-fairy-elf"
+    },
+    "inputs": { "character-level": 1, "energy": 16 },
+    "steps": [
+      { "stepId": "base", "value": 15 },
+      { "stepId": "level-offset", "value": 0 },
+      { "stepId": "level-contribution", "value": 0 },
+      { "stepId": "energy-contribution", "value": 16 },
+      { "stepId": "raw-mana", "value": 31 },
+      { "stepId": "visible-mana", "value": 31 }
+    ],
+    "rounding": { "mode": "TRUNCATE", "stage": "visible-mana", "decimalPlaces": 0 },
+    "rawOutput": 31,
+    "visibleOutput": 31,
+    "evidenceRefs": ["evd-0021", "evd-0026"],
+    "conflictIds": []
+  }
+}

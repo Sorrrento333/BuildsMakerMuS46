@@ -1,0 +1,34 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "ag-dark-knight-combined-step",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-ag-dark-knight", "version": "1.0.0" },
+  "context": {
+    "characterClassId": "class-dark-knight",
+    "evolutionId": "evolution-blade-master"
+  },
+  "inputs": { "energy": 11, "vitality": 26, "agility": 21, "strength": 29 },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-ag-dark-knight-combined-step",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": { "id": "formula-ag-dark-knight", "version": "1.0.0" },
+    "context": {
+      "characterClassId": "class-dark-knight",
+      "evolutionId": "evolution-blade-master"
+    },
+    "inputs": { "energy": 11, "vitality": 26, "agility": 21, "strength": 29 },
+    "steps": [
+      { "stepId": "vitality-contribution", "value": 7.8 },
+      { "stepId": "agility-contribution", "value": 4.2 },
+      { "stepId": "strength-contribution", "value": 4.35 },
+      { "stepId": "raw-ag", "value": 27.35 },
+      { "stepId": "visible-ag", "value": 27 }
+    ],
+    "rounding": { "mode": "TRUNCATE", "stage": "visible-ag", "decimalPlaces": 0 },
+    "rawOutput": 27.35,
+    "visibleOutput": 27,
+    "evidenceRefs": ["evd-0021", "evd-0026"],
+    "conflictIds": []
+  }
+}

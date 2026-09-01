@@ -1,0 +1,51 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "hp-summoner-vitality-step",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": {
+    "id": "formula-hp-summoner",
+    "version": "1.0.0"
+  },
+  "context": {
+    "characterClassId": "class-summoner",
+    "evolutionId": "evolution-summoner"
+  },
+  "inputs": {
+    "character-level": 1,
+    "vitality": 19
+  },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-hp-summoner-vitality-step",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": {
+      "id": "formula-hp-summoner",
+      "version": "1.0.0"
+    },
+    "context": {
+      "characterClassId": "class-summoner",
+      "evolutionId": "evolution-summoner"
+    },
+    "inputs": {
+      "character-level": 1,
+      "vitality": 19
+    },
+    "steps": [
+      { "stepId": "base", "value": 34 },
+      { "stepId": "level-offset", "value": 0 },
+      { "stepId": "level-contribution", "value": 0 },
+      { "stepId": "vitality-contribution", "value": 38 },
+      { "stepId": "raw-hp", "value": 72 },
+      { "stepId": "visible-hp", "value": 72 }
+    ],
+    "rounding": {
+      "mode": "TRUNCATE",
+      "stage": "visible-hp",
+      "decimalPlaces": 0
+    },
+    "rawOutput": 72,
+    "visibleOutput": 72,
+    "evidenceRefs": ["evd-0021", "evd-0027", "evd-0028", "evd-0029", "evd-0030"],
+    "conflictIds": []
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "sd-summoner-invalid-family",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-sd-summoner", "version": "1.0.0" },
+  "context": { "characterClassId": "class-dark-wizard", "evolutionId": "evolution-dark-wizard" },
+  "inputs": { "character-level": 1, "strength": 21, "agility": 21, "vitality": 18, "energy": 23, "defense": 7 },
+  "expectedErrorCode": "formula-not-applicable"
+}
