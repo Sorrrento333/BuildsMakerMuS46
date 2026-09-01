@@ -1757,6 +1757,26 @@ recurso ausente a partir de los coeficientes de otras familias.
 
 ## Bitácora de investigación
 
+### 2026-09-01 — Materialización productiva de daño y wizardry de Summoner y Magic Gladiator
+
+- Daño y wizardry se materializan como axiomas del ruleset desde `EVD-0021` y
+  `EVD-0026`, fuera del inventario de 24 claims de `RES-0002`; no se incorpora
+  evidencia ni claim nuevos.
+- Ocho fórmulas `1.0.0` nacen `PUBLISHED` contra schema `2.1.0`, una por salida
+  (`min-damage`, `max-damage`, `min-wizardry-damage` y `max-wizardry-damage`
+  por familia): Summoner conserva `str/8`, `str/4`, `ene/9` y `ene/4` sobre
+  STR 21/ENE 23; Magic Gladiator conserva `str/6 + ene/12`, `str/4 + ene/8`,
+  `ene/9` y `ene/4` sobre 26/26, con `conflictIds: ["dsp-0002"]`.
+- Cada programa trunca hacia cero una sola vez en el paso visible; las dos
+  fórmulas de daño de Magic Gladiator suman los aportes Strength y Energy con
+  aritmética decimal comprobada antes del truncamiento.
+- Ocho contratos enlazan treinta y dos positivos (tres por evolución base y uno
+  por la superior de cada familia) y dieciocho controles negativos. No hay
+  frontera RAW/VISIBLE ni controles de overflow.
+- Application y WPF materializan treinta y ocho fórmulas ejecutables; el
+  dataset avanza a `2026-07-29.5` (smoke `win-x64` PASS del 2026-09-01, hash
+  `sha256:cb00836252cf4a22dab6d4343e3c5ad7186907a2e382839334645b5ed6539c3a`).
+
 ### 2026-07-29 — Materialización productiva de Defense y SD de Dark Lord
 
 - `formula-defense-dark-lord` y `formula-sd-dark-lord` `1.0.0` se

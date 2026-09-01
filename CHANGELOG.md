@@ -1122,6 +1122,31 @@
 
 ### Added
 
+- Vertical funcional de Daño y Wizardry de Summoner y Magic Gladiator, como
+  axiomas del ruleset trazados desde `EVD-0021` y `EVD-0026` y exteriores al
+  inventario de 24 claims de `RES-0002`. Ocho fórmulas `1.0.0` nacen
+  `PUBLISHED` contra schema `2.1.0`:
+  `formula-{min,max}-damage-{summoner,magic-gladiator}` y
+  `formula-{min,max}-wizardry-{summoner,magic-gladiator}`.
+- Summoner conserva `min = str/8`, `max = str/4`, `min_wizardry = ene/9` y
+  `max_wizardry = ene/4` sobre STR 21/ENE 23. Magic Gladiator conserva
+  `min = str/6 + ene/12`, `max = str/4 + ene/8` y las mismas wizardry
+  `ene/9`/`ene/4` sobre 26/26, conservando el conflicto resuelto `DSP-0002`.
+- Cada programa divide y trunca hacia cero una sola vez en su paso visible; los
+  pasos de daño de Magic Gladiator suman los aportes Strength y Energy con
+  aritmética decimal comprobada (`DIVIDE` + `ADD`) antes del truncamiento.
+- Ocho contratos enlazan cuatro positivos cada uno (tres por evolución base y
+  uno por la superior: Dimension Master / Duel Master) y dieciocho controles
+  negativos de stats bajo base y familia ajena. Aplicabilidad declarada sobre
+  Summoner/Bloody Summoner/Dimension Master y Magic
+  Gladiator/Duel Master.
+- Application y WPF materializan treinta y ocho fórmulas ejecutables
+  reutilizando la resolución genérica de dependencias, sin handlers ni
+  constantes de Summoner/MG en C#. El smoke `win-x64` espera 38 fórmulas y 152
+  casos contextuales; el dataset avanza a `2026-07-29.5`. El smoke de
+  publicación local del 2026-09-01 aprobó SQLite `3.53.3`, 796 archivos,
+  149.324.815 bytes y 373 JSON del ruleset, con hash
+  `sha256:cb00836252cf4a22dab6d4343e3c5ad7186907a2e382839334645b5ed6539c3a`.
 - Vertical funcional de Defense y SD de Summoner, que materializa el último
   claim `VERIFIED` de `RES-0002`.
   `formula-defense-summoner` y `formula-sd-summoner` `1.0.0` nacen

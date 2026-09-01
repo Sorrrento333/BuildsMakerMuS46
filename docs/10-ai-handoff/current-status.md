@@ -2263,7 +2263,35 @@
   `trunc(RAW/2) == trunc(VISIBLE/2)`; no se fabrica ninguno.
 - Application y WPF materializan treinta fórmulas ejecutables. El dataset avanza
   a `2026-07-29.4` con hash
-  `sha256:3b9cdcb42b7c7f6eb18063b6697f402bda5ae7e16fca5dfafef58143696d03d0`
+`sha256:3b9cdcb42b7c7f6eb18063b6697f402bda5ae7e16fca5dfafef58143696d03d0`
+   (capturado por el smoke de publicación del 2026-09-01).
+- Vertical funcional de Daño y Wizardry de Summoner y Magic Gladiator cerrada.
+  `formula-min-damage-summoner`, `formula-max-damage-summoner`,
+  `formula-min-wizardry-summoner`, `formula-max-wizardry-summoner`,
+  `formula-min-damage-magic-gladiator`, `formula-max-damage-magic-gladiator`,
+  `formula-min-wizardry-magic-gladiator` y `formula-max-wizardry-magic-gladiator`
+  `1.0.0` nacen `PUBLISHED` contra schema `2.1.0` y trazan `EVD-0021` y
+  `EVD-0026`. Son axiomas del ruleset fuera del inventario de 24 claims de
+  `RES-0002`; las cuatro fórmulas de Magic Gladiator conservan el conflicto
+  resuelto `DSP-0002` por consumir Energy.
+- Summoner conserva `min_damage = str / 8`, `max_damage = str / 4`,
+  `min_wizardry = ene / 9` y `max_wizardry = ene / 4` sobre los mínimos STR 21
+  y ENE 23 (`EVD-0021`). Magic Gladiator conserva `min_damage = str / 6 +
+  ene / 12`, `max_damage = str / 4 + ene / 8` y las mismas wizardry `ene / 9`
+  y `ene / 4` sobre los mínimos 26/26. Cada programa divide y trunca hacia
+  cero una sola vez en el paso visible; las dos fórmulas de daño de Magic
+  Gladiator suman los aportes de Strength y Energy con aritmética decimal
+  comprobada (`DIVIDE` + `ADD`) antes del truncamiento.
+- Cada una de las ocho fórmulas enlaza cuatro positivos: tres sobre la
+  evolución base (Summoner / Magic Gladiator) y uno sobre la evolución
+  superior (Dimension Master / Duel Master); la aplicabilidad declarada cubre
+  las tres evoluciones respectivas. Los dieciocho controles negativos cubren
+  Strength y Energy por debajo de la base canónica, según la salida, y familia
+  ajena (`DSP-0002` no se reabre). No se fabrican controles de overflow porque
+  la suma máxima de coeficientes por salida es `3/8`.
+- Application y WPF materializan treinta y ocho fórmulas ejecutables. El
+  dataset avanza a `2026-07-29.5` con hash
+  `sha256:cb00836252cf4a22dab6d4343e3c5ad7186907a2e382839334645b5ed6539c3a`
   (capturado por el smoke de publicación del 2026-09-01).
 
 ## No iniciado
@@ -2278,8 +2306,20 @@
 - El canal público de actualización y firma continúa como decisión posterior de
   distribución.
 
-## Verificación más reciente — 2026-07-29
+## Verificación más reciente — 2026-09-01
 
+- Cierre de Daño/Wizardry de Summoner y Magic Gladiator: restauración y build
+  Release aprobados con 0 advertencias/0 errores; 320/320 pruebas pasan:
+  40 validator, 58 motor, 204 Application y 18 Data. CLI del validador: las
+  treinta y ocho fórmulas `PUBLISHED` pasan sin errores, incluidos los ocho
+  contratos nuevos de daño y wizardry (32 positivos/18 controles).
+- Comprobación estructural: 11 contratos/22 fixtures, 39 registros canónicos,
+  progresión 7/7+3/3 y treinta y nueve identidades de fórmula aprobados. El
+  gate factual cubre 156 positivos y 160 controles negativos.
+- Smoke WPF `win-x64`: PASS con SQLite `3.53.3`, 796 archivos,
+  149.324.815 bytes, 10 avisos legales, 373 JSON del ruleset, dataset
+  `2026-07-29.5`, treinta y ocho fórmulas y 152 casos contextuales. El hash es
+  `sha256:cb00836252cf4a22dab6d4343e3c5ad7186907a2e382839334645b5ed6539c3a`.
 - Cierre de Defense/SD de Summoner: restauración y build Release aprobados con
   0 advertencias/0 errores; 320/320 pruebas pasan: 40 validator, 58 motor,
   204 Application y 18 Data. CLI del validador: las treinta fórmulas `PUBLISHED`
@@ -2597,8 +2637,9 @@
   Knight, Fairy Elf, Summoner y Magic Gladiator se ejecuta con sus cuatro stats
   resueltos; AG de Dark Lord añade Command por la misma ruta contextual.
   Defense y SD de Dark Wizard, Dark Knight, Fairy Elf, Magic Gladiator, Dark
-  Lord y Summoner se ejecutan con dependencia `RAW`; daño y el
-  resto de Defense todavía no se ejecutan.
+  Lord y Summoner se ejecutan con dependencia `RAW`. Daño y wizardry de
+  Summoner y Magic Gladiator también se ejecutan; el resto de Defense, rates,
+  regeneración y buffs todavía no se ejecutan.
 - Licencia: texto Apache-2.0 contrastado con la publicación oficial; ADR-0005,
   `NOTICE` e inventario de terceros incorporados. La auditoría leyó metadatos
   `.nuspec` de todas las dependencias restauradas y el acuerdo incluido por la
