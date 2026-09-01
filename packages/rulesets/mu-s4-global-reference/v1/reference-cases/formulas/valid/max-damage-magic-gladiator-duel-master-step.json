@@ -1,0 +1,27 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "max-damage-magic-gladiator-duel-master-step",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-max-damage-magic-gladiator", "version": "1.0.0" },
+  "context": { "characterClassId": "class-magic-gladiator", "evolutionId": "evolution-duel-master" },
+  "inputs": { "strength": 35, "energy": 28 },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-max-damage-magic-gladiator-duel-master-step",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": { "id": "formula-max-damage-magic-gladiator", "version": "1.0.0" },
+    "context": { "characterClassId": "class-magic-gladiator", "evolutionId": "evolution-duel-master" },
+    "inputs": { "strength": 35, "energy": 28 },
+    "steps": [
+      { "stepId": "strength-term", "value": 8.75 },
+      { "stepId": "energy-term", "value": 3.5 },
+      { "stepId": "raw-max-damage", "value": 12.25 },
+      { "stepId": "visible-max-damage", "value": 12 }
+    ],
+    "rounding": { "mode": "TRUNCATE", "stage": "visible-max-damage", "decimalPlaces": 0 },
+    "rawOutput": 12.25,
+    "visibleOutput": 12,
+    "evidenceRefs": ["evd-0021", "evd-0026"],
+    "conflictIds": ["dsp-0002"]
+  }
+}

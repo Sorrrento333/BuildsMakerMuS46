@@ -121,7 +121,7 @@ public sealed class FormulaApplicationIntegrationTests
         using var historicalDocument = JsonDocument.Parse(
             File.ReadAllText(historicalPath));
 
-        Assert.Equal(30, catalog.Formulas.Length);
+        Assert.Equal(38, catalog.Formulas.Length);
         Assert.Equal(
             [
                 "2.0.0",
@@ -131,6 +131,14 @@ public sealed class FormulaApplicationIntegrationTests
                 "2.0.0",
                 "2.0.0",
                 "2.0.0",
+                "2.1.0",
+                "2.1.0",
+                "2.1.0",
+                "2.1.0",
+                "2.1.0",
+                "2.1.0",
+                "2.1.0",
+                "2.1.0",
                 "2.1.0",
                 "2.1.0",
                 "2.1.0",

@@ -1,0 +1,25 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "min-damage-summoner-fraction-step",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-min-damage-summoner", "version": "1.0.0" },
+  "context": { "characterClassId": "class-summoner", "evolutionId": "evolution-summoner" },
+  "inputs": { "strength": 25 },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-min-damage-summoner-fraction-step",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": { "id": "formula-min-damage-summoner", "version": "1.0.0" },
+    "context": { "characterClassId": "class-summoner", "evolutionId": "evolution-summoner" },
+    "inputs": { "strength": 25 },
+    "steps": [
+      { "stepId": "raw-min-damage", "value": 3.125 },
+      { "stepId": "visible-min-damage", "value": 3 }
+    ],
+    "rounding": { "mode": "TRUNCATE", "stage": "visible-min-damage", "decimalPlaces": 0 },
+    "rawOutput": 3.125,
+    "visibleOutput": 3,
+    "evidenceRefs": ["evd-0021", "evd-0026"],
+    "conflictIds": []
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "min-wizardry-magic-gladiator-fraction-step",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-min-wizardry-magic-gladiator", "version": "1.0.0" },
+  "context": { "characterClassId": "class-magic-gladiator", "evolutionId": "evolution-magic-gladiator" },
+  "inputs": { "energy": 28 },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-min-wizardry-magic-gladiator-fraction-step",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": { "id": "formula-min-wizardry-magic-gladiator", "version": "1.0.0" },
+    "context": { "characterClassId": "class-magic-gladiator", "evolutionId": "evolution-magic-gladiator" },
+    "inputs": { "energy": 28 },
+    "steps": [
+      { "stepId": "raw-min-wizardry-damage", "value": 3.1111111111111111111111111111 },
+      { "stepId": "visible-min-wizardry-damage", "value": 3 }
+    ],
+    "rounding": { "mode": "TRUNCATE", "stage": "visible-min-wizardry-damage", "decimalPlaces": 0 },
+    "rawOutput": 3.1111111111111111111111111111,
+    "visibleOutput": 3,
+    "evidenceRefs": ["evd-0021", "evd-0026"],
+    "conflictIds": ["dsp-0002"]
+  }
+}

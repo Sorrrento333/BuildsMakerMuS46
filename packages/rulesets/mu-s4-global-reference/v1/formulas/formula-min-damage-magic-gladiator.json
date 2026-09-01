@@ -1,0 +1,113 @@
+{
+  "schemaVersion": "2.1.0",
+  "id": "formula-min-damage-magic-gladiator",
+  "version": "1.0.0",
+  "rulesetId": "mu-s4-global-reference",
+  "status": "PUBLISHED",
+  "confidence": "VERIFIED",
+  "purpose": "Calculate visible base minimum damage for the Magic Gladiator family before equipment, options, buffs, private profiles, or undeclared modifiers.",
+  "applicability": {
+    "characterClassId": "class-magic-gladiator",
+    "evolutionIds": ["evolution-magic-gladiator", "evolution-duel-master"]
+  },
+  "inputs": [
+    {
+      "id": "strength",
+      "numericType": "INT64",
+      "unit": "stat-point",
+      "numericBounds": {
+        "minimum": 26,
+        "minimumInclusive": true,
+        "classification": "FACTUAL",
+        "evidenceRefs": ["evd-0021"]
+      },
+      "rangeErrorCode": "formula-stat-below-base",
+      "source": {
+        "kind": "CONTEXT_VALUE",
+        "valueId": "resolved-strength"
+      }
+    },
+    {
+      "id": "energy",
+      "numericType": "INT64",
+      "unit": "stat-point",
+      "numericBounds": {
+        "minimum": 26,
+        "minimumInclusive": true,
+        "classification": "FACTUAL",
+        "evidenceRefs": ["evd-0021"]
+      },
+      "rangeErrorCode": "formula-stat-below-base",
+      "source": {
+        "kind": "CONTEXT_VALUE",
+        "valueId": "resolved-energy"
+      }
+    }
+  ],
+  "output": {
+    "id": "min-damage",
+    "numericType": "INT64",
+    "unit": "damage-point"
+  },
+  "strategy": {
+    "kind": "PROGRAM",
+    "executionModel": "CHECKED_DECIMAL_V1",
+    "steps": [
+      {
+        "id": "strength-term",
+        "operation": "DIVIDE",
+        "operands": [
+          { "kind": "INPUT", "inputId": "strength" },
+          { "kind": "LITERAL", "value": 6 }
+        ]
+      },
+      {
+        "id": "energy-term",
+        "operation": "DIVIDE",
+        "operands": [
+          { "kind": "INPUT", "inputId": "energy" },
+          { "kind": "LITERAL", "value": 12 }
+        ]
+      },
+      {
+        "id": "raw-min-damage",
+        "operation": "ADD",
+        "operands": [
+          { "kind": "STEP", "stepId": "strength-term" },
+          { "kind": "STEP", "stepId": "energy-term" }
+        ]
+      },
+      {
+        "id": "visible-min-damage",
+        "operation": "APPLY_ROUNDING",
+        "operands": [{ "kind": "STEP", "stepId": "raw-min-damage" }]
+      }
+    ],
+    "dependencyFormulaRefs": []
+  },
+  "rounding": {
+    "mode": "TRUNCATE",
+    "stage": "visible-min-damage",
+    "decimalPlaces": 0
+  },
+  "trace": {
+    "stepIds": ["strength-term", "energy-term", "raw-min-damage", "visible-min-damage"],
+    "rawOutputStepId": "raw-min-damage",
+    "visibleOutputStepId": "visible-min-damage"
+  },
+  "constraints": [
+    "Resolve class and evolution applicability before evaluating arithmetic.",
+    "Divide Strength by the exact literal 6 and Energy by the exact literal 12 using checked decimal arithmetic, then add both terms.",
+    "Represent strength-term and energy-term exactly as base-10 decimals and add them with checked decimal arithmetic.",
+    "Do not round strength-term, energy-term or raw-min-damage before visible-min-damage.",
+    "Truncate raw-min-damage toward zero exactly once at visible-min-damage."
+  ],
+  "evidenceRefs": ["evd-0021", "evd-0026"],
+  "conflictIds": ["dsp-0002"],
+  "testCaseRefs": [
+    { "id": "min-damage-magic-gladiator-base", "version": "1.0.0" },
+    { "id": "min-damage-magic-gladiator-fraction-step", "version": "1.0.0" },
+    { "id": "min-damage-magic-gladiator-integer-step", "version": "1.0.0" },
+    { "id": "min-damage-magic-gladiator-duel-master-step", "version": "1.0.0" }
+  ]
+}

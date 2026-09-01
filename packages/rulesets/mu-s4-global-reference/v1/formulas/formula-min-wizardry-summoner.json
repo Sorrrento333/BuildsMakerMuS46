@@ -1,0 +1,80 @@
+{
+  "schemaVersion": "2.1.0",
+  "id": "formula-min-wizardry-summoner",
+  "version": "1.0.0",
+  "rulesetId": "mu-s4-global-reference",
+  "status": "PUBLISHED",
+  "confidence": "VERIFIED",
+  "purpose": "Calculate visible base minimum wizardry damage for the Summoner family before equipment, options, buffs, private profiles, or undeclared modifiers.",
+  "applicability": {
+    "characterClassId": "class-summoner",
+    "evolutionIds": ["evolution-summoner", "evolution-bloody-summoner", "evolution-dimension-master"]
+  },
+  "inputs": [
+    {
+      "id": "energy",
+      "numericType": "INT64",
+      "unit": "stat-point",
+      "numericBounds": {
+        "minimum": 23,
+        "minimumInclusive": true,
+        "classification": "FACTUAL",
+        "evidenceRefs": ["evd-0021"]
+      },
+      "rangeErrorCode": "formula-stat-below-base",
+      "source": {
+        "kind": "CONTEXT_VALUE",
+        "valueId": "resolved-energy"
+      }
+    }
+  ],
+  "output": {
+    "id": "min-wizardry-damage",
+    "numericType": "INT64",
+    "unit": "damage-point"
+  },
+  "strategy": {
+    "kind": "PROGRAM",
+    "executionModel": "CHECKED_DECIMAL_V1",
+    "steps": [
+      {
+        "id": "raw-min-wizardry-damage",
+        "operation": "DIVIDE",
+        "operands": [
+          { "kind": "INPUT", "inputId": "energy" },
+          { "kind": "LITERAL", "value": 9 }
+        ]
+      },
+      {
+        "id": "visible-min-wizardry-damage",
+        "operation": "APPLY_ROUNDING",
+        "operands": [{ "kind": "STEP", "stepId": "raw-min-wizardry-damage" }]
+      }
+    ],
+    "dependencyFormulaRefs": []
+  },
+  "rounding": {
+    "mode": "TRUNCATE",
+    "stage": "visible-min-wizardry-damage",
+    "decimalPlaces": 0
+  },
+  "trace": {
+    "stepIds": ["raw-min-wizardry-damage", "visible-min-wizardry-damage"],
+    "rawOutputStepId": "raw-min-wizardry-damage",
+    "visibleOutputStepId": "visible-min-wizardry-damage"
+  },
+  "constraints": [
+    "Resolve class and evolution applicability before evaluating arithmetic.",
+    "Divide Energy by the exact literal 9 using checked decimal arithmetic.",
+    "Do not round raw-min-wizardry-damage before visible-min-wizardry-damage.",
+    "Truncate raw-min-wizardry-damage toward zero exactly once at visible-min-wizardry-damage."
+  ],
+  "evidenceRefs": ["evd-0021", "evd-0026"],
+  "conflictIds": [],
+  "testCaseRefs": [
+    { "id": "min-wizardry-summoner-base", "version": "1.0.0" },
+    { "id": "min-wizardry-summoner-fraction-step", "version": "1.0.0" },
+    { "id": "min-wizardry-summoner-integer-step", "version": "1.0.0" },
+    { "id": "min-wizardry-summoner-dimension-master-step", "version": "1.0.0" }
+  ]
+}

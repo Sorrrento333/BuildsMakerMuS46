@@ -1,0 +1,25 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "max-damage-summoner-dimension-master-step",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-max-damage-summoner", "version": "1.0.0" },
+  "context": { "characterClassId": "class-summoner", "evolutionId": "evolution-dimension-master" },
+  "inputs": { "strength": 28 },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-max-damage-summoner-dimension-master-step",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": { "id": "formula-max-damage-summoner", "version": "1.0.0" },
+    "context": { "characterClassId": "class-summoner", "evolutionId": "evolution-dimension-master" },
+    "inputs": { "strength": 28 },
+    "steps": [
+      { "stepId": "raw-max-damage", "value": 7 },
+      { "stepId": "visible-max-damage", "value": 7 }
+    ],
+    "rounding": { "mode": "TRUNCATE", "stage": "visible-max-damage", "decimalPlaces": 0 },
+    "rawOutput": 7,
+    "visibleOutput": 7,
+    "evidenceRefs": ["evd-0021", "evd-0026"],
+    "conflictIds": []
+  }
+}

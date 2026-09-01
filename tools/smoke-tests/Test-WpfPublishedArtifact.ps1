@@ -224,10 +224,10 @@ if ($initialReport.SyntheticResetCount -ne 2 -or
 }
 if (-not $initialReport.PublishedFormulaContextVerified -or
     -not $replacementReport.PublishedFormulaContextVerified -or
-    $initialReport.PublishedFormulaCount -ne 30 -or
-    $replacementReport.PublishedFormulaCount -ne 30 -or
-    $initialReport.PublishedFormulaReferences.Count -ne 30 -or
-    $replacementReport.PublishedFormulaReferences.Count -ne 30 -or
+    $initialReport.PublishedFormulaCount -ne 38 -or
+    $replacementReport.PublishedFormulaCount -ne 38 -or
+    $initialReport.PublishedFormulaReferences.Count -ne 38 -or
+    $replacementReport.PublishedFormulaReferences.Count -ne 38 -or
     $initialReport.PublishedFormulaReferences -notcontains
         "formula-ag-dark-lord@1.0.0" -or
     $initialReport.PublishedFormulaReferences -notcontains
@@ -284,10 +284,26 @@ if (-not $initialReport.PublishedFormulaContextVerified -or
         "formula-sd-magic-gladiator@1.0.0" -or
     $initialReport.PublishedFormulaReferences -notcontains
         "formula-sd-summoner@1.0.0" -or
+    $initialReport.PublishedFormulaReferences -notcontains
+        "formula-max-damage-magic-gladiator@1.0.0" -or
+    $initialReport.PublishedFormulaReferences -notcontains
+        "formula-max-damage-summoner@1.0.0" -or
+    $initialReport.PublishedFormulaReferences -notcontains
+        "formula-max-wizardry-magic-gladiator@1.0.0" -or
+    $initialReport.PublishedFormulaReferences -notcontains
+        "formula-max-wizardry-summoner@1.0.0" -or
+    $initialReport.PublishedFormulaReferences -notcontains
+        "formula-min-damage-magic-gladiator@1.0.0" -or
+    $initialReport.PublishedFormulaReferences -notcontains
+        "formula-min-damage-summoner@1.0.0" -or
+    $initialReport.PublishedFormulaReferences -notcontains
+        "formula-min-wizardry-magic-gladiator@1.0.0" -or
+    $initialReport.PublishedFormulaReferences -notcontains
+        "formula-min-wizardry-summoner@1.0.0" -or
     ($replacementReport.PublishedFormulaReferences -join "|") -ne
         ($initialReport.PublishedFormulaReferences -join "|") -or
-    $initialReport.ApprovedPublishedFormulaCaseCount -ne 120 -or
-    $replacementReport.ApprovedPublishedFormulaCaseCount -ne 120) {
+    $initialReport.ApprovedPublishedFormulaCaseCount -ne 152 -or
+    $replacementReport.ApprovedPublishedFormulaCaseCount -ne 152) {
     throw "The published artifact did not reproduce all contextual and arithmetic formula traces."
 }
 if (-not $initialReport.BuildDraftPersistenceVerified -or

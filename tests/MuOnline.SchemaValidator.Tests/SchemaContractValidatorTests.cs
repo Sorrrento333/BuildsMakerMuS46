@@ -50,6 +50,14 @@ public sealed class SchemaContractValidatorTests
         "formula-mana-fairy-elf@1.0.0",
         "formula-mana-magic-gladiator@1.0.0",
         "formula-mana-summoner@1.0.0",
+        "formula-max-damage-magic-gladiator@1.0.0",
+        "formula-max-damage-summoner@1.0.0",
+        "formula-max-wizardry-magic-gladiator@1.0.0",
+        "formula-max-wizardry-summoner@1.0.0",
+        "formula-min-damage-magic-gladiator@1.0.0",
+        "formula-min-damage-summoner@1.0.0",
+        "formula-min-wizardry-magic-gladiator@1.0.0",
+        "formula-min-wizardry-summoner@1.0.0",
         "formula-sd-dark-knight@1.0.0",
         "formula-sd-dark-lord@1.0.0",
         "formula-sd-dark-wizard@1.0.0",
@@ -362,6 +370,120 @@ public sealed class SchemaContractValidatorTests
         "ag-magic-gladiator-invalid-family",
         "ag-magic-gladiator-strength-below-base",
         "ag-magic-gladiator-vitality-below-base",
+    ];
+
+    private static readonly string[] ExpectedSummonerMinDamagePositiveFormulaCaseIds =
+    [
+        "min-damage-summoner-base",
+        "min-damage-summoner-dimension-master-step",
+        "min-damage-summoner-fraction-step",
+        "min-damage-summoner-integer-step",
+    ];
+
+    private static readonly string[] ExpectedSummonerMinDamageNegativeFormulaCaseIds =
+    [
+        "min-damage-summoner-invalid-family",
+        "min-damage-summoner-strength-below-base",
+    ];
+
+    private static readonly string[] ExpectedSummonerMaxDamagePositiveFormulaCaseIds =
+    [
+        "max-damage-summoner-base",
+        "max-damage-summoner-dimension-master-step",
+        "max-damage-summoner-fraction-step",
+        "max-damage-summoner-integer-step",
+    ];
+
+    private static readonly string[] ExpectedSummonerMaxDamageNegativeFormulaCaseIds =
+    [
+        "max-damage-summoner-invalid-family",
+        "max-damage-summoner-strength-below-base",
+    ];
+
+    private static readonly string[] ExpectedSummonerMinWizardryPositiveFormulaCaseIds =
+    [
+        "min-wizardry-summoner-base",
+        "min-wizardry-summoner-dimension-master-step",
+        "min-wizardry-summoner-fraction-step",
+        "min-wizardry-summoner-integer-step",
+    ];
+
+    private static readonly string[] ExpectedSummonerMinWizardryNegativeFormulaCaseIds =
+    [
+        "min-wizardry-summoner-energy-below-base",
+        "min-wizardry-summoner-invalid-family",
+    ];
+
+    private static readonly string[] ExpectedSummonerMaxWizardryPositiveFormulaCaseIds =
+    [
+        "max-wizardry-summoner-base",
+        "max-wizardry-summoner-dimension-master-step",
+        "max-wizardry-summoner-fraction-step",
+        "max-wizardry-summoner-integer-step",
+    ];
+
+    private static readonly string[] ExpectedSummonerMaxWizardryNegativeFormulaCaseIds =
+    [
+        "max-wizardry-summoner-energy-below-base",
+        "max-wizardry-summoner-invalid-family",
+    ];
+
+    private static readonly string[] ExpectedMagicGladiatorMinDamagePositiveFormulaCaseIds =
+    [
+        "min-damage-magic-gladiator-base",
+        "min-damage-magic-gladiator-duel-master-step",
+        "min-damage-magic-gladiator-fraction-step",
+        "min-damage-magic-gladiator-integer-step",
+    ];
+
+    private static readonly string[] ExpectedMagicGladiatorMinDamageNegativeFormulaCaseIds =
+    [
+        "min-damage-magic-gladiator-energy-below-base",
+        "min-damage-magic-gladiator-invalid-family",
+        "min-damage-magic-gladiator-strength-below-base",
+    ];
+
+    private static readonly string[] ExpectedMagicGladiatorMaxDamagePositiveFormulaCaseIds =
+    [
+        "max-damage-magic-gladiator-base",
+        "max-damage-magic-gladiator-duel-master-step",
+        "max-damage-magic-gladiator-fraction-step",
+        "max-damage-magic-gladiator-integer-step",
+    ];
+
+    private static readonly string[] ExpectedMagicGladiatorMaxDamageNegativeFormulaCaseIds =
+    [
+        "max-damage-magic-gladiator-energy-below-base",
+        "max-damage-magic-gladiator-invalid-family",
+        "max-damage-magic-gladiator-strength-below-base",
+    ];
+
+    private static readonly string[] ExpectedMagicGladiatorMinWizardryPositiveFormulaCaseIds =
+    [
+        "min-wizardry-magic-gladiator-base",
+        "min-wizardry-magic-gladiator-duel-master-step",
+        "min-wizardry-magic-gladiator-fraction-step",
+        "min-wizardry-magic-gladiator-integer-step",
+    ];
+
+    private static readonly string[] ExpectedMagicGladiatorMinWizardryNegativeFormulaCaseIds =
+    [
+        "min-wizardry-magic-gladiator-energy-below-base",
+        "min-wizardry-magic-gladiator-invalid-family",
+    ];
+
+    private static readonly string[] ExpectedMagicGladiatorMaxWizardryPositiveFormulaCaseIds =
+    [
+        "max-wizardry-magic-gladiator-base",
+        "max-wizardry-magic-gladiator-duel-master-step",
+        "max-wizardry-magic-gladiator-fraction-step",
+        "max-wizardry-magic-gladiator-integer-step",
+    ];
+
+    private static readonly string[] ExpectedMagicGladiatorMaxWizardryNegativeFormulaCaseIds =
+    [
+        "max-wizardry-magic-gladiator-energy-below-base",
+        "max-wizardry-magic-gladiator-invalid-family",
     ];
 
     private static readonly string[] ExpectedPositiveFormulaCaseIds =
@@ -882,7 +1004,7 @@ public sealed class SchemaContractValidatorTests
     {
         var results = SchemaContractValidator.ValidateRulesetRecords(FindRepositoryRoot());
 
-        Assert.Equal(39, results.Count);
+        Assert.Equal(47, results.Count);
         Assert.All(results, result => Assert.True(
             result.ActualValidity,
             $"{result.RecordId} does not match {result.ContractName}."));
@@ -937,6 +1059,14 @@ public sealed class SchemaContractValidatorTests
                 "2.1.0",
                 "2.1.0",
                 "2.1.0",
+                "2.1.0",
+                "2.1.0",
+                "2.1.0",
+                "2.1.0",
+                "2.1.0",
+                "2.1.0",
+                "2.1.0",
+                "2.1.0",
             ],
             results
                 .Where(result => result.ContractName == "formula")
@@ -950,7 +1080,7 @@ public sealed class SchemaContractValidatorTests
         var results = FormulaReferenceCaseValidator.ValidateRepository(
             FindRepositoryRoot());
 
-        Assert.Equal(31, results.Count);
+        Assert.Equal(39, results.Count);
 
         var darkLordAg = Assert.Single(
             results,
@@ -1239,6 +1369,134 @@ public sealed class SchemaContractValidatorTests
         Assert.True(
             summonerSd.IsValid,
             $"{summonerSd.FormulaId}: {string.Join(" | ", summonerSd.Errors)}");
+
+        var summonerMinDamage = Assert.Single(
+            results,
+            result =>
+                result.FormulaId == "formula-min-damage-summoner" &&
+                result.FormulaVersion == "1.0.0");
+        Assert.Equal("PUBLISHED", summonerMinDamage.Status);
+        Assert.Equal(
+            ExpectedSummonerMinDamagePositiveFormulaCaseIds,
+            summonerMinDamage.PositiveCaseIds);
+        Assert.Equal(
+            ExpectedSummonerMinDamageNegativeFormulaCaseIds,
+            summonerMinDamage.NegativeCaseIds);
+        Assert.True(
+            summonerMinDamage.IsValid,
+            $"{summonerMinDamage.FormulaId}: {string.Join(" | ", summonerMinDamage.Errors)}");
+
+        var summonerMaxDamage = Assert.Single(
+            results,
+            result =>
+                result.FormulaId == "formula-max-damage-summoner" &&
+                result.FormulaVersion == "1.0.0");
+        Assert.Equal("PUBLISHED", summonerMaxDamage.Status);
+        Assert.Equal(
+            ExpectedSummonerMaxDamagePositiveFormulaCaseIds,
+            summonerMaxDamage.PositiveCaseIds);
+        Assert.Equal(
+            ExpectedSummonerMaxDamageNegativeFormulaCaseIds,
+            summonerMaxDamage.NegativeCaseIds);
+        Assert.True(
+            summonerMaxDamage.IsValid,
+            $"{summonerMaxDamage.FormulaId}: {string.Join(" | ", summonerMaxDamage.Errors)}");
+
+        var summonerMinWizardry = Assert.Single(
+            results,
+            result =>
+                result.FormulaId == "formula-min-wizardry-summoner" &&
+                result.FormulaVersion == "1.0.0");
+        Assert.Equal("PUBLISHED", summonerMinWizardry.Status);
+        Assert.Equal(
+            ExpectedSummonerMinWizardryPositiveFormulaCaseIds,
+            summonerMinWizardry.PositiveCaseIds);
+        Assert.Equal(
+            ExpectedSummonerMinWizardryNegativeFormulaCaseIds,
+            summonerMinWizardry.NegativeCaseIds);
+        Assert.True(
+            summonerMinWizardry.IsValid,
+            $"{summonerMinWizardry.FormulaId}: {string.Join(" | ", summonerMinWizardry.Errors)}");
+
+        var summonerMaxWizardry = Assert.Single(
+            results,
+            result =>
+                result.FormulaId == "formula-max-wizardry-summoner" &&
+                result.FormulaVersion == "1.0.0");
+        Assert.Equal("PUBLISHED", summonerMaxWizardry.Status);
+        Assert.Equal(
+            ExpectedSummonerMaxWizardryPositiveFormulaCaseIds,
+            summonerMaxWizardry.PositiveCaseIds);
+        Assert.Equal(
+            ExpectedSummonerMaxWizardryNegativeFormulaCaseIds,
+            summonerMaxWizardry.NegativeCaseIds);
+        Assert.True(
+            summonerMaxWizardry.IsValid,
+            $"{summonerMaxWizardry.FormulaId}: {string.Join(" | ", summonerMaxWizardry.Errors)}");
+
+        var magicGladiatorMinDamage = Assert.Single(
+            results,
+            result =>
+                result.FormulaId == "formula-min-damage-magic-gladiator" &&
+                result.FormulaVersion == "1.0.0");
+        Assert.Equal("PUBLISHED", magicGladiatorMinDamage.Status);
+        Assert.Equal(
+            ExpectedMagicGladiatorMinDamagePositiveFormulaCaseIds,
+            magicGladiatorMinDamage.PositiveCaseIds);
+        Assert.Equal(
+            ExpectedMagicGladiatorMinDamageNegativeFormulaCaseIds,
+            magicGladiatorMinDamage.NegativeCaseIds);
+        Assert.True(
+            magicGladiatorMinDamage.IsValid,
+            $"{magicGladiatorMinDamage.FormulaId}: {string.Join(" | ", magicGladiatorMinDamage.Errors)}");
+
+        var magicGladiatorMaxDamage = Assert.Single(
+            results,
+            result =>
+                result.FormulaId == "formula-max-damage-magic-gladiator" &&
+                result.FormulaVersion == "1.0.0");
+        Assert.Equal("PUBLISHED", magicGladiatorMaxDamage.Status);
+        Assert.Equal(
+            ExpectedMagicGladiatorMaxDamagePositiveFormulaCaseIds,
+            magicGladiatorMaxDamage.PositiveCaseIds);
+        Assert.Equal(
+            ExpectedMagicGladiatorMaxDamageNegativeFormulaCaseIds,
+            magicGladiatorMaxDamage.NegativeCaseIds);
+        Assert.True(
+            magicGladiatorMaxDamage.IsValid,
+            $"{magicGladiatorMaxDamage.FormulaId}: {string.Join(" | ", magicGladiatorMaxDamage.Errors)}");
+
+        var magicGladiatorMinWizardry = Assert.Single(
+            results,
+            result =>
+                result.FormulaId == "formula-min-wizardry-magic-gladiator" &&
+                result.FormulaVersion == "1.0.0");
+        Assert.Equal("PUBLISHED", magicGladiatorMinWizardry.Status);
+        Assert.Equal(
+            ExpectedMagicGladiatorMinWizardryPositiveFormulaCaseIds,
+            magicGladiatorMinWizardry.PositiveCaseIds);
+        Assert.Equal(
+            ExpectedMagicGladiatorMinWizardryNegativeFormulaCaseIds,
+            magicGladiatorMinWizardry.NegativeCaseIds);
+        Assert.True(
+            magicGladiatorMinWizardry.IsValid,
+            $"{magicGladiatorMinWizardry.FormulaId}: {string.Join(" | ", magicGladiatorMinWizardry.Errors)}");
+
+        var magicGladiatorMaxWizardry = Assert.Single(
+            results,
+            result =>
+                result.FormulaId == "formula-max-wizardry-magic-gladiator" &&
+                result.FormulaVersion == "1.0.0");
+        Assert.Equal("PUBLISHED", magicGladiatorMaxWizardry.Status);
+        Assert.Equal(
+            ExpectedMagicGladiatorMaxWizardryPositiveFormulaCaseIds,
+            magicGladiatorMaxWizardry.PositiveCaseIds);
+        Assert.Equal(
+            ExpectedMagicGladiatorMaxWizardryNegativeFormulaCaseIds,
+            magicGladiatorMaxWizardry.NegativeCaseIds);
+        Assert.True(
+            magicGladiatorMaxWizardry.IsValid,
+            $"{magicGladiatorMaxWizardry.FormulaId}: {string.Join(" | ", magicGladiatorMaxWizardry.Errors)}");
 
         var published = Assert.Single(
             results,
@@ -1631,7 +1889,7 @@ public sealed class SchemaContractValidatorTests
                 .ValidateRepository(temporaryRoot)
                 .ToArray();
 
-            Assert.Equal(31, results.Length);
+            Assert.Equal(39, results.Length);
             Assert.All(results, result => Assert.False(result.IsValid));
             Assert.All(
                 results,
