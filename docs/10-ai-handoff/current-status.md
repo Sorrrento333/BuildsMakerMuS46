@@ -871,7 +871,9 @@
   frontera RAW/VISIBLE para Summoner porque, con `agi / 3`, siempre se cumple
   `trunc(RAW/2) == trunc(VISIBLE/2)`; no se fabrica ninguno.
 - Application y WPF materializan treinta fórmulas ejecutables. El dataset avanza
-  a `2026-07-29.4` (hash capturado por el smoke de publicación pendiente).
+  a `2026-07-29.4` con hash
+  `sha256:3b9cdcb42b7c7f6eb18063b6697f402bda5ae7e16fca5dfafef58143696d03d0`
+  (capturado por el smoke de publicación del 2026-09-01).
 
 ## No iniciado
 
@@ -894,9 +896,11 @@
   controles) y `formula-sd-summoner` (4 positivos/7 controles).
 - `CHECKED_DECIMAL_V1` y el gate aceptan múltiples pasos intermedios
   `APPLY_ROUNDING`; `sd-summoner-base` fija SD 102 y discrimina la semántica de
-  truncamientos independientes. Dataset `2026-07-29.4` con 315 JSON; el hash,
-  conteo de archivos y bytes del smoke `win-x64` (30 fórmulas, 120 casos)
-  quedan por capturar en la ejecución del mantenedor.
+  truncamientos independientes.
+- Smoke WPF `win-x64`: PASS con SQLite `3.53.3`, 738 archivos,
+  149.256.211 bytes, 315 JSON del ruleset, dataset `2026-07-29.4`, treinta
+  fórmulas y 120 casos contextuales. El hash es
+  `sha256:3b9cdcb42b7c7f6eb18063b6697f402bda5ae7e16fca5dfafef58143696d03d0`.
 - Cierre de Defense/SD de Dark Lord: restauración bloqueada y build Release
   aprobados con 0 advertencias/0 errores; 302/302 pruebas pasan:
   40 validator, 57 motor, 187 Application y 18 Data. Los 18 casos nuevos

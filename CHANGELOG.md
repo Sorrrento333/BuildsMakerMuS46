@@ -25,7 +25,10 @@
 - Application y WPF materializan treinta fórmulas ejecutables reutilizando la
   resolución genérica de dependencias, sin handlers ni constantes de Summoner
   en C#. El smoke `win-x64` espera 30 fórmulas y 120 casos contextuales; el
-  dataset avanza a `2026-07-29.4` (hash capturado por el smoke de publicación).
+  dataset avanza a `2026-07-29.4`. El smoke de publicación local del 2026-09-01
+  aprobó SQLite `3.53.3`, 738 archivos, 149.256.211 bytes y 315 JSON del
+  ruleset, con hash
+  `sha256:3b9cdcb42b7c7f6eb18063b6697f402bda5ae7e16fca5dfafef58143696d03d0`.
 - Vertical funcional de Defense y SD de Dark Lord.
   `formula-defense-dark-lord` y `formula-sd-dark-lord` `1.0.0` nacen
   `PUBLISHED` contra schema `2.1.0`, trazan `EVD-0021`, `EVD-0026` y

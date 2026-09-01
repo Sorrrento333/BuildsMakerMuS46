@@ -11,10 +11,13 @@ La instrucción de ejecutar sólo la primera tarea pendiente continúa vigente.
 
 ## Prioridad inmediata
 
-1. Cerrar la documentación y el commit de la vertical de Defense/SD de Summoner,
-   que materializa el último claim `VERIFIED` de `RES-0002`. Capturar el hash y la
-   versión definitiva del dataset (`2026-07-29.4`) con el smoke WPF de publicación
-   y registrar el archivo/byte counts correspondientes.
+1. Cerrar la documentación y el commit de la vertical de Defense/SD de Summoner
+   quedó pendiente solo de capturar el hash y la versión definitiva del dataset
+   (`2026-07-29.4`) con el smoke WPF de publicación. Ese smoke ya pasó localmente
+   el 2026-09-01 con SQLite `3.53.3`, 738 archivos, 149.256.211 bytes, 315 JSON
+   del ruleset, treinta fórmulas y 120 casos contextuales; el hash es
+   `sha256:3b9cdcb42b7c7f6eb18063b6697f402bda5ae7e16fca5dfafef58143696d03d0`.
+   Sólo resta el commit y, en su caso, la ejecución del CJ en un runner remoto.
 2. Definir la siguiente vertical coherente entre los candidatos documentados:
    primeros contratos facticos restantes (daño y wizardry de Summoner/MG ya
    aprobados y sin motor), o los schemas de alto nivel (ruleset, quests, ítems,
@@ -39,7 +42,8 @@ La vertical de Defense/SD de Summoner quedó cerrada sobre la decisión general
   `sd-summoner-base` fija SD 102 y discrimina la semántica independiente (a
   plena precisión sería 103). No hay frontera RAW/VISIBLE para Summoner.
 - Application y WPF materializan treinta fórmulas ejecutables; el dataset avanza
-  a `2026-07-29.4` (hash capturado por el smoke de publicación pendiente).
+  a `2026-07-29.4` con hash
+  `sha256:3b9cdcb42b7c7f6eb18063b6697f402bda5ae7e16fca5dfafef58143696d03d0`.
 
 ## Verificación del cierre
 
@@ -48,10 +52,12 @@ La vertical de Defense/SD de Summoner quedó cerrada sobre la decisión general
 - CLI del validador: las treinta fórmulas `PUBLISHED` pasan sin errores,
   incluidos `formula-defense-summoner` (4 positivos/2 controles) y
   `formula-sd-summoner` (4 positivos/7 controles).
-- Smoke WPF `win-x64` (30 fórmulas y 120 casos contextuales): requiere una
-  ejecución del mantenedor para capturar hash/versión/bytes del dataset.
+- Smoke WPF `win-x64` (30 fórmulas y 120 casos contextuales): PASS local el
+  2026-09-01 con SQLite `3.53.3`, 738 archivos, 149.256.211 bytes, 315 JSON del
+  ruleset y hash `sha256:3b9cdcb42b7c7f6eb18063b6697f402bda5ae7e16fca5dfafef58143696d03d0`.
 
 ## Primera acción concreta
 
-Actualizar `docs/10-ai-handoff/current-status.md`, `next-actions.md` y
-`CHANGELOG.md`, y confirmar con el mantenedor la siguiente vertical elegida.
+Confirmar con el mantenedor la siguiente vertical elegida entre los candidatos
+documentados (contratos facticos restantes, schemas de alto nivel o builds/
+flujos de UI) y actualizar esta documentación y `CHANGELOG.md` al cerrarla.
