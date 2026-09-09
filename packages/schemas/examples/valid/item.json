@@ -1,0 +1,24 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "item-synthetic",
+  "version": "1.0.0",
+  "rulesetId": "ruleset-synthetic",
+  "displayName": "Synthetic staff",
+  "status": "PUBLISHED",
+  "confidence": "UNVERIFIED",
+  "slots": ["main-hand"],
+  "allowedClassIds": ["class-synthetic"],
+  "requiredLevel": 1,
+  "requiredStats": { "stat-synthetic": 0 },
+  "optionModules": [
+    {
+      "id": "option-synthetic-001",
+      "kind": "NORMAL",
+      "exclusiveWithIds": ["option-synthetic-002"],
+      "evidenceRefs": ["evidence-synthetic-001"]
+    }
+  ],
+  "socketSlots": 0,
+  "maxItemLevel": 4,
+  "evidenceRefs": ["evidence-synthetic-001"]
+}

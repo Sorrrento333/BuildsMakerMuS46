@@ -121,7 +121,7 @@ public sealed class FormulaApplicationIntegrationTests
         using var historicalDocument = JsonDocument.Parse(
             File.ReadAllText(historicalPath));
 
-        Assert.Equal(38, catalog.Formulas.Length);
+        Assert.Equal(42, catalog.Formulas.Length);
         Assert.Equal(
             [
                 "2.0.0",
@@ -131,6 +131,10 @@ public sealed class FormulaApplicationIntegrationTests
                 "2.0.0",
                 "2.0.0",
                 "2.0.0",
+                "2.1.0",
+                "2.1.0",
+                "2.1.0",
+                "2.1.0",
                 "2.1.0",
                 "2.1.0",
                 "2.1.0",
@@ -408,7 +412,11 @@ public sealed class FormulaApplicationIntegrationTests
                     "formula-sd-dark-wizard" or
                     "formula-sd-fairy-elf" or
                     "formula-sd-magic-gladiator" or
-                    "formula-sd-summoner")
+                    "formula-sd-summoner" or
+                    "formula-reflect-percent-summoner" or
+                    "formula-berserker-percent-summoner" or
+                    "formula-innovation-percent-summoner" or
+                    "formula-weakness-percent-summoner")
             .Select(item => item.Reference)
             .ToHashSet();
 

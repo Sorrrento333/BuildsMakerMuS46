@@ -1,0 +1,12 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "ruleset-synthetic",
+  "version": "1.0.0",
+  "displayName": "Synthetic reference ruleset",
+  "gameVersion": "season-4",
+  "status": "PUBLISHED",
+  "confidence": "VERIFIED",
+  "enabledFeatureIds": ["progression", "quests", "items", "skills", "scenarios"],
+  "formulaRefs": [{ "id": "formula-synthetic", "version": "1.0.0" }],
+  "evidenceRefs": ["evidence-synthetic-001"]
+}

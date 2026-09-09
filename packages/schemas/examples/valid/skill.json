@@ -1,0 +1,14 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "skill-synthetic",
+  "version": "1.0.0",
+  "rulesetId": "ruleset-synthetic",
+  "displayName": "Synthetic buff skill",
+  "status": "PUBLISHED",
+  "confidence": "UNVERIFIED",
+  "kind": "BUFF",
+  "requiredLevel": 1,
+  "allowedEvolutionIds": ["evolution-synthetic"],
+  "prerequisiteSkillIds": [],
+  "evidenceRefs": ["evidence-synthetic-001"]
+}

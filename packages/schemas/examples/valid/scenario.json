@@ -1,0 +1,15 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "scenario-synthetic",
+  "version": "1.0.0",
+  "rulesetId": "ruleset-synthetic",
+  "displayName": "Synthetic hunting scenario",
+  "status": "PUBLISHED",
+  "confidence": "UNVERIFIED",
+  "modality": "PVM",
+  "objective": "Maximize damage output",
+  "mapRefs": [{ "id": "map-synthetic", "version": "1.0.0" }],
+  "externalBuffIds": ["skill-synthetic"],
+  "ruleRefs": [{ "id": "progression-rule-synthetic", "version": "1.0.0" }],
+  "evidenceRefs": ["evidence-synthetic-001"]
+}

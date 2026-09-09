@@ -181,10 +181,12 @@ Los locks, SPDX, provenance y hashes revisados viven en
 `spikes/json-everything-source-build/`. El diseño, la integración y sus límites
 están en `docs/03-architecture/json-everything-source-integration.md`.
 
-El comando valida siete contratos `1.0.0`, los contratos `formula`,
+El comando valida siete contratos `1.0.0` de progresión e identidad, los cinco
+contratos de alto nivel `ruleset`, `quest-rule`, `item`, `skill` y `scenario`
+`1.0.0`, los contratos `formula`,
 `stat-distribution` y `build-draft` `1.1.0`, y
-`v2/formula.schema.json` `2.0.0`/`2.1.0`. Acepta los once fixtures de
-`examples/valid`, rechaza los once de `examples/invalid` y devuelve un código
+`v2/formula.schema.json` `2.0.0`/`2.1.0`. Acepta los dieciséis fixtures de
+`examples/valid`, rechaza los dieciséis de `examples/invalid` y devuelve un código
 distinto de cero si alguna expectativa no se cumple. También valida contra
 `character-class.schema.json`, `progression-rule.schema.json` y
 `formula.schema.json` los veintinueve registros canónicos de

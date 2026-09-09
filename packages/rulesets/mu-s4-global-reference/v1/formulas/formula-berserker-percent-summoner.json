@@ -1,0 +1,80 @@
+{
+  "schemaVersion": "2.1.0",
+  "id": "formula-berserker-percent-summoner",
+  "version": "1.0.0",
+  "rulesetId": "mu-s4-global-reference",
+  "status": "PUBLISHED",
+  "confidence": "VERIFIED",
+  "purpose": "Calculate visible base Berserker buff percentage for the Summoner family before equipment, options, buffs, private profiles, or undeclared modifiers.",
+  "applicability": {
+    "characterClassId": "class-summoner",
+    "evolutionIds": ["evolution-summoner", "evolution-bloody-summoner", "evolution-dimension-master"]
+  },
+  "inputs": [
+    {
+      "id": "energy",
+      "numericType": "INT64",
+      "unit": "stat-point",
+      "numericBounds": {
+        "minimum": 23,
+        "minimumInclusive": true,
+        "classification": "FACTUAL",
+        "evidenceRefs": ["evd-0021"]
+      },
+      "rangeErrorCode": "formula-stat-below-base",
+      "source": {
+        "kind": "CONTEXT_VALUE",
+        "valueId": "resolved-energy"
+      }
+    }
+  ],
+  "output": {
+    "id": "berserker-percent",
+    "numericType": "INT64",
+    "unit": "percent"
+  },
+  "strategy": {
+    "kind": "PROGRAM",
+    "executionModel": "CHECKED_DECIMAL_V1",
+    "steps": [
+      {
+        "id": "raw-berserker-percent",
+        "operation": "DIVIDE",
+        "operands": [
+          { "kind": "INPUT", "inputId": "energy" },
+          { "kind": "LITERAL", "value": 30 }
+        ]
+      },
+      {
+        "id": "visible-berserker-percent",
+        "operation": "APPLY_ROUNDING",
+        "operands": [{ "kind": "STEP", "stepId": "raw-berserker-percent" }]
+      }
+    ],
+    "dependencyFormulaRefs": []
+  },
+  "rounding": {
+    "mode": "TRUNCATE",
+    "stage": "visible-berserker-percent",
+    "decimalPlaces": 0
+  },
+  "trace": {
+    "stepIds": ["raw-berserker-percent", "visible-berserker-percent"],
+    "rawOutputStepId": "raw-berserker-percent",
+    "visibleOutputStepId": "visible-berserker-percent"
+  },
+  "constraints": [
+    "Resolve class and evolution applicability before evaluating arithmetic.",
+    "Divide Energy by the exact literal 30 using checked decimal arithmetic.",
+    "Do not round raw-berserker-percent before visible-berserker-percent.",
+    "Truncate raw-berserker-percent toward zero exactly once at visible-berserker-percent."
+  ],
+  "evidenceRefs": ["evd-0021", "evd-0026"],
+  "conflictIds": [],
+  "testCaseRefs": [
+    { "id": "berserker-percent-summoner-base", "version": "1.0.0" },
+    { "id": "berserker-percent-summoner-fraction-step", "version": "1.0.0" },
+    { "id": "berserker-percent-summoner-integer-step", "version": "1.0.0" },
+    { "id": "berserker-percent-summoner-dimension-master-step", "version": "1.0.0" }
+  ]
+}

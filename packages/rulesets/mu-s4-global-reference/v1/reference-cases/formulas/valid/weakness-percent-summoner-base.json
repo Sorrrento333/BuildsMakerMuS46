@@ -1,0 +1,26 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "weakness-percent-summoner-base",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-weakness-percent-summoner", "version": "1.0.0" },
+  "context": { "characterClassId": "class-summoner", "evolutionId": "evolution-summoner" },
+  "inputs": { "energy": 23 },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-weakness-percent-summoner-base",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": { "id": "formula-weakness-percent-summoner", "version": "1.0.0" },
+    "context": { "characterClassId": "class-summoner", "evolutionId": "evolution-summoner" },
+    "inputs": { "energy": 23 },
+    "steps": [
+      { "stepId": "energy-term", "value": 0.3538461538461538461538461538 },
+      { "stepId": "raw-weakness-percent", "value": 7.3538461538461538461538461538 },
+      { "stepId": "visible-weakness-percent", "value": 7 }
+    ],
+    "rounding": { "mode": "TRUNCATE", "stage": "visible-weakness-percent", "decimalPlaces": 0 },
+    "rawOutput": 7.3538461538461538461538461538,
+    "visibleOutput": 7,
+    "evidenceRefs": ["evd-0021", "evd-0026"],
+    "conflictIds": []
+  }
+}

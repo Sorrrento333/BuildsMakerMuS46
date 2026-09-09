@@ -224,10 +224,10 @@ if ($initialReport.SyntheticResetCount -ne 2 -or
 }
 if (-not $initialReport.PublishedFormulaContextVerified -or
     -not $replacementReport.PublishedFormulaContextVerified -or
-    $initialReport.PublishedFormulaCount -ne 38 -or
-    $replacementReport.PublishedFormulaCount -ne 38 -or
-    $initialReport.PublishedFormulaReferences.Count -ne 38 -or
-    $replacementReport.PublishedFormulaReferences.Count -ne 38 -or
+    $initialReport.PublishedFormulaCount -ne 42 -or
+    $replacementReport.PublishedFormulaCount -ne 42 -or
+    $initialReport.PublishedFormulaReferences.Count -ne 42 -or
+    $replacementReport.PublishedFormulaReferences.Count -ne 42 -or
     $initialReport.PublishedFormulaReferences -notcontains
         "formula-ag-dark-lord@1.0.0" -or
     $initialReport.PublishedFormulaReferences -notcontains
@@ -300,10 +300,18 @@ if (-not $initialReport.PublishedFormulaContextVerified -or
         "formula-min-wizardry-magic-gladiator@1.0.0" -or
     $initialReport.PublishedFormulaReferences -notcontains
         "formula-min-wizardry-summoner@1.0.0" -or
+    $initialReport.PublishedFormulaReferences -notcontains
+        "formula-reflect-percent-summoner@1.0.0" -or
+    $initialReport.PublishedFormulaReferences -notcontains
+        "formula-berserker-percent-summoner@1.0.0" -or
+    $initialReport.PublishedFormulaReferences -notcontains
+        "formula-innovation-percent-summoner@1.0.0" -or
+    $initialReport.PublishedFormulaReferences -notcontains
+        "formula-weakness-percent-summoner@1.0.0" -or
     ($replacementReport.PublishedFormulaReferences -join "|") -ne
         ($initialReport.PublishedFormulaReferences -join "|") -or
-    $initialReport.ApprovedPublishedFormulaCaseCount -ne 152 -or
-    $replacementReport.ApprovedPublishedFormulaCaseCount -ne 152) {
+    $initialReport.ApprovedPublishedFormulaCaseCount -ne 168 -or
+    $replacementReport.ApprovedPublishedFormulaCaseCount -ne 168) {
     throw "The published artifact did not reproduce all contextual and arithmetic formula traces."
 }
 if (-not $initialReport.BuildDraftPersistenceVerified -or

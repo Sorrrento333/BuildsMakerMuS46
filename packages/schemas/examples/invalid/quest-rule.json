@@ -1,0 +1,17 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "quest-rule-synthetic",
+  "version": "1.0.0",
+  "rulesetId": "ruleset-synthetic",
+  "displayName": "Synthetic bonus quest",
+  "status": "PUBLISHED",
+  "confidence": "VERIFIED",
+  "seriesId": "quest-series-synthetic",
+  "stage": 0,
+  "type": "UNKNOWN_QUEST",
+  "minimumLevel": 0,
+  "eligibleClassIds": [],
+  "eligibleEvolutionIds": [],
+  "evidenceRefs": [],
+  "testCaseRefs": []
+}

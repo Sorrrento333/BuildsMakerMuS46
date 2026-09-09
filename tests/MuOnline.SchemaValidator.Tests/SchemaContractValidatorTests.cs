@@ -31,6 +31,7 @@ public sealed class SchemaContractValidatorTests
         "formula-ag-fairy-elf@1.0.0",
         "formula-ag-magic-gladiator@1.0.0",
         "formula-ag-summoner@1.0.0",
+        "formula-berserker-percent-summoner@1.0.0",
         "formula-defense-dark-knight@1.0.0",
         "formula-defense-dark-lord@1.0.0",
         "formula-defense-dark-wizard@1.0.0",
@@ -44,6 +45,7 @@ public sealed class SchemaContractValidatorTests
         "formula-hp-fairy-elf@1.0.0",
         "formula-hp-magic-gladiator@1.0.0",
         "formula-hp-summoner@1.0.0",
+        "formula-innovation-percent-summoner@1.0.0",
         "formula-mana-dark-knight@1.0.0",
         "formula-mana-dark-lord@1.0.0",
         "formula-mana-dark-wizard@1.0.0",
@@ -58,12 +60,14 @@ public sealed class SchemaContractValidatorTests
         "formula-min-damage-summoner@1.0.0",
         "formula-min-wizardry-magic-gladiator@1.0.0",
         "formula-min-wizardry-summoner@1.0.0",
+        "formula-reflect-percent-summoner@1.0.0",
         "formula-sd-dark-knight@1.0.0",
         "formula-sd-dark-lord@1.0.0",
         "formula-sd-dark-wizard@1.0.0",
         "formula-sd-fairy-elf@1.0.0",
         "formula-sd-magic-gladiator@1.0.0",
         "formula-sd-summoner@1.0.0",
+        "formula-weakness-percent-summoner@1.0.0",
     ];
 
     private static readonly string[] ExpectedDarkKnightDefensePositiveFormulaCaseIds =
@@ -712,7 +716,7 @@ public sealed class SchemaContractValidatorTests
     {
         var results = SchemaContractValidator.ValidateRepository(FindRepositoryRoot());
 
-        Assert.Equal(22, results.Count);
+        Assert.Equal(32, results.Count);
         Assert.Collection(
             results,
             result => AssertResult(result, "evidence", "valid", expectedValidity: true),
@@ -736,7 +740,17 @@ public sealed class SchemaContractValidatorTests
             result => AssertResult(result, "server-profile", "valid", expectedValidity: true),
             result => AssertResult(result, "server-profile", "invalid", expectedValidity: false),
             result => AssertResult(result, "build", "valid", expectedValidity: true),
-            result => AssertResult(result, "build", "invalid", expectedValidity: false));
+            result => AssertResult(result, "build", "invalid", expectedValidity: false),
+            result => AssertResult(result, "ruleset", "valid", expectedValidity: true),
+            result => AssertResult(result, "ruleset", "invalid", expectedValidity: false),
+            result => AssertResult(result, "quest-rule", "valid", expectedValidity: true),
+            result => AssertResult(result, "quest-rule", "invalid", expectedValidity: false),
+            result => AssertResult(result, "item", "valid", expectedValidity: true),
+            result => AssertResult(result, "item", "invalid", expectedValidity: false),
+            result => AssertResult(result, "skill", "valid", expectedValidity: true),
+            result => AssertResult(result, "skill", "invalid", expectedValidity: false),
+            result => AssertResult(result, "scenario", "valid", expectedValidity: true),
+            result => AssertResult(result, "scenario", "invalid", expectedValidity: false));
     }
 
     [Theory]
@@ -1004,7 +1018,7 @@ public sealed class SchemaContractValidatorTests
     {
         var results = SchemaContractValidator.ValidateRulesetRecords(FindRepositoryRoot());
 
-        Assert.Equal(47, results.Count);
+        Assert.Equal(51, results.Count);
         Assert.All(results, result => Assert.True(
             result.ActualValidity,
             $"{result.RecordId} does not match {result.ContractName}."));
@@ -1067,6 +1081,10 @@ public sealed class SchemaContractValidatorTests
                 "2.1.0",
                 "2.1.0",
                 "2.1.0",
+                "2.1.0",
+                "2.1.0",
+                "2.1.0",
+                "2.1.0",
             ],
             results
                 .Where(result => result.ContractName == "formula")
@@ -1080,7 +1098,7 @@ public sealed class SchemaContractValidatorTests
         var results = FormulaReferenceCaseValidator.ValidateRepository(
             FindRepositoryRoot());
 
-        Assert.Equal(39, results.Count);
+        Assert.Equal(43, results.Count);
 
         var darkLordAg = Assert.Single(
             results,
@@ -1889,7 +1907,7 @@ public sealed class SchemaContractValidatorTests
                 .ValidateRepository(temporaryRoot)
                 .ToArray();
 
-            Assert.Equal(39, results.Length);
+            Assert.Equal(43, results.Length);
             Assert.All(results, result => Assert.False(result.IsValid));
             Assert.All(
                 results,
