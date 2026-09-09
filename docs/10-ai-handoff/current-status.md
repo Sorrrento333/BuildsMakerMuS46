@@ -2293,11 +2293,35 @@
   dataset avanza a `2026-07-29.5` con hash
   `sha256:cb00836252cf4a22dab6d4343e3c5ad7186907a2e382839334645b5ed6539c3a`
   (capturado por el smoke de publicación del 2026-09-01).
+- Vertical de Buffs de Summoner cerrada: `reflect_percent = 30 + ene / 42`,
+  `berserker_percent = ene / 30`, `innovation_percent = ene / 90 + 20` y
+  `weakness_percent = ene / 65 + 7`, axiomas del ruleset desde `EVD-0021` y
+  `EVD-0026` sobre Energy 23. Cuatro fórmulas `1.0.0` `PUBLISHED` contra
+  schema `2.1.0` con salida `percent`, aritmética decimal comprobada y
+  truncamiento único en el paso visible; las de constante exponen
+  `energy-term` en la traza. Enlazan dieciséis positivos (tres por evolución
+  base y uno por Dimension Master) y ocho controles negativos (Energy 22 y
+  familia ajena). `conflictIds` vacío: `DSP-0002` no aplica fuera de Magic
+  Gladiator.
+- Application y WPF materializan cuarenta y dos fórmulas ejecutables. El
+  dataset avanza a `2026-07-30.1` con hash
+  `sha256:ea9ff19fbc487d55de526e1faed3ffac2f7d49e0ee19051602b229b88ddf4655`
+  (capturado por el smoke de publicación del 2026-09-09).
+- Los cinco contratos de alto nivel restantes quedaron materializados en
+  `packages/schemas/v1` con versión `1.0.0`, fixtures válidos e inválidos
+  sintéticos y registro en el validador, la comprobación estructural y las
+  pruebas: `ruleset` (reglaset con contenido habilitado, fórmulas y fuentes),
+  `quest-rule` (series, etapas, prerrequisitos, elegibilidad y casos de prueba),
+  `item` (definición canónica con módulos de opciones y sockets), `skill`
+  (definiciones activas/pasivas/buffs) y `scenario` (modalidad, objetivo, mapas
+  y buffs externos). El inventario pasa de once a dieciséis contratos y de
+  veintidós a treinta y dos fixtures, sin añadir datos factuales al ruleset.
+- El contrato `item` se define como `ItemDefinition` canónico; la instancia con
+  nivel, opciones y sockets elegidos permanece como dato del usuario en
+  `build.schema.json`.
 
 ## No iniciado
 
-- Schemas restantes (`ruleset`, quests, ítems, skills, escenarios y
-  trazas); el validador integral/CI ya cubre el contrato de progresión.
 - Builds completas, resto del motor de cálculo y flujos de UI
   posteriores al presupuesto ganado y los borradores locales.
 
@@ -2306,14 +2330,29 @@
 - El canal público de actualización y firma continúa como decisión posterior de
   distribución.
 
-## Verificación más reciente — 2026-09-01
+## Verificación más reciente — 2026-09-09
+
+- Cierre de Buffs de Summoner: restauración y build Release aprobados con 0
+  advertencias/0 errores; 344/344 pruebas pasan: 40 validator, 58 motor, 228
+  Application y 18 Data. CLI del validador: las cuarenta y dos fórmulas
+  `PUBLISHED` pasan sin errores, incluidos los cuatro contratos nuevos de
+  buffs (16 positivos/8 controles).
+- Comprobación estructural: 16 contratos/32 fixtures, 51 registros canónicos,
+  progresión 7/7+3/3 y cuarenta y tres identidades de fórmula aprobados. El
+  gate factual cubre 172 positivos y 168 controles negativos.
+- Smoke WPF `win-x64`: PASS con SQLite `3.53.3`, 824 archivos,
+  149.359.513 bytes, 10 avisos legales, 401 JSON del ruleset, dataset
+  `2026-07-30.1`, cuarenta y dos fórmulas y 168 casos contextuales. El hash es
+  `sha256:ea9ff19fbc487d55de526e1faed3ffac2f7d49e0ee19051602b229b88ddf4655`.
+
+## Verificación anterior — 2026-09-01
 
 - Cierre de Daño/Wizardry de Summoner y Magic Gladiator: restauración y build
   Release aprobados con 0 advertencias/0 errores; 320/320 pruebas pasan:
   40 validator, 58 motor, 204 Application y 18 Data. CLI del validador: las
   treinta y ocho fórmulas `PUBLISHED` pasan sin errores, incluidos los ocho
   contratos nuevos de daño y wizardry (32 positivos/18 controles).
-- Comprobación estructural: 11 contratos/22 fixtures, 39 registros canónicos,
+- Comprobación estructural: 16 contratos/32 fixtures, 47 registros canónicos,
   progresión 7/7+3/3 y treinta y nueve identidades de fórmula aprobados. El
   gate factual cubre 156 positivos y 160 controles negativos.
 - Smoke WPF `win-x64`: PASS con SQLite `3.53.3`, 796 archivos,
@@ -2599,7 +2638,7 @@
   de Fairy Elf.
 - Json Everything fuente: 2 compilaciones independientes con SDK `10.0.301`,
   restore bloqueado de los tres proyectos fuente, hashes esperados para 3/3
-  DLL y SPDX contrastado. El harness actualizado ejecuta 2 × 22/22 fixtures y
+  DLL y SPDX contrastado. El harness actualizado ejecuta 2 × 32/32 fixtures y
   rechaza formatos inválidos: PASS.
 - Integración del validador: lock con sólo `Humanizer.Core 3.0.10`, tres DLL
   clasificados como referencias directas, aviso MIT presente y ausencia de
@@ -2746,7 +2785,7 @@
   hash y los commits declarados por los paquetes. Los 10 fixtures actuales pasan
   con la API evaluada, pero los binarios NuGet publicados fueron retirados. La
   compilación propia MIT integrada demuestra hashes idénticos entre dos rutas
-  fuente, 2 × 22/22 fixtures, formatos, SBOM, locks, auditoría y publicación
+  fuente, 2 × 32/32 fixtures, formatos, SBOM, locks, auditoría y publicación
   inspeccionada. Corvus 4.6.7 se conserva como contingencia sin asumir paridad.
 
 ## Decisión del propietario — 2026-07-18

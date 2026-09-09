@@ -1757,6 +1757,28 @@ recurso ausente a partir de los coeficientes de otras familias.
 
 ## Bitácora de investigación
 
+### 2026-09-09 — Materialización productiva de los buffs de Summoner
+
+- `reflect_percent`, `berserker_percent`, `innovation_percent` y
+  `weakness_percent` se materializan como cuatro axiomas del ruleset desde
+  `EVD-0026`, sobre la base de Energy 23 de `EVD-0021`, fuera del inventario de
+  24 claims de `RES-0002`; no se incorpora evidencia ni claim nuevos.
+- Cuatro fórmulas `1.0.0` nacen `PUBLISHED` contra schema `2.1.0` con salida
+  `percent`: `formula-reflect-percent-summoner` (`30 + ene/42`),
+  `formula-berserker-percent-summoner` (`ene/30`),
+  `formula-innovation-percent-summoner` (`ene/90 + 20`) y
+  `formula-weakness-percent-summoner` (`ene/65 + 7`). Cada programa usa
+  aritmética decimal comprobada y trunca hacia cero una sola vez en el paso
+  visible; las tres de constante suman la constante exacta al término
+  `energy-term` (paso visible en la traza).
+- Cuatro fórmulas enlazan dieciséis positivos (tres por evolución base y uno
+  por Dimension Master) y ocho controles negativos (Energy por debajo de la
+  base 23 y familia ajena). `conflictIds` queda vacío porque `DSP-0002` no
+  aplica fuera de Magic Gladiator.
+- Application y WPF materializan cuarenta y dos fórmulas ejecutables; el
+  dataset avanza a `2026-07-30.1` (smoke `win-x64` PASS del 2026-09-09, hash
+  `sha256:ea9ff19fbc487d55de526e1faed3ffac2f7d49e0ee19051602b229b88ddf4655`).
+
 ### 2026-09-01 — Materialización productiva de daño y wizardry de Summoner y Magic Gladiator
 
 - Daño y wizardry se materializan como axiomas del ruleset desde `EVD-0021` y

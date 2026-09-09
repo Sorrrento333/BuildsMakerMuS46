@@ -1122,6 +1122,45 @@
 
 ### Added
 
+- Vertical funcional de Buffs de Summoner, como axiomas del ruleset trazados
+  desde `EVD-0021` y `EVD-0026` y exteriores al inventario de 24 claims de
+  `RES-0002`. Cuatro fórmulas `1.0.0` nacen `PUBLISHED` contra schema `2.1.0`
+  con salida `percent`: `formula-reflect-percent-summoner` (`30 + ene/42`),
+  `formula-berserker-percent-summoner` (`ene/30`),
+  `formula-innovation-percent-summoner` (`ene/90 + 20`) y
+  `formula-weakness-percent-summoner` (`ene/65 + 7`), sobre la base de
+  Energy 23 de `EVD-0021`.
+- Cada programa divide y trunca hacia cero una sola vez en su paso visible;
+  las tres de constante exponen `energy-term` y suman la constante exacta con
+  aritmética decimal comprobada (`DIVIDE` + `ADD` + `APPLY_ROUNDING`) antes
+  del truncamiento.
+- Cuatro contratos enlazan cuatro positivos cada uno (tres por evolución base
+  y uno por Dimension Master) y dos controles negativos cada uno (Energy por
+  debajo de la base 23 y familia ajena). Aplicabilidad declarada sobre
+  Summoner/Bloody Summoner/Dimension Master. `conflictIds` vacío porque
+  `DSP-0002` no aplica fuera de Magic Gladiator.
+- Application y WPF materializan cuarenta y dos fórmulas ejecutables
+  reutilizando la resolución genérica de dependencias, sin handlers ni
+  constantes de buffs en C#. El smoke `win-x64` espera 42 fórmulas y 168
+  casos contextuales; el dataset avanza a `2026-07-30.1`. El smoke de
+  publicación local del 2026-09-09 aprobó SQLite `3.53.3`, 824 archivos,
+  149.359.513 bytes y 401 JSON del ruleset, con hash
+  `sha256:ea9ff19fbc487d55de526e1faed3ffac2f7d49e0ee19051602b229b88ddf4655`.
+- Cinco contratos de alto nivel materializados en `packages/schemas/v1` con
+  versión `1.0.0` y fixtures válidos e inválidos sintéticos: `ruleset`
+  (reglaset con contenido habilitado, fórmulas y fuentes), `quest-rule`
+  (series, etapas, prerrequisitos, elegibilidad y casos de prueba), `item`
+  (definición canónica con módulos de opciones Normal/Excellent/Ancient/
+  Harmony/Socket y sockets), `skill` (definiciones activas, pasivas y buffs)
+  y `scenario` (modalidad PVP/PVM/híbrido, objetivo, mapas y buffs externos).
+- El inventario del validador integral, de la comprobación estructural
+  PowerShell y de la prueba `AllVersionedFixtures…` pasa de once a dieciséis
+  contratos y de veintidós a treinta y dos fixtures; el harness fuente ejecuta
+  32/32 en dos rutas independientes. No se añadieron datos ni fórmulas
+  factuales al ruleset canónico.
+- El contrato `item` modela la `ItemDefinition` canónica; la instancia con
+  nivel, opciones y sockets elegidos permanece como dato del usuario en
+  `build.schema.json`.
 - Vertical funcional de Daño y Wizardry de Summoner y Magic Gladiator, como
   axiomas del ruleset trazados desde `EVD-0021` y `EVD-0026` y exteriores al
   inventario de 24 claims de `RES-0002`. Ocho fórmulas `1.0.0` nacen
