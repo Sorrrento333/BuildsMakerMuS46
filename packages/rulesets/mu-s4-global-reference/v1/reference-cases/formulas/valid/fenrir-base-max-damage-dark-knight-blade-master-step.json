@@ -1,0 +1,76 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "fenrir-base-max-damage-dark-knight-blade-master-step",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": {
+    "id": "formula-fenrir-base-max-damage-dark-knight",
+    "version": "1.0.0"
+  },
+  "context": {
+    "characterClassId": "class-dark-knight",
+    "evolutionId": "evolution-blade-master"
+  },
+  "inputs": {
+    "strength": 900,
+    "agility": 500,
+    "vitality": 400,
+    "energy": 300
+  },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-fenrir-base-max-damage-dark-knight-blade-master-step",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": {
+      "id": "formula-fenrir-base-max-damage-dark-knight",
+      "version": "1.0.0"
+    },
+    "context": {
+      "characterClassId": "class-dark-knight",
+      "evolutionId": "evolution-blade-master"
+    },
+    "inputs": {
+      "strength": 900,
+      "agility": 500,
+      "vitality": 400,
+      "energy": 300
+    },
+    "steps": [
+      {
+        "stepId": "strength-term",
+        "value": 300
+      },
+      {
+        "stepId": "agility-term",
+        "value": 100
+      },
+      {
+        "stepId": "vitality-term",
+        "value": 80
+      },
+      {
+        "stepId": "energy-term",
+        "value": 50
+      },
+      {
+        "stepId": "raw-fenrir-base-max-damage",
+        "value": 605
+      },
+      {
+        "stepId": "visible-fenrir-base-max-damage",
+        "value": 605
+      }
+    ],
+    "rounding": {
+      "mode": "TRUNCATE",
+      "stage": "visible-fenrir-base-max-damage",
+      "decimalPlaces": 0
+    },
+    "rawOutput": 605,
+    "visibleOutput": 605,
+    "evidenceRefs": [
+      "evd-0021",
+      "evd-0026"
+    ],
+    "conflictIds": []
+  }
+}

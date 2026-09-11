@@ -1,0 +1,131 @@
+{
+  "schemaVersion": "2.1.0",
+  "id": "formula-heal-fairy-elf",
+  "version": "1.0.0",
+  "rulesetId": "mu-s4-global-reference",
+  "status": "PUBLISHED",
+  "confidence": "VERIFIED",
+  "purpose": "Calculate visible base healing for the Fairy Elf family before equipment, options, buffs, private profiles, or undeclared modifiers.",
+  "applicability": {
+    "characterClassId": "class-fairy-elf",
+    "evolutionIds": [
+      "evolution-fairy-elf",
+      "evolution-muse-elf",
+      "evolution-high-elf"
+    ]
+  },
+  "inputs": [
+    {
+      "id": "energy",
+      "numericType": "INT64",
+      "unit": "stat-point",
+      "numericBounds": {
+        "minimum": 15,
+        "minimumInclusive": true,
+        "classification": "FACTUAL",
+        "evidenceRefs": [
+          "evd-0021"
+        ]
+      },
+      "rangeErrorCode": "formula-stat-below-base",
+      "source": {
+        "kind": "CONTEXT_VALUE",
+        "valueId": "resolved-energy"
+      }
+    }
+  ],
+  "output": {
+    "id": "heal",
+    "numericType": "INT64",
+    "unit": "hp-point"
+  },
+  "strategy": {
+    "kind": "PROGRAM",
+    "executionModel": "CHECKED_DECIMAL_V1",
+    "steps": [
+      {
+        "id": "energy-term",
+        "operation": "DIVIDE",
+        "operands": [
+          {
+            "kind": "INPUT",
+            "inputId": "energy"
+          },
+          {
+            "kind": "LITERAL",
+            "value": 9
+          }
+        ]
+      },
+      {
+        "id": "raw-heal",
+        "operation": "ADD",
+        "operands": [
+          {
+            "kind": "STEP",
+            "stepId": "energy-term"
+          },
+          {
+            "kind": "LITERAL",
+            "value": 2
+          }
+        ]
+      },
+      {
+        "id": "visible-heal",
+        "operation": "APPLY_ROUNDING",
+        "operands": [
+          {
+            "kind": "STEP",
+            "stepId": "raw-heal"
+          }
+        ]
+      }
+    ],
+    "dependencyFormulaRefs": []
+  },
+  "rounding": {
+    "mode": "TRUNCATE",
+    "stage": "visible-heal",
+    "decimalPlaces": 0
+  },
+  "trace": {
+    "stepIds": [
+      "energy-term",
+      "raw-heal",
+      "visible-heal"
+    ],
+    "rawOutputStepId": "raw-heal",
+    "visibleOutputStepId": "visible-heal"
+  },
+  "constraints": [
+    "Resolve class and evolution applicability before evaluating arithmetic.",
+    "Divide Energy by the exact literal 9 using checked decimal arithmetic, then add the exact literal 2.",
+    "Represent energy-term exactly as a base-10 decimal and add the constant with checked decimal arithmetic.",
+    "Do not round energy-term or raw-heal before visible-heal.",
+    "Truncate raw-heal toward zero exactly once at visible-heal."
+  ],
+  "evidenceRefs": [
+    "evd-0021",
+    "evd-0026"
+  ],
+  "conflictIds": [],
+  "testCaseRefs": [
+    {
+      "id": "heal-fairy-elf-base",
+      "version": "1.0.0"
+    },
+    {
+      "id": "heal-fairy-elf-fraction-step",
+      "version": "1.0.0"
+    },
+    {
+      "id": "heal-fairy-elf-integer-step",
+      "version": "1.0.0"
+    },
+    {
+      "id": "heal-fairy-elf-high-elf-step",
+      "version": "1.0.0"
+    }
+  ]
+}

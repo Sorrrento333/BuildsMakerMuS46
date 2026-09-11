@@ -1,0 +1,54 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "speed-dark-knight-blade-master-step",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": {
+    "id": "formula-speed-dark-knight",
+    "version": "1.0.0"
+  },
+  "context": {
+    "characterClassId": "class-dark-knight",
+    "evolutionId": "evolution-blade-master"
+  },
+  "inputs": {
+    "agility": 500
+  },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-speed-dark-knight-blade-master-step",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": {
+      "id": "formula-speed-dark-knight",
+      "version": "1.0.0"
+    },
+    "context": {
+      "characterClassId": "class-dark-knight",
+      "evolutionId": "evolution-blade-master"
+    },
+    "inputs": {
+      "agility": 500
+    },
+    "steps": [
+      {
+        "stepId": "raw-speed",
+        "value": 33.333333333333333333333333333
+      },
+      {
+        "stepId": "visible-speed",
+        "value": 33
+      }
+    ],
+    "rounding": {
+      "mode": "TRUNCATE",
+      "stage": "visible-speed",
+      "decimalPlaces": 0
+    },
+    "rawOutput": 33.333333333333333333333333333,
+    "visibleOutput": 33,
+    "evidenceRefs": [
+      "evd-0021",
+      "evd-0026"
+    ],
+    "conflictIds": []
+  }
+}

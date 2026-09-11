@@ -1,0 +1,115 @@
+{
+  "schemaVersion": "2.1.0",
+  "id": "formula-speed-dark-wizard",
+  "version": "1.0.0",
+  "rulesetId": "mu-s4-global-reference",
+  "status": "PUBLISHED",
+  "confidence": "VERIFIED",
+  "purpose": "Calculate visible base attack speed for the Dark Wizard family before equipment, options, buffs, private profiles, or undeclared modifiers.",
+  "applicability": {
+    "characterClassId": "class-dark-wizard",
+    "evolutionIds": [
+      "evolution-dark-wizard",
+      "evolution-soul-master",
+      "evolution-grand-master"
+    ]
+  },
+  "inputs": [
+    {
+      "id": "agility",
+      "numericType": "INT64",
+      "unit": "stat-point",
+      "numericBounds": {
+        "minimum": 18,
+        "minimumInclusive": true,
+        "classification": "FACTUAL",
+        "evidenceRefs": [
+          "evd-0021"
+        ]
+      },
+      "rangeErrorCode": "formula-stat-below-base",
+      "source": {
+        "kind": "CONTEXT_VALUE",
+        "valueId": "resolved-agility"
+      }
+    }
+  ],
+  "output": {
+    "id": "speed",
+    "numericType": "INT64",
+    "unit": "speed-point"
+  },
+  "strategy": {
+    "kind": "PROGRAM",
+    "executionModel": "CHECKED_DECIMAL_V1",
+    "steps": [
+      {
+        "id": "raw-speed",
+        "operation": "DIVIDE",
+        "operands": [
+          {
+            "kind": "INPUT",
+            "inputId": "agility"
+          },
+          {
+            "kind": "LITERAL",
+            "value": 10
+          }
+        ]
+      },
+      {
+        "id": "visible-speed",
+        "operation": "APPLY_ROUNDING",
+        "operands": [
+          {
+            "kind": "STEP",
+            "stepId": "raw-speed"
+          }
+        ]
+      }
+    ],
+    "dependencyFormulaRefs": []
+  },
+  "rounding": {
+    "mode": "TRUNCATE",
+    "stage": "visible-speed",
+    "decimalPlaces": 0
+  },
+  "trace": {
+    "stepIds": [
+      "raw-speed",
+      "visible-speed"
+    ],
+    "rawOutputStepId": "raw-speed",
+    "visibleOutputStepId": "visible-speed"
+  },
+  "constraints": [
+    "Resolve class and evolution applicability before evaluating arithmetic.",
+    "Divide Agility by the exact literal 10 using checked decimal arithmetic.",
+    "Do not round raw-speed before visible-speed.",
+    "Truncate raw-speed toward zero exactly once at visible-speed."
+  ],
+  "evidenceRefs": [
+    "evd-0021",
+    "evd-0026"
+  ],
+  "conflictIds": [],
+  "testCaseRefs": [
+    {
+      "id": "speed-dark-wizard-base",
+      "version": "1.0.0"
+    },
+    {
+      "id": "speed-dark-wizard-fraction-step",
+      "version": "1.0.0"
+    },
+    {
+      "id": "speed-dark-wizard-integer-step",
+      "version": "1.0.0"
+    },
+    {
+      "id": "speed-dark-wizard-grand-master-step",
+      "version": "1.0.0"
+    }
+  ]
+}

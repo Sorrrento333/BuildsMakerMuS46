@@ -1,0 +1,17 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "min-wizardry-dark-wizard-energy-below-base",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": {
+    "id": "formula-min-wizardry-dark-wizard",
+    "version": "1.0.0"
+  },
+  "context": {
+    "characterClassId": "class-dark-wizard",
+    "evolutionId": "evolution-dark-wizard"
+  },
+  "inputs": {
+    "energy": 29
+  },
+  "expectedErrorCode": "formula-stat-below-base"
+}

@@ -121,11 +121,11 @@ public sealed class FormulaApplicationIntegrationTests
         using var historicalDocument = JsonDocument.Parse(
             File.ReadAllText(historicalPath));
 
-        Assert.Equal(82, catalog.Formulas.Length);
+        Assert.Equal(107, catalog.Formulas.Length);
         Assert.Equal(
             [
                 .. Enumerable.Repeat("2.0.0", 7),
-                .. Enumerable.Repeat("2.1.0", 75),
+                .. Enumerable.Repeat("2.1.0", 100),
             ],
             catalog.Formulas
                 .Select(ReadSchemaVersion)
@@ -416,7 +416,32 @@ public sealed class FormulaApplicationIntegrationTests
                     "formula-min-damage-fairy-elf" or
                     "formula-max-damage-dark-knight" or
                     "formula-max-damage-dark-lord" or
-                    "formula-max-damage-fairy-elf")
+                    "formula-max-damage-fairy-elf" or
+                    "formula-speed-dark-knight" or
+                    "formula-speed-dark-wizard" or
+                    "formula-speed-fairy-elf" or
+                    "formula-speed-magic-gladiator" or
+                    "formula-speed-dark-lord" or
+                    "formula-speed-summoner" or
+                    "formula-combo-base-dark-knight" or
+                    "formula-skill-percent-dark-knight" or
+                    "formula-skill-percent-dark-lord" or
+                    "formula-fortitude-percent-dark-knight" or
+                    "formula-fenrir-base-min-damage-dark-knight" or
+                    "formula-fenrir-base-max-damage-dark-knight" or
+                    "formula-fenrir-base-min-damage-dark-wizard" or
+                    "formula-fenrir-base-max-damage-dark-wizard" or
+                    "formula-min-wizardry-dark-wizard" or
+                    "formula-max-wizardry-dark-wizard" or
+                    "formula-soul-barrier-percent-dark-wizard" or
+                    "formula-nova-max-spell-damage-dark-wizard" or
+                    "formula-damage-buff-fairy-elf" or
+                    "formula-defense-buff-fairy-elf" or
+                    "formula-heal-fairy-elf" or
+                    "formula-critical-damage-dark-lord" or
+                    "formula-fireburst-bonus-min-damage-dark-lord" or
+                    "formula-fireburst-bonus-max-damage-dark-lord" or
+                    "formula-guild-member-capacity-dark-lord")
             .Select(item => item.Reference)
             .ToHashSet();
 

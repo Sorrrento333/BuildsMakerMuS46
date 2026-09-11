@@ -1,0 +1,54 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "speed-summoner-dimension-master-step",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": {
+    "id": "formula-speed-summoner",
+    "version": "1.0.0"
+  },
+  "context": {
+    "characterClassId": "class-summoner",
+    "evolutionId": "evolution-dimension-master"
+  },
+  "inputs": {
+    "agility": 500
+  },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-speed-summoner-dimension-master-step",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": {
+      "id": "formula-speed-summoner",
+      "version": "1.0.0"
+    },
+    "context": {
+      "characterClassId": "class-summoner",
+      "evolutionId": "evolution-dimension-master"
+    },
+    "inputs": {
+      "agility": 500
+    },
+    "steps": [
+      {
+        "stepId": "raw-speed",
+        "value": 25
+      },
+      {
+        "stepId": "visible-speed",
+        "value": 25
+      }
+    ],
+    "rounding": {
+      "mode": "TRUNCATE",
+      "stage": "visible-speed",
+      "decimalPlaces": 0
+    },
+    "rawOutput": 25,
+    "visibleOutput": 25,
+    "evidenceRefs": [
+      "evd-0021",
+      "evd-0026"
+    ],
+    "conflictIds": []
+  }
+}

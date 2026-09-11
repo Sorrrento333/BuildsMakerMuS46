@@ -1,0 +1,54 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "speed-dark-wizard-grand-master-step",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": {
+    "id": "formula-speed-dark-wizard",
+    "version": "1.0.0"
+  },
+  "context": {
+    "characterClassId": "class-dark-wizard",
+    "evolutionId": "evolution-grand-master"
+  },
+  "inputs": {
+    "agility": 500
+  },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-speed-dark-wizard-grand-master-step",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": {
+      "id": "formula-speed-dark-wizard",
+      "version": "1.0.0"
+    },
+    "context": {
+      "characterClassId": "class-dark-wizard",
+      "evolutionId": "evolution-grand-master"
+    },
+    "inputs": {
+      "agility": 500
+    },
+    "steps": [
+      {
+        "stepId": "raw-speed",
+        "value": 50
+      },
+      {
+        "stepId": "visible-speed",
+        "value": 50
+      }
+    ],
+    "rounding": {
+      "mode": "TRUNCATE",
+      "stage": "visible-speed",
+      "decimalPlaces": 0
+    },
+    "rawOutput": 50,
+    "visibleOutput": 50,
+    "evidenceRefs": [
+      "evd-0021",
+      "evd-0026"
+    ],
+    "conflictIds": []
+  }
+}

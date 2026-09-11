@@ -1,0 +1,162 @@
+{
+  "schemaVersion": "2.1.0",
+  "id": "formula-guild-member-capacity-dark-lord",
+  "version": "1.0.0",
+  "rulesetId": "mu-s4-global-reference",
+  "status": "PUBLISHED",
+  "confidence": "VERIFIED",
+  "purpose": "Calculate visible base guild member capacity for the Dark Lord family before equipment, options, buffs, private profiles, or undeclared modifiers.",
+  "applicability": {
+    "characterClassId": "class-dark-lord",
+    "evolutionIds": [
+      "evolution-dark-lord",
+      "evolution-lord-emperor"
+    ]
+  },
+  "inputs": [
+    {
+      "id": "character-level",
+      "numericType": "INT32",
+      "unit": "level",
+      "numericBounds": {
+        "minimum": 1,
+        "minimumInclusive": true,
+        "maximum": 2147483647,
+        "maximumInclusive": true,
+        "classification": "TECHNICAL"
+      },
+      "rangeErrorCode": "formula-level-out-of-range",
+      "source": {
+        "kind": "CONTEXT_VALUE",
+        "valueId": "character-level"
+      }
+    },
+    {
+      "id": "command",
+      "numericType": "INT64",
+      "unit": "stat-point",
+      "numericBounds": {
+        "minimum": 25,
+        "minimumInclusive": true,
+        "classification": "FACTUAL",
+        "evidenceRefs": [
+          "evd-0021"
+        ]
+      },
+      "rangeErrorCode": "formula-stat-below-base",
+      "source": {
+        "kind": "CONTEXT_VALUE",
+        "valueId": "resolved-command"
+      }
+    }
+  ],
+  "output": {
+    "id": "guild-member-capacity",
+    "numericType": "INT64",
+    "unit": "member-count"
+  },
+  "strategy": {
+    "kind": "PROGRAM",
+    "executionModel": "CHECKED_DECIMAL_V1",
+    "steps": [
+      {
+        "id": "level-term",
+        "operation": "DIVIDE",
+        "operands": [
+          {
+            "kind": "INPUT",
+            "inputId": "character-level"
+          },
+          {
+            "kind": "LITERAL",
+            "value": 10
+          }
+        ]
+      },
+      {
+        "id": "command-term",
+        "operation": "DIVIDE",
+        "operands": [
+          {
+            "kind": "INPUT",
+            "inputId": "command"
+          },
+          {
+            "kind": "LITERAL",
+            "value": 10
+          }
+        ]
+      },
+      {
+        "id": "raw-guild-member-capacity",
+        "operation": "ADD",
+        "operands": [
+          {
+            "kind": "STEP",
+            "stepId": "level-term"
+          },
+          {
+            "kind": "STEP",
+            "stepId": "command-term"
+          }
+        ]
+      },
+      {
+        "id": "visible-guild-member-capacity",
+        "operation": "APPLY_ROUNDING",
+        "operands": [
+          {
+            "kind": "STEP",
+            "stepId": "raw-guild-member-capacity"
+          }
+        ]
+      }
+    ],
+    "dependencyFormulaRefs": []
+  },
+  "rounding": {
+    "mode": "TRUNCATE",
+    "stage": "visible-guild-member-capacity",
+    "decimalPlaces": 0
+  },
+  "trace": {
+    "stepIds": [
+      "level-term",
+      "command-term",
+      "raw-guild-member-capacity",
+      "visible-guild-member-capacity"
+    ],
+    "rawOutputStepId": "raw-guild-member-capacity",
+    "visibleOutputStepId": "visible-guild-member-capacity"
+  },
+  "constraints": [
+    "Resolve class and evolution applicability before evaluating arithmetic.",
+    "Divide the character level by the exact literal 10 and Command by the exact literal 10 using checked decimal arithmetic, then add both terms.",
+    "Represent level-term and command-term exactly as base-10 decimals and add them with checked decimal arithmetic.",
+    "Do not round level-term, command-term or raw-guild-member-capacity before visible-guild-member-capacity.",
+    "Truncate raw-guild-member-capacity toward zero exactly once at visible-guild-member-capacity."
+  ],
+  "evidenceRefs": [
+    "evd-0021",
+    "evd-0026"
+  ],
+  "conflictIds": [],
+  "testCaseRefs": [
+    {
+      "id": "guild-member-capacity-dark-lord-base",
+      "version": "1.0.0"
+    },
+    {
+      "id": "guild-member-capacity-dark-lord-fraction-step",
+      "version": "1.0.0"
+    },
+    {
+      "id": "guild-member-capacity-dark-lord-integer-step",
+      "version": "1.0.0"
+    },
+    {
+      "id": "guild-member-capacity-dark-lord-lord-emperor-step",
+      "version": "1.0.0"
+    }
+  ]
+}

@@ -121,7 +121,32 @@ $expectedPublishedFormulaReferences = @(
     "formula-sd-fairy-elf@1.0.0",
     "formula-sd-magic-gladiator@1.0.0",
     "formula-sd-summoner@1.0.0",
-    "formula-weakness-percent-summoner@1.0.0"
+    "formula-weakness-percent-summoner@1.0.0",
+    "formula-combo-base-dark-knight@1.0.0",
+    "formula-critical-damage-dark-lord@1.0.0",
+    "formula-damage-buff-fairy-elf@1.0.0",
+    "formula-defense-buff-fairy-elf@1.0.0",
+    "formula-fenrir-base-max-damage-dark-knight@1.0.0",
+    "formula-fenrir-base-max-damage-dark-wizard@1.0.0",
+    "formula-fenrir-base-min-damage-dark-knight@1.0.0",
+    "formula-fenrir-base-min-damage-dark-wizard@1.0.0",
+    "formula-fireburst-bonus-max-damage-dark-lord@1.0.0",
+    "formula-fireburst-bonus-min-damage-dark-lord@1.0.0",
+    "formula-fortitude-percent-dark-knight@1.0.0",
+    "formula-guild-member-capacity-dark-lord@1.0.0",
+    "formula-heal-fairy-elf@1.0.0",
+    "formula-max-wizardry-dark-wizard@1.0.0",
+    "formula-min-wizardry-dark-wizard@1.0.0",
+    "formula-nova-max-spell-damage-dark-wizard@1.0.0",
+    "formula-skill-percent-dark-knight@1.0.0",
+    "formula-skill-percent-dark-lord@1.0.0",
+    "formula-soul-barrier-percent-dark-wizard@1.0.0",
+    "formula-speed-dark-knight@1.0.0",
+    "formula-speed-dark-lord@1.0.0",
+    "formula-speed-dark-wizard@1.0.0",
+    "formula-speed-fairy-elf@1.0.0",
+    "formula-speed-magic-gladiator@1.0.0",
+    "formula-speed-summoner@1.0.0"
 )
 
 function Assert-PublishedLegalFiles {
@@ -314,16 +339,16 @@ $replacementReferenceDifference = Compare-Object `
     -DifferenceObject $replacementReport.PublishedFormulaReferences
 if (-not $initialReport.PublishedFormulaContextVerified -or
     -not $replacementReport.PublishedFormulaContextVerified -or
-    $initialReport.PublishedFormulaCount -ne 82 -or
-    $replacementReport.PublishedFormulaCount -ne 82 -or
-    $initialReport.PublishedFormulaReferences.Count -ne 82 -or
-    $replacementReport.PublishedFormulaReferences.Count -ne 82 -or
+    $initialReport.PublishedFormulaCount -ne 107 -or
+    $replacementReport.PublishedFormulaCount -ne 107 -or
+    $initialReport.PublishedFormulaReferences.Count -ne 107 -or
+    $replacementReport.PublishedFormulaReferences.Count -ne 107 -or
     $null -ne $initialReferenceDifference -or
     $null -ne $replacementReferenceDifference -or
     ($replacementReport.PublishedFormulaReferences -join "|") -ne
         ($initialReport.PublishedFormulaReferences -join "|") -or
-    $initialReport.ApprovedPublishedFormulaCaseCount -ne 328 -or
-    $replacementReport.ApprovedPublishedFormulaCaseCount -ne 328) {
+    $initialReport.ApprovedPublishedFormulaCaseCount -ne 428 -or
+    $replacementReport.ApprovedPublishedFormulaCaseCount -ne 428) {
     throw "The published artifact did not reproduce all contextual and arithmetic formula traces."
 }
 if (-not $initialReport.BuildDraftPersistenceVerified -or

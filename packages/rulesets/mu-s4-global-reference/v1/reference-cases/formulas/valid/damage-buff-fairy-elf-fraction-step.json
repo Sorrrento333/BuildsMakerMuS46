@@ -1,0 +1,58 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "damage-buff-fairy-elf-fraction-step",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": {
+    "id": "formula-damage-buff-fairy-elf",
+    "version": "1.0.0"
+  },
+  "context": {
+    "characterClassId": "class-fairy-elf",
+    "evolutionId": "evolution-fairy-elf"
+  },
+  "inputs": {
+    "energy": 16
+  },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-damage-buff-fairy-elf-fraction-step",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": {
+      "id": "formula-damage-buff-fairy-elf",
+      "version": "1.0.0"
+    },
+    "context": {
+      "characterClassId": "class-fairy-elf",
+      "evolutionId": "evolution-fairy-elf"
+    },
+    "inputs": {
+      "energy": 16
+    },
+    "steps": [
+      {
+        "stepId": "energy-term",
+        "value": 2.2857142857142857142857142857
+      },
+      {
+        "stepId": "raw-damage-buff",
+        "value": 5.2857142857142857142857142857
+      },
+      {
+        "stepId": "visible-damage-buff",
+        "value": 5
+      }
+    ],
+    "rounding": {
+      "mode": "TRUNCATE",
+      "stage": "visible-damage-buff",
+      "decimalPlaces": 0
+    },
+    "rawOutput": 5.2857142857142857142857142857,
+    "visibleOutput": 5,
+    "evidenceRefs": [
+      "evd-0021",
+      "evd-0026"
+    ],
+    "conflictIds": []
+  }
+}

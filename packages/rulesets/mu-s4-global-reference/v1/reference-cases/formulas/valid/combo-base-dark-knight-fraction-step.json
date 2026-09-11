@@ -1,0 +1,62 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "combo-base-dark-knight-fraction-step",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": {
+    "id": "formula-combo-base-dark-knight",
+    "version": "1.0.0"
+  },
+  "context": {
+    "characterClassId": "class-dark-knight",
+    "evolutionId": "evolution-dark-knight"
+  },
+  "inputs": {
+    "strength": 29,
+    "agility": 20,
+    "energy": 10
+  },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-combo-base-dark-knight-fraction-step",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": {
+      "id": "formula-combo-base-dark-knight",
+      "version": "1.0.0"
+    },
+    "context": {
+      "characterClassId": "class-dark-knight",
+      "evolutionId": "evolution-dark-knight"
+    },
+    "inputs": {
+      "strength": 29,
+      "agility": 20,
+      "energy": 10
+    },
+    "steps": [
+      {
+        "stepId": "stat-sum",
+        "value": 59
+      },
+      {
+        "stepId": "raw-combo-base",
+        "value": 29.5
+      },
+      {
+        "stepId": "visible-combo-base",
+        "value": 29
+      }
+    ],
+    "rounding": {
+      "mode": "TRUNCATE",
+      "stage": "visible-combo-base",
+      "decimalPlaces": 0
+    },
+    "rawOutput": 29.5,
+    "visibleOutput": 29,
+    "evidenceRefs": [
+      "evd-0021",
+      "evd-0026"
+    ],
+    "conflictIds": []
+  }
+}

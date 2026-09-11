@@ -1,0 +1,17 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "speed-fairy-elf-invalid-family",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": {
+    "id": "formula-speed-fairy-elf",
+    "version": "1.0.0"
+  },
+  "context": {
+    "characterClassId": "class-dark-wizard",
+    "evolutionId": "evolution-dark-wizard"
+  },
+  "inputs": {
+    "agility": 25
+  },
+  "expectedErrorCode": "formula-not-applicable"
+}

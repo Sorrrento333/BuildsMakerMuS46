@@ -1,0 +1,64 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "fireburst-bonus-min-damage-dark-lord-integer-step",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": {
+    "id": "formula-fireburst-bonus-min-damage-dark-lord",
+    "version": "1.0.0"
+  },
+  "context": {
+    "characterClassId": "class-dark-lord",
+    "evolutionId": "evolution-dark-lord"
+  },
+  "inputs": {
+    "strength": 50,
+    "energy": 50
+  },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-fireburst-bonus-min-damage-dark-lord-integer-step",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": {
+      "id": "formula-fireburst-bonus-min-damage-dark-lord",
+      "version": "1.0.0"
+    },
+    "context": {
+      "characterClassId": "class-dark-lord",
+      "evolutionId": "evolution-dark-lord"
+    },
+    "inputs": {
+      "strength": 50,
+      "energy": 50
+    },
+    "steps": [
+      {
+        "stepId": "strength-term",
+        "value": 2
+      },
+      {
+        "stepId": "energy-term",
+        "value": 1
+      },
+      {
+        "stepId": "raw-fireburst-bonus-min-damage",
+        "value": 103
+      },
+      {
+        "stepId": "visible-fireburst-bonus-min-damage",
+        "value": 103
+      }
+    ],
+    "rounding": {
+      "mode": "TRUNCATE",
+      "stage": "visible-fireburst-bonus-min-damage",
+      "decimalPlaces": 0
+    },
+    "rawOutput": 103,
+    "visibleOutput": 103,
+    "evidenceRefs": [
+      "evd-0021",
+      "evd-0026"
+    ],
+    "conflictIds": []
+  }
+}

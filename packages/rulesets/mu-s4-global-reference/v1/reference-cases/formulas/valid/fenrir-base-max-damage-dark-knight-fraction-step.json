@@ -1,0 +1,76 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "fenrir-base-max-damage-dark-knight-fraction-step",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": {
+    "id": "formula-fenrir-base-max-damage-dark-knight",
+    "version": "1.0.0"
+  },
+  "context": {
+    "characterClassId": "class-dark-knight",
+    "evolutionId": "evolution-dark-knight"
+  },
+  "inputs": {
+    "strength": 29,
+    "agility": 20,
+    "vitality": 25,
+    "energy": 10
+  },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-fenrir-base-max-damage-dark-knight-fraction-step",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": {
+      "id": "formula-fenrir-base-max-damage-dark-knight",
+      "version": "1.0.0"
+    },
+    "context": {
+      "characterClassId": "class-dark-knight",
+      "evolutionId": "evolution-dark-knight"
+    },
+    "inputs": {
+      "strength": 29,
+      "agility": 20,
+      "vitality": 25,
+      "energy": 10
+    },
+    "steps": [
+      {
+        "stepId": "strength-term",
+        "value": 9.666666666666666666666666667
+      },
+      {
+        "stepId": "agility-term",
+        "value": 4
+      },
+      {
+        "stepId": "vitality-term",
+        "value": 5
+      },
+      {
+        "stepId": "energy-term",
+        "value": 1.6666666666666666666666666667
+      },
+      {
+        "stepId": "raw-fenrir-base-max-damage",
+        "value": 95.33333333333333333333333333
+      },
+      {
+        "stepId": "visible-fenrir-base-max-damage",
+        "value": 95
+      }
+    ],
+    "rounding": {
+      "mode": "TRUNCATE",
+      "stage": "visible-fenrir-base-max-damage",
+      "decimalPlaces": 0
+    },
+    "rawOutput": 95.33333333333333333333333333,
+    "visibleOutput": 95,
+    "evidenceRefs": [
+      "evd-0021",
+      "evd-0026"
+    ],
+    "conflictIds": []
+  }
+}

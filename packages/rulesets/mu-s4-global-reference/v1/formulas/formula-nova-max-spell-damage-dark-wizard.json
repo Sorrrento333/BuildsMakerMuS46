@@ -1,0 +1,131 @@
+{
+  "schemaVersion": "2.1.0",
+  "id": "formula-nova-max-spell-damage-dark-wizard",
+  "version": "1.0.0",
+  "rulesetId": "mu-s4-global-reference",
+  "status": "PUBLISHED",
+  "confidence": "VERIFIED",
+  "purpose": "Calculate visible base Nova maximum spell damage for the Dark Wizard family before equipment, options, buffs, private profiles, or undeclared modifiers.",
+  "applicability": {
+    "characterClassId": "class-dark-wizard",
+    "evolutionIds": [
+      "evolution-dark-wizard",
+      "evolution-soul-master",
+      "evolution-grand-master"
+    ]
+  },
+  "inputs": [
+    {
+      "id": "strength",
+      "numericType": "INT64",
+      "unit": "stat-point",
+      "numericBounds": {
+        "minimum": 18,
+        "minimumInclusive": true,
+        "classification": "FACTUAL",
+        "evidenceRefs": [
+          "evd-0021"
+        ]
+      },
+      "rangeErrorCode": "formula-stat-below-base",
+      "source": {
+        "kind": "CONTEXT_VALUE",
+        "valueId": "resolved-strength"
+      }
+    }
+  ],
+  "output": {
+    "id": "nova-max-spell-damage",
+    "numericType": "INT64",
+    "unit": "damage-point"
+  },
+  "strategy": {
+    "kind": "PROGRAM",
+    "executionModel": "CHECKED_DECIMAL_V1",
+    "steps": [
+      {
+        "id": "strength-term",
+        "operation": "DIVIDE",
+        "operands": [
+          {
+            "kind": "INPUT",
+            "inputId": "strength"
+          },
+          {
+            "kind": "LITERAL",
+            "value": 2
+          }
+        ]
+      },
+      {
+        "id": "raw-nova-max-spell-damage",
+        "operation": "ADD",
+        "operands": [
+          {
+            "kind": "STEP",
+            "stepId": "strength-term"
+          },
+          {
+            "kind": "LITERAL",
+            "value": 1320
+          }
+        ]
+      },
+      {
+        "id": "visible-nova-max-spell-damage",
+        "operation": "APPLY_ROUNDING",
+        "operands": [
+          {
+            "kind": "STEP",
+            "stepId": "raw-nova-max-spell-damage"
+          }
+        ]
+      }
+    ],
+    "dependencyFormulaRefs": []
+  },
+  "rounding": {
+    "mode": "TRUNCATE",
+    "stage": "visible-nova-max-spell-damage",
+    "decimalPlaces": 0
+  },
+  "trace": {
+    "stepIds": [
+      "strength-term",
+      "raw-nova-max-spell-damage",
+      "visible-nova-max-spell-damage"
+    ],
+    "rawOutputStepId": "raw-nova-max-spell-damage",
+    "visibleOutputStepId": "visible-nova-max-spell-damage"
+  },
+  "constraints": [
+    "Resolve class and evolution applicability before evaluating arithmetic.",
+    "Divide Strength by the exact literal 2 using checked decimal arithmetic, then add the exact literal 1320.",
+    "Represent strength-term exactly as a base-10 decimal and add the constant with checked decimal arithmetic.",
+    "Do not round strength-term or raw-nova-max-spell-damage before visible-nova-max-spell-damage.",
+    "Truncate raw-nova-max-spell-damage toward zero exactly once at visible-nova-max-spell-damage."
+  ],
+  "evidenceRefs": [
+    "evd-0021",
+    "evd-0026"
+  ],
+  "conflictIds": [],
+  "testCaseRefs": [
+    {
+      "id": "nova-max-spell-damage-dark-wizard-base",
+      "version": "1.0.0"
+    },
+    {
+      "id": "nova-max-spell-damage-dark-wizard-fraction-step",
+      "version": "1.0.0"
+    },
+    {
+      "id": "nova-max-spell-damage-dark-wizard-integer-step",
+      "version": "1.0.0"
+    },
+    {
+      "id": "nova-max-spell-damage-dark-wizard-grand-master-step",
+      "version": "1.0.0"
+    }
+  ]
+}

@@ -1,0 +1,64 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "critical-damage-dark-lord-integer-step",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": {
+    "id": "formula-critical-damage-dark-lord",
+    "version": "1.0.0"
+  },
+  "context": {
+    "characterClassId": "class-dark-lord",
+    "evolutionId": "evolution-dark-lord"
+  },
+  "inputs": {
+    "command": 50,
+    "strength": 60
+  },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-critical-damage-dark-lord-integer-step",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": {
+      "id": "formula-critical-damage-dark-lord",
+      "version": "1.0.0"
+    },
+    "context": {
+      "characterClassId": "class-dark-lord",
+      "evolutionId": "evolution-dark-lord"
+    },
+    "inputs": {
+      "command": 50,
+      "strength": 60
+    },
+    "steps": [
+      {
+        "stepId": "command-term",
+        "value": 2
+      },
+      {
+        "stepId": "strength-term",
+        "value": 2
+      },
+      {
+        "stepId": "raw-critical-damage",
+        "value": 4
+      },
+      {
+        "stepId": "visible-critical-damage",
+        "value": 4
+      }
+    ],
+    "rounding": {
+      "mode": "TRUNCATE",
+      "stage": "visible-critical-damage",
+      "decimalPlaces": 0
+    },
+    "rawOutput": 4,
+    "visibleOutput": 4,
+    "evidenceRefs": [
+      "evd-0021",
+      "evd-0026"
+    ],
+    "conflictIds": []
+  }
+}

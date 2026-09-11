@@ -1,0 +1,64 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "guild-member-capacity-dark-lord-fraction-step",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": {
+    "id": "formula-guild-member-capacity-dark-lord",
+    "version": "1.0.0"
+  },
+  "context": {
+    "characterClassId": "class-dark-lord",
+    "evolutionId": "evolution-dark-lord"
+  },
+  "inputs": {
+    "character-level": 2,
+    "command": 25
+  },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-guild-member-capacity-dark-lord-fraction-step",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": {
+      "id": "formula-guild-member-capacity-dark-lord",
+      "version": "1.0.0"
+    },
+    "context": {
+      "characterClassId": "class-dark-lord",
+      "evolutionId": "evolution-dark-lord"
+    },
+    "inputs": {
+      "character-level": 2,
+      "command": 25
+    },
+    "steps": [
+      {
+        "stepId": "level-term",
+        "value": 0.2
+      },
+      {
+        "stepId": "command-term",
+        "value": 2.5
+      },
+      {
+        "stepId": "raw-guild-member-capacity",
+        "value": 2.7
+      },
+      {
+        "stepId": "visible-guild-member-capacity",
+        "value": 2
+      }
+    ],
+    "rounding": {
+      "mode": "TRUNCATE",
+      "stage": "visible-guild-member-capacity",
+      "decimalPlaces": 0
+    },
+    "rawOutput": 2.7,
+    "visibleOutput": 2,
+    "evidenceRefs": [
+      "evd-0021",
+      "evd-0026"
+    ],
+    "conflictIds": []
+  }
+}

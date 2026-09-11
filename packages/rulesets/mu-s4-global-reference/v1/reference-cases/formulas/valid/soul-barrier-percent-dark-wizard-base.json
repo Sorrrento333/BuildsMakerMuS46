@@ -1,0 +1,64 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "soul-barrier-percent-dark-wizard-base",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": {
+    "id": "formula-soul-barrier-percent-dark-wizard",
+    "version": "1.0.0"
+  },
+  "context": {
+    "characterClassId": "class-dark-wizard",
+    "evolutionId": "evolution-dark-wizard"
+  },
+  "inputs": {
+    "agility": 18,
+    "energy": 30
+  },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-soul-barrier-percent-dark-wizard-base",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": {
+      "id": "formula-soul-barrier-percent-dark-wizard",
+      "version": "1.0.0"
+    },
+    "context": {
+      "characterClassId": "class-dark-wizard",
+      "evolutionId": "evolution-dark-wizard"
+    },
+    "inputs": {
+      "agility": 18,
+      "energy": 30
+    },
+    "steps": [
+      {
+        "stepId": "agility-term",
+        "value": 0.36
+      },
+      {
+        "stepId": "energy-term",
+        "value": 0.15
+      },
+      {
+        "stepId": "raw-soul-barrier-percent",
+        "value": 10.51
+      },
+      {
+        "stepId": "visible-soul-barrier-percent",
+        "value": 10
+      }
+    ],
+    "rounding": {
+      "mode": "TRUNCATE",
+      "stage": "visible-soul-barrier-percent",
+      "decimalPlaces": 0
+    },
+    "rawOutput": 10.51,
+    "visibleOutput": 10,
+    "evidenceRefs": [
+      "evd-0021",
+      "evd-0026"
+    ],
+    "conflictIds": []
+  }
+}

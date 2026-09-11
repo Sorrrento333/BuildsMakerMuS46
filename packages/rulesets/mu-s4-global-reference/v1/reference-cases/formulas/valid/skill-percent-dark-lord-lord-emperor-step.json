@@ -1,0 +1,58 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "skill-percent-dark-lord-lord-emperor-step",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": {
+    "id": "formula-skill-percent-dark-lord",
+    "version": "1.0.0"
+  },
+  "context": {
+    "characterClassId": "class-dark-lord",
+    "evolutionId": "evolution-lord-emperor"
+  },
+  "inputs": {
+    "energy": 400
+  },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-skill-percent-dark-lord-lord-emperor-step",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": {
+      "id": "formula-skill-percent-dark-lord",
+      "version": "1.0.0"
+    },
+    "context": {
+      "characterClassId": "class-dark-lord",
+      "evolutionId": "evolution-lord-emperor"
+    },
+    "inputs": {
+      "energy": 400
+    },
+    "steps": [
+      {
+        "stepId": "energy-term",
+        "value": 20
+      },
+      {
+        "stepId": "raw-skill-percent",
+        "value": 220
+      },
+      {
+        "stepId": "visible-skill-percent",
+        "value": 220
+      }
+    ],
+    "rounding": {
+      "mode": "TRUNCATE",
+      "stage": "visible-skill-percent",
+      "decimalPlaces": 0
+    },
+    "rawOutput": 220,
+    "visibleOutput": 220,
+    "evidenceRefs": [
+      "evd-0021",
+      "evd-0026"
+    ],
+    "conflictIds": []
+  }
+}

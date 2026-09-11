@@ -1,0 +1,64 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "critical-damage-dark-lord-lord-emperor-step",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": {
+    "id": "formula-critical-damage-dark-lord",
+    "version": "1.0.0"
+  },
+  "context": {
+    "characterClassId": "class-dark-lord",
+    "evolutionId": "evolution-lord-emperor"
+  },
+  "inputs": {
+    "command": 400,
+    "strength": 900
+  },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-critical-damage-dark-lord-lord-emperor-step",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": {
+      "id": "formula-critical-damage-dark-lord",
+      "version": "1.0.0"
+    },
+    "context": {
+      "characterClassId": "class-dark-lord",
+      "evolutionId": "evolution-lord-emperor"
+    },
+    "inputs": {
+      "command": 400,
+      "strength": 900
+    },
+    "steps": [
+      {
+        "stepId": "command-term",
+        "value": 16
+      },
+      {
+        "stepId": "strength-term",
+        "value": 30
+      },
+      {
+        "stepId": "raw-critical-damage",
+        "value": 46
+      },
+      {
+        "stepId": "visible-critical-damage",
+        "value": 46
+      }
+    ],
+    "rounding": {
+      "mode": "TRUNCATE",
+      "stage": "visible-critical-damage",
+      "decimalPlaces": 0
+    },
+    "rawOutput": 46,
+    "visibleOutput": 46,
+    "evidenceRefs": [
+      "evd-0021",
+      "evd-0026"
+    ],
+    "conflictIds": []
+  }
+}

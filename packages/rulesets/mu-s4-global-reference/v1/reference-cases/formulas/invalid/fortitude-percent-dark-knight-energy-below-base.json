@@ -1,0 +1,18 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "fortitude-percent-dark-knight-energy-below-base",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": {
+    "id": "formula-fortitude-percent-dark-knight",
+    "version": "1.0.0"
+  },
+  "context": {
+    "characterClassId": "class-dark-knight",
+    "evolutionId": "evolution-dark-knight"
+  },
+  "inputs": {
+    "vitality": 25,
+    "energy": 9
+  },
+  "expectedErrorCode": "formula-stat-below-base"
+}

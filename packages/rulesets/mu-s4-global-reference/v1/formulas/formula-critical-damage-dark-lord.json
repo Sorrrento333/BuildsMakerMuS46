@@ -1,0 +1,163 @@
+{
+  "schemaVersion": "2.1.0",
+  "id": "formula-critical-damage-dark-lord",
+  "version": "1.0.0",
+  "rulesetId": "mu-s4-global-reference",
+  "status": "PUBLISHED",
+  "confidence": "VERIFIED",
+  "purpose": "Calculate visible base critical damage for the Dark Lord family before equipment, options, buffs, private profiles, or undeclared modifiers.",
+  "applicability": {
+    "characterClassId": "class-dark-lord",
+    "evolutionIds": [
+      "evolution-dark-lord",
+      "evolution-lord-emperor"
+    ]
+  },
+  "inputs": [
+    {
+      "id": "command",
+      "numericType": "INT64",
+      "unit": "stat-point",
+      "numericBounds": {
+        "minimum": 25,
+        "minimumInclusive": true,
+        "classification": "FACTUAL",
+        "evidenceRefs": [
+          "evd-0021"
+        ]
+      },
+      "rangeErrorCode": "formula-stat-below-base",
+      "source": {
+        "kind": "CONTEXT_VALUE",
+        "valueId": "resolved-command"
+      }
+    },
+    {
+      "id": "strength",
+      "numericType": "INT64",
+      "unit": "stat-point",
+      "numericBounds": {
+        "minimum": 26,
+        "minimumInclusive": true,
+        "classification": "FACTUAL",
+        "evidenceRefs": [
+          "evd-0021"
+        ]
+      },
+      "rangeErrorCode": "formula-stat-below-base",
+      "source": {
+        "kind": "CONTEXT_VALUE",
+        "valueId": "resolved-strength"
+      }
+    }
+  ],
+  "output": {
+    "id": "critical-damage",
+    "numericType": "INT64",
+    "unit": "damage-point"
+  },
+  "strategy": {
+    "kind": "PROGRAM",
+    "executionModel": "CHECKED_DECIMAL_V1",
+    "steps": [
+      {
+        "id": "command-term",
+        "operation": "DIVIDE",
+        "operands": [
+          {
+            "kind": "INPUT",
+            "inputId": "command"
+          },
+          {
+            "kind": "LITERAL",
+            "value": 25
+          }
+        ]
+      },
+      {
+        "id": "strength-term",
+        "operation": "DIVIDE",
+        "operands": [
+          {
+            "kind": "INPUT",
+            "inputId": "strength"
+          },
+          {
+            "kind": "LITERAL",
+            "value": 30
+          }
+        ]
+      },
+      {
+        "id": "raw-critical-damage",
+        "operation": "ADD",
+        "operands": [
+          {
+            "kind": "STEP",
+            "stepId": "command-term"
+          },
+          {
+            "kind": "STEP",
+            "stepId": "strength-term"
+          }
+        ]
+      },
+      {
+        "id": "visible-critical-damage",
+        "operation": "APPLY_ROUNDING",
+        "operands": [
+          {
+            "kind": "STEP",
+            "stepId": "raw-critical-damage"
+          }
+        ]
+      }
+    ],
+    "dependencyFormulaRefs": []
+  },
+  "rounding": {
+    "mode": "TRUNCATE",
+    "stage": "visible-critical-damage",
+    "decimalPlaces": 0
+  },
+  "trace": {
+    "stepIds": [
+      "command-term",
+      "strength-term",
+      "raw-critical-damage",
+      "visible-critical-damage"
+    ],
+    "rawOutputStepId": "raw-critical-damage",
+    "visibleOutputStepId": "visible-critical-damage"
+  },
+  "constraints": [
+    "Resolve class and evolution applicability before evaluating arithmetic.",
+    "Divide Command by the exact literal 25 and Strength by the exact literal 30 using checked decimal arithmetic, then add both terms.",
+    "Represent command-term and strength-term exactly as base-10 decimals and add them with checked decimal arithmetic.",
+    "Do not round command-term, strength-term or raw-critical-damage before visible-critical-damage.",
+    "Truncate raw-critical-damage toward zero exactly once at visible-critical-damage."
+  ],
+  "evidenceRefs": [
+    "evd-0021",
+    "evd-0026"
+  ],
+  "conflictIds": [],
+  "testCaseRefs": [
+    {
+      "id": "critical-damage-dark-lord-base",
+      "version": "1.0.0"
+    },
+    {
+      "id": "critical-damage-dark-lord-fraction-step",
+      "version": "1.0.0"
+    },
+    {
+      "id": "critical-damage-dark-lord-integer-step",
+      "version": "1.0.0"
+    },
+    {
+      "id": "critical-damage-dark-lord-lord-emperor-step",
+      "version": "1.0.0"
+    }
+  ]
+}

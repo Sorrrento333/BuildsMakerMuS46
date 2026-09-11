@@ -1,0 +1,56 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "speed-magic-gladiator-base",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": {
+    "id": "formula-speed-magic-gladiator",
+    "version": "1.0.0"
+  },
+  "context": {
+    "characterClassId": "class-magic-gladiator",
+    "evolutionId": "evolution-magic-gladiator"
+  },
+  "inputs": {
+    "agility": 26
+  },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-speed-magic-gladiator-base",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": {
+      "id": "formula-speed-magic-gladiator",
+      "version": "1.0.0"
+    },
+    "context": {
+      "characterClassId": "class-magic-gladiator",
+      "evolutionId": "evolution-magic-gladiator"
+    },
+    "inputs": {
+      "agility": 26
+    },
+    "steps": [
+      {
+        "stepId": "raw-speed",
+        "value": 1.7333333333333333333333333333
+      },
+      {
+        "stepId": "visible-speed",
+        "value": 1
+      }
+    ],
+    "rounding": {
+      "mode": "TRUNCATE",
+      "stage": "visible-speed",
+      "decimalPlaces": 0
+    },
+    "rawOutput": 1.7333333333333333333333333333,
+    "visibleOutput": 1,
+    "evidenceRefs": [
+      "evd-0021",
+      "evd-0026"
+    ],
+    "conflictIds": [
+      "dsp-0002"
+    ]
+  }
+}

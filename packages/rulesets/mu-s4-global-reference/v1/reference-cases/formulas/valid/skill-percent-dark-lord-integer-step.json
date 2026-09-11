@@ -1,0 +1,58 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "skill-percent-dark-lord-integer-step",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": {
+    "id": "formula-skill-percent-dark-lord",
+    "version": "1.0.0"
+  },
+  "context": {
+    "characterClassId": "class-dark-lord",
+    "evolutionId": "evolution-dark-lord"
+  },
+  "inputs": {
+    "energy": 20
+  },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-skill-percent-dark-lord-integer-step",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": {
+      "id": "formula-skill-percent-dark-lord",
+      "version": "1.0.0"
+    },
+    "context": {
+      "characterClassId": "class-dark-lord",
+      "evolutionId": "evolution-dark-lord"
+    },
+    "inputs": {
+      "energy": 20
+    },
+    "steps": [
+      {
+        "stepId": "energy-term",
+        "value": 1
+      },
+      {
+        "stepId": "raw-skill-percent",
+        "value": 201
+      },
+      {
+        "stepId": "visible-skill-percent",
+        "value": 201
+      }
+    ],
+    "rounding": {
+      "mode": "TRUNCATE",
+      "stage": "visible-skill-percent",
+      "decimalPlaces": 0
+    },
+    "rawOutput": 201,
+    "visibleOutput": 201,
+    "evidenceRefs": [
+      "evd-0021",
+      "evd-0026"
+    ],
+    "conflictIds": []
+  }
+}

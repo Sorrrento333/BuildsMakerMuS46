@@ -1,0 +1,64 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "fortitude-percent-dark-knight-blade-master-step",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": {
+    "id": "formula-fortitude-percent-dark-knight",
+    "version": "1.0.0"
+  },
+  "context": {
+    "characterClassId": "class-dark-knight",
+    "evolutionId": "evolution-blade-master"
+  },
+  "inputs": {
+    "vitality": 500,
+    "energy": 400
+  },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-fortitude-percent-dark-knight-blade-master-step",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": {
+      "id": "formula-fortitude-percent-dark-knight",
+      "version": "1.0.0"
+    },
+    "context": {
+      "characterClassId": "class-dark-knight",
+      "evolutionId": "evolution-blade-master"
+    },
+    "inputs": {
+      "vitality": 500,
+      "energy": 400
+    },
+    "steps": [
+      {
+        "stepId": "vitality-term",
+        "value": 5
+      },
+      {
+        "stepId": "energy-term",
+        "value": 20
+      },
+      {
+        "stepId": "raw-fortitude-percent",
+        "value": 37
+      },
+      {
+        "stepId": "visible-fortitude-percent",
+        "value": 37
+      }
+    ],
+    "rounding": {
+      "mode": "TRUNCATE",
+      "stage": "visible-fortitude-percent",
+      "decimalPlaces": 0
+    },
+    "rawOutput": 37,
+    "visibleOutput": 37,
+    "evidenceRefs": [
+      "evd-0021",
+      "evd-0026"
+    ],
+    "conflictIds": []
+  }
+}
