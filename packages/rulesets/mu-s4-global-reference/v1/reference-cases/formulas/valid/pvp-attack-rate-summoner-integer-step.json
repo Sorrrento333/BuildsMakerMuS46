@@ -1,0 +1,27 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "pvp-attack-rate-summoner-integer-step",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-pvp-attack-rate-summoner", "version": "1.0.0" },
+  "context": { "characterClassId": "class-summoner", "evolutionId": "evolution-summoner" },
+  "inputs": { "agility": 22, "character-level": 2 },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-pvp-attack-rate-summoner-integer-step",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": { "id": "formula-pvp-attack-rate-summoner", "version": "1.0.0" },
+    "context": { "characterClassId": "class-summoner", "evolutionId": "evolution-summoner" },
+    "inputs": { "agility": 22, "character-level": 2 },
+    "steps": [
+      { "stepId": "level-contribution", "value": 6 },
+      { "stepId": "agility-contribution", "value": 77.0 },
+      { "stepId": "raw-pvp-attack-rate", "value": 83.0 },
+      { "stepId": "visible-pvp-attack-rate", "value": 83 }
+    ],
+    "rounding": { "mode": "TRUNCATE", "stage": "visible-pvp-attack-rate", "decimalPlaces": 0 },
+    "rawOutput": 83.0,
+    "visibleOutput": 83,
+    "evidenceRefs": ["evd-0021", "evd-0026"],
+    "conflictIds": []
+  }
+}

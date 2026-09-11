@@ -121,51 +121,11 @@ public sealed class FormulaApplicationIntegrationTests
         using var historicalDocument = JsonDocument.Parse(
             File.ReadAllText(historicalPath));
 
-        Assert.Equal(42, catalog.Formulas.Length);
+        Assert.Equal(82, catalog.Formulas.Length);
         Assert.Equal(
             [
-                "2.0.0",
-                "2.0.0",
-                "2.0.0",
-                "2.0.0",
-                "2.0.0",
-                "2.0.0",
-                "2.0.0",
-                "2.1.0",
-                "2.1.0",
-                "2.1.0",
-                "2.1.0",
-                "2.1.0",
-                "2.1.0",
-                "2.1.0",
-                "2.1.0",
-                "2.1.0",
-                "2.1.0",
-                "2.1.0",
-                "2.1.0",
-                "2.1.0",
-                "2.1.0",
-                "2.1.0",
-                "2.1.0",
-                "2.1.0",
-                "2.1.0",
-                "2.1.0",
-                "2.1.0",
-                "2.1.0",
-                "2.1.0",
-                "2.1.0",
-                "2.1.0",
-                "2.1.0",
-                "2.1.0",
-                "2.1.0",
-                "2.1.0",
-                "2.1.0",
-                "2.1.0",
-                "2.1.0",
-                "2.1.0",
-                "2.1.0",
-                "2.1.0",
-                "2.1.0",
+                .. Enumerable.Repeat("2.0.0", 7),
+                .. Enumerable.Repeat("2.1.0", 75),
             ],
             catalog.Formulas
                 .Select(ReadSchemaVersion)
@@ -416,7 +376,47 @@ public sealed class FormulaApplicationIntegrationTests
                     "formula-reflect-percent-summoner" or
                     "formula-berserker-percent-summoner" or
                     "formula-innovation-percent-summoner" or
-                    "formula-weakness-percent-summoner")
+                    "formula-weakness-percent-summoner" or
+                    "formula-pvm-attack-rate-dark-knight" or
+                    "formula-pvm-attack-rate-dark-lord" or
+                    "formula-pvm-attack-rate-dark-wizard" or
+                    "formula-pvm-attack-rate-fairy-elf" or
+                    "formula-pvm-attack-rate-magic-gladiator" or
+                    "formula-pvm-attack-rate-summoner" or
+                    "formula-pvm-defense-rate-dark-knight" or
+                    "formula-pvm-defense-rate-dark-lord" or
+                    "formula-pvm-defense-rate-dark-wizard" or
+                    "formula-pvm-defense-rate-fairy-elf" or
+                    "formula-pvm-defense-rate-magic-gladiator" or
+                    "formula-pvm-defense-rate-summoner" or
+                    "formula-pvp-attack-rate-dark-knight" or
+                    "formula-pvp-attack-rate-dark-lord" or
+                    "formula-pvp-attack-rate-dark-wizard" or
+                    "formula-pvp-attack-rate-fairy-elf" or
+                    "formula-pvp-attack-rate-magic-gladiator" or
+                    "formula-pvp-attack-rate-summoner" or
+                    "formula-pvp-defense-rate-dark-knight" or
+                    "formula-pvp-defense-rate-dark-lord" or
+                    "formula-pvp-defense-rate-dark-wizard" or
+                    "formula-pvp-defense-rate-fairy-elf" or
+                    "formula-pvp-defense-rate-magic-gladiator" or
+                    "formula-pvp-defense-rate-summoner" or
+                    "formula-mana-regen-dark-knight" or
+                    "formula-mana-regen-dark-lord" or
+                    "formula-mana-regen-dark-wizard" or
+                    "formula-mana-regen-fairy-elf" or
+                    "formula-mana-regen-magic-gladiator" or
+                    "formula-ag-regen-dark-knight" or
+                    "formula-ag-regen-dark-lord" or
+                    "formula-ag-regen-dark-wizard" or
+                    "formula-ag-regen-fairy-elf" or
+                    "formula-ag-regen-magic-gladiator" or
+                    "formula-min-damage-dark-knight" or
+                    "formula-min-damage-dark-lord" or
+                    "formula-min-damage-fairy-elf" or
+                    "formula-max-damage-dark-knight" or
+                    "formula-max-damage-dark-lord" or
+                    "formula-max-damage-fairy-elf")
             .Select(item => item.Reference)
             .ToHashSet();
 

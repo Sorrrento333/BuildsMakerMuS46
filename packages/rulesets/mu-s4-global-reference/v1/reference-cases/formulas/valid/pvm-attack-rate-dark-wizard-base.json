@@ -1,0 +1,29 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "pvm-attack-rate-dark-wizard-base",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-pvm-attack-rate-dark-wizard", "version": "1.0.0" },
+  "context": { "characterClassId": "class-dark-wizard", "evolutionId": "evolution-dark-wizard" },
+  "inputs": { "agility": 18, "character-level": 1, "strength": 18 },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-pvm-attack-rate-dark-wizard-base",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": { "id": "formula-pvm-attack-rate-dark-wizard", "version": "1.0.0" },
+    "context": { "characterClassId": "class-dark-wizard", "evolutionId": "evolution-dark-wizard" },
+    "inputs": { "agility": 18, "character-level": 1, "strength": 18 },
+    "steps": [
+      { "stepId": "level-contribution", "value": 5 },
+      { "stepId": "agility-numerator", "value": 54 },
+      { "stepId": "agility-contribution", "value": 27 },
+      { "stepId": "strength-contribution", "value": 4.5 },
+      { "stepId": "raw-pvm-attack-rate", "value": 36.5 },
+      { "stepId": "visible-pvm-attack-rate", "value": 36 }
+    ],
+    "rounding": { "mode": "TRUNCATE", "stage": "visible-pvm-attack-rate", "decimalPlaces": 0 },
+    "rawOutput": 36.5,
+    "visibleOutput": 36,
+    "evidenceRefs": ["evd-0021", "evd-0026"],
+    "conflictIds": []
+  }
+}

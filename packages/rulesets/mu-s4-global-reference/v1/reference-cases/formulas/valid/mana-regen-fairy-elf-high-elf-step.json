@@ -1,0 +1,25 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "mana-regen-fairy-elf-high-elf-step",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-mana-regen-fairy-elf", "version": "1.0.0" },
+  "context": { "characterClassId": "class-fairy-elf", "evolutionId": "evolution-high-elf" },
+  "inputs": { "character-level": 110, "mana": 193.5 },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-mana-regen-fairy-elf-high-elf-step",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": { "id": "formula-mana-regen-fairy-elf", "version": "1.0.0" },
+    "context": { "characterClassId": "class-fairy-elf", "evolutionId": "evolution-high-elf" },
+    "inputs": { "character-level": 110, "mana": 193.5 },
+    "steps": [
+      { "stepId": "raw-mana-regen", "value": 7.0363636363636363636363636364 },
+      { "stepId": "visible-mana-regen", "value": 7 }
+    ],
+    "rounding": { "mode": "TRUNCATE", "stage": "visible-mana-regen", "decimalPlaces": 0 },
+    "rawOutput": 7.0363636363636363636363636364,
+    "visibleOutput": 7,
+    "evidenceRefs": ["evd-0021", "evd-0026"],
+    "conflictIds": []
+  }
+}

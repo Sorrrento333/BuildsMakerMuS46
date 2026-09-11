@@ -1,0 +1,25 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "mana-regen-dark-knight-integer-step",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-mana-regen-dark-knight", "version": "1.0.0" },
+  "context": { "characterClassId": "class-dark-knight", "evolutionId": "evolution-dark-knight" },
+  "inputs": { "character-level": 71, "mana": 55.0 },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-mana-regen-dark-knight-integer-step",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": { "id": "formula-mana-regen-dark-knight", "version": "1.0.0" },
+    "context": { "characterClassId": "class-dark-knight", "evolutionId": "evolution-dark-knight" },
+    "inputs": { "character-level": 71, "mana": 55.0 },
+    "steps": [
+      { "stepId": "raw-mana-regen", "value": 2 },
+      { "stepId": "visible-mana-regen", "value": 2 }
+    ],
+    "rounding": { "mode": "TRUNCATE", "stage": "visible-mana-regen", "decimalPlaces": 0 },
+    "rawOutput": 2,
+    "visibleOutput": 2,
+    "evidenceRefs": ["evd-0021", "evd-0026"],
+    "conflictIds": []
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "ag-regen-dark-wizard-ag-out-of-range",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-ag-regen-dark-wizard", "version": "1.0.0" },
+  "context": { "characterClassId": "class-dark-wizard", "evolutionId": "evolution-dark-wizard" },
+  "inputs": { "ag": -1, "agility": 18 },
+  "expectedErrorCode": "formula-dependency-out-of-range"
+}

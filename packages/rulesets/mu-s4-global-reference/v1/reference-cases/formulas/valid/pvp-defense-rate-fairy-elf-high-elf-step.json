@@ -1,0 +1,27 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "pvp-defense-rate-fairy-elf-high-elf-step",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-pvp-defense-rate-fairy-elf", "version": "1.0.0" },
+  "context": { "characterClassId": "class-fairy-elf", "evolutionId": "evolution-high-elf" },
+  "inputs": { "agility": 500, "character-level": 220 },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-pvp-defense-rate-fairy-elf-high-elf-step",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": { "id": "formula-pvp-defense-rate-fairy-elf", "version": "1.0.0" },
+    "context": { "characterClassId": "class-fairy-elf", "evolutionId": "evolution-high-elf" },
+    "inputs": { "agility": 500, "character-level": 220 },
+    "steps": [
+      { "stepId": "level-contribution", "value": 440 },
+      { "stepId": "agility-contribution", "value": 50.0 },
+      { "stepId": "raw-pvp-defense-rate", "value": 490.0 },
+      { "stepId": "visible-pvp-defense-rate", "value": 490 }
+    ],
+    "rounding": { "mode": "TRUNCATE", "stage": "visible-pvp-defense-rate", "decimalPlaces": 0 },
+    "rawOutput": 490.0,
+    "visibleOutput": 490,
+    "evidenceRefs": ["evd-0021", "evd-0026"],
+    "conflictIds": []
+  }
+}

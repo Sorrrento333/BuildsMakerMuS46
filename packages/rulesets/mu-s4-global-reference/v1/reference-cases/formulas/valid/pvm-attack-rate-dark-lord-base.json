@@ -1,0 +1,30 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "pvm-attack-rate-dark-lord-base",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-pvm-attack-rate-dark-lord", "version": "1.0.0" },
+  "context": { "characterClassId": "class-dark-lord", "evolutionId": "evolution-dark-lord" },
+  "inputs": { "agility": 20, "character-level": 1, "command": 25, "strength": 26 },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-pvm-attack-rate-dark-lord-base",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": { "id": "formula-pvm-attack-rate-dark-lord", "version": "1.0.0" },
+    "context": { "characterClassId": "class-dark-lord", "evolutionId": "evolution-dark-lord" },
+    "inputs": { "agility": 20, "character-level": 1, "command": 25, "strength": 26 },
+    "steps": [
+      { "stepId": "level-contribution", "value": 5 },
+      { "stepId": "agility-numerator", "value": 60 },
+      { "stepId": "agility-contribution", "value": 30 },
+      { "stepId": "strength-contribution", "value": 4.3333333333333333333333333333 },
+      { "stepId": "command-contribution", "value": 2.5 },
+      { "stepId": "raw-pvm-attack-rate", "value": 41.833333333333333333333333333 },
+      { "stepId": "visible-pvm-attack-rate", "value": 41 }
+    ],
+    "rounding": { "mode": "TRUNCATE", "stage": "visible-pvm-attack-rate", "decimalPlaces": 0 },
+    "rawOutput": 41.833333333333333333333333333,
+    "visibleOutput": 41,
+    "evidenceRefs": ["evd-0021", "evd-0026"],
+    "conflictIds": []
+  }
+}

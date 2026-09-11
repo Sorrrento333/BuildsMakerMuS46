@@ -1,0 +1,27 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "ag-regen-dark-lord-integer-step",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-ag-regen-dark-lord", "version": "1.0.0" },
+  "context": { "characterClassId": "class-dark-lord", "evolutionId": "evolution-dark-lord" },
+  "inputs": { "ag": 33.55, "agility": 70 },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-ag-regen-dark-lord-integer-step",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": { "id": "formula-ag-regen-dark-lord", "version": "1.0.0" },
+    "context": { "characterClassId": "class-dark-lord", "evolutionId": "evolution-dark-lord" },
+    "inputs": { "ag": 33.55, "agility": 70 },
+    "steps": [
+      { "stepId": "base-ag-regen", "value": 1.9 },
+      { "stepId": "ag-contribution", "value": 1.0166666666666666666666666667 },
+      { "stepId": "raw-ag-regen", "value": 2.9166666666666666666666666667 },
+      { "stepId": "visible-ag-regen", "value": 2 }
+    ],
+    "rounding": { "mode": "TRUNCATE", "stage": "visible-ag-regen", "decimalPlaces": 0 },
+    "rawOutput": 2.9166666666666666666666666667,
+    "visibleOutput": 2,
+    "evidenceRefs": ["evd-0021", "evd-0026"],
+    "conflictIds": []
+  }
+}

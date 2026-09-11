@@ -1,0 +1,27 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "max-damage-fairy-elf-integer-step",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-max-damage-fairy-elf", "version": "1.0.0" },
+  "context": { "characterClassId": "class-fairy-elf", "evolutionId": "evolution-fairy-elf" },
+  "inputs": { "agility": 32, "strength": 32 },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-max-damage-fairy-elf-integer-step",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": { "id": "formula-max-damage-fairy-elf", "version": "1.0.0" },
+    "context": { "characterClassId": "class-fairy-elf", "evolutionId": "evolution-fairy-elf" },
+    "inputs": { "agility": 32, "strength": 32 },
+    "steps": [
+      { "stepId": "strength-contribution", "value": 4 },
+      { "stepId": "agility-contribution", "value": 8 },
+      { "stepId": "raw-max-damage", "value": 12 },
+      { "stepId": "visible-max-damage", "value": 12 }
+    ],
+    "rounding": { "mode": "TRUNCATE", "stage": "visible-max-damage", "decimalPlaces": 0 },
+    "rawOutput": 12,
+    "visibleOutput": 12,
+    "evidenceRefs": ["evd-0021", "evd-0026"],
+    "conflictIds": []
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "mana-regen-dark-lord-fraction-step",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-mana-regen-dark-lord", "version": "1.0.0" },
+  "context": { "characterClassId": "class-dark-lord", "evolutionId": "evolution-dark-lord" },
+  "inputs": { "character-level": 2, "mana": 41 },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-mana-regen-dark-lord-fraction-step",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": { "id": "formula-mana-regen-dark-lord", "version": "1.0.0" },
+    "context": { "characterClassId": "class-dark-lord", "evolutionId": "evolution-dark-lord" },
+    "inputs": { "character-level": 2, "mana": 41 },
+    "steps": [
+      { "stepId": "raw-mana-regen", "value": 1.4909090909090909090909090909 },
+      { "stepId": "visible-mana-regen", "value": 1 }
+    ],
+    "rounding": { "mode": "TRUNCATE", "stage": "visible-mana-regen", "decimalPlaces": 0 },
+    "rawOutput": 1.4909090909090909090909090909,
+    "visibleOutput": 1,
+    "evidenceRefs": ["evd-0021", "evd-0026"],
+    "conflictIds": []
+  }
+}

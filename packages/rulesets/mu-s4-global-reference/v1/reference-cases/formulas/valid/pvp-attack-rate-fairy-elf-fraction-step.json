@@ -1,0 +1,27 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "pvp-attack-rate-fairy-elf-fraction-step",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-pvp-attack-rate-fairy-elf", "version": "1.0.0" },
+  "context": { "characterClassId": "class-fairy-elf", "evolutionId": "evolution-fairy-elf" },
+  "inputs": { "agility": 26, "character-level": 1 },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-pvp-attack-rate-fairy-elf-fraction-step",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": { "id": "formula-pvp-attack-rate-fairy-elf", "version": "1.0.0" },
+    "context": { "characterClassId": "class-fairy-elf", "evolutionId": "evolution-fairy-elf" },
+    "inputs": { "agility": 26, "character-level": 1 },
+    "steps": [
+      { "stepId": "level-contribution", "value": 3 },
+      { "stepId": "agility-contribution", "value": 15.6 },
+      { "stepId": "raw-pvp-attack-rate", "value": 18.6 },
+      { "stepId": "visible-pvp-attack-rate", "value": 18 }
+    ],
+    "rounding": { "mode": "TRUNCATE", "stage": "visible-pvp-attack-rate", "decimalPlaces": 0 },
+    "rawOutput": 18.6,
+    "visibleOutput": 18,
+    "evidenceRefs": ["evd-0021", "evd-0026"],
+    "conflictIds": []
+  }
+}

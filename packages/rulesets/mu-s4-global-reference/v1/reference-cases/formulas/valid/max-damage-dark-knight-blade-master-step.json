@@ -1,0 +1,25 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "max-damage-dark-knight-blade-master-step",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-max-damage-dark-knight", "version": "1.0.0" },
+  "context": { "characterClassId": "class-dark-knight", "evolutionId": "evolution-blade-master" },
+  "inputs": { "strength": 1200 },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-max-damage-dark-knight-blade-master-step",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": { "id": "formula-max-damage-dark-knight", "version": "1.0.0" },
+    "context": { "characterClassId": "class-dark-knight", "evolutionId": "evolution-blade-master" },
+    "inputs": { "strength": 1200 },
+    "steps": [
+      { "stepId": "raw-max-damage", "value": 300 },
+      { "stepId": "visible-max-damage", "value": 300 }
+    ],
+    "rounding": { "mode": "TRUNCATE", "stage": "visible-max-damage", "decimalPlaces": 0 },
+    "rawOutput": 300,
+    "visibleOutput": 300,
+    "evidenceRefs": ["evd-0021", "evd-0026"],
+    "conflictIds": []
+  }
+}

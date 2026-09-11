@@ -1,0 +1,27 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "pvp-defense-rate-magic-gladiator-base",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-pvp-defense-rate-magic-gladiator", "version": "1.0.0" },
+  "context": { "characterClassId": "class-magic-gladiator", "evolutionId": "evolution-magic-gladiator" },
+  "inputs": { "agility": 26, "character-level": 1 },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-pvp-defense-rate-magic-gladiator-base",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": { "id": "formula-pvp-defense-rate-magic-gladiator", "version": "1.0.0" },
+    "context": { "characterClassId": "class-magic-gladiator", "evolutionId": "evolution-magic-gladiator" },
+    "inputs": { "agility": 26, "character-level": 1 },
+    "steps": [
+      { "stepId": "level-contribution", "value": 2 },
+      { "stepId": "agility-contribution", "value": 6.50 },
+      { "stepId": "raw-pvp-defense-rate", "value": 8.50 },
+      { "stepId": "visible-pvp-defense-rate", "value": 8 }
+    ],
+    "rounding": { "mode": "TRUNCATE", "stage": "visible-pvp-defense-rate", "decimalPlaces": 0 },
+    "rawOutput": 8.50,
+    "visibleOutput": 8,
+    "evidenceRefs": ["evd-0021", "evd-0026"],
+    "conflictIds": []
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "ag-regen-magic-gladiator-duel-master-step",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-ag-regen-magic-gladiator", "version": "1.0.0" },
+  "context": { "characterClassId": "class-magic-gladiator", "evolutionId": "evolution-duel-master" },
+  "inputs": { "ag": 73.40, "agility": 226 },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-ag-regen-magic-gladiator-duel-master-step",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": { "id": "formula-ag-regen-magic-gladiator", "version": "1.0.0" },
+    "context": { "characterClassId": "class-magic-gladiator", "evolutionId": "evolution-duel-master" },
+    "inputs": { "ag": 73.40, "agility": 226 },
+    "steps": [
+      { "stepId": "base-ag-regen", "value": 1.9 },
+      { "stepId": "ag-contribution", "value": 2.2242424242424242424242424242 },
+      { "stepId": "raw-ag-regen", "value": 4.1242424242424242424242424242 },
+      { "stepId": "visible-ag-regen", "value": 4 }
+    ],
+    "rounding": { "mode": "TRUNCATE", "stage": "visible-ag-regen", "decimalPlaces": 0 },
+    "rawOutput": 4.1242424242424242424242424242,
+    "visibleOutput": 4,
+    "evidenceRefs": ["evd-0021", "evd-0026"],
+    "conflictIds": []
+  }
+}

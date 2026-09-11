@@ -1,0 +1,25 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "pvm-defense-rate-dark-lord-base",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-pvm-defense-rate-dark-lord", "version": "1.0.0" },
+  "context": { "characterClassId": "class-dark-lord", "evolutionId": "evolution-dark-lord" },
+  "inputs": { "agility": 20 },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-pvm-defense-rate-dark-lord-base",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": { "id": "formula-pvm-defense-rate-dark-lord", "version": "1.0.0" },
+    "context": { "characterClassId": "class-dark-lord", "evolutionId": "evolution-dark-lord" },
+    "inputs": { "agility": 20 },
+    "steps": [
+      { "stepId": "raw-pvm-defense-rate", "value": 2.8571428571428571428571428571 },
+      { "stepId": "visible-pvm-defense-rate", "value": 2 }
+    ],
+    "rounding": { "mode": "TRUNCATE", "stage": "visible-pvm-defense-rate", "decimalPlaces": 0 },
+    "rawOutput": 2.8571428571428571428571428571,
+    "visibleOutput": 2,
+    "evidenceRefs": ["evd-0021", "evd-0026"],
+    "conflictIds": []
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "max-damage-dark-knight-fraction-step",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-max-damage-dark-knight", "version": "1.0.0" },
+  "context": { "characterClassId": "class-dark-knight", "evolutionId": "evolution-dark-knight" },
+  "inputs": { "strength": 29 },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-max-damage-dark-knight-fraction-step",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": { "id": "formula-max-damage-dark-knight", "version": "1.0.0" },
+    "context": { "characterClassId": "class-dark-knight", "evolutionId": "evolution-dark-knight" },
+    "inputs": { "strength": 29 },
+    "steps": [
+      { "stepId": "raw-max-damage", "value": 7.25 },
+      { "stepId": "visible-max-damage", "value": 7 }
+    ],
+    "rounding": { "mode": "TRUNCATE", "stage": "visible-max-damage", "decimalPlaces": 0 },
+    "rawOutput": 7.25,
+    "visibleOutput": 7,
+    "evidenceRefs": ["evd-0021", "evd-0026"],
+    "conflictIds": []
+  }
+}

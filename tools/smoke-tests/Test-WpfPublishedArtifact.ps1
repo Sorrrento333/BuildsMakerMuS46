@@ -39,6 +39,90 @@ $requiredRulesetDirectories = @(
     "reference-cases\progression\valid",
     "reference-cases\progression\invalid"
 )
+$expectedPublishedFormulaReferences = @(
+    "formula-ag-dark-knight@1.0.0",
+    "formula-ag-dark-lord@1.0.0",
+    "formula-ag-dark-wizard@1.0.0",
+    "formula-ag-fairy-elf@1.0.0",
+    "formula-ag-magic-gladiator@1.0.0",
+    "formula-ag-regen-dark-knight@1.0.0",
+    "formula-ag-regen-dark-lord@1.0.0",
+    "formula-ag-regen-dark-wizard@1.0.0",
+    "formula-ag-regen-fairy-elf@1.0.0",
+    "formula-ag-regen-magic-gladiator@1.0.0",
+    "formula-ag-summoner@1.0.0",
+    "formula-berserker-percent-summoner@1.0.0",
+    "formula-defense-dark-knight@1.0.0",
+    "formula-defense-dark-lord@1.0.0",
+    "formula-defense-dark-wizard@1.0.0",
+    "formula-defense-fairy-elf@1.0.0",
+    "formula-defense-magic-gladiator@1.0.0",
+    "formula-defense-summoner@1.0.0",
+    "formula-hp-dark-knight@1.0.0",
+    "formula-hp-dark-lord@1.0.0",
+    "formula-hp-dark-wizard@1.1.0",
+    "formula-hp-fairy-elf@1.0.0",
+    "formula-hp-magic-gladiator@1.0.0",
+    "formula-hp-summoner@1.0.0",
+    "formula-innovation-percent-summoner@1.0.0",
+    "formula-mana-dark-knight@1.0.0",
+    "formula-mana-dark-lord@1.0.0",
+    "formula-mana-dark-wizard@1.0.0",
+    "formula-mana-fairy-elf@1.0.0",
+    "formula-mana-magic-gladiator@1.0.0",
+    "formula-mana-regen-dark-knight@1.0.0",
+    "formula-mana-regen-dark-lord@1.0.0",
+    "formula-mana-regen-dark-wizard@1.0.0",
+    "formula-mana-regen-fairy-elf@1.0.0",
+    "formula-mana-regen-magic-gladiator@1.0.0",
+    "formula-mana-summoner@1.0.0",
+    "formula-max-damage-dark-knight@1.0.0",
+    "formula-max-damage-dark-lord@1.0.0",
+    "formula-max-damage-fairy-elf@1.0.0",
+    "formula-max-damage-magic-gladiator@1.0.0",
+    "formula-max-damage-summoner@1.0.0",
+    "formula-max-wizardry-magic-gladiator@1.0.0",
+    "formula-max-wizardry-summoner@1.0.0",
+    "formula-min-damage-dark-knight@1.0.0",
+    "formula-min-damage-dark-lord@1.0.0",
+    "formula-min-damage-fairy-elf@1.0.0",
+    "formula-min-damage-magic-gladiator@1.0.0",
+    "formula-min-damage-summoner@1.0.0",
+    "formula-min-wizardry-magic-gladiator@1.0.0",
+    "formula-min-wizardry-summoner@1.0.0",
+    "formula-pvm-attack-rate-dark-knight@1.0.0",
+    "formula-pvm-attack-rate-dark-lord@1.0.0",
+    "formula-pvm-attack-rate-dark-wizard@1.0.0",
+    "formula-pvm-attack-rate-fairy-elf@1.0.0",
+    "formula-pvm-attack-rate-magic-gladiator@1.0.0",
+    "formula-pvm-attack-rate-summoner@1.0.0",
+    "formula-pvm-defense-rate-dark-knight@1.0.0",
+    "formula-pvm-defense-rate-dark-lord@1.0.0",
+    "formula-pvm-defense-rate-dark-wizard@1.0.0",
+    "formula-pvm-defense-rate-fairy-elf@1.0.0",
+    "formula-pvm-defense-rate-magic-gladiator@1.0.0",
+    "formula-pvm-defense-rate-summoner@1.0.0",
+    "formula-pvp-attack-rate-dark-knight@1.0.0",
+    "formula-pvp-attack-rate-dark-lord@1.0.0",
+    "formula-pvp-attack-rate-dark-wizard@1.0.0",
+    "formula-pvp-attack-rate-fairy-elf@1.0.0",
+    "formula-pvp-attack-rate-magic-gladiator@1.0.0",
+    "formula-pvp-attack-rate-summoner@1.0.0",
+    "formula-pvp-defense-rate-dark-knight@1.0.0",
+    "formula-pvp-defense-rate-dark-lord@1.0.0",
+    "formula-pvp-defense-rate-dark-wizard@1.0.0",
+    "formula-pvp-defense-rate-fairy-elf@1.0.0",
+    "formula-pvp-defense-rate-magic-gladiator@1.0.0",
+    "formula-pvp-defense-rate-summoner@1.0.0",
+    "formula-reflect-percent-summoner@1.0.0",
+    "formula-sd-dark-knight@1.0.0",
+    "formula-sd-dark-lord@1.0.0",
+    "formula-sd-dark-wizard@1.0.0",
+    "formula-sd-fairy-elf@1.0.0",
+    "formula-sd-magic-gladiator@1.0.0",
+    "formula-sd-summoner@1.0.0",
+    "formula-weakness-percent-summoner@1.0.0"
+)
 
 function Assert-PublishedLegalFiles {
     param(
@@ -222,96 +306,24 @@ if ($initialReport.SyntheticResetCount -ne 2 -or
         $initialReport.SyntheticTotalDistributablePoints) {
     throw "The configurable reset contribution was not preserved."
 }
+$initialReferenceDifference = Compare-Object `
+    -ReferenceObject $expectedPublishedFormulaReferences `
+    -DifferenceObject $initialReport.PublishedFormulaReferences
+$replacementReferenceDifference = Compare-Object `
+    -ReferenceObject $expectedPublishedFormulaReferences `
+    -DifferenceObject $replacementReport.PublishedFormulaReferences
 if (-not $initialReport.PublishedFormulaContextVerified -or
     -not $replacementReport.PublishedFormulaContextVerified -or
-    $initialReport.PublishedFormulaCount -ne 42 -or
-    $replacementReport.PublishedFormulaCount -ne 42 -or
-    $initialReport.PublishedFormulaReferences.Count -ne 42 -or
-    $replacementReport.PublishedFormulaReferences.Count -ne 42 -or
-    $initialReport.PublishedFormulaReferences -notcontains
-        "formula-ag-dark-lord@1.0.0" -or
-    $initialReport.PublishedFormulaReferences -notcontains
-        "formula-ag-dark-knight@1.0.0" -or
-    $initialReport.PublishedFormulaReferences -notcontains
-        "formula-ag-dark-wizard@1.0.0" -or
-    $initialReport.PublishedFormulaReferences -notcontains
-        "formula-ag-fairy-elf@1.0.0" -or
-    $initialReport.PublishedFormulaReferences -notcontains
-        "formula-ag-magic-gladiator@1.0.0" -or
-    $initialReport.PublishedFormulaReferences -notcontains
-        "formula-ag-summoner@1.0.0" -or
-    $initialReport.PublishedFormulaReferences -notcontains
-        "formula-defense-dark-knight@1.0.0" -or
-    $initialReport.PublishedFormulaReferences -notcontains
-        "formula-defense-dark-wizard@1.0.0" -or
-    $initialReport.PublishedFormulaReferences -notcontains
-        "formula-defense-fairy-elf@1.0.0" -or
-    $initialReport.PublishedFormulaReferences -notcontains
-        "formula-defense-magic-gladiator@1.0.0" -or
-    $initialReport.PublishedFormulaReferences -notcontains
-        "formula-defense-summoner@1.0.0" -or
-    $initialReport.PublishedFormulaReferences -notcontains
-        "formula-hp-dark-knight@1.0.0" -or
-    $initialReport.PublishedFormulaReferences -notcontains
-        "formula-hp-dark-lord@1.0.0" -or
-    $initialReport.PublishedFormulaReferences -notcontains
-        "formula-hp-fairy-elf@1.0.0" -or
-    $initialReport.PublishedFormulaReferences -notcontains
-        "formula-hp-dark-wizard@1.1.0" -or
-    $initialReport.PublishedFormulaReferences -notcontains
-        "formula-hp-summoner@1.0.0" -or
-    $initialReport.PublishedFormulaReferences -notcontains
-        "formula-hp-magic-gladiator@1.0.0" -or
-    $initialReport.PublishedFormulaReferences -notcontains
-        "formula-mana-dark-knight@1.0.0" -or
-    $initialReport.PublishedFormulaReferences -notcontains
-        "formula-mana-dark-wizard@1.0.0" -or
-    $initialReport.PublishedFormulaReferences -notcontains
-        "formula-mana-fairy-elf@1.0.0" -or
-    $initialReport.PublishedFormulaReferences -notcontains
-        "formula-mana-dark-lord@1.0.0" -or
-    $initialReport.PublishedFormulaReferences -notcontains
-        "formula-mana-magic-gladiator@1.0.0" -or
-    $initialReport.PublishedFormulaReferences -notcontains
-        "formula-mana-summoner@1.0.0" -or
-    $initialReport.PublishedFormulaReferences -notcontains
-        "formula-sd-dark-knight@1.0.0" -or
-    $initialReport.PublishedFormulaReferences -notcontains
-        "formula-sd-dark-wizard@1.0.0" -or
-    $initialReport.PublishedFormulaReferences -notcontains
-        "formula-sd-fairy-elf@1.0.0" -or
-    $initialReport.PublishedFormulaReferences -notcontains
-        "formula-sd-magic-gladiator@1.0.0" -or
-    $initialReport.PublishedFormulaReferences -notcontains
-        "formula-sd-summoner@1.0.0" -or
-    $initialReport.PublishedFormulaReferences -notcontains
-        "formula-max-damage-magic-gladiator@1.0.0" -or
-    $initialReport.PublishedFormulaReferences -notcontains
-        "formula-max-damage-summoner@1.0.0" -or
-    $initialReport.PublishedFormulaReferences -notcontains
-        "formula-max-wizardry-magic-gladiator@1.0.0" -or
-    $initialReport.PublishedFormulaReferences -notcontains
-        "formula-max-wizardry-summoner@1.0.0" -or
-    $initialReport.PublishedFormulaReferences -notcontains
-        "formula-min-damage-magic-gladiator@1.0.0" -or
-    $initialReport.PublishedFormulaReferences -notcontains
-        "formula-min-damage-summoner@1.0.0" -or
-    $initialReport.PublishedFormulaReferences -notcontains
-        "formula-min-wizardry-magic-gladiator@1.0.0" -or
-    $initialReport.PublishedFormulaReferences -notcontains
-        "formula-min-wizardry-summoner@1.0.0" -or
-    $initialReport.PublishedFormulaReferences -notcontains
-        "formula-reflect-percent-summoner@1.0.0" -or
-    $initialReport.PublishedFormulaReferences -notcontains
-        "formula-berserker-percent-summoner@1.0.0" -or
-    $initialReport.PublishedFormulaReferences -notcontains
-        "formula-innovation-percent-summoner@1.0.0" -or
-    $initialReport.PublishedFormulaReferences -notcontains
-        "formula-weakness-percent-summoner@1.0.0" -or
+    $initialReport.PublishedFormulaCount -ne 82 -or
+    $replacementReport.PublishedFormulaCount -ne 82 -or
+    $initialReport.PublishedFormulaReferences.Count -ne 82 -or
+    $replacementReport.PublishedFormulaReferences.Count -ne 82 -or
+    $null -ne $initialReferenceDifference -or
+    $null -ne $replacementReferenceDifference -or
     ($replacementReport.PublishedFormulaReferences -join "|") -ne
         ($initialReport.PublishedFormulaReferences -join "|") -or
-    $initialReport.ApprovedPublishedFormulaCaseCount -ne 168 -or
-    $replacementReport.ApprovedPublishedFormulaCaseCount -ne 168) {
+    $initialReport.ApprovedPublishedFormulaCaseCount -ne 328 -or
+    $replacementReport.ApprovedPublishedFormulaCaseCount -ne 328) {
     throw "The published artifact did not reproduce all contextual and arithmetic formula traces."
 }
 if (-not $initialReport.BuildDraftPersistenceVerified -or

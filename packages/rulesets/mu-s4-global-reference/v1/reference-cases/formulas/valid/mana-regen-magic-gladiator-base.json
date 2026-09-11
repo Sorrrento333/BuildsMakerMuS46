@@ -1,0 +1,25 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "mana-regen-magic-gladiator-base",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-mana-regen-magic-gladiator", "version": "1.0.0" },
+  "context": { "characterClassId": "class-magic-gladiator", "evolutionId": "evolution-magic-gladiator" },
+  "inputs": { "character-level": 1, "mana": 60 },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-mana-regen-magic-gladiator-base",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": { "id": "formula-mana-regen-magic-gladiator", "version": "1.0.0" },
+    "context": { "characterClassId": "class-magic-gladiator", "evolutionId": "evolution-magic-gladiator" },
+    "inputs": { "character-level": 1, "mana": 60 },
+    "steps": [
+      { "stepId": "raw-mana-regen", "value": 2.1818181818181818181818181818 },
+      { "stepId": "visible-mana-regen", "value": 2 }
+    ],
+    "rounding": { "mode": "TRUNCATE", "stage": "visible-mana-regen", "decimalPlaces": 0 },
+    "rawOutput": 2.1818181818181818181818181818,
+    "visibleOutput": 2,
+    "evidenceRefs": ["evd-0021", "evd-0026"],
+    "conflictIds": []
+  }
+}

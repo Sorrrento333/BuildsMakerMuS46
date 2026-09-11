@@ -1,0 +1,9 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "mana-regen-dark-knight-invalid-family",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-mana-regen-dark-knight", "version": "1.0.0" },
+  "context": { "characterClassId": "class-dark-wizard", "evolutionId": "evolution-dark-wizard" },
+  "inputs": { "character-level": 1, "mana": 20.0 },
+  "expectedErrorCode": "formula-not-applicable"
+}

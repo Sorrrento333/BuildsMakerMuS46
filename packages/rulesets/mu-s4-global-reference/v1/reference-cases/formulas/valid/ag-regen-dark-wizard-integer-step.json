@@ -1,0 +1,27 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "ag-regen-dark-wizard-integer-step",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-ag-regen-dark-wizard", "version": "1.0.0" },
+  "context": { "characterClassId": "class-dark-wizard", "evolutionId": "evolution-dark-wizard" },
+  "inputs": { "ag": 41.3, "agility": 68 },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-ag-regen-dark-wizard-integer-step",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": { "id": "formula-ag-regen-dark-wizard", "version": "1.0.0" },
+    "context": { "characterClassId": "class-dark-wizard", "evolutionId": "evolution-dark-wizard" },
+    "inputs": { "ag": 41.3, "agility": 68 },
+    "steps": [
+      { "stepId": "base-ag-regen", "value": 2 },
+      { "stepId": "ag-contribution", "value": 2.065 },
+      { "stepId": "raw-ag-regen", "value": 4.065 },
+      { "stepId": "visible-ag-regen", "value": 4 }
+    ],
+    "rounding": { "mode": "TRUNCATE", "stage": "visible-ag-regen", "decimalPlaces": 0 },
+    "rawOutput": 4.065,
+    "visibleOutput": 4,
+    "evidenceRefs": ["evd-0021", "evd-0026"],
+    "conflictIds": []
+  }
+}

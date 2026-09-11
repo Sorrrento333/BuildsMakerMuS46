@@ -30,6 +30,11 @@ public sealed class SchemaContractValidatorTests
         "formula-ag-dark-wizard@1.0.0",
         "formula-ag-fairy-elf@1.0.0",
         "formula-ag-magic-gladiator@1.0.0",
+        "formula-ag-regen-dark-knight@1.0.0",
+        "formula-ag-regen-dark-lord@1.0.0",
+        "formula-ag-regen-dark-wizard@1.0.0",
+        "formula-ag-regen-fairy-elf@1.0.0",
+        "formula-ag-regen-magic-gladiator@1.0.0",
         "formula-ag-summoner@1.0.0",
         "formula-berserker-percent-summoner@1.0.0",
         "formula-defense-dark-knight@1.0.0",
@@ -51,15 +56,50 @@ public sealed class SchemaContractValidatorTests
         "formula-mana-dark-wizard@1.0.0",
         "formula-mana-fairy-elf@1.0.0",
         "formula-mana-magic-gladiator@1.0.0",
+        "formula-mana-regen-dark-knight@1.0.0",
+        "formula-mana-regen-dark-lord@1.0.0",
+        "formula-mana-regen-dark-wizard@1.0.0",
+        "formula-mana-regen-fairy-elf@1.0.0",
+        "formula-mana-regen-magic-gladiator@1.0.0",
         "formula-mana-summoner@1.0.0",
+        "formula-max-damage-dark-knight@1.0.0",
+        "formula-max-damage-dark-lord@1.0.0",
+        "formula-max-damage-fairy-elf@1.0.0",
         "formula-max-damage-magic-gladiator@1.0.0",
         "formula-max-damage-summoner@1.0.0",
         "formula-max-wizardry-magic-gladiator@1.0.0",
         "formula-max-wizardry-summoner@1.0.0",
+        "formula-min-damage-dark-knight@1.0.0",
+        "formula-min-damage-dark-lord@1.0.0",
+        "formula-min-damage-fairy-elf@1.0.0",
         "formula-min-damage-magic-gladiator@1.0.0",
         "formula-min-damage-summoner@1.0.0",
         "formula-min-wizardry-magic-gladiator@1.0.0",
         "formula-min-wizardry-summoner@1.0.0",
+        "formula-pvm-attack-rate-dark-knight@1.0.0",
+        "formula-pvm-attack-rate-dark-lord@1.0.0",
+        "formula-pvm-attack-rate-dark-wizard@1.0.0",
+        "formula-pvm-attack-rate-fairy-elf@1.0.0",
+        "formula-pvm-attack-rate-magic-gladiator@1.0.0",
+        "formula-pvm-attack-rate-summoner@1.0.0",
+        "formula-pvm-defense-rate-dark-knight@1.0.0",
+        "formula-pvm-defense-rate-dark-lord@1.0.0",
+        "formula-pvm-defense-rate-dark-wizard@1.0.0",
+        "formula-pvm-defense-rate-fairy-elf@1.0.0",
+        "formula-pvm-defense-rate-magic-gladiator@1.0.0",
+        "formula-pvm-defense-rate-summoner@1.0.0",
+        "formula-pvp-attack-rate-dark-knight@1.0.0",
+        "formula-pvp-attack-rate-dark-lord@1.0.0",
+        "formula-pvp-attack-rate-dark-wizard@1.0.0",
+        "formula-pvp-attack-rate-fairy-elf@1.0.0",
+        "formula-pvp-attack-rate-magic-gladiator@1.0.0",
+        "formula-pvp-attack-rate-summoner@1.0.0",
+        "formula-pvp-defense-rate-dark-knight@1.0.0",
+        "formula-pvp-defense-rate-dark-lord@1.0.0",
+        "formula-pvp-defense-rate-dark-wizard@1.0.0",
+        "formula-pvp-defense-rate-fairy-elf@1.0.0",
+        "formula-pvp-defense-rate-magic-gladiator@1.0.0",
+        "formula-pvp-defense-rate-summoner@1.0.0",
         "formula-reflect-percent-summoner@1.0.0",
         "formula-sd-dark-knight@1.0.0",
         "formula-sd-dark-lord@1.0.0",
@@ -1018,7 +1058,7 @@ public sealed class SchemaContractValidatorTests
     {
         var results = SchemaContractValidator.ValidateRulesetRecords(FindRepositoryRoot());
 
-        Assert.Equal(51, results.Count);
+        Assert.Equal(91, results.Count);
         Assert.All(results, result => Assert.True(
             result.ActualValidity,
             $"{result.RecordId} does not match {result.ContractName}."));
@@ -1043,48 +1083,8 @@ public sealed class SchemaContractValidatorTests
         Assert.Equal(
             [
                 "1.1.0",
-                "2.0.0",
-                "2.0.0",
-                "2.0.0",
-                "2.0.0",
-                "2.0.0",
-                "2.0.0",
-                "2.0.0",
-                "2.1.0",
-                "2.1.0",
-                "2.1.0",
-                "2.1.0",
-                "2.1.0",
-                "2.1.0",
-                "2.1.0",
-                "2.1.0",
-                "2.1.0",
-                "2.1.0",
-                "2.1.0",
-                "2.1.0",
-                "2.1.0",
-                "2.1.0",
-                "2.1.0",
-                "2.1.0",
-                "2.1.0",
-                "2.1.0",
-                "2.1.0",
-                "2.1.0",
-                "2.1.0",
-                "2.1.0",
-                "2.1.0",
-                "2.1.0",
-                "2.1.0",
-                "2.1.0",
-                "2.1.0",
-                "2.1.0",
-                "2.1.0",
-                "2.1.0",
-                "2.1.0",
-                "2.1.0",
-                "2.1.0",
-                "2.1.0",
-                "2.1.0",
+                .. Enumerable.Repeat("2.0.0", 7),
+                .. Enumerable.Repeat("2.1.0", 75),
             ],
             results
                 .Where(result => result.ContractName == "formula")
@@ -1098,7 +1098,7 @@ public sealed class SchemaContractValidatorTests
         var results = FormulaReferenceCaseValidator.ValidateRepository(
             FindRepositoryRoot());
 
-        Assert.Equal(43, results.Count);
+        Assert.Equal(83, results.Count);
 
         var darkLordAg = Assert.Single(
             results,
@@ -1907,7 +1907,7 @@ public sealed class SchemaContractValidatorTests
                 .ValidateRepository(temporaryRoot)
                 .ToArray();
 
-            Assert.Equal(43, results.Length);
+            Assert.Equal(83, results.Length);
             Assert.All(results, result => Assert.False(result.IsValid));
             Assert.All(
                 results,

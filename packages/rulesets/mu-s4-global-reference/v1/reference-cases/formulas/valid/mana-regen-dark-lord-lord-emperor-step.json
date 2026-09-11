@@ -1,0 +1,25 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "mana-regen-dark-lord-lord-emperor-step",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-mana-regen-dark-lord", "version": "1.0.0" },
+  "context": { "characterClassId": "class-dark-lord", "evolutionId": "evolution-lord-emperor" },
+  "inputs": { "character-level": 71, "mana": 110 },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-mana-regen-dark-lord-lord-emperor-step",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": { "id": "formula-mana-regen-dark-lord", "version": "1.0.0" },
+    "context": { "characterClassId": "class-dark-lord", "evolutionId": "evolution-lord-emperor" },
+    "inputs": { "character-level": 71, "mana": 110 },
+    "steps": [
+      { "stepId": "raw-mana-regen", "value": 4 },
+      { "stepId": "visible-mana-regen", "value": 4 }
+    ],
+    "rounding": { "mode": "TRUNCATE", "stage": "visible-mana-regen", "decimalPlaces": 0 },
+    "rawOutput": 4,
+    "visibleOutput": 4,
+    "evidenceRefs": ["evd-0021", "evd-0026"],
+    "conflictIds": []
+  }
+}

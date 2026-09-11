@@ -1,0 +1,71 @@
+{
+  "schemaVersion": "2.1.0",
+  "id": "formula-pvm-defense-rate-dark-lord",
+  "version": "1.0.0",
+  "rulesetId": "mu-s4-global-reference",
+  "status": "PUBLISHED",
+  "confidence": "VERIFIED",
+  "purpose": "Calculate visible base PVM defense rate for the Dark Lord family before equipment, options, buffs, private profiles, or undeclared modifiers.",
+  "applicability": {
+    "characterClassId": "class-dark-lord",
+    "evolutionIds": ["evolution-dark-lord", "evolution-lord-emperor"]
+  },
+  "inputs": [
+    {
+      "id": "agility",
+      "numericType": "INT64",
+      "unit": "stat-point",
+      "numericBounds": {
+        "minimum": 20,
+        "minimumInclusive": true,
+        "classification": "FACTUAL",
+        "evidenceRefs": ["evd-0021"]
+      },
+      "rangeErrorCode": "formula-stat-below-base",
+      "source": { "kind": "CONTEXT_VALUE", "valueId": "resolved-agility" }
+    }
+  ],
+  "output": { "id": "pvm-defense-rate", "numericType": "INT64", "unit": "rate-point" },
+  "strategy": {
+    "kind": "PROGRAM",
+    "executionModel": "CHECKED_DECIMAL_V1",
+    "steps": [
+      {
+        "id": "raw-pvm-defense-rate",
+        "operation": "DIVIDE",
+        "operands": [
+          { "kind": "INPUT", "inputId": "agility" },
+          { "kind": "LITERAL", "value": 7 }
+        ]
+      },
+      {
+        "id": "visible-pvm-defense-rate",
+        "operation": "APPLY_ROUNDING",
+        "operands": [
+          { "kind": "STEP", "stepId": "raw-pvm-defense-rate" }
+        ]
+      }
+    ],
+    "dependencyFormulaRefs": []
+  },
+  "rounding": { "mode": "TRUNCATE", "stage": "visible-pvm-defense-rate", "decimalPlaces": 0 },
+  "trace": {
+    "stepIds": ["raw-pvm-defense-rate", "visible-pvm-defense-rate"],
+    "rawOutputStepId": "raw-pvm-defense-rate",
+    "visibleOutputStepId": "visible-pvm-defense-rate"
+  },
+  "constraints": [
+    "Resolve class and evolution applicability before evaluating arithmetic.",
+    "Divide Agility by the exact literal 7 using checked decimal arithmetic.",
+    "Do not round raw-pvm-defense-rate before visible-pvm-defense-rate.",
+    "Truncate raw-pvm-defense-rate toward zero exactly once at visible-pvm-defense-rate."
+  ],
+  "evidenceRefs": ["evd-0021", "evd-0026"],
+  "conflictIds": [],
+  "testCaseRefs": [
+    { "id": "pvm-defense-rate-dark-lord-base", "version": "1.0.0" },
+    { "id": "pvm-defense-rate-dark-lord-fraction-step", "version": "1.0.0" },
+    { "id": "pvm-defense-rate-dark-lord-integer-step", "version": "1.0.0" },
+    { "id": "pvm-defense-rate-dark-lord-lord-emperor-step", "version": "1.0.0" }
+  ]
+}

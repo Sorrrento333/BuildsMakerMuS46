@@ -1,0 +1,27 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "min-damage-dark-lord-lord-emperor-step",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-min-damage-dark-lord", "version": "1.0.0" },
+  "context": { "characterClassId": "class-dark-lord", "evolutionId": "evolution-lord-emperor" },
+  "inputs": { "energy": 420, "strength": 1050 },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-min-damage-dark-lord-lord-emperor-step",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": { "id": "formula-min-damage-dark-lord", "version": "1.0.0" },
+    "context": { "characterClassId": "class-dark-lord", "evolutionId": "evolution-lord-emperor" },
+    "inputs": { "energy": 420, "strength": 1050 },
+    "steps": [
+      { "stepId": "strength-contribution", "value": 150 },
+      { "stepId": "energy-contribution", "value": 30 },
+      { "stepId": "raw-min-damage", "value": 180 },
+      { "stepId": "visible-min-damage", "value": 180 }
+    ],
+    "rounding": { "mode": "TRUNCATE", "stage": "visible-min-damage", "decimalPlaces": 0 },
+    "rawOutput": 180,
+    "visibleOutput": 180,
+    "evidenceRefs": ["evd-0021", "evd-0026"],
+    "conflictIds": []
+  }
+}

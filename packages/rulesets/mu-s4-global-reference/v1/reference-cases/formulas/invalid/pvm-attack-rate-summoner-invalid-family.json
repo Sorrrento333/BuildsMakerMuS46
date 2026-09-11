@@ -1,0 +1,9 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "pvm-attack-rate-summoner-invalid-family",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-pvm-attack-rate-summoner", "version": "1.0.0" },
+  "context": { "characterClassId": "class-magic-gladiator", "evolutionId": "evolution-magic-gladiator" },
+  "inputs": { "agility": 21, "character-level": 1, "strength": 21 },
+  "expectedErrorCode": "formula-not-applicable"
+}

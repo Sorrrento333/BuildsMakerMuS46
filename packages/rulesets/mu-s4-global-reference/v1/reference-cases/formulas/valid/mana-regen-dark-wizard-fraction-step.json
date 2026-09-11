@@ -1,0 +1,25 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "mana-regen-dark-wizard-fraction-step",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-mana-regen-dark-wizard", "version": "1.0.0" },
+  "context": { "characterClassId": "class-dark-wizard", "evolutionId": "evolution-dark-wizard" },
+  "inputs": { "character-level": 2, "mana": 62 },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-mana-regen-dark-wizard-fraction-step",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": { "id": "formula-mana-regen-dark-wizard", "version": "1.0.0" },
+    "context": { "characterClassId": "class-dark-wizard", "evolutionId": "evolution-dark-wizard" },
+    "inputs": { "character-level": 2, "mana": 62 },
+    "steps": [
+      { "stepId": "raw-mana-regen", "value": 2.2545454545454545454545454545 },
+      { "stepId": "visible-mana-regen", "value": 2 }
+    ],
+    "rounding": { "mode": "TRUNCATE", "stage": "visible-mana-regen", "decimalPlaces": 0 },
+    "rawOutput": 2.2545454545454545454545454545,
+    "visibleOutput": 2,
+    "evidenceRefs": ["evd-0021", "evd-0026"],
+    "conflictIds": []
+  }
+}

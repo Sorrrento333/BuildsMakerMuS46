@@ -1,0 +1,25 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "pvm-defense-rate-fairy-elf-fraction-step",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-pvm-defense-rate-fairy-elf", "version": "1.0.0" },
+  "context": { "characterClassId": "class-fairy-elf", "evolutionId": "evolution-fairy-elf" },
+  "inputs": { "agility": 27 },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-pvm-defense-rate-fairy-elf-fraction-step",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": { "id": "formula-pvm-defense-rate-fairy-elf", "version": "1.0.0" },
+    "context": { "characterClassId": "class-fairy-elf", "evolutionId": "evolution-fairy-elf" },
+    "inputs": { "agility": 27 },
+    "steps": [
+      { "stepId": "raw-pvm-defense-rate", "value": 6.75 },
+      { "stepId": "visible-pvm-defense-rate", "value": 6 }
+    ],
+    "rounding": { "mode": "TRUNCATE", "stage": "visible-pvm-defense-rate", "decimalPlaces": 0 },
+    "rawOutput": 6.75,
+    "visibleOutput": 6,
+    "evidenceRefs": ["evd-0021", "evd-0026"],
+    "conflictIds": []
+  }
+}

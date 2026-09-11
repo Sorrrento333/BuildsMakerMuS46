@@ -1,0 +1,9 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "pvp-defense-rate-dark-knight-agility-below-base",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-pvp-defense-rate-dark-knight", "version": "1.0.0" },
+  "context": { "characterClassId": "class-dark-knight", "evolutionId": "evolution-dark-knight" },
+  "inputs": { "agility": 19, "character-level": 1 },
+  "expectedErrorCode": "formula-stat-below-base"
+}

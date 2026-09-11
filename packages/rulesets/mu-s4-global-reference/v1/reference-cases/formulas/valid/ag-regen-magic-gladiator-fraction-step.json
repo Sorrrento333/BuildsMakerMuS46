@@ -1,0 +1,27 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "ag-regen-magic-gladiator-fraction-step",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-ag-regen-magic-gladiator", "version": "1.0.0" },
+  "context": { "characterClassId": "class-magic-gladiator", "evolutionId": "evolution-magic-gladiator" },
+  "inputs": { "ag": 23.65, "agility": 27 },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-ag-regen-magic-gladiator-fraction-step",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": { "id": "formula-ag-regen-magic-gladiator", "version": "1.0.0" },
+    "context": { "characterClassId": "class-magic-gladiator", "evolutionId": "evolution-magic-gladiator" },
+    "inputs": { "ag": 23.65, "agility": 27 },
+    "steps": [
+      { "stepId": "base-ag-regen", "value": 1.9 },
+      { "stepId": "ag-contribution", "value": 0.7166666666666666666666666667 },
+      { "stepId": "raw-ag-regen", "value": 2.6166666666666666666666666667 },
+      { "stepId": "visible-ag-regen", "value": 2 }
+    ],
+    "rounding": { "mode": "TRUNCATE", "stage": "visible-ag-regen", "decimalPlaces": 0 },
+    "rawOutput": 2.6166666666666666666666666667,
+    "visibleOutput": 2,
+    "evidenceRefs": ["evd-0021", "evd-0026"],
+    "conflictIds": []
+  }
+}

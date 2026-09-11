@@ -1,0 +1,27 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "ag-regen-fairy-elf-fraction-step",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-ag-regen-fairy-elf", "version": "1.0.0" },
+  "context": { "characterClassId": "class-fairy-elf", "evolutionId": "evolution-fairy-elf" },
+  "inputs": { "ag": 20.8, "agility": 26 },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-ag-regen-fairy-elf-fraction-step",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": { "id": "formula-ag-regen-fairy-elf", "version": "1.0.0" },
+    "context": { "characterClassId": "class-fairy-elf", "evolutionId": "evolution-fairy-elf" },
+    "inputs": { "ag": 20.8, "agility": 26 },
+    "steps": [
+      { "stepId": "base-ag-regen", "value": 2 },
+      { "stepId": "ag-contribution", "value": 0.6240624062406240624062406241 },
+      { "stepId": "raw-ag-regen", "value": 2.6240624062406240624062406241 },
+      { "stepId": "visible-ag-regen", "value": 2 }
+    ],
+    "rounding": { "mode": "TRUNCATE", "stage": "visible-ag-regen", "decimalPlaces": 0 },
+    "rawOutput": 2.6240624062406240624062406241,
+    "visibleOutput": 2,
+    "evidenceRefs": ["evd-0021", "evd-0026"],
+    "conflictIds": []
+  }
+}

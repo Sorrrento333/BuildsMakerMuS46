@@ -1,0 +1,9 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "ag-regen-fairy-elf-invalid-family",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-ag-regen-fairy-elf", "version": "1.0.0" },
+  "context": { "characterClassId": "class-dark-wizard", "evolutionId": "evolution-dark-wizard" },
+  "inputs": { "ag": 20.6, "agility": 25 },
+  "expectedErrorCode": "formula-not-applicable"
+}

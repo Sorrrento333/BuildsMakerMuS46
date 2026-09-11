@@ -1,0 +1,9 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "pvp-attack-rate-dark-lord-invalid-family",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-pvp-attack-rate-dark-lord", "version": "1.0.0" },
+  "context": { "characterClassId": "class-dark-knight", "evolutionId": "evolution-dark-knight" },
+  "inputs": { "agility": 20, "character-level": 1 },
+  "expectedErrorCode": "formula-not-applicable"
+}

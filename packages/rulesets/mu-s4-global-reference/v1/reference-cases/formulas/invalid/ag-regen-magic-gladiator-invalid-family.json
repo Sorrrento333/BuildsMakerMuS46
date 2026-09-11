@@ -1,0 +1,9 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "ag-regen-magic-gladiator-invalid-family",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-ag-regen-magic-gladiator", "version": "1.0.0" },
+  "context": { "characterClassId": "class-fairy-elf", "evolutionId": "evolution-fairy-elf" },
+  "inputs": { "ag": 23.40, "agility": 26 },
+  "expectedErrorCode": "formula-not-applicable"
+}

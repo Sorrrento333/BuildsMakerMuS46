@@ -1,0 +1,27 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "pvp-attack-rate-dark-knight-base",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-pvp-attack-rate-dark-knight", "version": "1.0.0" },
+  "context": { "characterClassId": "class-dark-knight", "evolutionId": "evolution-dark-knight" },
+  "inputs": { "agility": 20, "character-level": 1 },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-pvp-attack-rate-dark-knight-base",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": { "id": "formula-pvp-attack-rate-dark-knight", "version": "1.0.0" },
+    "context": { "characterClassId": "class-dark-knight", "evolutionId": "evolution-dark-knight" },
+    "inputs": { "agility": 20, "character-level": 1 },
+    "steps": [
+      { "stepId": "level-contribution", "value": 3 },
+      { "stepId": "agility-contribution", "value": 90.0 },
+      { "stepId": "raw-pvp-attack-rate", "value": 93.0 },
+      { "stepId": "visible-pvp-attack-rate", "value": 93 }
+    ],
+    "rounding": { "mode": "TRUNCATE", "stage": "visible-pvp-attack-rate", "decimalPlaces": 0 },
+    "rawOutput": 93.0,
+    "visibleOutput": 93,
+    "evidenceRefs": ["evd-0021", "evd-0026"],
+    "conflictIds": []
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "pvp-attack-rate-dark-wizard-agility-below-base",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-pvp-attack-rate-dark-wizard", "version": "1.0.0" },
+  "context": { "characterClassId": "class-dark-wizard", "evolutionId": "evolution-dark-wizard" },
+  "inputs": { "agility": 17, "character-level": 1 },
+  "expectedErrorCode": "formula-stat-below-base"
+}
