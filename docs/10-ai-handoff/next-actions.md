@@ -89,6 +89,45 @@ documentados y cerrarla con integración, pruebas, documentación y smoke:
 2. Trazas de cálculo de alto nivel aún sin contrato propio si el motor lo
    exige en una vertical posterior.
 
+## Última tarea cerrada — Speed, Combo, Skills, Wizardry y Guild
+
+La vertical del catálogo restante de `EVD-0026` quedó cerrada como axiomas del
+ruleset trazándose exclusivamente desde `EVD-0021` y `EVD-0026`:
+
+- Veinticinco fórmulas `1.0.0` `PUBLISHED` contra schema `2.1.0`: seis `speed`
+  (`agi/15`, `agi/10`, `agi/50`, `agi/15`, `agi/10` y `agi/20` por familia,
+  unidad nueva `speed-point`), `combo-base-dark-knight` (`(str + agi + ene)/2`,
+  único control de overflow), `skill-percent` de Dark Knight (`200 + ene/10`)
+  y Dark Lord (`200 + ene/20`), `fortitude-percent` (`12 + vit/100 + ene/20`),
+  `soul-barrier-percent` (`10 + agi/50 + ene/200`), `damage-buff` (`3 + ene/7`),
+  `defense-buff` (`2 + ene/8`), `heal` (`2 + ene/9`),
+  `fenrir-base-{min,max}-damage` de Dark Knight (`45/75 + str/3 + agi/5 +
+  vit/5 + ene/6`) y Dark Wizard (`60/90 + str/5 + agi/5 + vit/7 + ene/3`),
+  `min/max-wizardry-dark-wizard` (`ene/9` y `ene/4`),
+  `nova-max-spell-damage` (`1320 + str/2`), `critical-damage`
+  (`cmd/25 + str/30`), `fireburst-bonus-{min,max}-damage`
+  (`100/150 + str/25 + ene/50`) y `guild-member-capacity`
+  (`lvl/10 + cmd/10`, unidad nueva `member-count`, única con entrada de nivel).
+- Cada programa divide y trunca hacia cero una sola vez en el paso visible con
+  aritmética decimal comprobada. Cien positivos (cuatro por fórmula) y setenta
+  y un controles negativos (44 stat fuera de base + 25 familia ajena + 1 nivel
+  inválido + 1 overflow). Sólo `formula-speed-magic-gladiator` hereda
+  `conflictIds: dsp-0002`.
+- Application y WPF materializan ciento siete fórmulas ejecutables; el dataset
+  avanza a `2026-07-30.3` con hash
+  `sha256:ef6fd756c2a69245906019d4c4cf01c3a7baba460067bbfffc4c4906361b0f18`.
+
+## Verificación del cierre — Speed, Combo, Skills, Wizardry y Guild
+
+- Restauración y build Release aprobados con 0 advertencias/0 errores;
+  755/755 pruebas pasan: 40 validator, 58 motor, 639 Application y 18 Data.
+- CLI del validador: las ciento siete fórmulas `PUBLISHED` pasan sin errores;
+  el gate factual cubre 432 positivos y 319 controles negativos.
+- Smoke WPF `win-x64` (107 fórmulas y 428 casos contextuales): PASS local el
+  2026-09-11 con SQLite `3.53.3`, 1300 archivos, 150.022.448 bytes, 877 JSON
+  del ruleset y hash
+  `sha256:ef6fd756c2a69245906019d4c4cf01c3a7baba460067bbfffc4c4906361b0f18`.
+
 ## Última tarea cerrada — rates, regeneración y daño restante
 
 La vertical de Rates, Regeneración y Daño restante quedó cerrada como axiomas

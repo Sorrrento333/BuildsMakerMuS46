@@ -1122,6 +1122,41 @@
 
 ### Added
 
+- Vertical funcional del catálogo restante de `EVD-0026` (Speed, Combo,
+  Skills, Wizardry, Fenrir, buffs, crítico, Fireburst y Guild), como axiomas
+  del ruleset trazados desde `EVD-0021` y `EVD-0026` y exteriores al inventario
+  de 24 claims de `RES-0002`. Veinticinco fórmulas `1.0.0` nacen `PUBLISHED`
+  contra schema `2.1.0`.
+- `speed = agility / divisor` (15/10/50/15/10/20 para Dark Knight, Dark
+  Wizard, Fairy Elf, Magic Gladiator, Dark Lord y Summoner) con unidad nueva
+  `speed-point`; `combo-base-dark-knight = (str + agi + ene) / 2` con único
+  control de overflow del conjunto; `skill-percent` de Dark Knight
+  (`200 + ene/10`) y Dark Lord (`200 + ene/20`); `fortitude-percent`
+  (`12 + vit/100 + ene/20`); `soul-barrier-percent` (`10 + agi/50 + ene/200`);
+  buffs de Fairy Elf `damage-buff = 3 + ene/7`, `defense-buff = 2 + ene/8` y
+  `heal = 2 + ene/9`.
+- `fenrir-base-{min,max}-damage` de Dark Knight (`45/75 + str/3 + agi/5 +
+  vit/5 + ene/6`) y Dark Wizard (`60/90 + str/5 + agi/5 + vit/7 + ene/3`);
+  `min/max-wizardry-dark-wizard` (`ene/9` y `ene/4`) completan wizardry
+  (MG/Summoner ya publicados); `nova-max-spell-damage = 1320 + str/2`;
+  `critical-damage = cmd/25 + str/30` (único del conjunto que consume
+  Command); `fireburst-bonus-{min,max}-damage = 100/150 + str/25 + ene/50` y
+  `guild-member-capacity = lvl/10 + cmd/10` (única con entrada de nivel, unidad
+  nueva `member-count` y control `invalid-level`).
+- Cada programa divide y trunca hacia cero una sola vez en su paso visible con
+  aritmética decimal comprobada (`ADD`/`DIVIDE`/`APPLY_ROUNDING`). Veinticinco
+  contratos enlazan 100 positivos (cuatro por fórmula: base, fracción, entero y
+  evolución superior) y 71 controles negativos (44 stat fuera de base + 25
+  familia ajena + 1 nivel inválido + 1 overflow). Aplicabilidad declarada
+  sobre todas las evoluciones de cada familia; sólo
+  `formula-speed-magic-gladiator` hereda `conflictIds: dsp-0002`.
+- Application y WPF materializan ciento siete fórmulas ejecutables reutilizando
+  la resolución genérica de dependencias, sin handlers ni constantes de estos
+  beneficios en C#. El smoke `win-x64` espera 107 fórmulas y 428 casos
+  contextuales; el dataset avanza a `2026-07-30.3`. El smoke de publicación
+  local del 2026-09-11 aprobó SQLite `3.53.3`, 1300 archivos,
+  150.022.448 bytes y 877 JSON del ruleset, con hash
+  `sha256:ef6fd756c2a69245906019d4c4cf01c3a7baba460067bbfffc4c4906361b0f18`.
 - Vertical funcional de Rates, Regeneración y Daño restante, como axiomas del
   ruleset trazados desde `EVD-0021` y `EVD-0026` y exteriores al inventario de
   24 claims de `RES-0002`. Cuarenta fórmulas `1.0.0` nacen `PUBLISHED` contra

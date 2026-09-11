@@ -2347,6 +2347,21 @@
 
 ## Verificación más reciente — 2026-09-11
 
+- Cierre de Speed/Combo/Skills/Wizardry/Fenrir/Buffs/Guild: restauración y
+  build Release aprobados con 0 advertencias/0 errores; 755/755 pruebas
+  pasan: 40 validator, 58 motor, 639 Application y 18 Data. CLI del
+  validador: las ciento siete fórmulas `PUBLISHED` pasan sin errores,
+  incluidos los veinticinco contratos nuevos (100 positivos/71 controles).
+- Comprobación estructural: 16 contratos/32 fixtures, 54 registros canónicos,
+  progresión 7/7+3/3 y ciento ocho identidades de fórmula aprobados. El gate
+  factual cubre 432 positivos y 319 controles negativos.
+- Smoke WPF `win-x64`: PASS con SQLite `3.53.3`, 1300 archivos,
+  150.022.448 bytes, 10 avisos legales, 877 JSON del ruleset, dataset
+  `2026-07-30.3`, ciento siete fórmulas y 428 casos contextuales. El hash es
+  `sha256:ef6fd756c2a69245906019d4c4cf01c3a7baba460067bbfffc4c4906361b0f18`.
+
+## Verificación anterior — 2026-09-11
+
 - Cierre de Rates/Regeneración/Daño restante: restauración y build Release
   aprobados con 0 advertencias/0 errores; 584/584 pruebas pasan: 40 validator,
   58 motor, 468 Application y 18 Data. CLI del validador: las ochenta y dos

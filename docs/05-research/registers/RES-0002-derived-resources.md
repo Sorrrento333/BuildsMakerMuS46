@@ -1757,6 +1757,35 @@ recurso ausente a partir de los coeficientes de otras familias.
 
 ## Bitácora de investigación
 
+### 2026-09-11 — Materialización de Speed, Combo, Skills, Wizardry, Fenrir, buffs y Guild
+
+- El catálogo restante de `EVD-0026` (speed, combo, skill-percent, fortitude,
+  soul-barrier, wizardry de Dark Wizard, nova, buffs de Fairy Elf, fenrir,
+  critical, fireburst y guild) se materializa como axiomas del ruleset desde
+  `EVD-0021` y `EVD-0026`, fuera del inventario de 24 claims de `RES-0002`; no
+  se incorpora evidencia ni claim nuevos.
+- Veinticinco fórmulas `1.0.0` nacen `PUBLISHED` contra schema `2.1.0`: `speed`
+  (`agi/15`, `agi/10`, `agi/50`, `agi/15`, `agi/10` y `agi/20` por familia),
+  `combo-base-dark-knight` (`(str + agi + ene)/2`, único control de overflow),
+  `skill-percent` de Dark Knight (`200 + ene/10`) y Dark Lord (`200 + ene/20`),
+  `fortitude-percent` (`12 + vit/100 + ene/20`), `soul-barrier-percent`
+  (`10 + agi/50 + ene/200`), `damage-buff` (`3 + ene/7`), `defense-buff`
+  (`2 + ene/8`), `heal` (`2 + ene/9`), `fenrir-base-{min,max}-damage` de Dark
+  Knight (`45/75 + str/3 + agi/5 + vit/5 + ene/6`) y Dark Wizard
+  (`60/90 + str/5 + agi/5 + vit/7 + ene/3`), `min/max-wizardry-dark-wizard`
+  (`ene/9` y `ene/4`), `nova-max-spell-damage` (`1320 + str/2`),
+  `critical-damage` (`cmd/25 + str/30`), `fireburst-bonus-{min,max}-damage`
+  (`100/150 + str/25 + ene/50`) y `guild-member-capacity` (`lvl/10 + cmd/10`).
+- Unidades nuevas `speed-point` (speed) y `member-count` (guild); el resto
+  reutiliza `damage-point`, `percent` y `hp-point`. Sólo
+  `formula-speed-magic-gladiator` hereda `conflictIds: dsp-0002`; el resto
+  conserva `[]`. `guild-member-capacity` es la única con entrada de nivel y
+  declara `formula-level-out-of-range`.
+- Veinticinco contratos enlazan 100 positivos (cuatro por fórmula) y 71
+  controles negativos (44 stat fuera de base + 25 familia ajena + 1 nivel
+  inválido + 1 overflow). Application y WPF materializan 107 fórmulas
+  ejecutables; el dataset avanza a `2026-07-30.3`.
+
 ### 2026-09-11 — Materialización productiva de rates, regeneración y daño restante
 
 - Rates, regeneración y el daño físico restante se materializan como axiomas
