@@ -84,13 +84,45 @@ La instrucción de ejecutar sólo la primera tarea pendiente continúa vigente.
 Confirmar con el mantenedor la siguiente vertical entre los candidatos
 documentados y cerrarla con integración, pruebas, documentación y smoke:
 
-1. Materializar los contratos fácticos restantes que `EVD-0026` preserva sin
-   motor: rates, regeneración y el resto de Defense. Los buffs de Summoner
-   quedaron cerrados el 2026-09-09.
-2. Builds completas, resto del motor de cálculo y flujos de UI posteriores al
+1. Builds completas, resto del motor de cálculo y flujos de UI posteriores al
    presupuesto ganado y los borradores locales.
-3. Trazas de cálculo de alto nivel aún sin contrato propio si el motor lo
+2. Trazas de cálculo de alto nivel aún sin contrato propio si el motor lo
    exige en una vertical posterior.
+
+## Última tarea cerrada — rates, regeneración y daño restante
+
+La vertical de Rates, Regeneración y Daño restante quedó cerrada como axiomas
+del ruleset trazándose exclusivamente desde `EVD-0021` y `EVD-0026`:
+
+- Cuarenta fórmulas `1.0.0` `PUBLISHED` contra schema `2.1.0`: veinticuatro
+  rates (`pvm-attack-rate`, `pvm-defense-rate`, `pvp-attack-rate` y
+  `pvp-defense-rate` por familia), diez regeneraciones (`mana-regen` y
+  `ag-regen` de Dark Wizard, Dark Knight, Fairy Elf, Magic Gladiator y Dark
+  Lord) y seis daños físicos restantes (`min-damage`/`max-damage` de Dark
+  Knight, Fairy Elf y Dark Lord). Son exteriores al inventario de 24 claims de
+  `RES-0002`.
+- Dark Lord sustituye `strength / 4` por `strength / 6 + command / 10` en
+  `pvm-attack-rate` (único rate que consume Command, resuelto con adición de
+  cuatro operandos). Las regeneraciones consumen la salida `RAW` de
+  `formula-mana-{familia}`/`formula-ag-{familia}` por la misma ruta que
+  Defense→SD.
+- Cada programa divide y trunca hacia cero una sola vez en el paso visible con
+  aritmética decimal comprobada. Ciento sesenta positivos (cuatro por fórmula:
+  base, fracción, entero y evolución superior) y ochenta controles negativos.
+- Application y WPF materializan ochenta y dos fórmulas ejecutables; el dataset
+  avanza a `2026-07-30.2` con hash
+  `sha256:08bd49ab45892995c86a7f0b40f1186e71d389f8215fca66530ff10efc9ee2b9`.
+
+## Verificación del cierre — rates, regeneración y daño restante
+
+- Restauración y build Release aprobados con 0 advertencias/0 errores;
+  584/584 pruebas pasan: 40 validator, 58 motor, 468 Application y 18 Data.
+- CLI del validador: las ochenta y dos fórmulas `PUBLISHED` pasan sin errores;
+  el gate factual cubre 332 positivos y 248 controles negativos.
+- Smoke WPF `win-x64` (82 fórmulas y 328 casos contextuales): PASS local el
+  2026-09-11 con SQLite `3.53.3`, 1104 archivos, 149.737.806 bytes, 681 JSON
+  del ruleset y hash
+  `sha256:08bd49ab45892995c86a7f0b40f1186e71d389f8215fca66530ff10efc9ee2b9`.
 
 ## Última tarea cerrada
 

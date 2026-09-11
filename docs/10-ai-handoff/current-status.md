@@ -2307,6 +2307,21 @@
   dataset avanza a `2026-07-30.1` con hash
   `sha256:ea9ff19fbc487d55de526e1faed3ffac2f7d49e0ee19051602b229b88ddf4655`
   (capturado por el smoke de publicación del 2026-09-09).
+- Vertical de Rates, Regeneración y Daño restante cerrada: cuarenta fórmulas
+  `1.0.0` `PUBLISHED` contra schema `2.1.0` — veinticuatro rates
+  (`pvm-attack-rate = 5 × level + 1.5 × agility + strength / 4`, con Dark Lord
+  en `strength / 6 + command / 10`; `pvm-defense-rate = agility / d`;
+  `pvp-attack-rate = 3 × level + k × agility`; `pvp-defense-rate =
+  2 × level + k × agility`), diez regeneraciones (`mana-regen = mana / 27.5`
+  y `ag-regen = base + ag / divisor`, consumiendo el `RAW` de Mana/AG) y seis
+  daños físicos restantes (`min/max-damage` de Dark Knight `str/6`/`str/4`,
+  Fairy Elf `str/14 + agi/7`/`str/8 + agi/4` y Dark Lord
+  `str/7 + ene/14`/`str/5 + ene/10`), axiomas desde `EVD-0021` y `EVD-0026`.
+  Enlazan 160 positivos (cuatro por fórmula) y 80 controles negativos.
+- Application y WPF materializan ochenta y dos fórmulas ejecutables. El
+  dataset avanza a `2026-07-30.2` con hash
+  `sha256:08bd49ab45892995c86a7f0b40f1186e71d389f8215fca66530ff10efc9ee2b9`
+  (capturado por el smoke de publicación del 2026-09-11).
 - Los cinco contratos de alto nivel restantes quedaron materializados en
   `packages/schemas/v1` con versión `1.0.0`, fixtures válidos e inválidos
   sintéticos y registro en el validador, la comprobación estructural y las
@@ -2330,7 +2345,22 @@
 - El canal público de actualización y firma continúa como decisión posterior de
   distribución.
 
-## Verificación más reciente — 2026-09-09
+## Verificación más reciente — 2026-09-11
+
+- Cierre de Rates/Regeneración/Daño restante: restauración y build Release
+  aprobados con 0 advertencias/0 errores; 584/584 pruebas pasan: 40 validator,
+  58 motor, 468 Application y 18 Data. CLI del validador: las ochenta y dos
+  fórmulas `PUBLISHED` pasan sin errores, incluidos los cuarenta contratos
+  nuevos (160 positivos/80 controles).
+- Comprobación estructural: 16 contratos/32 fixtures, 51 registros canónicos,
+  progresión 7/7+3/3 y ochenta y tres identidades de fórmula aprobados. El
+  gate factual cubre 332 positivos y 248 controles negativos.
+- Smoke WPF `win-x64`: PASS con SQLite `3.53.3`, 1104 archivos,
+  149.737.806 bytes, 10 avisos legales, 681 JSON del ruleset, dataset
+  `2026-07-30.2`, ochenta y dos fórmulas y 328 casos contextuales. El hash es
+  `sha256:08bd49ab45892995c86a7f0b40f1186e71d389f8215fca66530ff10efc9ee2b9`.
+
+## Verificación anterior — 2026-09-09
 
 - Cierre de Buffs de Summoner: restauración y build Release aprobados con 0
   advertencias/0 errores; 344/344 pruebas pasan: 40 validator, 58 motor, 228
@@ -2677,8 +2707,9 @@
   resueltos; AG de Dark Lord añade Command por la misma ruta contextual.
   Defense y SD de Dark Wizard, Dark Knight, Fairy Elf, Magic Gladiator, Dark
   Lord y Summoner se ejecutan con dependencia `RAW`. Daño y wizardry de
-  Summoner y Magic Gladiator también se ejecutan; el resto de Defense, rates,
-  regeneración y buffs todavía no se ejecutan.
+  Summoner y Magic Gladiator, los buffs de Summoner, los rates, la
+  regeneración y el daño restante de Dark Knight, Fairy Elf y Dark Lord también
+  se ejecutan; la materialización cubre las ochenta y dos fórmulas ejecutables.
 - Licencia: texto Apache-2.0 contrastado con la publicación oficial; ADR-0005,
   `NOTICE` e inventario de terceros incorporados. La auditoría leyó metadatos
   `.nuspec` de todas las dependencias restauradas y el acuerdo incluido por la

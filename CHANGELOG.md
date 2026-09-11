@@ -1122,6 +1122,36 @@
 
 ### Added
 
+- Vertical funcional de Rates, Regeneración y Daño restante, como axiomas del
+  ruleset trazados desde `EVD-0021` y `EVD-0026` y exteriores al inventario de
+  24 claims de `RES-0002`. Cuarenta fórmulas `1.0.0` nacen `PUBLISHED` contra
+  schema `2.1.0`: veinticuatro rates (`pvm-attack-rate`, `pvm-defense-rate`,
+  `pvp-attack-rate` y `pvp-defense-rate` por familia), diez regeneraciones
+  (`mana-regen` y `ag-regen` de Dark Wizard, Dark Knight, Fairy Elf, Magic
+  Gladiator y Dark Lord) y seis daños físicos restantes (`min-damage` y
+  `max-damage` de Dark Knight, Fairy Elf y Dark Lord).
+- `pvm-attack-rate = 5 × level + 1.5 × agility + strength / 4`, con Dark Lord
+  sustituyendo `strength / 4` por `strength / 6 + command / 10` (único rate que
+  consume Command y única adición de cuatro operandos del conjunto);
+  `pvm-defense-rate = agility / d`; `pvp-attack-rate = 3 × level + k × agility`
+  y `pvp-defense-rate = 2 × level + k × agility`, con k según familia.
+- `mana-regen = mana / 27.5` y `ag-regen = base + ag / divisor` consumen la
+  salida `RAW` decimal de `formula-mana-{familia}` y `formula-ag-{familia}`
+  `1.0.0` por la misma ruta que Defense→SD. El daño restante conserva
+  `str/6`, `str/7 + ene/14`, `str/14 + agi/7`, `str/4`, `str/5 + ene/10` y
+  `str/8 + agi/4`.
+- Cada programa divide y trunca hacia cero una sola vez en su paso visible con
+  aritmética decimal comprobada. Cuarenta contratos enlazan 160 positivos
+  (cuatro por fórmula: base, fracción, entero y evolución superior) y 80
+  controles negativos (stat/dependencia fuera de base y familia ajena).
+  Aplicabilidad declarada sobre las tres evoluciones de cada familia.
+- Application y WPF materializan ochenta y dos fórmulas ejecutables
+  reutilizando la resolución genérica de dependencias, sin handlers ni
+  constantes de rates/regen/daño en C#. El smoke `win-x64` espera 82 fórmulas
+  y 328 casos contextuales; el dataset avanza a `2026-07-30.2`. El smoke de
+  publicación local del 2026-09-11 aprobó SQLite `3.53.3`, 1104 archivos,
+  149.737.806 bytes y 681 JSON del ruleset, con hash
+  `sha256:08bd49ab45892995c86a7f0b40f1186e71d389f8215fca66530ff10efc9ee2b9`.
 - Vertical funcional de Buffs de Summoner, como axiomas del ruleset trazados
   desde `EVD-0021` y `EVD-0026` y exteriores al inventario de 24 claims de
   `RES-0002`. Cuatro fórmulas `1.0.0` nacen `PUBLISHED` contra schema `2.1.0`

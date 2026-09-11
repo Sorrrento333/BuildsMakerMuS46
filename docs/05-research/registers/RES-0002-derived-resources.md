@@ -1757,6 +1757,40 @@ recurso ausente a partir de los coeficientes de otras familias.
 
 ## Bitácora de investigación
 
+### 2026-09-11 — Materialización productiva de rates, regeneración y daño restante
+
+- Rates, regeneración y el daño físico restante se materializan como axiomas
+  del ruleset desde `EVD-0021` y `EVD-0026`, fuera del inventario de 24 claims
+  de `RES-0002`; no se incorpora evidencia ni claim nuevos.
+- Cuarenta fórmulas `1.0.0` nacen `PUBLISHED` contra schema `2.1.0`:
+  veinticuatro rates (`pvm-attack-rate = 5 × level + 1.5 × agility +
+  strength / 4`, `pvm-defense-rate = agility / d`,
+  `pvp-attack-rate = 3 × level + k × agility` y
+  `pvp-defense-rate = 2 × level + k × agility` por familia; Dark Lord
+  sustituye `strength / 4` por `strength / 6 + command / 10`, única adición de
+  cuatro operandos del conjunto), diez regeneraciones
+  (`mana-regen = mana / 27.5` y `ag-regen = base + ag / divisor`) y seis daños
+  restantes (`min/max-damage` de Dark Knight `str/6` y `str/4`, de Fairy Elf
+  `str/14 + agi/7` y `str/8 + agi/4` y de Dark Lord `str/7 + ene/14` y
+  `str/5 + ene/10`).
+- Las regeneraciones consumen la salida `RAW` decimal de
+  `formula-mana-{familia}` y `formula-ag-{familia}` `1.0.0` por la misma ruta
+  que Defense→SD, con `formula-dependency-out-of-range` para su mínimo técnico;
+  el programa declara el stat de anclaje contextual (`character-level`/
+  `agility`) sin consumirlo en la aritmética.
+- Cuarenta contratos enlazan 160 positivos (cuatro por fórmula: base,
+  fracción, entero y evolución superior) y 80 controles negativos (stat/
+  dependencia fuera de base y familia ajena). No se fabrican controles de
+  overflow: regeneración y daño no alcanzan `INT64` en su dominio y los rates
+  conservan sus dos controles.
+- Application y WPF materializan ochenta y dos fórmulas ejecutables; el dataset
+  avanza a `2026-07-30.2` (smoke `win-x64` PASS del 2026-09-11, hash
+  `sha256:08bd49ab45892995c86a7f0b40f1186e71d389f8215fca66530ff10efc9ee2b9`).
+- Nota de generación: la regeneración de AG de Dark Knight consume el `RAW`
+  canónico 25.7 de `formula-ag-dark-knight`; la variante 17.7 presente en la
+  tabla auxiliar del generador no corresponde a la fórmula publicada y quedó
+  descartada (los casos verificados consumen 25.7).
+
 ### 2026-09-09 — Materialización productiva de los buffs de Summoner
 
 - `reflect_percent`, `berserker_percent`, `innovation_percent` y
