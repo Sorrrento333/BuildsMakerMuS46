@@ -18,6 +18,8 @@ public static class FormulaContextErrorCodes
     public const string DependencyCycle = "formula-context-dependency-cycle";
     public const string DependencyIncoherent =
         "formula-context-dependency-incoherent";
+    public const string NoApplicableFormula =
+        "formula-context-no-applicable-formula";
 }
 
 public sealed class FormulaContextException : Exception

@@ -196,12 +196,21 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
+                    <Button x:Name="EvaluateBuildButton"
+                            Content="Evaluar atributos derivados"
+                            HorizontalAlignment="Left"
+                            Padding="12,4"
+                            Click="EvaluateBuildButtonClick"
+                            AutomationProperties.Name="Evaluar todos los atributos derivados" />
                     <TextBlock Text="Fórmula publicada"
+                               Grid.Row="1"
+                               Margin="0,12,0,0"
                                FontWeight="SemiBold" />
                     <ComboBox x:Name="FormulaComboBox"
-                              Grid.Row="1"
+                              Grid.Row="2"
                               Margin="0,6,0,12"
                               MinWidth="320"
                               HorizontalAlignment="Left"
@@ -209,7 +218,7 @@
                               SelectionChanged="FormulaSelectionChanged"
                               AutomationProperties.Name="Fórmula derivada publicada" />
                     <TextBox x:Name="FormulaResultTextBox"
-                             Grid.Row="2"
+                             Grid.Row="3"
                              Padding="12"
                              MinHeight="160"
                              IsReadOnly="True"

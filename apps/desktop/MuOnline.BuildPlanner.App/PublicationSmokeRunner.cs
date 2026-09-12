@@ -37,6 +37,7 @@ internal static class PublicationSmokeRunner
         Directory.CreateDirectory(options.DataDirectory);
         var progressionVerification = VerifyPublishedProgressionRuleset();
         var formulaVerification = VerifyPublishedCharacterFormulas();
+        var buildVerification = VerifyPublishedCharacterBuild(progressionVerification);
         var buildDraftServices = PublishedBuildDraftServices.Create(
             options.DataDirectory,
             [SyntheticMigration]);
@@ -52,6 +53,7 @@ internal static class PublicationSmokeRunner
                 options,
                 progressionVerification,
                 formulaVerification,
+                buildVerification,
                 buildDraftServices),
             PublicationSmokePhase.VerifyUpdate => VerifyUpdate(
                 databasePath,
@@ -59,6 +61,7 @@ internal static class PublicationSmokeRunner
                 options,
                 progressionVerification,
                 formulaVerification,
+                buildVerification,
                 buildDraftServices),
             _ => throw new ArgumentOutOfRangeException(nameof(options)),
         };
@@ -70,6 +73,7 @@ internal static class PublicationSmokeRunner
         PublicationSmokeOptions options,
         ProgressionVerificationResult progressionVerification,
         PublishedFormulaVerification formulaVerification,
+        VerifiedCharacterBuild buildVerification,
         PublishedBuildDraftServices buildDraftServices)
     {
         if (!File.Exists(databasePath) || File.Exists(backupPath))
@@ -114,6 +118,7 @@ internal static class PublicationSmokeRunner
             migrationResult,
             progressionVerification,
             formulaVerification,
+            buildVerification,
             buildDraftServices);
     }
 
@@ -123,6 +128,7 @@ internal static class PublicationSmokeRunner
         PublicationSmokeOptions options,
         ProgressionVerificationResult progressionVerification,
         PublishedFormulaVerification formulaVerification,
+        VerifiedCharacterBuild buildVerification,
         PublishedBuildDraftServices buildDraftServices)
     {
         if (!File.Exists(databasePath) || !File.Exists(backupPath))
@@ -144,6 +150,7 @@ internal static class PublicationSmokeRunner
             migrationResult,
             progressionVerification,
             formulaVerification,
+            buildVerification,
             buildDraftServices);
     }
 
@@ -155,6 +162,7 @@ internal static class PublicationSmokeRunner
         MigrationApplicationResult migrationResult,
         ProgressionVerificationResult progressionVerification,
         PublishedFormulaVerification formulaVerification,
+        VerifiedCharacterBuild buildVerification,
         PublishedBuildDraftServices buildDraftServices) => new(
             Success: true,
             Phase: options.Phase == PublicationSmokePhase.Initialize ? "initialize" : "verify-update",
@@ -192,6 +200,8 @@ internal static class PublicationSmokeRunner
                 .Select(reference => $"{reference.Id}@{reference.Version}")
                 .ToArray(),
             ApprovedPublishedFormulaCaseCount: formulaVerification.ApprovedCaseCount,
+            PublishedBuildEvaluationVerified: buildVerification.Verified,
+            PublishedBuildFormulaCount: buildVerification.FormulaCount,
             BuildDraftPersistenceVerified: true,
             BuildDraftId: BuildDraftId,
             BuildDraftDatasetVersion:
@@ -295,6 +305,62 @@ internal static class PublicationSmokeRunner
                 .ThenBy(reference => reference.Version, StringComparer.Ordinal)
                 .ToArray(),
             ApprovedCaseCount: cases.Length);
+    }
+
+    private static VerifiedCharacterBuild VerifyPublishedCharacterBuild(
+        ProgressionVerificationResult progressionVerification)
+    {
+        var syntheticDistribution = progressionVerification.SyntheticDistribution;
+        var buildUseCase = PublishedProgressionRuleset.CreateCharacterBuildUseCase();
+        var formulaUseCase = PublishedProgressionRuleset.CreateCharacterFormulaUseCase();
+        var request = new ProgressionPointBudgetRequest(
+            syntheticDistribution.ProgressionInputs.CharacterClassId,
+            syntheticDistribution.ProgressionInputs.EvolutionId,
+            syntheticDistribution.ProgressionInputs.Level,
+            syntheticDistribution.ProgressionInputs.CompletedQuestIds);
+        var resetInputs = new ResetPointInputs(
+            syntheticDistribution.ResetInputs.ResetCount,
+            syntheticDistribution.ResetInputs.PointsPerReset);
+
+        var evaluation = buildUseCase.Execute(
+            request,
+            resetInputs,
+            syntheticDistribution.Allocations);
+        var expectedReferences = PublishedProgressionRuleset.FormulaCatalog.Formulas
+            .Where(formula =>
+                formula.Applicability.CharacterClassId ==
+                    syntheticDistribution.ProgressionInputs.CharacterClassId &&
+                formula.Applicability.EvolutionIds.Contains(
+                    syntheticDistribution.ProgressionInputs.EvolutionId))
+            .Select(formula => formula.Reference)
+            .OrderBy(reference => reference.Id, StringComparer.Ordinal)
+            .ThenBy(reference => reference.Version, StringComparer.Ordinal)
+            .ToArray();
+        if (!evaluation.Formulas
+            .Select(item => item.Formula.Reference)
+            .SequenceEqual(expectedReferences))
+        {
+            throw new InvalidOperationException(
+                "The published full-build evaluation did not cover exactly the applicable formula references.");
+        }
+
+        foreach (var formulaEvaluation in evaluation.Formulas)
+        {
+            var single = formulaUseCase.Execute(
+                formulaEvaluation.Formula.Reference,
+                request,
+                resetInputs,
+                syntheticDistribution.Allocations);
+            if (single.Formula.RawOutput != formulaEvaluation.Calculation.RawOutput ||
+                single.Formula.VisibleOutput != formulaEvaluation.Calculation.VisibleOutput)
+            {
+                throw new InvalidOperationException(
+                    $"Full-build evaluation diverged from the single-formula path for " +
+                    $"'{formulaEvaluation.Formula.Reference.Id}@{formulaEvaluation.Formula.Reference.Version}'.");
+            }
+        }
+
+        return new VerifiedCharacterBuild(true, evaluation.Formulas.Length);
     }
 
     private static ProgressionVerificationResult VerifyPublishedProgressionRuleset()
@@ -646,6 +712,10 @@ internal static class PublicationSmokeRunner
         bool Verified,
         FormulaReference[] FormulaReferences,
         int ApprovedCaseCount);
+
+    private sealed record VerifiedCharacterBuild(
+        bool Verified,
+        int FormulaCount);
 
     private sealed record PublishedFormulaReferenceCase(
         string Id,

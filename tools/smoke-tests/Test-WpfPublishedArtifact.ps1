@@ -363,6 +363,16 @@ if (-not $initialReport.BuildDraftPersistenceVerified -or
     throw "The external build draft did not survive replacement and exact revalidation."
 }
 
+if (-not $initialReport.PublishedBuildEvaluationVerified -or
+    -not $replacementReport.PublishedBuildEvaluationVerified -or
+    $initialReport.PublishedBuildFormulaCount -le 0 -or
+    $initialReport.PublishedBuildFormulaCount -ne
+        $replacementReport.PublishedBuildFormulaCount -or
+    $initialReport.PublishedBuildFormulaCount -gt
+        $initialReport.PublishedFormulaCount) {
+    throw "The published artifact did not reproduce the full-build grouped evaluation."
+}
+
 $initialRulesetRoot = Join-Path $initialPublishDirectory $publishedRulesetRelativePath
 $replacementRulesetRoot = Join-Path $replacementPublishDirectory $publishedRulesetRelativePath
 $initialRulesetFiles = Get-ChildItem -LiteralPath $initialRulesetRoot -Recurse -File
@@ -407,6 +417,7 @@ Write-Output "Progression cases: $($initialReport.ApprovedProgressionCaseCount) 
 Write-Output "Synthetic stat distribution: $($initialReport.SyntheticStatDistributionStatCount) stats, $($initialReport.SyntheticStatDistributionSpentPoints) spent"
 Write-Output "Reset configuration: $($initialReport.SyntheticResetCount) x $($initialReport.SyntheticPointsPerReset) = $($initialReport.SyntheticResetPoints)"
 Write-Output "Published formulas: $($initialReport.PublishedFormulaReferences -join ', '), $($initialReport.ApprovedPublishedFormulaCaseCount) contextual cases"
+Write-Output "Full build evaluation: $($initialReport.PublishedBuildFormulaCount) formulas grouped"
 Write-Output "Build draft: $($initialReport.BuildDraftId), dataset $($initialReport.BuildDraftDatasetVersion)"
 Write-Output "Ruleset files: $($initialRulesetFiles.Count)"
 Write-Output "Artifacts: $runRoot"
