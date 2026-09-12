@@ -20,5 +20,22 @@ public static class SqliteBuildDraftMigrations
                     payload_json TEXT NOT NULL
                 );
                 """),
+            new SqliteMigration(
+                2,
+                "create_builds",
+                """
+                CREATE TABLE builds (
+                    id TEXT NOT NULL PRIMARY KEY,
+                    schema_version TEXT NOT NULL,
+                    ruleset_id TEXT NOT NULL,
+                    ruleset_version TEXT NOT NULL,
+                    dataset_version TEXT NOT NULL,
+                    dataset_hash TEXT NOT NULL,
+                    engine_version TEXT NOT NULL,
+                    character_class_id TEXT NOT NULL,
+                    evolution_id TEXT NOT NULL,
+                    payload_json TEXT NOT NULL
+                );
+                """),
         ]);
 }

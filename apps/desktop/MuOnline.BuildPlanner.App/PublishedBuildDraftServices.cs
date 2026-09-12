@@ -10,6 +10,8 @@ namespace MuOnline.BuildPlanner.App;
 internal sealed record PublishedBuildDraftServices(
     SaveBuildDraftUseCase SaveUseCase,
     LoadBuildDraftUseCase LoadUseCase,
+    SaveBuildUseCase SaveBuildUseCase,
+    LoadBuildUseCase LoadBuildUseCase,
     BuildDraftRuntimeContext RuntimeContext,
     string DatabasePath,
     MigrationApplicationResult MigrationResult)
@@ -66,6 +68,7 @@ internal sealed record PublishedBuildDraftServices(
                 maximumRetryCount: 2,
                 retryDelay: TimeSpan.FromMilliseconds(150)));
         var repository = new SqliteBuildDraftRepository(connectionString, writePolicy);
+        var buildRepository = new SqliteBuildRepository(connectionString, writePolicy);
         var context = new BuildDraftRuntimeContext(
             PublishedProgressionRuleset.Catalog,
             new BuildDraftVersionedReference(
@@ -75,10 +78,13 @@ internal sealed record PublishedBuildDraftServices(
                 DatasetVersion,
                 ComputeDatasetHash(PublishedProgressionRuleset.SnapshotRoot)),
             EngineVersion);
+        var loadBuildDraftUseCase = new LoadBuildDraftUseCase(repository, context);
 
         return new PublishedBuildDraftServices(
             new SaveBuildDraftUseCase(repository, context),
-            new LoadBuildDraftUseCase(repository, context),
+            loadBuildDraftUseCase,
+            new SaveBuildUseCase(buildRepository, loadBuildDraftUseCase, context),
+            new LoadBuildUseCase(buildRepository, context),
             context,
             databasePath,
             migrationResult);

@@ -20,7 +20,7 @@ internal static class PublicationSmokeRunner
     private const string BuildDraftId = "publication-smoke-draft";
 
     private static readonly SqliteMigration SyntheticMigration = new(
-        2,
+        3,
         "create_publication_smoke_probe",
         """
         CREATE TABLE publication_smoke_probe (

@@ -25,6 +25,8 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
@@ -277,6 +279,56 @@
                      TextWrapping="Wrap"
                      VerticalScrollBarVisibility="Auto"
                      AutomationProperties.Name="Resultado de borrador" />
+
+            <GroupBox Grid.Row="15"
+                      Grid.ColumnSpan="2"
+                      Margin="0,24,0,0"
+                      Header="Build completa local">
+                <Grid Margin="12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="180" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <TextBlock VerticalAlignment="Center"
+                               Text="ID de la build" />
+                    <TextBox x:Name="BuildIdTextBox"
+                             Grid.Column="1"
+                             MinHeight="30"
+                             VerticalContentAlignment="Center"
+                             Text="mi-build" />
+
+                    <StackPanel Grid.Row="1"
+                                Grid.Column="1"
+                                Margin="0,12,0,0"
+                                Orientation="Horizontal">
+                        <Button Width="160"
+                                Padding="12,6"
+                                Click="SaveBuildButtonClick"
+                                Content="Guardar build" />
+                        <Button Width="120"
+                                Margin="12,0,0,0"
+                                Padding="12,6"
+                                Click="LoadBuildButtonClick"
+                                Content="Cargar" />
+                    </StackPanel>
+                </Grid>
+            </GroupBox>
+
+            <TextBox x:Name="BuildResultTextBox"
+                     Grid.Row="16"
+                     Grid.ColumnSpan="2"
+                     Margin="0,16,0,0"
+                     Padding="12"
+                     MinHeight="72"
+                     IsReadOnly="True"
+                     TextWrapping="Wrap"
+                     VerticalScrollBarVisibility="Auto"
+                     AutomationProperties.Name="Resultado de build completa" />
         </Grid>
     </ScrollViewer>
 </Window>
