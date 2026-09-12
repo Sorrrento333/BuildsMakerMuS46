@@ -1122,6 +1122,28 @@
 
 ### Added
 
+- Vertical de evaluación de build en lote cerrada:
+  `CalculateCharacterBuildUseCase` evalúa en una sola pasada todas las
+  fórmulas publicadas aplicables a la clase y evolución de un estado validado,
+  con caché compartida, orden determinista (referencia y luego versión),
+  detección de ciclos y trazas anidadas de contexto y dependencia por fórmula;
+  sin fórmula aplicable lanza el código nuevo
+  `formula-context-no-applicable-formula`.
+- La evaluación resuelve una sola vez el estado (progresión, resets,
+  distribución y stats) y reutiliza la resolución contextual, el intérprete
+  decimal y la selección `RAW`/`VISIBLE` existentes; cada dependencia se
+  calcula una única vez y su traza anidada se conserva aunque varias fórmulas
+  del mismo lote la consuman. WPF agrega "Evaluar atributos derivados" con
+  resultados agrupados por salida derivada y el error traducido de la
+  clase/evolución sin fórmula aplicable.
+- El smoke de publicación verifica el lote sobre el personaje sintético con
+  paridad por fórmula (crudo, visible y pasos) contra el camino individual, 19
+  fórmulas agrupadas, y amplía el reporte con `PublishedBuildEvaluationVerified`
+  y `PublishedBuildFormulaCount`. Seis pruebas de integración de Application
+  cierran la vertical; no se incorporan JSON factuales: ruleset `1.0.0`, motor
+  `0.2.0` y dataset `2026-07-30.3` permanecen sin cambios. El smoke del
+  2026-09-11 pasa con 1300 archivos y 150.038.168 bytes y el hash de dataset
+  `sha256:ef6fd756c2a69245906019d4c4cf01c3a7baba460067bbfffc4c4906361b0f18`.
 - Vertical funcional del catálogo restante de `EVD-0026` (Speed, Combo,
   Skills, Wizardry, Fenrir, buffs, crítico, Fireburst y Guild), como axiomas
   del ruleset trazados desde `EVD-0021` y `EVD-0026` y exteriores al inventario

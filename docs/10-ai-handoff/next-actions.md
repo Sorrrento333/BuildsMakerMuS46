@@ -84,10 +84,42 @@ La instrucción de ejecutar sólo la primera tarea pendiente continúa vigente.
 Confirmar con el mantenedor la siguiente vertical entre los candidatos
 documentados y cerrarla con integración, pruebas, documentación y smoke:
 
-1. Builds completas, resto del motor de cálculo y flujos de UI posteriores al
-   presupuesto ganado y los borradores locales.
+1. Builds completas y flujos de UI posteriores al presupuesto ganado, los
+   borradores locales y la evaluación en lote: master buys, persistencia de la
+   build completa y pantallas restantes del flujo.
 2. Trazas de cálculo de alto nivel aún sin contrato propio si el motor lo
    exige en una vertical posterior.
+
+## Última tarea cerrada — evaluación de build en lote
+
+La vertical de evaluación de build en lote quedó cerrada sobre el motor
+existente sin nuevos datos factuales:
+
+- `CalculateCharacterBuildUseCase` evalúa en una sola pasada todas las fórmulas
+  publicadas aplicables a la clase y evolución del estado validado, con caché
+  compartida, orden determinista por referencia y versión, detección de ciclos
+  y trazas anidadas de contexto y dependencia por fórmula.
+- Sin fórmula aplicable lanza el código nuevo
+  `formula-context-no-applicable-formula`; la resolución del estado (nivel,
+  evolución, puntos y distribución) ocurre una sola vez y WPF agrega "Evaluar
+  atributos derivados" con resultados agrupados por salida derivada.
+- El smoke verifica el lote sobre el personaje sintético (cinco stats y 201
+  gastados, resets `2 × 100 = 200`) con paridad por fórmula contra el camino
+  individual: 19 fórmulas agrupadas. Nuevos campos
+  `PublishedBuildEvaluationVerified` y `PublishedBuildFormulaCount`.
+- Seis pruebas de integración de Application cierran la vertical; ruleset
+  `1.0.0`, motor `0.2.0` y dataset `2026-07-30.3` permanecen sin cambios.
+
+## Verificación del cierre — evaluación de build en lote
+
+- Restauración y build Release aprobados con 0 advertencias/0 errores; 761/761
+  pruebas pasan: 40 validator, 58 motor, 645 Application y 18 Data.
+- CLI del validador: las ciento siete fórmulas `PUBLISHED` pasan sin errores
+  (los datos no cambian respecto al dataset `2026-07-30.3`).
+- Smoke WPF `win-x64`: PASS local el 2026-09-11 con SQLite `3.53.3`, 1300
+  archivos, 150.038.168 bytes, 10 avisos legales, 877 JSON del ruleset y
+  dataset `2026-07-30.3` con hash
+  `sha256:ef6fd756c2a69245906019d4c4cf01c3a7baba460067bbfffc4c4906361b0f18`.
 
 ## Última tarea cerrada — Speed, Combo, Skills, Wizardry y Guild
 

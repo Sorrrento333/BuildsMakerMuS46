@@ -2334,18 +2334,61 @@
 - El contrato `item` se define como `ItemDefinition` canónico; la instancia con
   nivel, opciones y sockets elegidos permanece como dato del usuario en
   `build.schema.json`.
+- Evaluación de build en lote cerrada: `CalculateCharacterBuildUseCase` evalúa
+  en una sola pasada todas las fórmulas publicadas aplicables a la clase y
+  evolución de un estado validado, con caché compartida, orden determinista
+  (referencia y luego versión, ordinal), detección de ciclos y trazas anidadas
+  de contexto y dependencia por fórmula; sin fórmula aplicable lanza el código
+  nuevo `formula-context-no-applicable-formula`. La evaluación resuelve una
+  sola vez el estado (progresión, resets, distribución y stats) y reutiliza la
+  resolución contextual, el intérprete decimal y la selección `RAW`/`VISIBLE`
+  ya materializados.
+- Cada dependencia se calcula una única vez y su traza anidada se conserva
+  aunque varias fórmulas del mismo lote la consuman; WPF agrega "Evaluar
+  atributos derivados" con resultados agrupados por salida derivada
+  (referencia, versión y crudo visible) y el error traducido de la
+  clase/evolución sin fórmula aplicable.
+- Seis pruebas de integración de Application cierran la vertical (cobertura
+  exacta por clase×evolución, paridad con el camino individual, traza anidada
+  del par maná/regeneración, orden determinista, fallo cerrado por nivel
+  inválido/asignación negativa y ausencia de fórmula aplicable). El smoke
+  verifica el lote sobre el personaje sintético con 19 fórmulas agrupadas. No
+  se incorporan JSON factuales: ruleset `1.0.0`, motor `0.2.0` y dataset
+  `2026-07-30.3` permanecen sin cambios.
 
 ## No iniciado
 
-- Builds completas, resto del motor de cálculo y flujos de UI
-  posteriores al presupuesto ganado y los borradores locales.
+- Builds completas y flujos de UI posteriores al presupuesto ganado, los
+  borradores locales y la evaluación en lote: master buys, persistencia de la
+  build completa y pantallas restantes del flujo.
 
 ## Decisiones abiertas
 
 - El canal público de actualización y firma continúa como decisión posterior de
   distribución.
 
-## Verificación más reciente — 2026-09-11
+## Verificación más reciente — 2026-09-11 (evaluación de build en lote)
+
+- Cierre de la evaluación de build en lote: restauración y build Release
+  aprobados con 0 advertencias/0 errores; 761/761 pruebas pasan: 40 validator,
+  58 motor, 645 Application y 18 Data. Seis pruebas de integración de
+  Application fijan cobertura exacta por clase×evolución, paridad
+  lote/individual, traza anidada compartida, orden determinista y fallos
+  cerrados por nivel inválido, asignación negativa y ausencia de fórmula
+  aplicable.
+- Smoke WPF `win-x64`: PASS con SQLite `3.53.3`, 1300 archivos,
+  150.038.168 bytes, 10 avisos legales, 877 JSON del ruleset, dataset
+  `2026-07-30.3` (hash
+  `sha256:ef6fd756c2a69245906019d4c4cf01c3a7baba460067bbfffc4c4906361b0f18`)
+  y los nuevos reportes `PublishedBuildEvaluationVerified`/
+  `PublishedBuildFormulaCount` aprobados; el lote reproducido sobre el
+  personaje sintético (cinco stats y 201 gastados, resets `2 × 100 = 200`)
+  agrupa 19 fórmulas con paridad por fórmula contra el camino individual.
+- No se incorporaron JSON factuales nuevos: ruleset `1.0.0`, motor `0.2.0` y
+  dataset `2026-07-30.3` permanecen sin cambios; el validador no registra
+  diferencias sobre las ciento siete fórmulas `PUBLISHED`.
+
+## Verificación anterior — 2026-09-11 (Speed, Combo, Skills, Wizardry y Guild)
 
 - Cierre de Speed/Combo/Skills/Wizardry/Fenrir/Buffs/Guild: restauración y
   build Release aprobados con 0 advertencias/0 errores; 755/755 pruebas
