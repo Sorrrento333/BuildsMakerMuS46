@@ -20,6 +20,8 @@ public partial class MainWindow : Window
     private readonly CalculateCharacterBuildUseCase _characterBuildUseCase;
     private readonly SaveBuildDraftUseCase _saveBuildDraftUseCase;
     private readonly LoadBuildDraftUseCase _loadBuildDraftUseCase;
+    private readonly SaveBuildUseCase _saveBuildUseCase;
+    private readonly LoadBuildUseCase _loadBuildUseCase;
     private readonly Dictionary<string, TextBox> _allocationInputs =
         new(StringComparer.Ordinal);
     private ProgressionPointBudgetResult? _currentBudget;
@@ -46,6 +48,8 @@ public partial class MainWindow : Window
             PublishedProgressionRuleset.CreateCharacterBuildUseCase();
         _saveBuildDraftUseCase = buildDraftServices.SaveUseCase;
         _loadBuildDraftUseCase = buildDraftServices.LoadUseCase;
+        _saveBuildUseCase = buildDraftServices.SaveBuildUseCase;
+        _loadBuildUseCase = buildDraftServices.LoadBuildUseCase;
 
         ClassComboBox.ItemsSource = _catalog.CharacterOptions
             .OrderBy(item => item.DisplayName, StringComparer.CurrentCulture)
@@ -871,6 +875,75 @@ public partial class MainWindow : Window
         return true;
     }
 
+    private async void SaveBuildButtonClick(object sender, RoutedEventArgs e)
+    {
+        var buildId = BuildIdTextBox.Text.Trim();
+        var draftId = BuildDraftIdTextBox.Text.Trim();
+        if (!IsValidBuildDraftId(buildId) ||
+            !IsValidBuildDraftId(draftId))
+        {
+            BuildResultTextBox.Text =
+                "El ID de la build y el del borrador deben usar minúsculas, " +
+                "números y guiones simples.";
+            return;
+        }
+
+        try
+        {
+            var build = await _saveBuildUseCase.ExecuteAsync(
+                new SaveBuildRequest(buildId, draftId),
+                CancellationToken.None);
+            BuildResultTextBox.Text =
+                $"Build '{build.Id}' guardada. " +
+                $"{build.Stats.Count} stats del snapshot exacto.";
+        }
+        catch (BuildException exception)
+        {
+            BuildResultTextBox.Text =
+                $"No se pudo guardar ({exception.Code}): " +
+                TranslateBuildError(exception.Code);
+        }
+        catch (BuildDraftException exception)
+        {
+            BuildResultTextBox.Text =
+                $"No se pudo guardar el borrador ({exception.Code}): " +
+                TranslateBuildDraftError(exception.Code);
+        }
+    }
+
+    private async void LoadBuildButtonClick(object sender, RoutedEventArgs e)
+    {
+        var buildId = BuildIdTextBox.Text.Trim();
+        if (!IsValidBuildDraftId(buildId))
+        {
+            BuildResultTextBox.Text =
+                "El ID de la build debe usar minúsculas, números y guiones simples.";
+            return;
+        }
+
+        try
+        {
+            var build = await _loadBuildUseCase.ExecuteAsync(
+                buildId,
+                CancellationToken.None);
+            BuildResultTextBox.Text =
+                $"Build '{build.Id}' cargada. " +
+                $"{build.Stats.Count} stats revalidados contra el snapshot exacto.";
+        }
+        catch (BuildException exception)
+        {
+            BuildResultTextBox.Text =
+                $"No se pudo cargar ({exception.Code}): " +
+                TranslateBuildError(exception.Code);
+        }
+        catch (BuildDraftException exception)
+        {
+            BuildResultTextBox.Text =
+                $"No se pudo cargar el borrador fuente ({exception.Code}): " +
+                TranslateBuildDraftError(exception.Code);
+        }
+    }
+
     private static string TranslateBuildDraftError(string code) => code switch
     {
         BuildDraftErrorCodes.NotFound =>
@@ -886,5 +959,22 @@ public partial class MainWindow : Window
         BuildDraftErrorCodes.WriteConflict =>
             "la base local siguió ocupada después de los reintentos configurados.",
         _ => "se produjo un error de borrador no reconocido.",
+    };
+
+    private static string TranslateBuildError(string code) => code switch
+    {
+        BuildErrorCodes.NotFound =>
+            "no existe una build con ese ID.",
+        BuildErrorCodes.SchemaUnsupported =>
+            "la build usa una versión de esquema no soportada.",
+        BuildErrorCodes.DependencyUnavailable =>
+            "no está publicado exactamente el ruleset, dataset o motor del snapshot.",
+        BuildErrorCodes.SourceMismatch =>
+            "las identidades internas de la build no son coherentes.",
+        BuildErrorCodes.RevalidationFailed =>
+            "el recálculo no reproduce la caché persistida.",
+        BuildErrorCodes.WriteConflict =>
+            "la base local siguió ocupada después de los reintentos configurados.",
+        _ => "se produjo un error de build no reconocido.",
     };
 }
