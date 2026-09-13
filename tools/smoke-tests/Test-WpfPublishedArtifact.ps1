@@ -292,9 +292,9 @@ if (-not $initialReport.DataOutsideBinaryDirectory -or
     -not $replacementReport.DataOutsideBinaryDirectory) {
     throw "The smoke database was stored inside a binary directory."
 }
-if ($initialReport.AppliedMigrationCount -ne 2 -or
+if ($initialReport.AppliedMigrationCount -ne 3 -or
     $initialReport.AlreadyAppliedMigrationCount -ne 0 -or
-    $replacementReport.AlreadyAppliedMigrationCount -ne 2) {
+    $replacementReport.AlreadyAppliedMigrationCount -ne 3) {
     throw "The build-draft and smoke migrations were not recognized across binary replacement."
 }
 if ($initialReport.SqliteVersion -ne $replacementReport.SqliteVersion) {
