@@ -1,0 +1,11 @@
+﻿HEAD:apps/desktop/MuOnline.BuildPlanner.App/MainWindow.xaml.cs:23:    private readonly SaveBuildUseCase _saveBuildUseCase;
+HEAD:apps/desktop/MuOnline.BuildPlanner.App/MainWindow.xaml.cs:24:    private readonly LoadBuildUseCase _loadBuildUseCase;
+HEAD:apps/desktop/MuOnline.BuildPlanner.App/MainWindow.xaml.cs:51:        _saveBuildUseCase = buildDraftServices.SaveBuildUseCase;
+HEAD:apps/desktop/MuOnline.BuildPlanner.App/MainWindow.xaml.cs:52:        _loadBuildUseCase = buildDraftServices.LoadBuildUseCase;
+HEAD:apps/desktop/MuOnline.BuildPlanner.App/MainWindow.xaml.cs:878:    private async void SaveBuildButtonClick(object sender, RoutedEventArgs e)
+HEAD:apps/desktop/MuOnline.BuildPlanner.App/MainWindow.xaml.cs:893:            var build = await _saveBuildUseCase.ExecuteAsync(
+HEAD:apps/desktop/MuOnline.BuildPlanner.App/MainWindow.xaml.cs:904:                TranslateBuildError(exception.Code);
+HEAD:apps/desktop/MuOnline.BuildPlanner.App/MainWindow.xaml.cs:914:    private async void LoadBuildButtonClick(object sender, RoutedEventArgs e)
+HEAD:apps/desktop/MuOnline.BuildPlanner.App/MainWindow.xaml.cs:926:            var build = await _loadBuildUseCase.ExecuteAsync(
+HEAD:apps/desktop/MuOnline.BuildPlanner.App/MainWindow.xaml.cs:937:                TranslateBuildError(exception.Code);
+HEAD:apps/desktop/MuOnline.BuildPlanner.App/MainWindow.xaml.cs:964:    private static string TranslateBuildError(string code) => code switch

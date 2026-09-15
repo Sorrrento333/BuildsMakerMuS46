@@ -1,0 +1,5 @@
+﻿MigrationApplicationResult.cs
+MigrationIntegrityException.cs
+SqliteBuildDraftMigrations.cs
+SqliteMigration.cs
+SqliteMigrationRunner.cs

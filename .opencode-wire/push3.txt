@@ -1,0 +1,9 @@
+﻿git : To https://github.com/Sorrrento333/BuildsMakerMuS46.git
+En línea: 7 Carácter: 1
++ git push 2>&1 | Out-String -Width 250 | Set-Content -LiteralPath "$w\ ...
++ ~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (To https://gith...sMakerMuS46.git:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+   40f5bbb..45cf218  codex/reset-aware-drafts-traced-formulas -> codex/reset-aware-drafts-traced-formulas
+

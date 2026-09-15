@@ -1,0 +1,13 @@
+﻿param(
+    [string]$RepositoryRoot = (Resolve-Path (Join-Path $PSScriptRoot "../..")),
+    [string]$ExpectedSdkVersion = "10.0.301"
+)
+
+$ErrorActionPreference = "Stop"
+Set-StrictMode -Version Latest
+
+$inputRoot = Join-Path $RepositoryRoot "spikes/json-everything-source-build"
+$provenanceInput = Get-Content -LiteralPath (Join-Path $inputRoot "source-build-provenance.json") -Raw | ConvertFrom-Json
+$sbomInput = Get-Content -LiteralPath (Join-Path $inputRoot "source-build.spdx.json") -Raw | ConvertFrom-Json
+$sourceCommit = $provenanceInput.sourceCommit
+

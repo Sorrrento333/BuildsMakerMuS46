@@ -1,0 +1,7 @@
+﻿completed	failure	feat: persist a full character build locally	CI	codex/reset-aware-drafts-traced-formulas	pull_request	34738909899	1m32s	2026-09-13T04:52:17Z
+completed	failure	wire build save/load via draft services in MainWindow	CI	codex/reset-aware-drafts-traced-formulas	push	34738907245	1m48s	2026-09-13T04:52:13Z
+completed	failure	feat: persist a full character build locally	CI	codex/reset-aware-drafts-traced-formulas	pull_request	34727764464	1m36s	2026-09-13T00:21:38Z
+completed	failure	feat: persist a full character build locally	CI	codex/reset-aware-drafts-traced-formulas	push	34727763137	1m9s	2026-09-13T00:21:36Z
+completed	failure	feat: persist a full character build locally	CI	codex/reset-aware-drafts-traced-formulas	push	34717935047	1m19s	2026-09-12T20:43:43Z
+completed	failure	docs: record rates, regen and remaining damage dataset 2026-07-30.2	CI	codex/reset-aware-drafts-traced-formulas	push	34579785375	1m26s	2026-09-11T08:33:37Z
+

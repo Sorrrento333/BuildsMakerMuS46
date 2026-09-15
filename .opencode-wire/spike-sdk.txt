@@ -1,0 +1,7 @@
+﻿3:    [string]$ExpectedSdkVersion = "10.0.301"
+63:$actualSdkVersion = (& dotnet --version).Trim()
+64:if ($ExpectedSdkVersion -ne $provenanceInput.sdkVersion) {
+67:if ($LASTEXITCODE -ne 0 -or $actualSdkVersion -ne $ExpectedSdkVersion) {
+68:    throw "Expected .NET SDK $ExpectedSdkVersion, found '$actualSdkVersion'."
+251:$namespaceSeed = "$sourceCommit-$actualSdkVersion"
+265:    sdkVersion = $actualSdkVersion

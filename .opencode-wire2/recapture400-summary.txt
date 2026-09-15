@@ -1,0 +1,8 @@
+﻿dotnet-exe=True
+sdk-version=10.0.400
+PROJ [Json.More] exists=False
+  SKIP-missing
+PROJ [JsonPointer] exists=False
+  SKIP-missing
+PROJ [JsonSchema] exists=False
+  SKIP-missing

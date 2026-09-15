@@ -1,0 +1,10 @@
+﻿git : fatal: ambiguous argument 'origin/vertebrado/reset-aware-traced-formulas..HEAD': unknown revision or path not in the working tree.
+En línea: 7 Carácter: 1
++ git log origin/vertebrado/reset-aware-traced-formulas..HEAD --oneline ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (fatal: ambiguou...e working tree.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+Use '--' to separate paths from revisions, like this:
+'git <command> [<revision>...] -- [<file>...]'
+

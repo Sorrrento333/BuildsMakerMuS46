@@ -1,0 +1,7 @@
+﻿git.exe : Cloning into 'F:\Proyecto Builds\Programa\artifacts\json-everything-source-build\source'...
+En F:\Proyecto Builds\Programa\tools\spikes\Test-JsonEverythingSourceBuild.ps1: 27 Carácter: 9
++         & $FilePath @Arguments
++         ~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Cloning into 'F...uild\source'...:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
