@@ -1,5 +1,5 @@
 {
-  "sdkVersion": "10.0.301",
+  "sdkVersion": "10.0.400",
   "targetFramework": "net10.0",
   "repository": "https://github.com/json-everything/json-everything.git",
   "sourceCommit": "8f112c415735af9519a5b478447ad8239fa18642",

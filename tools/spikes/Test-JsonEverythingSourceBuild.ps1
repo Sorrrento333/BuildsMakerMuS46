@@ -1,6 +1,6 @@
 param(
     [string]$RepositoryRoot = (Resolve-Path (Join-Path $PSScriptRoot "../..")),
-    [string]$ExpectedSdkVersion = "10.0.301"
+    [string]$ExpectedSdkVersion = "10.0.400"
 )
 
 $ErrorActionPreference = "Stop"
