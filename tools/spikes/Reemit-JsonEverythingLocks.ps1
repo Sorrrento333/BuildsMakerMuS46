@@ -100,7 +100,7 @@ $restoreProperties = @(
 foreach ($entry in $lockMappings.GetEnumerator()) {
     $csproj = Join-Path $sourceRoot (($entry.Value -replace "packages.lock.json$", "") + "$($entry.Key).csproj")
     Write-Host "== Re-emitting reviewed lock for $($entry.Key) under SDK $ExpectedSdkVersion =="
-    Invoke-Checked dotnet @("restore", $csproj, $restoreProperties) $sourceRoot
+    Invoke-Checked dotnet @(@("restore", $csproj) + $restoreProperties) $sourceRoot
 }
 
 Copy-RegeneratedLocks $sourceRoot
