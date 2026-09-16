@@ -11,7 +11,7 @@ $summaryPath = "C:\Users\SORREN~1\AppData\Local\Temp\opencode\nspc\spike-summary
 Remove-Item -LiteralPath $summaryPath -ErrorAction SilentlyContinue
 function L([string]$s) { $s | Out-File -LiteralPath $summaryPath -Append -Encoding utf8 }
 
-L "== SPIKE-AJENO-REAL BAJO SDK .400 (valor=true de usuario) =="
+L "== SPIKE-AJENO-REAL BAJO SDK .401 (valor=true de usuario) =="
 L "dotnet=$(Get-Command dotnet.exe -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Source)"
 $env:DOTNET_MULTILEVEL_LOOKUP = "0"
 $env:DOTNET_SKIP_FIRST_TIME_EXPERIENCE = "1"
@@ -30,7 +30,7 @@ $sdkVersion = $provenance.sdkVersion
 $sourceCommit = $provenance.sourceCommit
 L "provenance-sdk=$sdkVersion sourceCommit=$sourceCommit"
 
-$expectedSdk = "10.0.400"
+$expectedSdk = "10.0.401"
 $provenance | Add-Member -NotePropertyName ExpectedSdkVersion -NotePropertyValue $expectedSdk -Force
 
 $spikePath = Join-Path $repo "tools\spikes\Test-JsonEverythingSourceBuild.ps1"

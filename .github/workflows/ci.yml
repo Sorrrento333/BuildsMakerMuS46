@@ -17,13 +17,13 @@ jobs:
       - name: Set up .NET 10
         uses: actions/setup-dotnet@v5
         with:
-          dotnet-version: '10.0.400'
+          dotnet-version: '10.0.401'
           cache: true
           cache-dependency-path: '**/packages.lock.json'
 
-      - name: Re-emit reviewed locks to Tasks.Git .4xx band under SDK .400
+      - name: Re-emit reviewed locks to Tasks.Git .4xx band under SDK .401
         shell: pwsh
-        run: ./tools/spikes/Reemit-JsonEverythingLocks.ps1 -ExpectedSdkVersion '10.0.400'
+        run: ./tools/spikes/Reemit-JsonEverythingLocks.ps1 -ExpectedSdkVersion '10.0.401'
 
       - name: Build and verify Json Everything from pinned MIT source
         shell: pwsh
@@ -51,7 +51,7 @@ jobs:
       - name: Set up .NET 10
         uses: actions/setup-dotnet@v5
         with:
-          dotnet-version: '10.0.400'
+          dotnet-version: '10.0.401'
           cache: true
           cache-dependency-path: '**/packages.lock.json'
 

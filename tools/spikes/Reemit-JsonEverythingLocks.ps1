@@ -1,6 +1,6 @@
 param(
     [string]$RepositoryRoot = (Resolve-Path (Join-Path $PSScriptRoot "../..")),
-    [string]$ExpectedSdkVersion = "10.0.400"
+    [string]$ExpectedSdkVersion = "10.0.401"
 )
 
 $ErrorActionPreference = "Stop"
@@ -31,6 +31,17 @@ function Invoke-Checked {
     finally {
         Pop-Location
     }
+}
+
+$expectedSdkPattern = "^{0}\s" -f [regex]::Escape($ExpectedSdkVersion)
+$installedSdkVersions = @(& dotnet --list-sdks)
+if ($LASTEXITCODE -ne 0 -or @($installedSdkVersions | Where-Object { $_ -match $expectedSdkPattern }).Count -eq 0) {
+    throw "Expected .NET SDK $ExpectedSdkVersion. Installed SDKs: $($installedSdkVersions -join ', ')"
+}
+
+$actualSdkVersion = (& dotnet --version).Trim()
+if ($LASTEXITCODE -ne 0 -or $actualSdkVersion -ne $ExpectedSdkVersion) {
+    throw "Expected .NET SDK $ExpectedSdkVersion, found '$actualSdkVersion'."
 }
 
 $artifactRoot = Join-Path $RepositoryRoot "artifacts/json-everything-source-build"
@@ -67,7 +78,6 @@ $lockMappings = [ordered]@{
 function Copy-ReviewedLocks {
     param([string]$DestinationSourceRoot)
     foreach ($entry in $lockMappings.GetEnumerator()) {
-        $reviewedLock = Join-Path $inputRoot "locks/$($entry.Key.Substring(0,0))$($entry.Key).packages.lock.json"
         $reviewedLock = Join-Path $inputRoot "locks/$($entry.Key).packages.lock.json"
         if (-not (Test-Path -LiteralPath $reviewedLock)) {
             throw "Missing reviewed lock: $reviewedLock"
@@ -88,7 +98,57 @@ function Copy-RegeneratedLocks {
     }
 }
 
+function Set-SourceLinkPackageVersion {
+    param([string]$DestinationSourceRoot)
+
+    @"
+<Project>
+  <ItemGroup>
+    <PackageReference Update="Microsoft.SourceLink.GitHub" Version="$ExpectedSdkVersion" />
+  </ItemGroup>
+</Project>
+"@ | Set-Content -LiteralPath (Join-Path $DestinationSourceRoot "Directory.Build.targets") -Encoding utf8
+}
+
+function Update-ReviewedSbomPackageVersions {
+    param([string]$SourceSourceRoot)
+
+    $resolvedPackages = @{}
+    $assets = Get-ChildItem -LiteralPath (Join-Path $SourceSourceRoot "src") -Filter project.assets.json -Recurse
+    foreach ($asset in $assets) {
+        $assetsJson = Get-Content -LiteralPath $asset.FullName -Raw | ConvertFrom-Json
+        foreach ($library in $assetsJson.libraries.PSObject.Properties) {
+            if ($library.Value.type -ne "package") {
+                continue
+            }
+
+            $packageParts = $library.Name -split "/", 2
+            $packageName = $packageParts[0]
+            $packageVersion = $packageParts[1]
+            if ($resolvedPackages.ContainsKey($packageName) -and $resolvedPackages[$packageName] -ne $packageVersion) {
+                throw "Package $packageName resolved to multiple versions while re-emitting locks."
+            }
+            $resolvedPackages[$packageName] = $packageVersion
+        }
+    }
+
+    $sbomPath = Join-Path $inputRoot "source-build.spdx.json"
+    $sbom = Get-Content -LiteralPath $sbomPath -Raw | ConvertFrom-Json
+    foreach ($package in $sbom.packages) {
+        if (-not $resolvedPackages.ContainsKey($package.name)) {
+            continue
+        }
+
+        $package.versionInfo = $resolvedPackages[$package.name]
+        $safeId = ($package.name + "-" + $package.versionInfo) -replace "[^A-Za-z0-9.-]", "-"
+        $package.SPDXID = "SPDXRef-NuGet-$safeId"
+        $package.downloadLocation = "https://www.nuget.org/packages/$($package.name)/$($package.versionInfo)"
+    }
+    $sbom | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $sbomPath -Encoding utf8
+}
+
 Copy-ReviewedLocks $sourceRoot
+Set-SourceLinkPackageVersion $sourceRoot
 
 $restoreProperties = @(
     "-p:TargetFrameworks=net10.0",
@@ -103,16 +163,18 @@ foreach ($entry in $lockMappings.GetEnumerator()) {
     )
 
     Write-Host "== Re-emitting reviewed lock for $($entry.Key) under SDK $ExpectedSdkVersion =="
-
-    Invoke-Checked dotnet (@('restore', $csproj) + $restoreProperties) $sourceRoot
+    Invoke-Checked dotnet (@('restore', $csproj, '--force-evaluate') + $restoreProperties) $sourceRoot
 }
 
 Copy-RegeneratedLocks $sourceRoot
+Update-ReviewedSbomPackageVersions $sourceRoot
 
 foreach ($entry in $lockMappings.GetEnumerator()) {
     $csproj = Join-Path $sourceRoot (($entry.Value -replace "packages.lock.json$", "") + "$($entry.Key).csproj")
     Write-Host "== Verifying locked-mode restore for $($entry.Key) =="
-    Invoke-Checked dotnet @("restore", $csproj, "--locked-mode", "-p:RestoreLockedMode=true") $sourceRoot
+    Invoke-Checked dotnet (
+        @("restore", $csproj, "--locked-mode", "-p:RestoreLockedMode=true") + $restoreProperties
+    ) $sourceRoot
 }
 
 $tasksGit = Get-ChildItem -LiteralPath (Join-Path $inputRoot "locks") -Filter "*.packages.lock.json" |

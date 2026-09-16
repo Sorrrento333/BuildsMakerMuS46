@@ -1,6 +1,6 @@
 param(
     [string]$RepositoryRoot = (Resolve-Path (Join-Path $PSScriptRoot "../..")),
-    [string]$ExpectedSdkVersion = "10.0.400"
+    [string]$ExpectedSdkVersion = "10.0.401"
 )
 
 $ErrorActionPreference = "Stop"
@@ -53,6 +53,18 @@ function Copy-ReviewedLocks {
     }
 }
 
+function Set-SourceLinkPackageVersion {
+    param([string]$DestinationSourceRoot)
+
+    @"
+<Project>
+  <ItemGroup>
+    <PackageReference Update="Microsoft.SourceLink.GitHub" Version="$ExpectedSdkVersion" />
+  </ItemGroup>
+</Project>
+"@ | Set-Content -LiteralPath (Join-Path $DestinationSourceRoot "Directory.Build.targets") -Encoding utf8
+}
+
 function Set-ReproducibleCheckoutConfiguration {
     param([string]$SourceRepositoryRoot)
 
@@ -60,10 +72,17 @@ function Set-ReproducibleCheckoutConfiguration {
     Invoke-Checked git @("config", "core.eol", "lf") $SourceRepositoryRoot
 }
 
-$actualSdkVersion = (& dotnet --version).Trim()
 if ($ExpectedSdkVersion -ne $provenanceInput.sdkVersion) {
     throw "Expected SDK parameter differs from the reviewed provenance input."
 }
+
+$expectedSdkPattern = "^{0}\s" -f [regex]::Escape($ExpectedSdkVersion)
+$installedSdkVersions = @(& dotnet --list-sdks)
+if ($LASTEXITCODE -ne 0 -or @($installedSdkVersions | Where-Object { $_ -match $expectedSdkPattern }).Count -eq 0) {
+    throw "Expected .NET SDK $ExpectedSdkVersion. Installed SDKs: $($installedSdkVersions -join ', ')"
+}
+
+$actualSdkVersion = (& dotnet --version).Trim()
 if ($LASTEXITCODE -ne 0 -or $actualSdkVersion -ne $ExpectedSdkVersion) {
     throw "Expected .NET SDK $ExpectedSdkVersion, found '$actualSdkVersion'."
 }
@@ -84,6 +103,7 @@ Set-ReproducibleCheckoutConfiguration $sourceRoot
 Invoke-Checked git @("checkout", "--detach", $sourceCommit) $sourceRoot
 Invoke-Checked git @("fetch", "--depth", "1", "origin", $transitiveCommit) $sourceRoot
 Copy-ReviewedLocks $sourceRoot
+Set-SourceLinkPackageVersion $sourceRoot
 
 $actualCommit = (& git -C $sourceRoot rev-parse HEAD).Trim()
 if ($actualCommit -ne $sourceCommit) {
@@ -135,6 +155,7 @@ Invoke-Checked git @("clone", "--filter=blob:none", "--no-checkout", $repository
 Set-ReproducibleCheckoutConfiguration $repeatSourceRoot
 Invoke-Checked git @("checkout", "--detach", $sourceCommit) $repeatSourceRoot
 Copy-ReviewedLocks $repeatSourceRoot
+Set-SourceLinkPackageVersion $repeatSourceRoot
 $repeatProjectPath = Join-Path $repeatSourceRoot "src/JsonSchema/JsonSchema.csproj"
 Invoke-Checked dotnet (@("restore", $repeatProjectPath, "--locked-mode") + $restoreProperties) $repeatSourceRoot
 $repeatBuildProperties = $commonBuildProperties + @("-p:PathMap=$repeatSourceRoot=/_/json-everything")
