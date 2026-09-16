@@ -1,0 +1,9 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "ag-regen-dark-knight-ag-out-of-range",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-ag-regen-dark-knight", "version": "1.0.0" },
+  "context": { "characterClassId": "class-dark-knight", "evolutionId": "evolution-dark-knight" },
+  "inputs": { "ag": -1, "agility": 20 },
+  "expectedErrorCode": "formula-dependency-out-of-range"
+}

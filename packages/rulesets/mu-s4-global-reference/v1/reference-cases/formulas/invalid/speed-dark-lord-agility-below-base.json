@@ -1,0 +1,17 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "speed-dark-lord-agility-below-base",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": {
+    "id": "formula-speed-dark-lord",
+    "version": "1.0.0"
+  },
+  "context": {
+    "characterClassId": "class-dark-lord",
+    "evolutionId": "evolution-dark-lord"
+  },
+  "inputs": {
+    "agility": 19
+  },
+  "expectedErrorCode": "formula-stat-below-base"
+}

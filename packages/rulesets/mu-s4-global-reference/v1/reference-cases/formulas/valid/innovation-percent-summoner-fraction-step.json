@@ -1,0 +1,26 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "innovation-percent-summoner-fraction-step",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-innovation-percent-summoner", "version": "1.0.0" },
+  "context": { "characterClassId": "class-summoner", "evolutionId": "evolution-summoner" },
+  "inputs": { "energy": 25 },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-innovation-percent-summoner-fraction-step",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": { "id": "formula-innovation-percent-summoner", "version": "1.0.0" },
+    "context": { "characterClassId": "class-summoner", "evolutionId": "evolution-summoner" },
+    "inputs": { "energy": 25 },
+    "steps": [
+      { "stepId": "energy-term", "value": 0.2777777777777777777777777778 },
+      { "stepId": "raw-innovation-percent", "value": 20.277777777777777777777777778 },
+      { "stepId": "visible-innovation-percent", "value": 20 }
+    ],
+    "rounding": { "mode": "TRUNCATE", "stage": "visible-innovation-percent", "decimalPlaces": 0 },
+    "rawOutput": 20.277777777777777777777777778,
+    "visibleOutput": 20,
+    "evidenceRefs": ["evd-0021", "evd-0026"],
+    "conflictIds": []
+  }
+}

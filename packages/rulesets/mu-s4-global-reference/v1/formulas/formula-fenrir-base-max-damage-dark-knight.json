@@ -1,0 +1,242 @@
+{
+  "schemaVersion": "2.1.0",
+  "id": "formula-fenrir-base-max-damage-dark-knight",
+  "version": "1.0.0",
+  "rulesetId": "mu-s4-global-reference",
+  "status": "PUBLISHED",
+  "confidence": "VERIFIED",
+  "purpose": "Calculate visible base Fenrir base maximum damage for the Dark Knight family before equipment, options, buffs, private profiles, or undeclared modifiers.",
+  "applicability": {
+    "characterClassId": "class-dark-knight",
+    "evolutionIds": [
+      "evolution-dark-knight",
+      "evolution-blade-knight",
+      "evolution-blade-master"
+    ]
+  },
+  "inputs": [
+    {
+      "id": "strength",
+      "numericType": "INT64",
+      "unit": "stat-point",
+      "numericBounds": {
+        "minimum": 28,
+        "minimumInclusive": true,
+        "classification": "FACTUAL",
+        "evidenceRefs": [
+          "evd-0021"
+        ]
+      },
+      "rangeErrorCode": "formula-stat-below-base",
+      "source": {
+        "kind": "CONTEXT_VALUE",
+        "valueId": "resolved-strength"
+      }
+    },
+    {
+      "id": "agility",
+      "numericType": "INT64",
+      "unit": "stat-point",
+      "numericBounds": {
+        "minimum": 20,
+        "minimumInclusive": true,
+        "classification": "FACTUAL",
+        "evidenceRefs": [
+          "evd-0021"
+        ]
+      },
+      "rangeErrorCode": "formula-stat-below-base",
+      "source": {
+        "kind": "CONTEXT_VALUE",
+        "valueId": "resolved-agility"
+      }
+    },
+    {
+      "id": "vitality",
+      "numericType": "INT64",
+      "unit": "stat-point",
+      "numericBounds": {
+        "minimum": 25,
+        "minimumInclusive": true,
+        "classification": "FACTUAL",
+        "evidenceRefs": [
+          "evd-0021"
+        ]
+      },
+      "rangeErrorCode": "formula-stat-below-base",
+      "source": {
+        "kind": "CONTEXT_VALUE",
+        "valueId": "resolved-vitality"
+      }
+    },
+    {
+      "id": "energy",
+      "numericType": "INT64",
+      "unit": "stat-point",
+      "numericBounds": {
+        "minimum": 10,
+        "minimumInclusive": true,
+        "classification": "FACTUAL",
+        "evidenceRefs": [
+          "evd-0021"
+        ]
+      },
+      "rangeErrorCode": "formula-stat-below-base",
+      "source": {
+        "kind": "CONTEXT_VALUE",
+        "valueId": "resolved-energy"
+      }
+    }
+  ],
+  "output": {
+    "id": "fenrir-base-max-damage",
+    "numericType": "INT64",
+    "unit": "damage-point"
+  },
+  "strategy": {
+    "kind": "PROGRAM",
+    "executionModel": "CHECKED_DECIMAL_V1",
+    "steps": [
+      {
+        "id": "strength-term",
+        "operation": "DIVIDE",
+        "operands": [
+          {
+            "kind": "INPUT",
+            "inputId": "strength"
+          },
+          {
+            "kind": "LITERAL",
+            "value": 3
+          }
+        ]
+      },
+      {
+        "id": "agility-term",
+        "operation": "DIVIDE",
+        "operands": [
+          {
+            "kind": "INPUT",
+            "inputId": "agility"
+          },
+          {
+            "kind": "LITERAL",
+            "value": 5
+          }
+        ]
+      },
+      {
+        "id": "vitality-term",
+        "operation": "DIVIDE",
+        "operands": [
+          {
+            "kind": "INPUT",
+            "inputId": "vitality"
+          },
+          {
+            "kind": "LITERAL",
+            "value": 5
+          }
+        ]
+      },
+      {
+        "id": "energy-term",
+        "operation": "DIVIDE",
+        "operands": [
+          {
+            "kind": "INPUT",
+            "inputId": "energy"
+          },
+          {
+            "kind": "LITERAL",
+            "value": 6
+          }
+        ]
+      },
+      {
+        "id": "raw-fenrir-base-max-damage",
+        "operation": "ADD",
+        "operands": [
+          {
+            "kind": "STEP",
+            "stepId": "strength-term"
+          },
+          {
+            "kind": "STEP",
+            "stepId": "agility-term"
+          },
+          {
+            "kind": "STEP",
+            "stepId": "vitality-term"
+          },
+          {
+            "kind": "STEP",
+            "stepId": "energy-term"
+          },
+          {
+            "kind": "LITERAL",
+            "value": 75
+          }
+        ]
+      },
+      {
+        "id": "visible-fenrir-base-max-damage",
+        "operation": "APPLY_ROUNDING",
+        "operands": [
+          {
+            "kind": "STEP",
+            "stepId": "raw-fenrir-base-max-damage"
+          }
+        ]
+      }
+    ],
+    "dependencyFormulaRefs": []
+  },
+  "rounding": {
+    "mode": "TRUNCATE",
+    "stage": "visible-fenrir-base-max-damage",
+    "decimalPlaces": 0
+  },
+  "trace": {
+    "stepIds": [
+      "strength-term",
+      "agility-term",
+      "vitality-term",
+      "energy-term",
+      "raw-fenrir-base-max-damage",
+      "visible-fenrir-base-max-damage"
+    ],
+    "rawOutputStepId": "raw-fenrir-base-max-damage",
+    "visibleOutputStepId": "visible-fenrir-base-max-damage"
+  },
+  "constraints": [
+    "Resolve class and evolution applicability before evaluating arithmetic.",
+    "Divide Strength by the exact literal 3, Agility by 5, Vitality by 5 and Energy by 6 using checked decimal arithmetic, then add the exact literal 75.",
+    "Represent each divided term exactly as a base-10 decimal and add them with checked decimal arithmetic.",
+    "Do not round strength-term, agility-term, vitality-term, energy-term or raw-fenrir-base-max-damage before visible-fenrir-base-max-damage.",
+    "Truncate raw-fenrir-base-max-damage toward zero exactly once at visible-fenrir-base-max-damage."
+  ],
+  "evidenceRefs": [
+    "evd-0021",
+    "evd-0026"
+  ],
+  "conflictIds": [],
+  "testCaseRefs": [
+    {
+      "id": "fenrir-base-max-damage-dark-knight-base",
+      "version": "1.0.0"
+    },
+    {
+      "id": "fenrir-base-max-damage-dark-knight-fraction-step",
+      "version": "1.0.0"
+    },
+    {
+      "id": "fenrir-base-max-damage-dark-knight-integer-step",
+      "version": "1.0.0"
+    },
+    {
+      "id": "fenrir-base-max-damage-dark-knight-blade-master-step",
+      "version": "1.0.0"
+    }
+  ]
+}

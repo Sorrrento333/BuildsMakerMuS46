@@ -44,6 +44,11 @@ public static class SchemaContractValidator
         new("build-draft", "v1", "build-draft", "build-draft"),
         new("server-profile", "v1", "server-profile", "server-profile"),
         new("build", "v1", "build", "build"),
+        new("ruleset", "v1", "ruleset", "ruleset"),
+        new("quest-rule", "v1", "quest-rule", "quest-rule"),
+        new("item", "v1", "item", "item"),
+        new("skill", "v1", "skill", "skill"),
+        new("scenario", "v1", "scenario", "scenario"),
     ];
 
     public static IReadOnlyList<FixtureValidationResult> ValidateRepository(string repositoryRoot)

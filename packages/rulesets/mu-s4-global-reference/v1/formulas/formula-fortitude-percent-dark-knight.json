@@ -1,0 +1,168 @@
+{
+  "schemaVersion": "2.1.0",
+  "id": "formula-fortitude-percent-dark-knight",
+  "version": "1.0.0",
+  "rulesetId": "mu-s4-global-reference",
+  "status": "PUBLISHED",
+  "confidence": "VERIFIED",
+  "purpose": "Calculate visible base Fortitude buff percentage for the Dark Knight family before equipment, options, buffs, private profiles, or undeclared modifiers.",
+  "applicability": {
+    "characterClassId": "class-dark-knight",
+    "evolutionIds": [
+      "evolution-dark-knight",
+      "evolution-blade-knight",
+      "evolution-blade-master"
+    ]
+  },
+  "inputs": [
+    {
+      "id": "vitality",
+      "numericType": "INT64",
+      "unit": "stat-point",
+      "numericBounds": {
+        "minimum": 25,
+        "minimumInclusive": true,
+        "classification": "FACTUAL",
+        "evidenceRefs": [
+          "evd-0021"
+        ]
+      },
+      "rangeErrorCode": "formula-stat-below-base",
+      "source": {
+        "kind": "CONTEXT_VALUE",
+        "valueId": "resolved-vitality"
+      }
+    },
+    {
+      "id": "energy",
+      "numericType": "INT64",
+      "unit": "stat-point",
+      "numericBounds": {
+        "minimum": 10,
+        "minimumInclusive": true,
+        "classification": "FACTUAL",
+        "evidenceRefs": [
+          "evd-0021"
+        ]
+      },
+      "rangeErrorCode": "formula-stat-below-base",
+      "source": {
+        "kind": "CONTEXT_VALUE",
+        "valueId": "resolved-energy"
+      }
+    }
+  ],
+  "output": {
+    "id": "fortitude-percent",
+    "numericType": "INT64",
+    "unit": "percent"
+  },
+  "strategy": {
+    "kind": "PROGRAM",
+    "executionModel": "CHECKED_DECIMAL_V1",
+    "steps": [
+      {
+        "id": "vitality-term",
+        "operation": "DIVIDE",
+        "operands": [
+          {
+            "kind": "INPUT",
+            "inputId": "vitality"
+          },
+          {
+            "kind": "LITERAL",
+            "value": 100
+          }
+        ]
+      },
+      {
+        "id": "energy-term",
+        "operation": "DIVIDE",
+        "operands": [
+          {
+            "kind": "INPUT",
+            "inputId": "energy"
+          },
+          {
+            "kind": "LITERAL",
+            "value": 20
+          }
+        ]
+      },
+      {
+        "id": "raw-fortitude-percent",
+        "operation": "ADD",
+        "operands": [
+          {
+            "kind": "STEP",
+            "stepId": "vitality-term"
+          },
+          {
+            "kind": "STEP",
+            "stepId": "energy-term"
+          },
+          {
+            "kind": "LITERAL",
+            "value": 12
+          }
+        ]
+      },
+      {
+        "id": "visible-fortitude-percent",
+        "operation": "APPLY_ROUNDING",
+        "operands": [
+          {
+            "kind": "STEP",
+            "stepId": "raw-fortitude-percent"
+          }
+        ]
+      }
+    ],
+    "dependencyFormulaRefs": []
+  },
+  "rounding": {
+    "mode": "TRUNCATE",
+    "stage": "visible-fortitude-percent",
+    "decimalPlaces": 0
+  },
+  "trace": {
+    "stepIds": [
+      "vitality-term",
+      "energy-term",
+      "raw-fortitude-percent",
+      "visible-fortitude-percent"
+    ],
+    "rawOutputStepId": "raw-fortitude-percent",
+    "visibleOutputStepId": "visible-fortitude-percent"
+  },
+  "constraints": [
+    "Resolve class and evolution applicability before evaluating arithmetic.",
+    "Divide Vitality by the exact literal 100 and Energy by the exact literal 20 using checked decimal arithmetic, then add the exact literal 12.",
+    "Represent vitality-term and energy-term exactly as base-10 decimals and add them with checked decimal arithmetic.",
+    "Do not round vitality-term, energy-term or raw-fortitude-percent before visible-fortitude-percent.",
+    "Truncate raw-fortitude-percent toward zero exactly once at visible-fortitude-percent."
+  ],
+  "evidenceRefs": [
+    "evd-0021",
+    "evd-0026"
+  ],
+  "conflictIds": [],
+  "testCaseRefs": [
+    {
+      "id": "fortitude-percent-dark-knight-base",
+      "version": "1.0.0"
+    },
+    {
+      "id": "fortitude-percent-dark-knight-fraction-step",
+      "version": "1.0.0"
+    },
+    {
+      "id": "fortitude-percent-dark-knight-integer-step",
+      "version": "1.0.0"
+    },
+    {
+      "id": "fortitude-percent-dark-knight-blade-master-step",
+      "version": "1.0.0"
+    }
+  ]
+}

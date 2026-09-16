@@ -1,0 +1,25 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "pvm-defense-rate-dark-wizard-grand-master-step",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-pvm-defense-rate-dark-wizard", "version": "1.0.0" },
+  "context": { "characterClassId": "class-dark-wizard", "evolutionId": "evolution-grand-master" },
+  "inputs": { "agility": 300 },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-pvm-defense-rate-dark-wizard-grand-master-step",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": { "id": "formula-pvm-defense-rate-dark-wizard", "version": "1.0.0" },
+    "context": { "characterClassId": "class-dark-wizard", "evolutionId": "evolution-grand-master" },
+    "inputs": { "agility": 300 },
+    "steps": [
+      { "stepId": "raw-pvm-defense-rate", "value": 100 },
+      { "stepId": "visible-pvm-defense-rate", "value": 100 }
+    ],
+    "rounding": { "mode": "TRUNCATE", "stage": "visible-pvm-defense-rate", "decimalPlaces": 0 },
+    "rawOutput": 100,
+    "visibleOutput": 100,
+    "evidenceRefs": ["evd-0021", "evd-0026"],
+    "conflictIds": []
+  }
+}

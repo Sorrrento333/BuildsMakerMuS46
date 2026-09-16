@@ -1,0 +1,29 @@
+﻿== REEMIT-AND-SPIKE-WIRE6 ==
+dotnet400-exe=True
+sdk400-version=10.0.400
+source-root-exists=True
+lockReviewedRoot-exists=True
+lockReviewed-count=3
+  [Json.More] proj-exists=True
+    restore:   Determinando los proyectos que se van a restaurar...
+    restore: F:\Proyecto Builds\Programa\artifacts\json-everything-source-build\source\src\Json.More\Json.More.csproj : error NU1902: Advertencia como error: El paquete "Microsoft.Build.Tasks.Git" 10.0.201 tiene una vulnerabilidad de gravedad moderada conocida, https://github.com/advisories/GHSA-23fw-v26w-5fgq
+    restore:   No se pudo restaurar F:\Proyecto Builds\Programa\artifacts\json-everything-source-build\source\src\Json.More\Json.More.csproj (en 400 ms).
+  [Json.More] restore-exit=1
+  [JsonPointer] proj-exists=True
+    restore:   Determinando los proyectos que se van a restaurar...
+    restore: F:\Proyecto Builds\Programa\artifacts\json-everything-source-build\source\src\Json.More\Json.More.csproj : error NU1902: Advertencia como error: El paquete "Microsoft.Build.Tasks.Git" 10.0.201 tiene una vulnerabilidad de gravedad moderada conocida, https://github.com/advisories/GHSA-23fw-v26w-5fgq [F:\Proyecto Builds\Programa\artifacts\json-everything-source-build\source\src\JsonPointer\JsonPointer.csproj]
+    restore: F:\Proyecto Builds\Programa\artifacts\json-everything-source-build\source\src\JsonPointer\JsonPointer.csproj : error NU1902: Advertencia como error: El paquete "Microsoft.Build.Tasks.Git" 10.0.201 tiene una vulnerabilidad de gravedad moderada conocida, https://github.com/advisories/GHSA-23fw-v26w-5fgq
+    restore:   No se pudo restaurar F:\Proyecto Builds\Programa\artifacts\json-everything-source-build\source\src\JsonPointer\JsonPointer.csproj (en 351 ms).
+    restore:   No se pudo restaurar F:\Proyecto Builds\Programa\artifacts\json-everything-source-build\source\src\Json.More\Json.More.csproj (en 351 ms).
+  [JsonPointer] restore-exit=1
+  [JsonSchema] proj-exists=True
+    restore:   Determinando los proyectos que se van a restaurar...
+    restore: F:\Proyecto Builds\Programa\artifacts\json-everything-source-build\source\src\JsonPointer\JsonPointer.csproj : error NU1902: Advertencia como error: El paquete "Microsoft.Build.Tasks.Git" 10.0.201 tiene una vulnerabilidad de gravedad moderada conocida, https://github.com/advisories/GHSA-23fw-v26w-5fgq [F:\Proyecto Builds\Programa\artifacts\json-everything-source-build\source\src\JsonSchema\JsonSchema.csproj]
+    restore: F:\Proyecto Builds\Programa\artifacts\json-everything-source-build\source\src\Json.More\Json.More.csproj : error NU1902: Advertencia como error: El paquete "Microsoft.Build.Tasks.Git" 10.0.201 tiene una vulnerabilidad de gravedad moderada conocida, https://github.com/advisories/GHSA-23fw-v26w-5fgq [F:\Proyecto Builds\Programa\artifacts\json-everything-source-build\source\src\JsonSchema\JsonSchema.csproj]
+    restore: F:\Proyecto Builds\Programa\artifacts\json-everything-source-build\source\src\JsonSchema\JsonSchema.csproj : error NU1902: Advertencia como error: El paquete "Microsoft.Build.Tasks.Git" 10.0.201 tiene una vulnerabilidad de gravedad moderada conocida, https://github.com/advisories/GHSA-23fw-v26w-5fgq
+    restore:   No se pudo restaurar F:\Proyecto Builds\Programa\artifacts\json-everything-source-build\source\src\Json.More\Json.More.csproj (en 368 ms).
+    restore:   No se pudo restaurar F:\Proyecto Builds\Programa\artifacts\json-everything-source-build\source\src\JsonPointer\JsonPointer.csproj (en 368 ms).
+    restore:   No se pudo restaurar F:\Proyecto Builds\Programa\artifacts\json-everything-source-build\source\src\JsonSchema\JsonSchema.csproj (en 368 ms).
+  [JsonSchema] restore-exit=1
+reemit-all-ok=False
+== REEMIT-AND-SPIKE-WIRE6 FIN ==

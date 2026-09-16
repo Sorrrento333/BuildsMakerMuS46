@@ -1,0 +1,9 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "max-wizardry-magic-gladiator-energy-below-base",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-max-wizardry-magic-gladiator", "version": "1.0.0" },
+  "context": { "characterClassId": "class-magic-gladiator", "evolutionId": "evolution-magic-gladiator" },
+  "inputs": { "energy": 25 },
+  "expectedErrorCode": "formula-stat-below-base"
+}

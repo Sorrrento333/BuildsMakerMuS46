@@ -31,4 +31,7 @@ internal static class PublishedProgressionRuleset
 
     public static CalculateCharacterFormulaUseCase CreateCharacterFormulaUseCase() =>
         new(Catalog, FormulaCatalog);
+
+    public static CalculateCharacterBuildUseCase CreateCharacterBuildUseCase() =>
+        new(Catalog, FormulaCatalog);
 }

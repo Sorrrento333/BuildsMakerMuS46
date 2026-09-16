@@ -1,0 +1,17 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "speed-dark-lord-invalid-family",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": {
+    "id": "formula-speed-dark-lord",
+    "version": "1.0.0"
+  },
+  "context": {
+    "characterClassId": "class-dark-wizard",
+    "evolutionId": "evolution-dark-wizard"
+  },
+  "inputs": {
+    "agility": 20
+  },
+  "expectedErrorCode": "formula-not-applicable"
+}

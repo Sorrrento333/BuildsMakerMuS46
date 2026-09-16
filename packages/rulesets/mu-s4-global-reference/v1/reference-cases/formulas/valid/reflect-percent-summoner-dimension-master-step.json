@@ -1,0 +1,26 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "reflect-percent-summoner-dimension-master-step",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-reflect-percent-summoner", "version": "1.0.0" },
+  "context": { "characterClassId": "class-summoner", "evolutionId": "evolution-dimension-master" },
+  "inputs": { "energy": 28 },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-reflect-percent-summoner-dimension-master-step",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": { "id": "formula-reflect-percent-summoner", "version": "1.0.0" },
+    "context": { "characterClassId": "class-summoner", "evolutionId": "evolution-dimension-master" },
+    "inputs": { "energy": 28 },
+    "steps": [
+      { "stepId": "energy-term", "value": 0.6666666666666666666666666667 },
+      { "stepId": "raw-reflect-percent", "value": 30.666666666666666666666666667 },
+      { "stepId": "visible-reflect-percent", "value": 30 }
+    ],
+    "rounding": { "mode": "TRUNCATE", "stage": "visible-reflect-percent", "decimalPlaces": 0 },
+    "rawOutput": 30.666666666666666666666666667,
+    "visibleOutput": 30,
+    "evidenceRefs": ["evd-0021", "evd-0026"],
+    "conflictIds": []
+  }
+}

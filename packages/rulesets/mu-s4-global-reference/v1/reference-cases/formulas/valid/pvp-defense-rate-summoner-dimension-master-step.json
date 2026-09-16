@@ -1,0 +1,27 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "pvp-defense-rate-summoner-dimension-master-step",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-pvp-defense-rate-summoner", "version": "1.0.0" },
+  "context": { "characterClassId": "class-summoner", "evolutionId": "evolution-dimension-master" },
+  "inputs": { "agility": 500, "character-level": 220 },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-pvp-defense-rate-summoner-dimension-master-step",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": { "id": "formula-pvp-defense-rate-summoner", "version": "1.0.0" },
+    "context": { "characterClassId": "class-summoner", "evolutionId": "evolution-dimension-master" },
+    "inputs": { "agility": 500, "character-level": 220 },
+    "steps": [
+      { "stepId": "level-contribution", "value": 440 },
+      { "stepId": "agility-contribution", "value": 250.0 },
+      { "stepId": "raw-pvp-defense-rate", "value": 690.0 },
+      { "stepId": "visible-pvp-defense-rate", "value": 690 }
+    ],
+    "rounding": { "mode": "TRUNCATE", "stage": "visible-pvp-defense-rate", "decimalPlaces": 0 },
+    "rawOutput": 690.0,
+    "visibleOutput": 690,
+    "evidenceRefs": ["evd-0021", "evd-0026"],
+    "conflictIds": []
+  }
+}

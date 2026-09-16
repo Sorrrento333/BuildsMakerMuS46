@@ -1,0 +1,9 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "min-damage-magic-gladiator-strength-below-base",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-min-damage-magic-gladiator", "version": "1.0.0" },
+  "context": { "characterClassId": "class-magic-gladiator", "evolutionId": "evolution-magic-gladiator" },
+  "inputs": { "strength": 25, "energy": 26 },
+  "expectedErrorCode": "formula-stat-below-base"
+}

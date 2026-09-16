@@ -1,0 +1,2 @@
+﻿8: new SqliteMigration(
+23: new SqliteMigration(

@@ -1,0 +1,58 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "defense-buff-fairy-elf-base",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": {
+    "id": "formula-defense-buff-fairy-elf",
+    "version": "1.0.0"
+  },
+  "context": {
+    "characterClassId": "class-fairy-elf",
+    "evolutionId": "evolution-fairy-elf"
+  },
+  "inputs": {
+    "energy": 15
+  },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-defense-buff-fairy-elf-base",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": {
+      "id": "formula-defense-buff-fairy-elf",
+      "version": "1.0.0"
+    },
+    "context": {
+      "characterClassId": "class-fairy-elf",
+      "evolutionId": "evolution-fairy-elf"
+    },
+    "inputs": {
+      "energy": 15
+    },
+    "steps": [
+      {
+        "stepId": "energy-term",
+        "value": 1.875
+      },
+      {
+        "stepId": "raw-defense-buff",
+        "value": 3.875
+      },
+      {
+        "stepId": "visible-defense-buff",
+        "value": 3
+      }
+    ],
+    "rounding": {
+      "mode": "TRUNCATE",
+      "stage": "visible-defense-buff",
+      "decimalPlaces": 0
+    },
+    "rawOutput": 3.875,
+    "visibleOutput": 3,
+    "evidenceRefs": [
+      "evd-0021",
+      "evd-0026"
+    ],
+    "conflictIds": []
+  }
+}

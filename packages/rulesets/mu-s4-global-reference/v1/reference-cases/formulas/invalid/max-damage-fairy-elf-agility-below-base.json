@@ -1,0 +1,9 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "max-damage-fairy-elf-agility-below-base",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-max-damage-fairy-elf", "version": "1.0.0" },
+  "context": { "characterClassId": "class-fairy-elf", "evolutionId": "evolution-fairy-elf" },
+  "inputs": { "agility": 24, "strength": 22 },
+  "expectedErrorCode": "formula-stat-below-base"
+}

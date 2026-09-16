@@ -1,0 +1,27 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "min-damage-magic-gladiator-base",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-min-damage-magic-gladiator", "version": "1.0.0" },
+  "context": { "characterClassId": "class-magic-gladiator", "evolutionId": "evolution-magic-gladiator" },
+  "inputs": { "strength": 26, "energy": 26 },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-min-damage-magic-gladiator-base",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": { "id": "formula-min-damage-magic-gladiator", "version": "1.0.0" },
+    "context": { "characterClassId": "class-magic-gladiator", "evolutionId": "evolution-magic-gladiator" },
+    "inputs": { "strength": 26, "energy": 26 },
+    "steps": [
+      { "stepId": "strength-term", "value": 4.3333333333333333333333333333 },
+      { "stepId": "energy-term", "value": 2.1666666666666666666666666667 },
+      { "stepId": "raw-min-damage", "value": 6.5000000000000000000000000000 },
+      { "stepId": "visible-min-damage", "value": 6 }
+    ],
+    "rounding": { "mode": "TRUNCATE", "stage": "visible-min-damage", "decimalPlaces": 0 },
+    "rawOutput": 6.5000000000000000000000000000,
+    "visibleOutput": 6,
+    "evidenceRefs": ["evd-0021", "evd-0026"],
+    "conflictIds": ["dsp-0002"]
+  }
+}

@@ -1,0 +1,108 @@
+{
+  "schemaVersion": "2.1.0",
+  "id": "formula-ag-regen-dark-lord",
+  "version": "1.0.0",
+  "rulesetId": "mu-s4-global-reference",
+  "status": "PUBLISHED",
+  "confidence": "VERIFIED",
+  "purpose": "Calculate visible base AG regeneration for the Dark Lord family before equipment, options, buffs, private profiles, or undeclared modifiers.",
+  "applicability": {
+    "characterClassId": "class-dark-lord",
+    "evolutionIds": ["evolution-dark-lord", "evolution-lord-emperor"]
+  },
+  "inputs": [
+    {
+      "id": "agility",
+      "numericType": "INT64",
+      "unit": "stat-point",
+      "numericBounds": {
+        "minimum": 20,
+        "minimumInclusive": true,
+        "classification": "FACTUAL",
+        "evidenceRefs": ["evd-0021"]
+      },
+      "rangeErrorCode": "formula-stat-below-base",
+      "source": { "kind": "CONTEXT_VALUE", "valueId": "resolved-agility" }
+    },
+    {
+      "id": "ag",
+      "numericType": "DECIMAL",
+      "unit": "ag-point",
+      "numericBounds": {
+        "minimum": 0,
+        "minimumInclusive": true,
+        "classification": "TECHNICAL"
+      },
+      "rangeErrorCode": "formula-dependency-out-of-range",
+      "source": {
+        "kind": "FORMULA_OUTPUT",
+        "formulaId": "formula-ag-dark-lord",
+        "formulaVersion": "1.0.0",
+        "outputStage": "RAW"
+      }
+    }
+  ],
+  "output": { "id": "ag-regen", "numericType": "INT64", "unit": "ag-regen-point" },
+  "strategy": {
+    "kind": "PROGRAM",
+    "executionModel": "CHECKED_DECIMAL_V1",
+    "steps": [
+      {
+        "id": "base-ag-regen",
+        "operation": "CONSTANT",
+        "operands": [
+          { "kind": "LITERAL", "value": 1.9 }
+        ]
+      },
+      {
+        "id": "ag-contribution",
+        "operation": "DIVIDE",
+        "operands": [
+          { "kind": "INPUT", "inputId": "ag" },
+          { "kind": "LITERAL", "value": 33 }
+        ]
+      },
+      {
+        "id": "raw-ag-regen",
+        "operation": "ADD",
+        "operands": [
+          { "kind": "STEP", "stepId": "base-ag-regen" },
+          { "kind": "STEP", "stepId": "ag-contribution" }
+        ]
+      },
+      {
+        "id": "visible-ag-regen",
+        "operation": "APPLY_ROUNDING",
+        "operands": [
+          { "kind": "STEP", "stepId": "raw-ag-regen" }
+        ]
+      }
+    ],
+    "dependencyFormulaRefs": [
+      { "id": "formula-ag-dark-lord", "version": "1.0.0" }
+    ]
+  },
+  "rounding": { "mode": "TRUNCATE", "stage": "visible-ag-regen", "decimalPlaces": 0 },
+  "trace": {
+    "stepIds": ["base-ag-regen", "ag-contribution", "raw-ag-regen", "visible-ag-regen"],
+    "rawOutputStepId": "raw-ag-regen",
+    "visibleOutputStepId": "visible-ag-regen"
+  },
+  "constraints": [
+    "Resolve class and evolution applicability before evaluating arithmetic.",
+    "Resolve formula-ag-dark-lord version 1.0.0 from the same validated character state.",
+    "Resolve Agility from the same validated character state as the AG pool dependency.",
+    "Consume the RAW decimal ag output selected by owner decision EVD-0026.",
+    "Represent the exact literals 1.9 and 33 as base-10 decimals and use checked decimal arithmetic.",
+    "Do not round raw-ag-regen before visible-ag-regen.",
+    "Truncate raw-ag-regen toward zero exactly once at visible-ag-regen."
+  ],
+  "evidenceRefs": ["evd-0021", "evd-0026"],
+  "conflictIds": [],
+  "testCaseRefs": [
+    { "id": "ag-regen-dark-lord-base", "version": "1.0.0" },
+    { "id": "ag-regen-dark-lord-fraction-step", "version": "1.0.0" },
+    { "id": "ag-regen-dark-lord-integer-step", "version": "1.0.0" },
+    { "id": "ag-regen-dark-lord-lord-emperor-step", "version": "1.0.0" }
+  ]
+}

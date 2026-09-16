@@ -1,0 +1,27 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "pvp-attack-rate-dark-lord-lord-emperor-step",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-pvp-attack-rate-dark-lord", "version": "1.0.0" },
+  "context": { "characterClassId": "class-dark-lord", "evolutionId": "evolution-lord-emperor" },
+  "inputs": { "agility": 500, "character-level": 220 },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-pvp-attack-rate-dark-lord-lord-emperor-step",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": { "id": "formula-pvp-attack-rate-dark-lord", "version": "1.0.0" },
+    "context": { "characterClassId": "class-dark-lord", "evolutionId": "evolution-lord-emperor" },
+    "inputs": { "agility": 500, "character-level": 220 },
+    "steps": [
+      { "stepId": "level-contribution", "value": 660 },
+      { "stepId": "agility-contribution", "value": 2000 },
+      { "stepId": "raw-pvp-attack-rate", "value": 2660 },
+      { "stepId": "visible-pvp-attack-rate", "value": 2660 }
+    ],
+    "rounding": { "mode": "TRUNCATE", "stage": "visible-pvp-attack-rate", "decimalPlaces": 0 },
+    "rawOutput": 2660,
+    "visibleOutput": 2660,
+    "evidenceRefs": ["evd-0021", "evd-0026"],
+    "conflictIds": []
+  }
+}

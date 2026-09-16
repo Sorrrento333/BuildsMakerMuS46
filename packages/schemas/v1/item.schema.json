@@ -1,0 +1,103 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.mu46.local/v1/item.schema.json",
+  "title": "ItemDefinition",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "id",
+    "version",
+    "rulesetId",
+    "displayName",
+    "status",
+    "confidence",
+    "slots",
+    "allowedClassIds",
+    "optionModules",
+    "socketSlots",
+    "evidenceRefs"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "1.0.0" },
+    "id": { "$ref": "#/$defs/id" },
+    "version": { "$ref": "#/$defs/semver" },
+    "rulesetId": { "$ref": "#/$defs/id" },
+    "displayName": { "type": "string", "minLength": 1 },
+    "status": { "enum": ["DRAFT", "REVIEWED", "PUBLISHED", "DEPRECATED"] },
+    "confidence": { "$ref": "#/$defs/confidence" },
+    "slots": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/id" },
+      "uniqueItems": true
+    },
+    "allowedClassIds": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/id" },
+      "uniqueItems": true
+    },
+    "requiredLevel": { "type": "integer", "minimum": 1 },
+    "requiredStats": {
+      "type": "object",
+      "propertyNames": { "$ref": "#/$defs/id" },
+      "additionalProperties": { "type": "integer", "minimum": 0 }
+    },
+    "optionModules": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/optionModule" },
+      "uniqueItems": true
+    },
+    "socketSlots": { "type": "integer", "minimum": 0 },
+    "maxItemLevel": { "type": "integer", "minimum": 0 },
+    "evidenceRefs": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/id" },
+      "uniqueItems": true
+    },
+    "conflictIds": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/id" },
+      "uniqueItems": true
+    },
+    "notes": { "type": "string" }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+    },
+    "semver": {
+      "type": "string",
+      "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)$"
+    },
+    "confidence": {
+      "enum": ["UNVERIFIED", "PARTIAL", "VERIFIED", "DISPUTED", "DEPRECATED"]
+    },
+    "optionModule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "evidenceRefs"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "kind": {
+          "enum": ["NORMAL", "EXCELLENT", "ANCIENT", "HARMONY", "SOCKET"]
+        },
+        "exclusiveWithIds": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/id" },
+          "uniqueItems": true
+        },
+        "evidenceRefs": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/id" },
+          "uniqueItems": true
+        }
+      }
+    }
+  }
+}

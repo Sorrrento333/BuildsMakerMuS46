@@ -1,0 +1,116 @@
+{
+  "schemaVersion": "2.1.0",
+  "id": "formula-speed-magic-gladiator",
+  "version": "1.0.0",
+  "rulesetId": "mu-s4-global-reference",
+  "status": "PUBLISHED",
+  "confidence": "VERIFIED",
+  "purpose": "Calculate visible base attack speed for the Magic Gladiator family before equipment, options, buffs, private profiles, or undeclared modifiers.",
+  "applicability": {
+    "characterClassId": "class-magic-gladiator",
+    "evolutionIds": [
+      "evolution-magic-gladiator",
+      "evolution-duel-master"
+    ]
+  },
+  "inputs": [
+    {
+      "id": "agility",
+      "numericType": "INT64",
+      "unit": "stat-point",
+      "numericBounds": {
+        "minimum": 26,
+        "minimumInclusive": true,
+        "classification": "FACTUAL",
+        "evidenceRefs": [
+          "evd-0021"
+        ]
+      },
+      "rangeErrorCode": "formula-stat-below-base",
+      "source": {
+        "kind": "CONTEXT_VALUE",
+        "valueId": "resolved-agility"
+      }
+    }
+  ],
+  "output": {
+    "id": "speed",
+    "numericType": "INT64",
+    "unit": "speed-point"
+  },
+  "strategy": {
+    "kind": "PROGRAM",
+    "executionModel": "CHECKED_DECIMAL_V1",
+    "steps": [
+      {
+        "id": "raw-speed",
+        "operation": "DIVIDE",
+        "operands": [
+          {
+            "kind": "INPUT",
+            "inputId": "agility"
+          },
+          {
+            "kind": "LITERAL",
+            "value": 15
+          }
+        ]
+      },
+      {
+        "id": "visible-speed",
+        "operation": "APPLY_ROUNDING",
+        "operands": [
+          {
+            "kind": "STEP",
+            "stepId": "raw-speed"
+          }
+        ]
+      }
+    ],
+    "dependencyFormulaRefs": []
+  },
+  "rounding": {
+    "mode": "TRUNCATE",
+    "stage": "visible-speed",
+    "decimalPlaces": 0
+  },
+  "trace": {
+    "stepIds": [
+      "raw-speed",
+      "visible-speed"
+    ],
+    "rawOutputStepId": "raw-speed",
+    "visibleOutputStepId": "visible-speed"
+  },
+  "constraints": [
+    "Resolve class and evolution applicability before evaluating arithmetic.",
+    "Divide Agility by the exact literal 15 using checked decimal arithmetic.",
+    "Do not round raw-speed before visible-speed.",
+    "Truncate raw-speed toward zero exactly once at visible-speed."
+  ],
+  "evidenceRefs": [
+    "evd-0021",
+    "evd-0026"
+  ],
+  "conflictIds": [
+    "dsp-0002"
+  ],
+  "testCaseRefs": [
+    {
+      "id": "speed-magic-gladiator-base",
+      "version": "1.0.0"
+    },
+    {
+      "id": "speed-magic-gladiator-fraction-step",
+      "version": "1.0.0"
+    },
+    {
+      "id": "speed-magic-gladiator-integer-step",
+      "version": "1.0.0"
+    },
+    {
+      "id": "speed-magic-gladiator-duel-master-step",
+      "version": "1.0.0"
+    }
+  ]
+}

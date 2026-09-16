@@ -1,0 +1,17 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "skill-percent-dark-knight-energy-below-base",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": {
+    "id": "formula-skill-percent-dark-knight",
+    "version": "1.0.0"
+  },
+  "context": {
+    "characterClassId": "class-dark-knight",
+    "evolutionId": "evolution-dark-knight"
+  },
+  "inputs": {
+    "energy": 9
+  },
+  "expectedErrorCode": "formula-stat-below-base"
+}

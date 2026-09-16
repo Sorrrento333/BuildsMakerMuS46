@@ -1,0 +1,18 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "fireburst-bonus-max-damage-dark-lord-energy-below-base",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": {
+    "id": "formula-fireburst-bonus-max-damage-dark-lord",
+    "version": "1.0.0"
+  },
+  "context": {
+    "characterClassId": "class-dark-lord",
+    "evolutionId": "evolution-dark-lord"
+  },
+  "inputs": {
+    "strength": 26,
+    "energy": 14
+  },
+  "expectedErrorCode": "formula-stat-below-base"
+}

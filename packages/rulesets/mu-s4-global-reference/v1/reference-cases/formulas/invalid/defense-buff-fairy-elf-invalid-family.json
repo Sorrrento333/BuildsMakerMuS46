@@ -1,0 +1,17 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "defense-buff-fairy-elf-invalid-family",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": {
+    "id": "formula-defense-buff-fairy-elf",
+    "version": "1.0.0"
+  },
+  "context": {
+    "characterClassId": "class-dark-wizard",
+    "evolutionId": "evolution-dark-wizard"
+  },
+  "inputs": {
+    "energy": 15
+  },
+  "expectedErrorCode": "formula-not-applicable"
+}

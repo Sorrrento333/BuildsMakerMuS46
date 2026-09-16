@@ -1,0 +1,58 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "skill-percent-dark-knight-integer-step",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": {
+    "id": "formula-skill-percent-dark-knight",
+    "version": "1.0.0"
+  },
+  "context": {
+    "characterClassId": "class-dark-knight",
+    "evolutionId": "evolution-dark-knight"
+  },
+  "inputs": {
+    "energy": 20
+  },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-skill-percent-dark-knight-integer-step",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": {
+      "id": "formula-skill-percent-dark-knight",
+      "version": "1.0.0"
+    },
+    "context": {
+      "characterClassId": "class-dark-knight",
+      "evolutionId": "evolution-dark-knight"
+    },
+    "inputs": {
+      "energy": 20
+    },
+    "steps": [
+      {
+        "stepId": "energy-term",
+        "value": 2
+      },
+      {
+        "stepId": "raw-skill-percent",
+        "value": 202
+      },
+      {
+        "stepId": "visible-skill-percent",
+        "value": 202
+      }
+    ],
+    "rounding": {
+      "mode": "TRUNCATE",
+      "stage": "visible-skill-percent",
+      "decimalPlaces": 0
+    },
+    "rawOutput": 202,
+    "visibleOutput": 202,
+    "evidenceRefs": [
+      "evd-0021",
+      "evd-0026"
+    ],
+    "conflictIds": []
+  }
+}

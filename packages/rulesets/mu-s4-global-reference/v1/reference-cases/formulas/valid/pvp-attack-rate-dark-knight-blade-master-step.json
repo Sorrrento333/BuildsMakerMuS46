@@ -1,0 +1,27 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "pvp-attack-rate-dark-knight-blade-master-step",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-pvp-attack-rate-dark-knight", "version": "1.0.0" },
+  "context": { "characterClassId": "class-dark-knight", "evolutionId": "evolution-blade-master" },
+  "inputs": { "agility": 500, "character-level": 220 },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-pvp-attack-rate-dark-knight-blade-master-step",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": { "id": "formula-pvp-attack-rate-dark-knight", "version": "1.0.0" },
+    "context": { "characterClassId": "class-dark-knight", "evolutionId": "evolution-blade-master" },
+    "inputs": { "agility": 500, "character-level": 220 },
+    "steps": [
+      { "stepId": "level-contribution", "value": 660 },
+      { "stepId": "agility-contribution", "value": 2250.0 },
+      { "stepId": "raw-pvp-attack-rate", "value": 2910.0 },
+      { "stepId": "visible-pvp-attack-rate", "value": 2910 }
+    ],
+    "rounding": { "mode": "TRUNCATE", "stage": "visible-pvp-attack-rate", "decimalPlaces": 0 },
+    "rawOutput": 2910.0,
+    "visibleOutput": 2910,
+    "evidenceRefs": ["evd-0021", "evd-0026"],
+    "conflictIds": []
+  }
+}

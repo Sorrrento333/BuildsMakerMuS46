@@ -1,0 +1,76 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "fenrir-base-min-damage-dark-wizard-integer-step",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": {
+    "id": "formula-fenrir-base-min-damage-dark-wizard",
+    "version": "1.0.0"
+  },
+  "context": {
+    "characterClassId": "class-dark-wizard",
+    "evolutionId": "evolution-dark-wizard"
+  },
+  "inputs": {
+    "strength": 25,
+    "agility": 20,
+    "vitality": 28,
+    "energy": 30
+  },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-fenrir-base-min-damage-dark-wizard-integer-step",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": {
+      "id": "formula-fenrir-base-min-damage-dark-wizard",
+      "version": "1.0.0"
+    },
+    "context": {
+      "characterClassId": "class-dark-wizard",
+      "evolutionId": "evolution-dark-wizard"
+    },
+    "inputs": {
+      "strength": 25,
+      "agility": 20,
+      "vitality": 28,
+      "energy": 30
+    },
+    "steps": [
+      {
+        "stepId": "strength-term",
+        "value": 5
+      },
+      {
+        "stepId": "agility-term",
+        "value": 4
+      },
+      {
+        "stepId": "vitality-term",
+        "value": 4
+      },
+      {
+        "stepId": "energy-term",
+        "value": 10
+      },
+      {
+        "stepId": "raw-fenrir-base-min-damage",
+        "value": 83
+      },
+      {
+        "stepId": "visible-fenrir-base-min-damage",
+        "value": 83
+      }
+    ],
+    "rounding": {
+      "mode": "TRUNCATE",
+      "stage": "visible-fenrir-base-min-damage",
+      "decimalPlaces": 0
+    },
+    "rawOutput": 83,
+    "visibleOutput": 83,
+    "evidenceRefs": [
+      "evd-0021",
+      "evd-0026"
+    ],
+    "conflictIds": []
+  }
+}

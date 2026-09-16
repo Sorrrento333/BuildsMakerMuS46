@@ -1,0 +1,19 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "combo-base-dark-knight-energy-below-base",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": {
+    "id": "formula-combo-base-dark-knight",
+    "version": "1.0.0"
+  },
+  "context": {
+    "characterClassId": "class-dark-knight",
+    "evolutionId": "evolution-dark-knight"
+  },
+  "inputs": {
+    "strength": 28,
+    "agility": 20,
+    "energy": 9
+  },
+  "expectedErrorCode": "formula-stat-below-base"
+}

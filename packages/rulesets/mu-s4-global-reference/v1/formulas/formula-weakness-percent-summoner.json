@@ -1,0 +1,89 @@
+{
+  "schemaVersion": "2.1.0",
+  "id": "formula-weakness-percent-summoner",
+  "version": "1.0.0",
+  "rulesetId": "mu-s4-global-reference",
+  "status": "PUBLISHED",
+  "confidence": "VERIFIED",
+  "purpose": "Calculate visible base Weakness buff percentage for the Summoner family before equipment, options, buffs, private profiles, or undeclared modifiers.",
+  "applicability": {
+    "characterClassId": "class-summoner",
+    "evolutionIds": ["evolution-summoner", "evolution-bloody-summoner", "evolution-dimension-master"]
+  },
+  "inputs": [
+    {
+      "id": "energy",
+      "numericType": "INT64",
+      "unit": "stat-point",
+      "numericBounds": {
+        "minimum": 23,
+        "minimumInclusive": true,
+        "classification": "FACTUAL",
+        "evidenceRefs": ["evd-0021"]
+      },
+      "rangeErrorCode": "formula-stat-below-base",
+      "source": {
+        "kind": "CONTEXT_VALUE",
+        "valueId": "resolved-energy"
+      }
+    }
+  ],
+  "output": {
+    "id": "weakness-percent",
+    "numericType": "INT64",
+    "unit": "percent"
+  },
+  "strategy": {
+    "kind": "PROGRAM",
+    "executionModel": "CHECKED_DECIMAL_V1",
+    "steps": [
+      {
+        "id": "energy-term",
+        "operation": "DIVIDE",
+        "operands": [
+          { "kind": "INPUT", "inputId": "energy" },
+          { "kind": "LITERAL", "value": 65 }
+        ]
+      },
+      {
+        "id": "raw-weakness-percent",
+        "operation": "ADD",
+        "operands": [
+          { "kind": "STEP", "stepId": "energy-term" },
+          { "kind": "LITERAL", "value": 7 }
+        ]
+      },
+      {
+        "id": "visible-weakness-percent",
+        "operation": "APPLY_ROUNDING",
+        "operands": [{ "kind": "STEP", "stepId": "raw-weakness-percent" }]
+      }
+    ],
+    "dependencyFormulaRefs": []
+  },
+  "rounding": {
+    "mode": "TRUNCATE",
+    "stage": "visible-weakness-percent",
+    "decimalPlaces": 0
+  },
+  "trace": {
+    "stepIds": ["energy-term", "raw-weakness-percent", "visible-weakness-percent"],
+    "rawOutputStepId": "raw-weakness-percent",
+    "visibleOutputStepId": "visible-weakness-percent"
+  },
+  "constraints": [
+    "Resolve class and evolution applicability before evaluating arithmetic.",
+    "Divide Energy by the exact literal 65 using checked decimal arithmetic, then add the exact literal 7.",
+    "Represent energy-term exactly as a base-10 decimal and add the constant with checked decimal arithmetic.",
+    "Do not round energy-term or raw-weakness-percent before visible-weakness-percent.",
+    "Truncate raw-weakness-percent toward zero exactly once at visible-weakness-percent."
+  ],
+  "evidenceRefs": ["evd-0021", "evd-0026"],
+  "conflictIds": [],
+  "testCaseRefs": [
+    { "id": "weakness-percent-summoner-base", "version": "1.0.0" },
+    { "id": "weakness-percent-summoner-fraction-step", "version": "1.0.0" },
+    { "id": "weakness-percent-summoner-integer-step", "version": "1.0.0" },
+    { "id": "weakness-percent-summoner-dimension-master-step", "version": "1.0.0" }
+  ]
+}

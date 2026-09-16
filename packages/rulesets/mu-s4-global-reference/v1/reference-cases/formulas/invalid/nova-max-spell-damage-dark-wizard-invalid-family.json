@@ -1,0 +1,17 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "nova-max-spell-damage-dark-wizard-invalid-family",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": {
+    "id": "formula-nova-max-spell-damage-dark-wizard",
+    "version": "1.0.0"
+  },
+  "context": {
+    "characterClassId": "class-summoner",
+    "evolutionId": "evolution-summoner"
+  },
+  "inputs": {
+    "strength": 18
+  },
+  "expectedErrorCode": "formula-not-applicable"
+}

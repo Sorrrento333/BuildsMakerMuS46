@@ -1,0 +1,36 @@
+﻿36:         EnsureDataOutsideBinaryDirectory(options.DataDirectory);
+37:         Directory.CreateDirectory(options.DataDirectory);
+38:         var progressionVerification = VerifyPublishedProgressionRuleset();
+39:         var formulaVerification = VerifyPublishedCharacterFormulas();
+40:         var buildVerification = VerifyPublishedCharacterBuild(progressionVerification);
+41:         var buildDraftServices = PublishedBuildDraftServices.Create(
+42:             options.DataDirectory,
+43:             [SyntheticMigration]);
+44: 
+45:         var databasePath = buildDraftServices.DatabasePath;
+46:         var backupPath = Path.Combine(options.DataDirectory, BackupFileName);
+47: 
+48:         return options.Phase switch
+49:         {
+50:             PublicationSmokePhase.Initialize => Initialize(
+51:                 databasePath,
+52:                 backupPath,
+53:                 options,
+54:                 progressionVerification,
+55:                 formulaVerification,
+56:                 buildVerification,
+57:                 buildDraftServices),
+58:             PublicationSmokePhase.VerifyUpdate => VerifyUpdate(
+59:                 databasePath,
+60:                 backupPath,
+61:                 options,
+62:                 progressionVerification,
+63:                 formulaVerification,
+64:                 buildVerification,
+65:                 buildDraftServices),
+66:             _ => throw new ArgumentOutOfRangeException(nameof(options)),
+67:         };
+68:     }
+69: 
+70:     private static PublicationSmokeReport Initialize(
+71:         string databasePath,

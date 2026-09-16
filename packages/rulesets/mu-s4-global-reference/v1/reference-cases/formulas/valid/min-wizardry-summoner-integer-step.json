@@ -1,0 +1,25 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "min-wizardry-summoner-integer-step",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-min-wizardry-summoner", "version": "1.0.0" },
+  "context": { "characterClassId": "class-summoner", "evolutionId": "evolution-summoner" },
+  "inputs": { "energy": 27 },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-min-wizardry-summoner-integer-step",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": { "id": "formula-min-wizardry-summoner", "version": "1.0.0" },
+    "context": { "characterClassId": "class-summoner", "evolutionId": "evolution-summoner" },
+    "inputs": { "energy": 27 },
+    "steps": [
+      { "stepId": "raw-min-wizardry-damage", "value": 3 },
+      { "stepId": "visible-min-wizardry-damage", "value": 3 }
+    ],
+    "rounding": { "mode": "TRUNCATE", "stage": "visible-min-wizardry-damage", "decimalPlaces": 0 },
+    "rawOutput": 3,
+    "visibleOutput": 3,
+    "evidenceRefs": ["evd-0021", "evd-0026"],
+    "conflictIds": []
+  }
+}

@@ -1,0 +1,76 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "fenrir-base-min-damage-dark-knight-integer-step",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": {
+    "id": "formula-fenrir-base-min-damage-dark-knight",
+    "version": "1.0.0"
+  },
+  "context": {
+    "characterClassId": "class-dark-knight",
+    "evolutionId": "evolution-dark-knight"
+  },
+  "inputs": {
+    "strength": 30,
+    "agility": 25,
+    "vitality": 25,
+    "energy": 30
+  },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-fenrir-base-min-damage-dark-knight-integer-step",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": {
+      "id": "formula-fenrir-base-min-damage-dark-knight",
+      "version": "1.0.0"
+    },
+    "context": {
+      "characterClassId": "class-dark-knight",
+      "evolutionId": "evolution-dark-knight"
+    },
+    "inputs": {
+      "strength": 30,
+      "agility": 25,
+      "vitality": 25,
+      "energy": 30
+    },
+    "steps": [
+      {
+        "stepId": "strength-term",
+        "value": 10
+      },
+      {
+        "stepId": "agility-term",
+        "value": 5
+      },
+      {
+        "stepId": "vitality-term",
+        "value": 5
+      },
+      {
+        "stepId": "energy-term",
+        "value": 5
+      },
+      {
+        "stepId": "raw-fenrir-base-min-damage",
+        "value": 70
+      },
+      {
+        "stepId": "visible-fenrir-base-min-damage",
+        "value": 70
+      }
+    ],
+    "rounding": {
+      "mode": "TRUNCATE",
+      "stage": "visible-fenrir-base-min-damage",
+      "decimalPlaces": 0
+    },
+    "rawOutput": 70,
+    "visibleOutput": 70,
+    "evidenceRefs": [
+      "evd-0021",
+      "evd-0026"
+    ],
+    "conflictIds": []
+  }
+}

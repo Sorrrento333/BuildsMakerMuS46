@@ -1,0 +1,168 @@
+{
+  "schemaVersion": "2.1.0",
+  "id": "formula-soul-barrier-percent-dark-wizard",
+  "version": "1.0.0",
+  "rulesetId": "mu-s4-global-reference",
+  "status": "PUBLISHED",
+  "confidence": "VERIFIED",
+  "purpose": "Calculate visible base Soul Barrier buff percentage for the Dark Wizard family before equipment, options, buffs, private profiles, or undeclared modifiers.",
+  "applicability": {
+    "characterClassId": "class-dark-wizard",
+    "evolutionIds": [
+      "evolution-dark-wizard",
+      "evolution-soul-master",
+      "evolution-grand-master"
+    ]
+  },
+  "inputs": [
+    {
+      "id": "agility",
+      "numericType": "INT64",
+      "unit": "stat-point",
+      "numericBounds": {
+        "minimum": 18,
+        "minimumInclusive": true,
+        "classification": "FACTUAL",
+        "evidenceRefs": [
+          "evd-0021"
+        ]
+      },
+      "rangeErrorCode": "formula-stat-below-base",
+      "source": {
+        "kind": "CONTEXT_VALUE",
+        "valueId": "resolved-agility"
+      }
+    },
+    {
+      "id": "energy",
+      "numericType": "INT64",
+      "unit": "stat-point",
+      "numericBounds": {
+        "minimum": 30,
+        "minimumInclusive": true,
+        "classification": "FACTUAL",
+        "evidenceRefs": [
+          "evd-0021"
+        ]
+      },
+      "rangeErrorCode": "formula-stat-below-base",
+      "source": {
+        "kind": "CONTEXT_VALUE",
+        "valueId": "resolved-energy"
+      }
+    }
+  ],
+  "output": {
+    "id": "soul-barrier-percent",
+    "numericType": "INT64",
+    "unit": "percent"
+  },
+  "strategy": {
+    "kind": "PROGRAM",
+    "executionModel": "CHECKED_DECIMAL_V1",
+    "steps": [
+      {
+        "id": "agility-term",
+        "operation": "DIVIDE",
+        "operands": [
+          {
+            "kind": "INPUT",
+            "inputId": "agility"
+          },
+          {
+            "kind": "LITERAL",
+            "value": 50
+          }
+        ]
+      },
+      {
+        "id": "energy-term",
+        "operation": "DIVIDE",
+        "operands": [
+          {
+            "kind": "INPUT",
+            "inputId": "energy"
+          },
+          {
+            "kind": "LITERAL",
+            "value": 200
+          }
+        ]
+      },
+      {
+        "id": "raw-soul-barrier-percent",
+        "operation": "ADD",
+        "operands": [
+          {
+            "kind": "STEP",
+            "stepId": "agility-term"
+          },
+          {
+            "kind": "STEP",
+            "stepId": "energy-term"
+          },
+          {
+            "kind": "LITERAL",
+            "value": 10
+          }
+        ]
+      },
+      {
+        "id": "visible-soul-barrier-percent",
+        "operation": "APPLY_ROUNDING",
+        "operands": [
+          {
+            "kind": "STEP",
+            "stepId": "raw-soul-barrier-percent"
+          }
+        ]
+      }
+    ],
+    "dependencyFormulaRefs": []
+  },
+  "rounding": {
+    "mode": "TRUNCATE",
+    "stage": "visible-soul-barrier-percent",
+    "decimalPlaces": 0
+  },
+  "trace": {
+    "stepIds": [
+      "agility-term",
+      "energy-term",
+      "raw-soul-barrier-percent",
+      "visible-soul-barrier-percent"
+    ],
+    "rawOutputStepId": "raw-soul-barrier-percent",
+    "visibleOutputStepId": "visible-soul-barrier-percent"
+  },
+  "constraints": [
+    "Resolve class and evolution applicability before evaluating arithmetic.",
+    "Divide Agility by the exact literal 50 and Energy by the exact literal 200 using checked decimal arithmetic, then add the exact literal 10.",
+    "Represent agility-term and energy-term exactly as base-10 decimals and add them with checked decimal arithmetic.",
+    "Do not round agility-term, energy-term or raw-soul-barrier-percent before visible-soul-barrier-percent.",
+    "Truncate raw-soul-barrier-percent toward zero exactly once at visible-soul-barrier-percent."
+  ],
+  "evidenceRefs": [
+    "evd-0021",
+    "evd-0026"
+  ],
+  "conflictIds": [],
+  "testCaseRefs": [
+    {
+      "id": "soul-barrier-percent-dark-wizard-base",
+      "version": "1.0.0"
+    },
+    {
+      "id": "soul-barrier-percent-dark-wizard-fraction-step",
+      "version": "1.0.0"
+    },
+    {
+      "id": "soul-barrier-percent-dark-wizard-integer-step",
+      "version": "1.0.0"
+    },
+    {
+      "id": "soul-barrier-percent-dark-wizard-grand-master-step",
+      "version": "1.0.0"
+    }
+  ]
+}

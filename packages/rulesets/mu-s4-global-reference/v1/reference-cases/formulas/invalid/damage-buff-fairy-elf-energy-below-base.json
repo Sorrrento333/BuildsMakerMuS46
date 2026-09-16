@@ -1,0 +1,17 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "damage-buff-fairy-elf-energy-below-base",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": {
+    "id": "formula-damage-buff-fairy-elf",
+    "version": "1.0.0"
+  },
+  "context": {
+    "characterClassId": "class-fairy-elf",
+    "evolutionId": "evolution-fairy-elf"
+  },
+  "inputs": {
+    "energy": 14
+  },
+  "expectedErrorCode": "formula-stat-below-base"
+}

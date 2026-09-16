@@ -1,0 +1,25 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "min-wizardry-summoner-fraction-step",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-min-wizardry-summoner", "version": "1.0.0" },
+  "context": { "characterClassId": "class-summoner", "evolutionId": "evolution-summoner" },
+  "inputs": { "energy": 26 },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-min-wizardry-summoner-fraction-step",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": { "id": "formula-min-wizardry-summoner", "version": "1.0.0" },
+    "context": { "characterClassId": "class-summoner", "evolutionId": "evolution-summoner" },
+    "inputs": { "energy": 26 },
+    "steps": [
+      { "stepId": "raw-min-wizardry-damage", "value": 2.8888888888888888888888888889 },
+      { "stepId": "visible-min-wizardry-damage", "value": 2 }
+    ],
+    "rounding": { "mode": "TRUNCATE", "stage": "visible-min-wizardry-damage", "decimalPlaces": 0 },
+    "rawOutput": 2.8888888888888888888888888889,
+    "visibleOutput": 2,
+    "evidenceRefs": ["evd-0021", "evd-0026"],
+    "conflictIds": []
+  }
+}

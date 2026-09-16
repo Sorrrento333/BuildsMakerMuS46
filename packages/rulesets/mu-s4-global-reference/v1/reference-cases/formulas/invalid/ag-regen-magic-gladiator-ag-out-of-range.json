@@ -1,0 +1,9 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "ag-regen-magic-gladiator-ag-out-of-range",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-ag-regen-magic-gladiator", "version": "1.0.0" },
+  "context": { "characterClassId": "class-magic-gladiator", "evolutionId": "evolution-magic-gladiator" },
+  "inputs": { "ag": -1, "agility": 26 },
+  "expectedErrorCode": "formula-dependency-out-of-range"
+}

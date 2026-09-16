@@ -1,0 +1,54 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "max-wizardry-dark-wizard-integer-step",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": {
+    "id": "formula-max-wizardry-dark-wizard",
+    "version": "1.0.0"
+  },
+  "context": {
+    "characterClassId": "class-dark-wizard",
+    "evolutionId": "evolution-dark-wizard"
+  },
+  "inputs": {
+    "energy": 32
+  },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-max-wizardry-dark-wizard-integer-step",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": {
+      "id": "formula-max-wizardry-dark-wizard",
+      "version": "1.0.0"
+    },
+    "context": {
+      "characterClassId": "class-dark-wizard",
+      "evolutionId": "evolution-dark-wizard"
+    },
+    "inputs": {
+      "energy": 32
+    },
+    "steps": [
+      {
+        "stepId": "raw-max-wizardry-damage",
+        "value": 8
+      },
+      {
+        "stepId": "visible-max-wizardry-damage",
+        "value": 8
+      }
+    ],
+    "rounding": {
+      "mode": "TRUNCATE",
+      "stage": "visible-max-wizardry-damage",
+      "decimalPlaces": 0
+    },
+    "rawOutput": 8,
+    "visibleOutput": 8,
+    "evidenceRefs": [
+      "evd-0021",
+      "evd-0026"
+    ],
+    "conflictIds": []
+  }
+}

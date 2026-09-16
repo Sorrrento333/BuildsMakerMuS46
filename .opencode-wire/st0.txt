@@ -1,0 +1,11 @@
+﻿## codex/reset-aware-drafts-traced-formulas...origin/codex/reset-aware-drafts-traced-formulas
+?? .opencode-wire/
+?? branche-current.txt
+?? checks-current.txt
+?? githead-build.txt
+?? gitlog-build.txt
+?? gitstatus-build.txt
+?? gitwire-final/
+?? head-current.txt
+?? pr-current.json
+

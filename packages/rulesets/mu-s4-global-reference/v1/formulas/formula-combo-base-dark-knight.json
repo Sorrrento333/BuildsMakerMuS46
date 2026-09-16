@@ -1,0 +1,171 @@
+{
+  "schemaVersion": "2.1.0",
+  "id": "formula-combo-base-dark-knight",
+  "version": "1.0.0",
+  "rulesetId": "mu-s4-global-reference",
+  "status": "PUBLISHED",
+  "confidence": "VERIFIED",
+  "purpose": "Calculate visible base combo base damage for the Dark Knight family before equipment, options, buffs, private profiles, or undeclared modifiers.",
+  "applicability": {
+    "characterClassId": "class-dark-knight",
+    "evolutionIds": [
+      "evolution-dark-knight",
+      "evolution-blade-knight",
+      "evolution-blade-master"
+    ]
+  },
+  "inputs": [
+    {
+      "id": "strength",
+      "numericType": "INT64",
+      "unit": "stat-point",
+      "numericBounds": {
+        "minimum": 28,
+        "minimumInclusive": true,
+        "classification": "FACTUAL",
+        "evidenceRefs": [
+          "evd-0021"
+        ]
+      },
+      "rangeErrorCode": "formula-stat-below-base",
+      "source": {
+        "kind": "CONTEXT_VALUE",
+        "valueId": "resolved-strength"
+      }
+    },
+    {
+      "id": "agility",
+      "numericType": "INT64",
+      "unit": "stat-point",
+      "numericBounds": {
+        "minimum": 20,
+        "minimumInclusive": true,
+        "classification": "FACTUAL",
+        "evidenceRefs": [
+          "evd-0021"
+        ]
+      },
+      "rangeErrorCode": "formula-stat-below-base",
+      "source": {
+        "kind": "CONTEXT_VALUE",
+        "valueId": "resolved-agility"
+      }
+    },
+    {
+      "id": "energy",
+      "numericType": "INT64",
+      "unit": "stat-point",
+      "numericBounds": {
+        "minimum": 10,
+        "minimumInclusive": true,
+        "classification": "FACTUAL",
+        "evidenceRefs": [
+          "evd-0021"
+        ]
+      },
+      "rangeErrorCode": "formula-stat-below-base",
+      "source": {
+        "kind": "CONTEXT_VALUE",
+        "valueId": "resolved-energy"
+      }
+    }
+  ],
+  "output": {
+    "id": "combo-base",
+    "numericType": "INT64",
+    "unit": "damage-point"
+  },
+  "strategy": {
+    "kind": "PROGRAM",
+    "executionModel": "CHECKED_DECIMAL_V1",
+    "steps": [
+      {
+        "id": "stat-sum",
+        "operation": "ADD",
+        "operands": [
+          {
+            "kind": "INPUT",
+            "inputId": "strength"
+          },
+          {
+            "kind": "INPUT",
+            "inputId": "agility"
+          },
+          {
+            "kind": "INPUT",
+            "inputId": "energy"
+          }
+        ]
+      },
+      {
+        "id": "raw-combo-base",
+        "operation": "DIVIDE",
+        "operands": [
+          {
+            "kind": "STEP",
+            "stepId": "stat-sum"
+          },
+          {
+            "kind": "LITERAL",
+            "value": 2
+          }
+        ]
+      },
+      {
+        "id": "visible-combo-base",
+        "operation": "APPLY_ROUNDING",
+        "operands": [
+          {
+            "kind": "STEP",
+            "stepId": "raw-combo-base"
+          }
+        ]
+      }
+    ],
+    "dependencyFormulaRefs": []
+  },
+  "rounding": {
+    "mode": "TRUNCATE",
+    "stage": "visible-combo-base",
+    "decimalPlaces": 0
+  },
+  "trace": {
+    "stepIds": [
+      "stat-sum",
+      "raw-combo-base",
+      "visible-combo-base"
+    ],
+    "rawOutputStepId": "raw-combo-base",
+    "visibleOutputStepId": "visible-combo-base"
+  },
+  "constraints": [
+    "Resolve class and evolution applicability before evaluating arithmetic.",
+    "Add Strength, Agility and Energy with checked decimal arithmetic, then divide the sum by the exact literal 2.",
+    "Represent stat-sum exactly as a base-10 decimal and divide it with checked decimal arithmetic.",
+    "Do not round stat-sum or raw-combo-base before visible-combo-base.",
+    "Truncate raw-combo-base toward zero exactly once at visible-combo-base."
+  ],
+  "evidenceRefs": [
+    "evd-0021",
+    "evd-0026"
+  ],
+  "conflictIds": [],
+  "testCaseRefs": [
+    {
+      "id": "combo-base-dark-knight-base",
+      "version": "1.0.0"
+    },
+    {
+      "id": "combo-base-dark-knight-fraction-step",
+      "version": "1.0.0"
+    },
+    {
+      "id": "combo-base-dark-knight-integer-step",
+      "version": "1.0.0"
+    },
+    {
+      "id": "combo-base-dark-knight-blade-master-step",
+      "version": "1.0.0"
+    }
+  ]
+}

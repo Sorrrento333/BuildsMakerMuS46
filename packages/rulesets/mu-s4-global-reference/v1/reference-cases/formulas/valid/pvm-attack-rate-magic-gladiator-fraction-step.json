@@ -1,0 +1,29 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "pvm-attack-rate-magic-gladiator-fraction-step",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-pvm-attack-rate-magic-gladiator", "version": "1.0.0" },
+  "context": { "characterClassId": "class-magic-gladiator", "evolutionId": "evolution-magic-gladiator" },
+  "inputs": { "agility": 27, "character-level": 1, "strength": 26 },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-pvm-attack-rate-magic-gladiator-fraction-step",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": { "id": "formula-pvm-attack-rate-magic-gladiator", "version": "1.0.0" },
+    "context": { "characterClassId": "class-magic-gladiator", "evolutionId": "evolution-magic-gladiator" },
+    "inputs": { "agility": 27, "character-level": 1, "strength": 26 },
+    "steps": [
+      { "stepId": "level-contribution", "value": 5 },
+      { "stepId": "agility-numerator", "value": 81 },
+      { "stepId": "agility-contribution", "value": 40.5 },
+      { "stepId": "strength-contribution", "value": 6.5 },
+      { "stepId": "raw-pvm-attack-rate", "value": 52.0 },
+      { "stepId": "visible-pvm-attack-rate", "value": 52 }
+    ],
+    "rounding": { "mode": "TRUNCATE", "stage": "visible-pvm-attack-rate", "decimalPlaces": 0 },
+    "rawOutput": 52.0,
+    "visibleOutput": 52,
+    "evidenceRefs": ["evd-0021", "evd-0026"],
+    "conflictIds": []
+  }
+}

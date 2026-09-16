@@ -65,7 +65,7 @@ La validación integral está implementada en .NET 10 bajo
 `tools/validators/MuOnline.SchemaValidator`, con `JsonSchema.Net 9.2.2`
 compilado reproduciblemente desde fuente MIT, validación de formatos y un
 registro de schemas aislado por ejecución. Las
-pruebas verifican que los once fixtures válidos sean aceptados, los once
+pruebas verifican que los dieciséis fixtures válidos sean aceptados, los dieciséis
 inválidos sean rechazados, que los veintiséis registros canónicos sean válidos y que
 los diez casos de progresión coincidan con su resultado esperado, además de que
 las dos reglas resuelvan exactamente sus siete casos positivos y de que el
@@ -128,12 +128,20 @@ decimales exactos para coeficientes finitos en base 10. Mantiene inputs y salida
 redondeo exclusivamente en `APPLY_ROUNDING`. Las definiciones `2.0.0` continúan
 exigiendo `CHECKED_INT64_V1`.
 
+## Contratos de alto nivel implementados
+
+Los cinco contratos restantes se materializaron en `packages/schemas/v1` con
+versión `1.0.0`, fixtures válidos e inválidos sintéticos y registro en el
+validador, la comprobación estructural y las pruebas: `ruleset` (identifica
+reglaset, contenido habilitado, fórmulas y fuentes), `quest-rule` (series,
+etapas, prerrequisitos y elegibilidad con casos de prueba), `item` (definición
+canónica con módulos de opciones y sockets), `skill` (definiciones y buffs) y
+`scenario` (modalidad, objetivo, mapas y buffs externos). El inventario del
+validador pasa de once a dieciséis contratos y de veintidós a treinta y dos
+fixtures.
+
+La definición canónica de item se materializa como `item.schema.json`; la
+instancia con nivel, opciones y sockets elegidos sigue siendo dato del usuario
+en `build.schema.json`, sin datos factuales añadidos al ruleset canónico.
+
 ## Plan restante
-
-- `ruleset.schema.json`
-- `quest-rule.schema.json`
-- `item.schema.json`
-- `skill.schema.json`
-- `scenario.schema.json`
-
-Cada esquema tendrá ejemplos válidos e inválidos, versión, migración y pruebas de compatibilidad.

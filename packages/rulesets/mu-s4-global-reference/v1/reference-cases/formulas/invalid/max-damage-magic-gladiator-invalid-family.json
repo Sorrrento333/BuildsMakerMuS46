@@ -1,0 +1,9 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "max-damage-magic-gladiator-invalid-family",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-max-damage-magic-gladiator", "version": "1.0.0" },
+  "context": { "characterClassId": "class-dark-wizard", "evolutionId": "evolution-dark-wizard" },
+  "inputs": { "strength": 26, "energy": 26 },
+  "expectedErrorCode": "formula-not-applicable"
+}

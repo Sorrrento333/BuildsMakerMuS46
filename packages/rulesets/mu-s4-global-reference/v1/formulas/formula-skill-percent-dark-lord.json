@@ -1,0 +1,130 @@
+{
+  "schemaVersion": "2.1.0",
+  "id": "formula-skill-percent-dark-lord",
+  "version": "1.0.0",
+  "rulesetId": "mu-s4-global-reference",
+  "status": "PUBLISHED",
+  "confidence": "VERIFIED",
+  "purpose": "Calculate visible base Skill buff percentage for the Dark Lord family before equipment, options, buffs, private profiles, or undeclared modifiers.",
+  "applicability": {
+    "characterClassId": "class-dark-lord",
+    "evolutionIds": [
+      "evolution-dark-lord",
+      "evolution-lord-emperor"
+    ]
+  },
+  "inputs": [
+    {
+      "id": "energy",
+      "numericType": "INT64",
+      "unit": "stat-point",
+      "numericBounds": {
+        "minimum": 15,
+        "minimumInclusive": true,
+        "classification": "FACTUAL",
+        "evidenceRefs": [
+          "evd-0021"
+        ]
+      },
+      "rangeErrorCode": "formula-stat-below-base",
+      "source": {
+        "kind": "CONTEXT_VALUE",
+        "valueId": "resolved-energy"
+      }
+    }
+  ],
+  "output": {
+    "id": "skill-percent",
+    "numericType": "INT64",
+    "unit": "percent"
+  },
+  "strategy": {
+    "kind": "PROGRAM",
+    "executionModel": "CHECKED_DECIMAL_V1",
+    "steps": [
+      {
+        "id": "energy-term",
+        "operation": "DIVIDE",
+        "operands": [
+          {
+            "kind": "INPUT",
+            "inputId": "energy"
+          },
+          {
+            "kind": "LITERAL",
+            "value": 20
+          }
+        ]
+      },
+      {
+        "id": "raw-skill-percent",
+        "operation": "ADD",
+        "operands": [
+          {
+            "kind": "STEP",
+            "stepId": "energy-term"
+          },
+          {
+            "kind": "LITERAL",
+            "value": 200
+          }
+        ]
+      },
+      {
+        "id": "visible-skill-percent",
+        "operation": "APPLY_ROUNDING",
+        "operands": [
+          {
+            "kind": "STEP",
+            "stepId": "raw-skill-percent"
+          }
+        ]
+      }
+    ],
+    "dependencyFormulaRefs": []
+  },
+  "rounding": {
+    "mode": "TRUNCATE",
+    "stage": "visible-skill-percent",
+    "decimalPlaces": 0
+  },
+  "trace": {
+    "stepIds": [
+      "energy-term",
+      "raw-skill-percent",
+      "visible-skill-percent"
+    ],
+    "rawOutputStepId": "raw-skill-percent",
+    "visibleOutputStepId": "visible-skill-percent"
+  },
+  "constraints": [
+    "Resolve class and evolution applicability before evaluating arithmetic.",
+    "Divide Energy by the exact literal 20 using checked decimal arithmetic, then add the exact literal 200.",
+    "Represent energy-term exactly as a base-10 decimal and add the constant with checked decimal arithmetic.",
+    "Do not round energy-term or raw-skill-percent before visible-skill-percent.",
+    "Truncate raw-skill-percent toward zero exactly once at visible-skill-percent."
+  ],
+  "evidenceRefs": [
+    "evd-0021",
+    "evd-0026"
+  ],
+  "conflictIds": [],
+  "testCaseRefs": [
+    {
+      "id": "skill-percent-dark-lord-base",
+      "version": "1.0.0"
+    },
+    {
+      "id": "skill-percent-dark-lord-fraction-step",
+      "version": "1.0.0"
+    },
+    {
+      "id": "skill-percent-dark-lord-integer-step",
+      "version": "1.0.0"
+    },
+    {
+      "id": "skill-percent-dark-lord-lord-emperor-step",
+      "version": "1.0.0"
+    }
+  ]
+}

@@ -1,0 +1,89 @@
+{
+  "schemaVersion": "2.1.0",
+  "id": "formula-reflect-percent-summoner",
+  "version": "1.0.0",
+  "rulesetId": "mu-s4-global-reference",
+  "status": "PUBLISHED",
+  "confidence": "VERIFIED",
+  "purpose": "Calculate visible base Reflect buff percentage for the Summoner family before equipment, options, buffs, private profiles, or undeclared modifiers.",
+  "applicability": {
+    "characterClassId": "class-summoner",
+    "evolutionIds": ["evolution-summoner", "evolution-bloody-summoner", "evolution-dimension-master"]
+  },
+  "inputs": [
+    {
+      "id": "energy",
+      "numericType": "INT64",
+      "unit": "stat-point",
+      "numericBounds": {
+        "minimum": 23,
+        "minimumInclusive": true,
+        "classification": "FACTUAL",
+        "evidenceRefs": ["evd-0021"]
+      },
+      "rangeErrorCode": "formula-stat-below-base",
+      "source": {
+        "kind": "CONTEXT_VALUE",
+        "valueId": "resolved-energy"
+      }
+    }
+  ],
+  "output": {
+    "id": "reflect-percent",
+    "numericType": "INT64",
+    "unit": "percent"
+  },
+  "strategy": {
+    "kind": "PROGRAM",
+    "executionModel": "CHECKED_DECIMAL_V1",
+    "steps": [
+      {
+        "id": "energy-term",
+        "operation": "DIVIDE",
+        "operands": [
+          { "kind": "INPUT", "inputId": "energy" },
+          { "kind": "LITERAL", "value": 42 }
+        ]
+      },
+      {
+        "id": "raw-reflect-percent",
+        "operation": "ADD",
+        "operands": [
+          { "kind": "STEP", "stepId": "energy-term" },
+          { "kind": "LITERAL", "value": 30 }
+        ]
+      },
+      {
+        "id": "visible-reflect-percent",
+        "operation": "APPLY_ROUNDING",
+        "operands": [{ "kind": "STEP", "stepId": "raw-reflect-percent" }]
+      }
+    ],
+    "dependencyFormulaRefs": []
+  },
+  "rounding": {
+    "mode": "TRUNCATE",
+    "stage": "visible-reflect-percent",
+    "decimalPlaces": 0
+  },
+  "trace": {
+    "stepIds": ["energy-term", "raw-reflect-percent", "visible-reflect-percent"],
+    "rawOutputStepId": "raw-reflect-percent",
+    "visibleOutputStepId": "visible-reflect-percent"
+  },
+  "constraints": [
+    "Resolve class and evolution applicability before evaluating arithmetic.",
+    "Divide Energy by the exact literal 42 using checked decimal arithmetic, then add the exact literal 30.",
+    "Represent energy-term exactly as a base-10 decimal and add the constant with checked decimal arithmetic.",
+    "Do not round energy-term or raw-reflect-percent before visible-reflect-percent.",
+    "Truncate raw-reflect-percent toward zero exactly once at visible-reflect-percent."
+  ],
+  "evidenceRefs": ["evd-0021", "evd-0026"],
+  "conflictIds": [],
+  "testCaseRefs": [
+    { "id": "reflect-percent-summoner-base", "version": "1.0.0" },
+    { "id": "reflect-percent-summoner-fraction-step", "version": "1.0.0" },
+    { "id": "reflect-percent-summoner-integer-step", "version": "1.0.0" },
+    { "id": "reflect-percent-summoner-dimension-master-step", "version": "1.0.0" }
+  ]
+}

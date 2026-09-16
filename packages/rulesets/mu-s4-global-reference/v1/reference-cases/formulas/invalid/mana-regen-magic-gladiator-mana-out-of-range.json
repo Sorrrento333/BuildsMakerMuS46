@@ -1,0 +1,9 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "mana-regen-magic-gladiator-mana-out-of-range",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-mana-regen-magic-gladiator", "version": "1.0.0" },
+  "context": { "characterClassId": "class-magic-gladiator", "evolutionId": "evolution-magic-gladiator" },
+  "inputs": { "character-level": 1, "mana": -1 },
+  "expectedErrorCode": "formula-dependency-out-of-range"
+}

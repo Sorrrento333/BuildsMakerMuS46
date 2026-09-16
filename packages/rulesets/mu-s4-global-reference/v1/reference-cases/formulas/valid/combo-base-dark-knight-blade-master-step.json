@@ -1,0 +1,62 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "combo-base-dark-knight-blade-master-step",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": {
+    "id": "formula-combo-base-dark-knight",
+    "version": "1.0.0"
+  },
+  "context": {
+    "characterClassId": "class-dark-knight",
+    "evolutionId": "evolution-blade-master"
+  },
+  "inputs": {
+    "strength": 900,
+    "agility": 500,
+    "energy": 400
+  },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-combo-base-dark-knight-blade-master-step",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": {
+      "id": "formula-combo-base-dark-knight",
+      "version": "1.0.0"
+    },
+    "context": {
+      "characterClassId": "class-dark-knight",
+      "evolutionId": "evolution-blade-master"
+    },
+    "inputs": {
+      "strength": 900,
+      "agility": 500,
+      "energy": 400
+    },
+    "steps": [
+      {
+        "stepId": "stat-sum",
+        "value": 1800
+      },
+      {
+        "stepId": "raw-combo-base",
+        "value": 900
+      },
+      {
+        "stepId": "visible-combo-base",
+        "value": 900
+      }
+    ],
+    "rounding": {
+      "mode": "TRUNCATE",
+      "stage": "visible-combo-base",
+      "decimalPlaces": 0
+    },
+    "rawOutput": 900,
+    "visibleOutput": 900,
+    "evidenceRefs": [
+      "evd-0021",
+      "evd-0026"
+    ],
+    "conflictIds": []
+  }
+}

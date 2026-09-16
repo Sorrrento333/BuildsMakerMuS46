@@ -17,8 +17,11 @@ public partial class MainWindow : Window
     private readonly CalculateStatDistributionUseCase _statDistributionUseCase;
     private readonly ExecutableFormulaCatalog _formulaCatalog;
     private readonly CalculateCharacterFormulaUseCase _characterFormulaUseCase;
+    private readonly CalculateCharacterBuildUseCase _characterBuildUseCase;
     private readonly SaveBuildDraftUseCase _saveBuildDraftUseCase;
     private readonly LoadBuildDraftUseCase _loadBuildDraftUseCase;
+    private readonly SaveBuildUseCase _saveBuildUseCase;
+    private readonly LoadBuildUseCase _loadBuildUseCase;
     private readonly Dictionary<string, TextBox> _allocationInputs =
         new(StringComparer.Ordinal);
     private ProgressionPointBudgetResult? _currentBudget;
@@ -41,8 +44,12 @@ public partial class MainWindow : Window
         _formulaCatalog = PublishedProgressionRuleset.FormulaCatalog;
         _characterFormulaUseCase =
             PublishedProgressionRuleset.CreateCharacterFormulaUseCase();
+        _characterBuildUseCase =
+            PublishedProgressionRuleset.CreateCharacterBuildUseCase();
         _saveBuildDraftUseCase = buildDraftServices.SaveUseCase;
         _loadBuildDraftUseCase = buildDraftServices.LoadUseCase;
+        _saveBuildUseCase = buildDraftServices.SaveBuildUseCase;
+        _loadBuildUseCase = buildDraftServices.LoadBuildUseCase;
 
         ClassComboBox.ItemsSource = _catalog.CharacterOptions
             .OrderBy(item => item.DisplayName, StringComparer.CurrentCulture)
@@ -481,6 +488,94 @@ public partial class MainWindow : Window
         BuildDraftResultTextBox?.Clear();
     }
 
+    private void EvaluateBuildButtonClick(object sender, RoutedEventArgs e)
+    {
+        if (_currentProgressionRequest is null ||
+            _currentDistribution is null)
+        {
+            FormulaResultTextBox.Text =
+                "Calcula el presupuesto y distribuye los puntos antes de evaluar la build.";
+            return;
+        }
+
+        try
+        {
+            var evaluation = _characterBuildUseCase.Execute(
+                _currentProgressionRequest,
+                _currentDistribution.ResetInputs,
+                _currentDistribution.Allocations);
+            FormulaResultTextBox.Text = FormatBuildResult(evaluation);
+        }
+        catch (FormulaContextException exception)
+        {
+            FormulaResultTextBox.Text =
+                $"No se pudo evaluar la build ({exception.Code}): " +
+                TranslateFormulaContextError(exception.Code);
+        }
+        catch (FormulaCalculationException exception)
+        {
+            FormulaResultTextBox.Text =
+                $"No se pudo calcular ({exception.Code}): {exception.Message}";
+        }
+        catch (FormulaExecutionException exception)
+        {
+            FormulaResultTextBox.Text =
+                $"No se pudo ejecutar ({exception.Code}): {exception.Message}";
+        }
+    }
+
+    private static string FormatBuildResult(CharacterBuildEvaluation evaluation)
+    {
+        var lines = new List<string>
+        {
+            $"Clase: {evaluation.State.CharacterClass.Id} " +
+            $"(evolución {evaluation.State.ProgressionRequest.EvolutionId})",
+            $"Fórmulas evaluadas: {evaluation.Formulas.Length}",
+        };
+        foreach (var group in evaluation.Formulas
+                     .OrderBy(item => item.Formula.Reference.Id, StringComparer.Ordinal)
+                     .ThenBy(item => item.Formula.Reference.Version, StringComparer.Ordinal)
+                     .GroupBy(item => BuildGroupLabel(item.Formula), StringComparer.Ordinal)
+                     .OrderBy(group => group.Key, StringComparer.Ordinal))
+        {
+            lines.Add(string.Empty);
+            lines.Add($"== {group.Key} ==");
+            lines.AddRange(group.Select(item =>
+                $"- {item.Formula.Output.Id}: {item.Calculation.VisibleOutput} " +
+                $"[{item.Formula.Reference.Id} v{item.Formula.Reference.Version}] " +
+                $"(crudo {item.Calculation.RawOutput})"));
+        }
+
+        return string.Join(Environment.NewLine, lines);
+    }
+
+    private static string BuildGroupLabel(FormulaDefinition formula)
+    {
+        var id = formula.Reference.Id
+            .StartsWith("formula-", StringComparison.Ordinal)
+                ? formula.Reference.Id["formula-".Length..]
+                : formula.Reference.Id;
+        var suffixes = new[]
+        {
+            "dark-knight",
+            "dark-wizard",
+            "fairy-elf",
+            "magic-gladiator",
+            "dark-lord",
+            "summoner",
+        };
+        foreach (var suffix in suffixes)
+        {
+            var marker = $"-{suffix}";
+            if (id.EndsWith(marker, StringComparison.Ordinal))
+            {
+                return id[..^marker.Length];
+            }
+        }
+
+        return id;
+    }
+
     private void ConfigureAndCalculateApplicableFormula()
     {
         if (_currentProgressionRequest is null ||
@@ -656,6 +751,8 @@ public partial class MainWindow : Window
             "las fórmulas dependientes forman un ciclo.",
         FormulaContextErrorCodes.DependencyIncoherent =>
             "una dependencia no declara una referencia y etapa de salida coherentes.",
+        FormulaContextErrorCodes.NoApplicableFormula =>
+            "no hay una fórmula derivada publicada aplicable a esta clase y evolución.",
         _ => "se produjo un error de contexto no reconocido.",
     };
 
@@ -778,6 +875,75 @@ public partial class MainWindow : Window
         return true;
     }
 
+    private async void SaveBuildButtonClick(object sender, RoutedEventArgs e)
+    {
+        var buildId = BuildIdTextBox.Text.Trim();
+        var draftId = BuildDraftIdTextBox.Text.Trim();
+        if (!IsValidBuildDraftId(buildId) ||
+            !IsValidBuildDraftId(draftId))
+        {
+            BuildResultTextBox.Text =
+                "El ID de la build y el del borrador deben usar minúsculas, " +
+                "números y guiones simples.";
+            return;
+        }
+
+        try
+        {
+            var build = await _saveBuildUseCase.ExecuteAsync(
+                new SaveBuildRequest(buildId, draftId),
+                CancellationToken.None);
+            BuildResultTextBox.Text =
+                $"Build '{build.Id}' guardada. " +
+                $"{build.Stats.Count} stats del snapshot exacto.";
+        }
+        catch (BuildException exception)
+        {
+            BuildResultTextBox.Text =
+                $"No se pudo guardar ({exception.Code}): " +
+                TranslateBuildError(exception.Code);
+        }
+        catch (BuildDraftException exception)
+        {
+            BuildResultTextBox.Text =
+                $"No se pudo guardar el borrador ({exception.Code}): " +
+                TranslateBuildDraftError(exception.Code);
+        }
+    }
+
+    private async void LoadBuildButtonClick(object sender, RoutedEventArgs e)
+    {
+        var buildId = BuildIdTextBox.Text.Trim();
+        if (!IsValidBuildDraftId(buildId))
+        {
+            BuildResultTextBox.Text =
+                "El ID de la build debe usar minúsculas, números y guiones simples.";
+            return;
+        }
+
+        try
+        {
+            var build = await _loadBuildUseCase.ExecuteAsync(
+                buildId,
+                CancellationToken.None);
+            BuildResultTextBox.Text =
+                $"Build '{build.Id}' cargada. " +
+                $"{build.Stats.Count} stats revalidados contra el snapshot exacto.";
+        }
+        catch (BuildException exception)
+        {
+            BuildResultTextBox.Text =
+                $"No se pudo cargar ({exception.Code}): " +
+                TranslateBuildError(exception.Code);
+        }
+        catch (BuildDraftException exception)
+        {
+            BuildResultTextBox.Text =
+                $"No se pudo cargar el borrador fuente ({exception.Code}): " +
+                TranslateBuildDraftError(exception.Code);
+        }
+    }
+
     private static string TranslateBuildDraftError(string code) => code switch
     {
         BuildDraftErrorCodes.NotFound =>
@@ -793,5 +959,22 @@ public partial class MainWindow : Window
         BuildDraftErrorCodes.WriteConflict =>
             "la base local siguió ocupada después de los reintentos configurados.",
         _ => "se produjo un error de borrador no reconocido.",
+    };
+
+    private static string TranslateBuildError(string code) => code switch
+    {
+        BuildErrorCodes.NotFound =>
+            "no existe una build con ese ID.",
+        BuildErrorCodes.SchemaUnsupported =>
+            "la build usa una versión de esquema no soportada.",
+        BuildErrorCodes.DependencyUnavailable =>
+            "no está publicado exactamente el ruleset, dataset o motor del snapshot.",
+        BuildErrorCodes.SourceMismatch =>
+            "las identidades internas de la build no son coherentes.",
+        BuildErrorCodes.RevalidationFailed =>
+            "el recálculo no reproduce la caché persistida.",
+        BuildErrorCodes.WriteConflict =>
+            "la base local siguió ocupada después de los reintentos configurados.",
+        _ => "se produjo un error de build no reconocido.",
     };
 }

@@ -1,0 +1,94 @@
+{
+  "schemaVersion": "2.1.0",
+  "id": "formula-mana-regen-dark-wizard",
+  "version": "1.0.0",
+  "rulesetId": "mu-s4-global-reference",
+  "status": "PUBLISHED",
+  "confidence": "VERIFIED",
+  "purpose": "Calculate visible base mana regeneration for the Dark Wizard family before equipment, options, buffs, private profiles, or undeclared modifiers.",
+  "applicability": {
+    "characterClassId": "class-dark-wizard",
+    "evolutionIds": ["evolution-dark-wizard", "evolution-soul-master", "evolution-grand-master"]
+  },
+  "inputs": [
+    {
+      "id": "character-level",
+      "numericType": "INT32",
+      "unit": "level",
+      "numericBounds": {
+        "minimum": 1,
+        "minimumInclusive": true,
+        "maximum": 2147483647,
+        "maximumInclusive": true,
+        "classification": "TECHNICAL"
+      },
+      "rangeErrorCode": "formula-level-out-of-range",
+      "source": { "kind": "CONTEXT_VALUE", "valueId": "character-level" }
+    },
+    {
+      "id": "mana",
+      "numericType": "DECIMAL",
+      "unit": "mana-point",
+      "numericBounds": {
+        "minimum": 0,
+        "minimumInclusive": true,
+        "classification": "TECHNICAL"
+      },
+      "rangeErrorCode": "formula-dependency-out-of-range",
+      "source": {
+        "kind": "FORMULA_OUTPUT",
+        "formulaId": "formula-mana-dark-wizard",
+        "formulaVersion": "1.0.0",
+        "outputStage": "RAW"
+      }
+    }
+  ],
+  "output": { "id": "mana-regen", "numericType": "INT64", "unit": "mana-regen-point" },
+  "strategy": {
+    "kind": "PROGRAM",
+    "executionModel": "CHECKED_DECIMAL_V1",
+    "steps": [
+      {
+        "id": "raw-mana-regen",
+        "operation": "DIVIDE",
+        "operands": [
+          { "kind": "INPUT", "inputId": "mana" },
+          { "kind": "LITERAL", "value": 27.5 }
+        ]
+      },
+      {
+        "id": "visible-mana-regen",
+        "operation": "APPLY_ROUNDING",
+        "operands": [
+          { "kind": "STEP", "stepId": "raw-mana-regen" }
+        ]
+      }
+    ],
+    "dependencyFormulaRefs": [
+      { "id": "formula-mana-dark-wizard", "version": "1.0.0" }
+    ]
+  },
+  "rounding": { "mode": "TRUNCATE", "stage": "visible-mana-regen", "decimalPlaces": 0 },
+  "trace": {
+    "stepIds": ["raw-mana-regen", "visible-mana-regen"],
+    "rawOutputStepId": "raw-mana-regen",
+    "visibleOutputStepId": "visible-mana-regen"
+  },
+  "constraints": [
+    "Resolve class and evolution applicability before evaluating arithmetic.",
+    "Resolve formula-mana-dark-wizard version 1.0.0 from the same validated character state.",
+    "Resolve the character level from the same validated character state as the mana pool dependency.",
+    "Consume the RAW decimal mana output selected by owner decision EVD-0026.",
+    "Divide the mana dependency by the exact literal 27.5 using checked decimal arithmetic.",
+    "Do not round raw-mana-regen before visible-mana-regen.",
+    "Truncate raw-mana-regen toward zero exactly once at visible-mana-regen."
+  ],
+  "evidenceRefs": ["evd-0021", "evd-0026"],
+  "conflictIds": [],
+  "testCaseRefs": [
+    { "id": "mana-regen-dark-wizard-base", "version": "1.0.0" },
+    { "id": "mana-regen-dark-wizard-fraction-step", "version": "1.0.0" },
+    { "id": "mana-regen-dark-wizard-integer-step", "version": "1.0.0" },
+    { "id": "mana-regen-dark-wizard-grand-master-step", "version": "1.0.0" }
+  ]
+}

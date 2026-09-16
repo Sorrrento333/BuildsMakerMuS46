@@ -1,0 +1,29 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "pvm-attack-rate-fairy-elf-integer-step",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-pvm-attack-rate-fairy-elf", "version": "1.0.0" },
+  "context": { "characterClassId": "class-fairy-elf", "evolutionId": "evolution-fairy-elf" },
+  "inputs": { "agility": 25, "character-level": 2, "strength": 24 },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-pvm-attack-rate-fairy-elf-integer-step",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": { "id": "formula-pvm-attack-rate-fairy-elf", "version": "1.0.0" },
+    "context": { "characterClassId": "class-fairy-elf", "evolutionId": "evolution-fairy-elf" },
+    "inputs": { "agility": 25, "character-level": 2, "strength": 24 },
+    "steps": [
+      { "stepId": "level-contribution", "value": 10 },
+      { "stepId": "agility-numerator", "value": 75 },
+      { "stepId": "agility-contribution", "value": 37.5 },
+      { "stepId": "strength-contribution", "value": 6 },
+      { "stepId": "raw-pvm-attack-rate", "value": 53.5 },
+      { "stepId": "visible-pvm-attack-rate", "value": 53 }
+    ],
+    "rounding": { "mode": "TRUNCATE", "stage": "visible-pvm-attack-rate", "decimalPlaces": 0 },
+    "rawOutput": 53.5,
+    "visibleOutput": 53,
+    "evidenceRefs": ["evd-0021", "evd-0026"],
+    "conflictIds": []
+  }
+}

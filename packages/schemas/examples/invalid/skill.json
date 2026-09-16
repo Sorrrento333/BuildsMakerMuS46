@@ -1,0 +1,13 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "skill-synthetic",
+  "version": "1.0.0",
+  "rulesetId": "ruleset-synthetic",
+  "displayName": "",
+  "status": "PUBLISHED",
+  "confidence": "UNVERIFIED",
+  "kind": "UNKNOWN",
+  "requiredLevel": 0,
+  "allowedEvolutionIds": [],
+  "evidenceRefs": []
+}

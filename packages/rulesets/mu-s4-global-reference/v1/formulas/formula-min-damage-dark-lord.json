@@ -1,0 +1,100 @@
+{
+  "schemaVersion": "2.1.0",
+  "id": "formula-min-damage-dark-lord",
+  "version": "1.0.0",
+  "rulesetId": "mu-s4-global-reference",
+  "status": "PUBLISHED",
+  "confidence": "VERIFIED",
+  "purpose": "Calculate visible base min-damage for the Dark Lord family before equipment, options, buffs, private profiles, or undeclared modifiers.",
+  "applicability": {
+    "characterClassId": "class-dark-lord",
+    "evolutionIds": ["evolution-dark-lord", "evolution-lord-emperor"]
+  },
+  "inputs": [
+    {
+      "id": "strength",
+      "numericType": "INT64",
+      "unit": "stat-point",
+      "numericBounds": {
+        "minimum": 26,
+        "minimumInclusive": true,
+        "classification": "FACTUAL",
+        "evidenceRefs": ["evd-0021"]
+      },
+      "rangeErrorCode": "formula-stat-below-base",
+      "source": { "kind": "CONTEXT_VALUE", "valueId": "resolved-strength" }
+    },
+    {
+      "id": "energy",
+      "numericType": "INT64",
+      "unit": "stat-point",
+      "numericBounds": {
+        "minimum": 15,
+        "minimumInclusive": true,
+        "classification": "FACTUAL",
+        "evidenceRefs": ["evd-0021"]
+      },
+      "rangeErrorCode": "formula-stat-below-base",
+      "source": { "kind": "CONTEXT_VALUE", "valueId": "resolved-energy" }
+    }
+  ],
+  "output": { "id": "min-damage", "numericType": "INT64", "unit": "damage-point" },
+  "strategy": {
+    "kind": "PROGRAM",
+    "executionModel": "CHECKED_DECIMAL_V1",
+    "steps": [
+      {
+        "id": "strength-contribution",
+        "operation": "DIVIDE",
+        "operands": [
+          { "kind": "INPUT", "inputId": "strength" },
+          { "kind": "LITERAL", "value": 7 }
+        ]
+      },
+      {
+        "id": "energy-contribution",
+        "operation": "DIVIDE",
+        "operands": [
+          { "kind": "INPUT", "inputId": "energy" },
+          { "kind": "LITERAL", "value": 14 }
+        ]
+      },
+      {
+        "id": "raw-min-damage",
+        "operation": "ADD",
+        "operands": [
+          { "kind": "STEP", "stepId": "strength-contribution" },
+          { "kind": "STEP", "stepId": "energy-contribution" }
+        ]
+      },
+      {
+        "id": "visible-min-damage",
+        "operation": "APPLY_ROUNDING",
+        "operands": [
+          { "kind": "STEP", "stepId": "raw-min-damage" }
+        ]
+      }
+    ],
+    "dependencyFormulaRefs": []
+  },
+  "rounding": { "mode": "TRUNCATE", "stage": "visible-min-damage", "decimalPlaces": 0 },
+  "trace": {
+    "stepIds": ["strength-contribution", "energy-contribution", "raw-min-damage", "visible-min-damage"],
+    "rawOutputStepId": "raw-min-damage",
+    "visibleOutputStepId": "visible-min-damage"
+  },
+  "constraints": [
+    "Resolve class and evolution applicability before evaluating arithmetic.",
+    "Represent the exact literals 7 and 14 as base-10 decimals and use checked decimal arithmetic.",
+    "Do not round any step before visible-min-damage.",
+    "Truncate raw-min-damage toward zero exactly once at visible-min-damage."
+  ],
+  "evidenceRefs": ["evd-0021", "evd-0026"],
+  "conflictIds": [],
+  "testCaseRefs": [
+    { "id": "min-damage-dark-lord-base", "version": "1.0.0" },
+    { "id": "min-damage-dark-lord-fraction-step", "version": "1.0.0" },
+    { "id": "min-damage-dark-lord-integer-step", "version": "1.0.0" },
+    { "id": "min-damage-dark-lord-lord-emperor-step", "version": "1.0.0" }
+  ]
+}

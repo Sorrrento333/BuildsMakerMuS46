@@ -1,0 +1,64 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "fortitude-percent-dark-knight-base",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": {
+    "id": "formula-fortitude-percent-dark-knight",
+    "version": "1.0.0"
+  },
+  "context": {
+    "characterClassId": "class-dark-knight",
+    "evolutionId": "evolution-dark-knight"
+  },
+  "inputs": {
+    "vitality": 25,
+    "energy": 10
+  },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-fortitude-percent-dark-knight-base",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": {
+      "id": "formula-fortitude-percent-dark-knight",
+      "version": "1.0.0"
+    },
+    "context": {
+      "characterClassId": "class-dark-knight",
+      "evolutionId": "evolution-dark-knight"
+    },
+    "inputs": {
+      "vitality": 25,
+      "energy": 10
+    },
+    "steps": [
+      {
+        "stepId": "vitality-term",
+        "value": 0.25
+      },
+      {
+        "stepId": "energy-term",
+        "value": 0.5
+      },
+      {
+        "stepId": "raw-fortitude-percent",
+        "value": 12.75
+      },
+      {
+        "stepId": "visible-fortitude-percent",
+        "value": 12
+      }
+    ],
+    "rounding": {
+      "mode": "TRUNCATE",
+      "stage": "visible-fortitude-percent",
+      "decimalPlaces": 0
+    },
+    "rawOutput": 12.75,
+    "visibleOutput": 12,
+    "evidenceRefs": [
+      "evd-0021",
+      "evd-0026"
+    ],
+    "conflictIds": []
+  }
+}

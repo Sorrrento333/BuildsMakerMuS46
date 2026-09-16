@@ -1,0 +1,13 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "scenario-synthetic",
+  "version": "1.0.0",
+  "rulesetId": "ruleset-synthetic",
+  "displayName": "Synthetic hunting scenario",
+  "status": "PUBLISHED",
+  "confidence": "UNVERIFIED",
+  "modality": "UNKNOWN",
+  "mapRefs": [],
+  "externalBuffIds": [],
+  "evidenceRefs": []
+}

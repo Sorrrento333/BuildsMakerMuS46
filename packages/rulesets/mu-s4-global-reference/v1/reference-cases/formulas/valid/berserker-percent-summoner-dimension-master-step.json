@@ -1,0 +1,25 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "berserker-percent-summoner-dimension-master-step",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-berserker-percent-summoner", "version": "1.0.0" },
+  "context": { "characterClassId": "class-summoner", "evolutionId": "evolution-dimension-master" },
+  "inputs": { "energy": 28 },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-berserker-percent-summoner-dimension-master-step",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": { "id": "formula-berserker-percent-summoner", "version": "1.0.0" },
+    "context": { "characterClassId": "class-summoner", "evolutionId": "evolution-dimension-master" },
+    "inputs": { "energy": 28 },
+    "steps": [
+      { "stepId": "raw-berserker-percent", "value": 0.9333333333333333333333333333 },
+      { "stepId": "visible-berserker-percent", "value": 0 }
+    ],
+    "rounding": { "mode": "TRUNCATE", "stage": "visible-berserker-percent", "decimalPlaces": 0 },
+    "rawOutput": 0.9333333333333333333333333333,
+    "visibleOutput": 0,
+    "evidenceRefs": ["evd-0021", "evd-0026"],
+    "conflictIds": []
+  }
+}

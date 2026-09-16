@@ -1,0 +1,24 @@
+﻿===== git status --porcelain=v2 (byte-exacto) =====
+# branch.oid 45cf218afd746a013d23d6a58688bed5e5314b84
+# branch.head codex/reset-aware-drafts-traced-formulas
+# branch.upstream origin/codex/reset-aware-drafts-traced-formulas
+# branch.ab +0 -0
+? .opencode-wire/
+? branche-current.txt
+? checks-current.txt
+? githead-build.txt
+? gitlog-build.txt
+? gitstatus-build.txt
+? gitwire-final/
+? head-current.txt
+? pr-current.json
+
+===== diff index vs HEAD (staged) =====
+
+===== diff worktree vs HEAD (unstaged) =====
+
+===== HEAD / origin / ahead-behind =====
+HEAD: 45cf218afd746a013d23d6a58688bed5e5314b84
+origin/codex/reset-aware-drafts-traced-formulas: 45cf218afd746a013d23d6a58688bed5e5314b84
+0	0
+

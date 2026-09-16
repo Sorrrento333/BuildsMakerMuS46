@@ -1,0 +1,64 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "guild-member-capacity-dark-lord-lord-emperor-step",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": {
+    "id": "formula-guild-member-capacity-dark-lord",
+    "version": "1.0.0"
+  },
+  "context": {
+    "characterClassId": "class-dark-lord",
+    "evolutionId": "evolution-lord-emperor"
+  },
+  "inputs": {
+    "character-level": 220,
+    "command": 400
+  },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-guild-member-capacity-dark-lord-lord-emperor-step",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": {
+      "id": "formula-guild-member-capacity-dark-lord",
+      "version": "1.0.0"
+    },
+    "context": {
+      "characterClassId": "class-dark-lord",
+      "evolutionId": "evolution-lord-emperor"
+    },
+    "inputs": {
+      "character-level": 220,
+      "command": 400
+    },
+    "steps": [
+      {
+        "stepId": "level-term",
+        "value": 22
+      },
+      {
+        "stepId": "command-term",
+        "value": 40
+      },
+      {
+        "stepId": "raw-guild-member-capacity",
+        "value": 62
+      },
+      {
+        "stepId": "visible-guild-member-capacity",
+        "value": 62
+      }
+    ],
+    "rounding": {
+      "mode": "TRUNCATE",
+      "stage": "visible-guild-member-capacity",
+      "decimalPlaces": 0
+    },
+    "rawOutput": 62,
+    "visibleOutput": 62,
+    "evidenceRefs": [
+      "evd-0021",
+      "evd-0026"
+    ],
+    "conflictIds": []
+  }
+}

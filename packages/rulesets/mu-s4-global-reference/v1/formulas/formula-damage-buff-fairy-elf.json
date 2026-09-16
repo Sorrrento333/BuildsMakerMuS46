@@ -1,0 +1,131 @@
+{
+  "schemaVersion": "2.1.0",
+  "id": "formula-damage-buff-fairy-elf",
+  "version": "1.0.0",
+  "rulesetId": "mu-s4-global-reference",
+  "status": "PUBLISHED",
+  "confidence": "VERIFIED",
+  "purpose": "Calculate visible base damage buff for the Fairy Elf family before equipment, options, buffs, private profiles, or undeclared modifiers.",
+  "applicability": {
+    "characterClassId": "class-fairy-elf",
+    "evolutionIds": [
+      "evolution-fairy-elf",
+      "evolution-muse-elf",
+      "evolution-high-elf"
+    ]
+  },
+  "inputs": [
+    {
+      "id": "energy",
+      "numericType": "INT64",
+      "unit": "stat-point",
+      "numericBounds": {
+        "minimum": 15,
+        "minimumInclusive": true,
+        "classification": "FACTUAL",
+        "evidenceRefs": [
+          "evd-0021"
+        ]
+      },
+      "rangeErrorCode": "formula-stat-below-base",
+      "source": {
+        "kind": "CONTEXT_VALUE",
+        "valueId": "resolved-energy"
+      }
+    }
+  ],
+  "output": {
+    "id": "damage-buff",
+    "numericType": "INT64",
+    "unit": "damage-point"
+  },
+  "strategy": {
+    "kind": "PROGRAM",
+    "executionModel": "CHECKED_DECIMAL_V1",
+    "steps": [
+      {
+        "id": "energy-term",
+        "operation": "DIVIDE",
+        "operands": [
+          {
+            "kind": "INPUT",
+            "inputId": "energy"
+          },
+          {
+            "kind": "LITERAL",
+            "value": 7
+          }
+        ]
+      },
+      {
+        "id": "raw-damage-buff",
+        "operation": "ADD",
+        "operands": [
+          {
+            "kind": "STEP",
+            "stepId": "energy-term"
+          },
+          {
+            "kind": "LITERAL",
+            "value": 3
+          }
+        ]
+      },
+      {
+        "id": "visible-damage-buff",
+        "operation": "APPLY_ROUNDING",
+        "operands": [
+          {
+            "kind": "STEP",
+            "stepId": "raw-damage-buff"
+          }
+        ]
+      }
+    ],
+    "dependencyFormulaRefs": []
+  },
+  "rounding": {
+    "mode": "TRUNCATE",
+    "stage": "visible-damage-buff",
+    "decimalPlaces": 0
+  },
+  "trace": {
+    "stepIds": [
+      "energy-term",
+      "raw-damage-buff",
+      "visible-damage-buff"
+    ],
+    "rawOutputStepId": "raw-damage-buff",
+    "visibleOutputStepId": "visible-damage-buff"
+  },
+  "constraints": [
+    "Resolve class and evolution applicability before evaluating arithmetic.",
+    "Divide Energy by the exact literal 7 using checked decimal arithmetic, then add the exact literal 3.",
+    "Represent energy-term exactly as a base-10 decimal and add the constant with checked decimal arithmetic.",
+    "Do not round energy-term or raw-damage-buff before visible-damage-buff.",
+    "Truncate raw-damage-buff toward zero exactly once at visible-damage-buff."
+  ],
+  "evidenceRefs": [
+    "evd-0021",
+    "evd-0026"
+  ],
+  "conflictIds": [],
+  "testCaseRefs": [
+    {
+      "id": "damage-buff-fairy-elf-base",
+      "version": "1.0.0"
+    },
+    {
+      "id": "damage-buff-fairy-elf-fraction-step",
+      "version": "1.0.0"
+    },
+    {
+      "id": "damage-buff-fairy-elf-integer-step",
+      "version": "1.0.0"
+    },
+    {
+      "id": "damage-buff-fairy-elf-high-elf-step",
+      "version": "1.0.0"
+    }
+  ]
+}

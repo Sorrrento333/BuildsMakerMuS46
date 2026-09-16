@@ -1,0 +1,4 @@
+﻿096ea6b feat: evaluate a full character build in one pass
+bb7105a feat: add speed, combo, skills, wizardry and guild formulas and dataset 2026-07-30.3
+e521943 feat: add rates, regeneration and remaining damage formulas
+

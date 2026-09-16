@@ -1,0 +1,58 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "heal-fairy-elf-high-elf-step",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": {
+    "id": "formula-heal-fairy-elf",
+    "version": "1.0.0"
+  },
+  "context": {
+    "characterClassId": "class-fairy-elf",
+    "evolutionId": "evolution-high-elf"
+  },
+  "inputs": {
+    "energy": 450
+  },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-heal-fairy-elf-high-elf-step",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": {
+      "id": "formula-heal-fairy-elf",
+      "version": "1.0.0"
+    },
+    "context": {
+      "characterClassId": "class-fairy-elf",
+      "evolutionId": "evolution-high-elf"
+    },
+    "inputs": {
+      "energy": 450
+    },
+    "steps": [
+      {
+        "stepId": "energy-term",
+        "value": 50
+      },
+      {
+        "stepId": "raw-heal",
+        "value": 52
+      },
+      {
+        "stepId": "visible-heal",
+        "value": 52
+      }
+    ],
+    "rounding": {
+      "mode": "TRUNCATE",
+      "stage": "visible-heal",
+      "decimalPlaces": 0
+    },
+    "rawOutput": 52,
+    "visibleOutput": 52,
+    "evidenceRefs": [
+      "evd-0021",
+      "evd-0026"
+    ],
+    "conflictIds": []
+  }
+}

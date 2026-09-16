@@ -1,0 +1,25 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "min-wizardry-magic-gladiator-duel-master-step",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": { "id": "formula-min-wizardry-magic-gladiator", "version": "1.0.0" },
+  "context": { "characterClassId": "class-magic-gladiator", "evolutionId": "evolution-duel-master" },
+  "inputs": { "energy": 32 },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-min-wizardry-magic-gladiator-duel-master-step",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": { "id": "formula-min-wizardry-magic-gladiator", "version": "1.0.0" },
+    "context": { "characterClassId": "class-magic-gladiator", "evolutionId": "evolution-duel-master" },
+    "inputs": { "energy": 32 },
+    "steps": [
+      { "stepId": "raw-min-wizardry-damage", "value": 3.5555555555555555555555555556 },
+      { "stepId": "visible-min-wizardry-damage", "value": 3 }
+    ],
+    "rounding": { "mode": "TRUNCATE", "stage": "visible-min-wizardry-damage", "decimalPlaces": 0 },
+    "rawOutput": 3.5555555555555555555555555556,
+    "visibleOutput": 3,
+    "evidenceRefs": ["evd-0021", "evd-0026"],
+    "conflictIds": ["dsp-0002"]
+  }
+}

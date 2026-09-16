@@ -1,0 +1,7 @@
+﻿F:\Proyecto Builds\Programa\spikes\json-everything-source-build\JsonEverything.SourceBuild.ContractHarness.csproj
+F:\Proyecto Builds\Programa\spikes\json-everything-source-build\packages.lock.json
+F:\Proyecto Builds\Programa\spikes\json-everything-source-build\Program.cs
+F:\Proyecto Builds\Programa\spikes\json-everything-source-build\README.md
+F:\Proyecto Builds\Programa\spikes\json-everything-source-build\source-build-provenance.json
+F:\Proyecto Builds\Programa\spikes\json-everything-source-build\source-build.spdx.json
+

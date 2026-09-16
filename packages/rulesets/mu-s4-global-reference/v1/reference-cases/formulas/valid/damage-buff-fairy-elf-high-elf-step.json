@@ -1,0 +1,58 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "damage-buff-fairy-elf-high-elf-step",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": {
+    "id": "formula-damage-buff-fairy-elf",
+    "version": "1.0.0"
+  },
+  "context": {
+    "characterClassId": "class-fairy-elf",
+    "evolutionId": "evolution-high-elf"
+  },
+  "inputs": {
+    "energy": 400
+  },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-damage-buff-fairy-elf-high-elf-step",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": {
+      "id": "formula-damage-buff-fairy-elf",
+      "version": "1.0.0"
+    },
+    "context": {
+      "characterClassId": "class-fairy-elf",
+      "evolutionId": "evolution-high-elf"
+    },
+    "inputs": {
+      "energy": 400
+    },
+    "steps": [
+      {
+        "stepId": "energy-term",
+        "value": 57.142857142857142857142857143
+      },
+      {
+        "stepId": "raw-damage-buff",
+        "value": 60.142857142857142857142857143
+      },
+      {
+        "stepId": "visible-damage-buff",
+        "value": 60
+      }
+    ],
+    "rounding": {
+      "mode": "TRUNCATE",
+      "stage": "visible-damage-buff",
+      "decimalPlaces": 0
+    },
+    "rawOutput": 60.142857142857142857142857143,
+    "visibleOutput": 60,
+    "evidenceRefs": [
+      "evd-0021",
+      "evd-0026"
+    ],
+    "conflictIds": []
+  }
+}

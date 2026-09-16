@@ -1,0 +1,20 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "item-synthetic",
+  "version": "1.0.0",
+  "rulesetId": "ruleset-synthetic",
+  "displayName": "",
+  "status": "PUBLISHED",
+  "confidence": "UNVERIFIED",
+  "slots": [],
+  "allowedClassIds": [],
+  "optionModules": [
+    {
+      "id": "option-synthetic-001",
+      "kind": "UNKNOWN",
+      "evidenceRefs": []
+    }
+  ],
+  "socketSlots": -1,
+  "evidenceRefs": []
+}

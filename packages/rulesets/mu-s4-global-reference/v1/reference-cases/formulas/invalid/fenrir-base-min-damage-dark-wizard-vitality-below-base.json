@@ -1,0 +1,20 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "fenrir-base-min-damage-dark-wizard-vitality-below-base",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": {
+    "id": "formula-fenrir-base-min-damage-dark-wizard",
+    "version": "1.0.0"
+  },
+  "context": {
+    "characterClassId": "class-dark-wizard",
+    "evolutionId": "evolution-dark-wizard"
+  },
+  "inputs": {
+    "strength": 18,
+    "agility": 18,
+    "vitality": 14,
+    "energy": 30
+  },
+  "expectedErrorCode": "formula-stat-below-base"
+}

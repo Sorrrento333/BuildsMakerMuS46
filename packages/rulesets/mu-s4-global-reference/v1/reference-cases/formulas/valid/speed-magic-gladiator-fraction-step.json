@@ -1,0 +1,56 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "speed-magic-gladiator-fraction-step",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": {
+    "id": "formula-speed-magic-gladiator",
+    "version": "1.0.0"
+  },
+  "context": {
+    "characterClassId": "class-magic-gladiator",
+    "evolutionId": "evolution-magic-gladiator"
+  },
+  "inputs": {
+    "agility": 27
+  },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-speed-magic-gladiator-fraction-step",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": {
+      "id": "formula-speed-magic-gladiator",
+      "version": "1.0.0"
+    },
+    "context": {
+      "characterClassId": "class-magic-gladiator",
+      "evolutionId": "evolution-magic-gladiator"
+    },
+    "inputs": {
+      "agility": 27
+    },
+    "steps": [
+      {
+        "stepId": "raw-speed",
+        "value": 1.8
+      },
+      {
+        "stepId": "visible-speed",
+        "value": 1
+      }
+    ],
+    "rounding": {
+      "mode": "TRUNCATE",
+      "stage": "visible-speed",
+      "decimalPlaces": 0
+    },
+    "rawOutput": 1.8,
+    "visibleOutput": 1,
+    "evidenceRefs": [
+      "evd-0021",
+      "evd-0026"
+    ],
+    "conflictIds": [
+      "dsp-0002"
+    ]
+  }
+}

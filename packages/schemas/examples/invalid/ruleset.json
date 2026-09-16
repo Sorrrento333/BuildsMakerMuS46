@@ -1,0 +1,11 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "Ruleset-Synthetic",
+  "version": "1.0",
+  "displayName": "",
+  "gameVersion": "",
+  "status": "PUBLISHED",
+  "confidence": "VERIFIED",
+  "enabledFeatureIds": [],
+  "evidenceRefs": []
+}

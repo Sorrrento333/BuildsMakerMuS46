@@ -1,0 +1,58 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "nova-max-spell-damage-dark-wizard-grand-master-step",
+  "rulesetId": "mu-s4-global-reference",
+  "formulaRef": {
+    "id": "formula-nova-max-spell-damage-dark-wizard",
+    "version": "1.0.0"
+  },
+  "context": {
+    "characterClassId": "class-dark-wizard",
+    "evolutionId": "evolution-grand-master"
+  },
+  "inputs": {
+    "strength": 400
+  },
+  "expectedTrace": {
+    "schemaVersion": "1.0.0",
+    "id": "trace-nova-max-spell-damage-dark-wizard-grand-master-step",
+    "rulesetId": "mu-s4-global-reference",
+    "formulaRef": {
+      "id": "formula-nova-max-spell-damage-dark-wizard",
+      "version": "1.0.0"
+    },
+    "context": {
+      "characterClassId": "class-dark-wizard",
+      "evolutionId": "evolution-grand-master"
+    },
+    "inputs": {
+      "strength": 400
+    },
+    "steps": [
+      {
+        "stepId": "strength-term",
+        "value": 200
+      },
+      {
+        "stepId": "raw-nova-max-spell-damage",
+        "value": 1520
+      },
+      {
+        "stepId": "visible-nova-max-spell-damage",
+        "value": 1520
+      }
+    ],
+    "rounding": {
+      "mode": "TRUNCATE",
+      "stage": "visible-nova-max-spell-damage",
+      "decimalPlaces": 0
+    },
+    "rawOutput": 1520,
+    "visibleOutput": 1520,
+    "evidenceRefs": [
+      "evd-0021",
+      "evd-0026"
+    ],
+    "conflictIds": []
+  }
+}
