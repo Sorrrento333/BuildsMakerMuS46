@@ -85,10 +85,45 @@ Confirmar con el mantenedor la siguiente vertical entre los candidatos
 documentados y cerrarla con integración, pruebas, documentación y smoke:
 
 1. Builds completas y flujos de UI posteriores al presupuesto ganado, los
-   borradores locales y la evaluación en lote: master buys, persistencia de la
-   build completa y pantallas restantes del flujo.
+   borradores locales, la evaluación en lote y la persistencia local: master
+   buys y pantallas restantes del flujo.
 2. Trazas de cálculo de alto nivel aún sin contrato propio si el motor lo
    exige en una vertical posterior.
+
+## Última tarea cerrada — persistencia de build completa local
+
+La vertical de persistencia de la build completa quedó cerrada sobre la capa de
+datos local sin nuevos datos factuales:
+
+- `SaveBuildUseCase` promueve un borrador a `CharacterBuild` (schema `1.0.0`)
+  con clase, evolución, nivel, stats finales (base + asignación), quests y
+  resets, y `LoadBuildUseCase` recarga y revalida contra el contexto exacto
+  (ruleset, dataset y motor) con códigos estables para ausencia, schema no
+  soportado, dependencia indisponible, identidad incoherente, evolución no
+  ofrecida y stats no alcanzables o ajenos a la clase; entrega copias
+  defensivas de stats y quest ids.
+- Data implementa `SqliteBuildRepository` con la migración 2 `create_builds`,
+  payload y metadata exactos, reemplazo atómico por ID y rollback ante fallo
+  intermedio; la contención de escritura usa el código estable `WriteConflict`.
+- El smoke verifica el round-trip del borrador sintético
+  `publication-smoke-draft` a la build `publication-smoke-build` (cinco stats,
+  resets `2 × 100 = 200`) y su supervivencia al respaldo/restauración y al
+  reemplazo simulado de binarios. Nuevos campos `BuildPersistenceVerified`,
+  `BuildId` y `BuildStatCount`.
+- Doce pruebas de integración de Application y seis de Data cierran la
+  vertical; ruleset `1.0.0`, motor `0.2.0` y dataset `2026-07-30.3` permanecen
+  sin cambios.
+
+## Verificación del cierre — persistencia de build completa local
+
+- Restauración y build Release aprobados con 0 advertencias/0 errores; 779/779
+  pruebas pasan: 40 validator, 58 motor, 657 Application y 24 Data.
+- CLI del validador: las ciento siete fórmulas `PUBLISHED` pasan sin errores
+  (los datos no cambian respecto al dataset `2026-07-30.3`).
+- Smoke WPF `win-x64`: PASS local el 2026-09-15 con SQLite `3.53.3`, 1300
+  archivos, 150.382.040 bytes, 10 avisos legales, 877 JSON del ruleset y
+  dataset `2026-07-30.3` con hash
+  `sha256:ef6fd756c2a69245906019d4c4cf01c3a7baba460067bbfffc4c4906361b0f18`.
 
 ## Última tarea cerrada — evaluación de build en lote
 
@@ -294,7 +329,7 @@ como axiomas del ruleset trazándose exclusivamente desde `EVD-0021` y
 
 ## Primera acción concreta
 
-Confirmar con el mantenedor el primer candidato restante (contratos fácticos de
-`EVD-0026` sin motor, builds/flujos de UI posteriores al borrador, o trazas de
-cálculo de alto nivel) y actualizar esta documentación y `CHANGELOG.md` al
-cerrarlo.
+Confirmar con el mantenedor el primer candidato restante (master buys y
+pantallas restantes del flujo, contratos fácticos de `EVD-0026` sin motor, o
+trazas de cálculo de alto nivel) y actualizar esta documentación y
+`CHANGELOG.md` al cerrarlo.

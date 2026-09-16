@@ -363,6 +363,18 @@ if (-not $initialReport.BuildDraftPersistenceVerified -or
     throw "The external build draft did not survive replacement and exact revalidation."
 }
 
+if (-not $initialReport.BuildPersistenceVerified -or
+    -not $replacementReport.BuildPersistenceVerified -or
+    $initialReport.BuildId -ne "publication-smoke-build" -or
+    $replacementReport.BuildId -ne $initialReport.BuildId -or
+    $initialReport.BuildStatCount -le 0 -or
+    $initialReport.BuildStatCount -ne
+        $replacementReport.BuildStatCount -or
+    $initialReport.BuildStatCount -ne
+        $initialReport.SyntheticStatDistributionStatCount) {
+    throw "The full character build did not survive replacement and exact revalidation."
+}
+
 if (-not $initialReport.PublishedBuildEvaluationVerified -or
     -not $replacementReport.PublishedBuildEvaluationVerified -or
     $initialReport.PublishedBuildFormulaCount -le 0 -or
@@ -419,5 +431,6 @@ Write-Output "Reset configuration: $($initialReport.SyntheticResetCount) x $($in
 Write-Output "Published formulas: $($initialReport.PublishedFormulaReferences -join ', '), $($initialReport.ApprovedPublishedFormulaCaseCount) contextual cases"
 Write-Output "Full build evaluation: $($initialReport.PublishedBuildFormulaCount) formulas grouped"
 Write-Output "Build draft: $($initialReport.BuildDraftId), dataset $($initialReport.BuildDraftDatasetVersion)"
+Write-Output "Full build: $($initialReport.BuildId), $($initialReport.BuildStatCount) stats"
 Write-Output "Ruleset files: $($initialRulesetFiles.Count)"
 Write-Output "Artifacts: $runRoot"

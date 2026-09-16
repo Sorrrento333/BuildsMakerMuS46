@@ -2355,35 +2355,49 @@
   verifica el lote sobre el personaje sintético con 19 fórmulas agrupadas. No
   se incorporan JSON factuales: ruleset `1.0.0`, motor `0.2.0` y dataset
   `2026-07-30.3` permanecen sin cambios.
+- Persistencia de build completa cerrada: `SaveBuildUseCase` promueve un
+  borrador a `CharacterBuild` (schema `1.0.0`) con clase, evolución, nivel,
+  stats finales, quests y resets; `LoadBuildUseCase` recarga y revalida la
+  build contra el contexto exacto y rechaza con códigos estables la ausencia, el
+  schema no soportado, la dependencia indisponible, la identidad incoherente, la
+  evolución no ofrecida, los stats no alcanzables o ajenos a la clase. Data
+  implementa `SqliteBuildRepository` con la migración 2 `create_builds`,
+  reemplazo atómico por ID y contención de escritura con código estable. WPF
+  compone el flujo de guardado/carga por ID. No se incorporan JSON factuales ni
+  se reutiliza la caché como verdad: ruleset `1.0.0`, motor `0.2.0` y dataset
+  `2026-07-30.3` permanecen sin cambios.
 
 ## No iniciado
 
 - Builds completas y flujos de UI posteriores al presupuesto ganado, los
-  borradores locales y la evaluación en lote: master buys, persistencia de la
-  build completa y pantallas restantes del flujo.
+  borradores locales, la evaluación en lote y la persistencia local: master
+  buys y pantallas restantes del flujo.
 
 ## Decisiones abiertas
 
 - El canal público de actualización y firma continúa como decisión posterior de
   distribución.
 
-## Verificación más reciente — 2026-09-11 (evaluación de build en lote)
+## Verificación más reciente — 2026-09-15 (persistencia de build local)
 
-- Cierre de la evaluación de build en lote: restauración y build Release
-  aprobados con 0 advertencias/0 errores; 761/761 pruebas pasan: 40 validator,
-  58 motor, 645 Application y 18 Data. Seis pruebas de integración de
-  Application fijan cobertura exacta por clase×evolución, paridad
-  lote/individual, traza anidada compartida, orden determinista y fallos
-  cerrados por nivel inválido, asignación negativa y ausencia de fórmula
-  aplicable.
-- Smoke WPF `win-x64`: PASS con SQLite `3.53.3`, 1300 archivos,
-  150.038.168 bytes, 10 avisos legales, 877 JSON del ruleset, dataset
-  `2026-07-30.3` (hash
-  `sha256:ef6fd756c2a69245906019d4c4cf01c3a7baba460067bbfffc4c4906361b0f18`)
-  y los nuevos reportes `PublishedBuildEvaluationVerified`/
-  `PublishedBuildFormulaCount` aprobados; el lote reproducido sobre el
-  personaje sintético (cinco stats y 201 gastados, resets `2 × 100 = 200`)
-  agrupa 19 fórmulas con paridad por fórmula contra el camino individual.
+- Cierre de la persistencia de build completa: restauración y build Release
+  aprobados con 0 advertencias/0 errores; 779/779 pruebas pasan: 40 validator,
+  58 motor, 657 Application y 24 Data. Doce pruebas de integración de
+  Application fijan promoción y recarga revalidada con snapshot exacto,
+  reemplazo por ID, rechazos cerrados (ID inválido, borrador/build ausentes,
+  schema no soportado, dependencia indisponible, identidad incoherente,
+  evolución no ofrecida, stats por debajo de base o ajenos a la clase) y nombres
+  de propiedades exactos del modelo serializado. Seis pruebas de integración de
+  Data fijan payload y metadata exactos, reemplazo atómico, rollback ante fallo,
+  recarga tras reabrir, carga ausente sin mutación y contención con código
+  estable.
+- Smoke WPF `win-x64`: PASS con SQLite `3.53.3`, 1300 archivos y
+  150.382.040 bytes; el borrador sintético `publication-smoke-draft` se
+  promueve a la build `publication-smoke-build` (cinco stats, resets
+  `2 × 100 = 200`) y sobrevive a la copia de respaldo, a la restauración del
+  backup y al reemplazo simulado de binarios; el reporte amplía
+  `BuildPersistenceVerified`/`BuildId`/`BuildStatCount` y las aserciones del
+  script se aprueban.
 - No se incorporaron JSON factuales nuevos: ruleset `1.0.0`, motor `0.2.0` y
   dataset `2026-07-30.3` permanecen sin cambios; el validador no registra
   diferencias sobre las ciento siete fórmulas `PUBLISHED`.

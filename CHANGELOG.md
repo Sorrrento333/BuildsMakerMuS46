@@ -1122,6 +1122,26 @@
 
 ### Added
 
+- Vertical de persistencia de build completa cerrada: `SaveBuildUseCase`
+  promueve un borrador a `CharacterBuild` (schema `1.0.0`; clase, evolución,
+  nivel, stats finales, quests y resets) y `LoadBuildUseCase` recarga y
+  revalida contra el contexto exacto (ruleset, dataset y motor) con códigos
+  estables para ausencia, schema no soportado, dependencia indisponible,
+  identidad incoherente, evolución no ofrecida y stats no alcanzables o ajenos
+  a la clase; entrega copias defensivas de stats y quest ids.
+- Data implementa `SqliteBuildRepository` con la migración 2 `create_builds`
+  (payload y metadata exactos, reemplazo atómico por ID y rollback ante fallo)
+  bajo la contención de escritura ya autorizada para borradores
+  (`WriteConflict`). El smoke de publicación verifica el round-trip del borrador
+  sintético `publication-smoke-draft` a la build `publication-smoke-build`
+  (cinco stats, resets `2 × 100 = 200`) y su supervivencia al
+  respaldo/restauración y al reemplazo simulado de binarios, y amplía el reporte
+  con `BuildPersistenceVerified`, `BuildId` y `BuildStatCount`. Doce pruebas de
+  integración de Application y seis de Data cierran la vertical; no se incorporan
+  JSON factuales: ruleset `1.0.0`, motor `0.2.0` y dataset `2026-07-30.3`
+  permanecen sin cambios. El smoke del 2026-09-15 pasa con 1300 archivos y
+  150.382.040 bytes y el hash de dataset
+  `sha256:ef6fd756c2a69245906019d4c4cf01c3a7baba460067bbfffc4c4906361b0f18`.
 - Vertical de evaluación de build en lote cerrada:
   `CalculateCharacterBuildUseCase` evalúa en una sola pasada todas las
   fórmulas publicadas aplicables a la clase y evolución de un estado validado,

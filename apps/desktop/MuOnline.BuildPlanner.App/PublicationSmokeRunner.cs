@@ -18,6 +18,7 @@ internal static class PublicationSmokeRunner
     private const string ExpectedPersistedValue = "persisted-across-update";
     private const string BackupFileName = "publication-smoke.backup.sqlite";
     private const string BuildDraftId = "publication-smoke-draft";
+    private const string BuildId = "publication-smoke-build";
 
     private static readonly SqliteMigration SyntheticMigration = new(
         3,
@@ -94,6 +95,7 @@ internal static class PublicationSmokeRunner
                 "INSERT INTO publication_smoke_probe (id, value) VALUES (2, $value);",
                 ExpectedPersistedValue);
             SaveAndVerifyBuildDraft(buildDraftServices, progressionVerification);
+            SaveAndVerifyBuild(buildDraftServices, progressionVerification);
             SqliteBackupService.CreateVerifiedBackup(connection, backupPath);
             ExecuteNonQuery(
                 connection,
@@ -109,6 +111,7 @@ internal static class PublicationSmokeRunner
             EnsureExpectedDatabaseState(reopenedConnection);
         }
         VerifyBuildDraft(buildDraftServices, progressionVerification);
+        VerifyBuild(buildDraftServices, progressionVerification);
 
         return CreateSuccessfulReport(
             options,
@@ -141,6 +144,7 @@ internal static class PublicationSmokeRunner
         var migrationResult = buildDraftServices.MigrationResult;
         EnsureExpectedDatabaseState(connection);
         VerifyBuildDraft(buildDraftServices, progressionVerification);
+        VerifyBuild(buildDraftServices, progressionVerification);
 
         return CreateSuccessfulReport(
             options,
@@ -208,6 +212,10 @@ internal static class PublicationSmokeRunner
                 buildDraftServices.RuntimeContext.Dataset.Version,
             BuildDraftDatasetHash:
                 buildDraftServices.RuntimeContext.Dataset.Hash,
+            BuildPersistenceVerified: true,
+            BuildId: BuildId,
+            BuildStatCount:
+                progressionVerification.SyntheticDistribution.StatCount,
             AppliedMigrationCount: migrationResult.AppliedCount,
             AlreadyAppliedMigrationCount: migrationResult.AlreadyAppliedCount,
             ErrorType: null,
@@ -467,6 +475,74 @@ internal static class PublicationSmokeRunner
                 sourceCase.CompletedQuestIds),
             Allocations: allocations);
     }
+
+    private static void SaveAndVerifyBuild(
+        PublishedBuildDraftServices services,
+        ProgressionVerificationResult progressionVerification)
+    {
+        var saved = services.SaveBuildUseCase.ExecuteAsync(
+                new SaveBuildRequest(BuildId, BuildDraftId))
+            .GetAwaiter()
+            .GetResult();
+        VerifyBuildServices(saved, services, progressionVerification);
+        VerifyBuild(services, progressionVerification);
+    }
+
+    private static void VerifyBuild(
+        PublishedBuildDraftServices services,
+        ProgressionVerificationResult progressionVerification)
+    {
+        var build = services.LoadBuildUseCase.ExecuteAsync(BuildId)
+            .GetAwaiter()
+            .GetResult();
+        VerifyBuildServices(build, services, progressionVerification);
+    }
+
+    private static void VerifyBuildServices(
+        CharacterBuild build,
+        PublishedBuildDraftServices services,
+        ProgressionVerificationResult progressionVerification)
+    {
+        var synthetic = progressionVerification.SyntheticDistribution;
+        var characterClass = services.RuntimeContext.Catalog.Classes.Single(
+            characterClass =>
+                characterClass.Id ==
+                synthetic.ProgressionInputs.CharacterClassId);
+        var expectedStats = characterClass.StatIds
+            .Order(StringComparer.Ordinal)
+            .ToDictionary(
+                statId => statId,
+                statId =>
+                    characterClass.BaseStats[statId].BaseValue +
+                    synthetic.Allocations[statId],
+                StringComparer.Ordinal);
+        if (build.Id != BuildId ||
+            build.SchemaVersion != CharacterBuild.CurrentSchemaVersion ||
+            build.Ruleset != services.RuntimeContext.Ruleset ||
+            build.Dataset != services.RuntimeContext.Dataset ||
+            build.EngineVersion != services.RuntimeContext.EngineVersion ||
+            build.CharacterClassId != synthetic.ProgressionInputs.CharacterClassId ||
+            build.EvolutionId != synthetic.ProgressionInputs.EvolutionId ||
+            build.Level != synthetic.ProgressionInputs.Level ||
+            build.ResetCount != synthetic.ResetInputs.ResetCount ||
+            !SameStats(build.Stats, expectedStats) ||
+            !build.QuestIds.Order(StringComparer.Ordinal)
+                .SequenceEqual(
+                    synthetic.ProgressionInputs.CompletedQuestIds
+                        .Order(StringComparer.Ordinal)))
+        {
+            throw new InvalidOperationException(
+                "The full character build did not survive persistence and Application revalidation.");
+        }
+    }
+
+    private static bool SameStats(
+        IReadOnlyDictionary<string, long> first,
+        Dictionary<string, long> second) =>
+        first.Count == second.Count &&
+        first.All(item =>
+            second.TryGetValue(item.Key, out var value) &&
+            item.Value == value);
 
     private static void SaveAndVerifyBuildDraft(
         PublishedBuildDraftServices services,
