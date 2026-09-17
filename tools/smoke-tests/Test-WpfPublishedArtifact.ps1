@@ -394,6 +394,15 @@ if (-not $initialReport.PublishedBuildEvaluationVerified -or
     throw "The published artifact did not reproduce the full-build grouped evaluation."
 }
 
+if (-not $initialReport.ItemCatalogVerified -or
+    -not $replacementReport.ItemCatalogVerified -or
+    $initialReport.ItemCatalogItemCount -ne 3 -or
+    $replacementReport.ItemCatalogItemCount -ne 3 -or
+    -not $initialReport.SyntheticItemEquipVerified -or
+    -not $replacementReport.SyntheticItemEquipVerified) {
+    throw "The published bounded item catalog did not materialize or evaluate in both phases."
+}
+
 $initialRulesetRoot = Join-Path $initialPublishDirectory $publishedRulesetRelativePath
 $replacementRulesetRoot = Join-Path $replacementPublishDirectory $publishedRulesetRelativePath
 $initialRulesetFiles = Get-ChildItem -LiteralPath $initialRulesetRoot -Recurse -File
@@ -439,6 +448,7 @@ Write-Output "Synthetic stat distribution: $($initialReport.SyntheticStatDistrib
 Write-Output "Reset configuration: $($initialReport.SyntheticResetCount) x $($initialReport.SyntheticPointsPerReset) = $($initialReport.SyntheticResetPoints)"
 Write-Output "Published formulas: $($initialReport.PublishedFormulaReferences -join ', '), $($initialReport.ApprovedPublishedFormulaCaseCount) contextual cases"
 Write-Output "Full build evaluation: $($initialReport.PublishedBuildFormulaCount) formulas grouped"
+Write-Output "Bounded item catalog: $($initialReport.ItemCatalogItemCount) items, equip evaluated: $($initialReport.SyntheticItemEquipVerified)"
 Write-Output "Build draft: $($initialReport.BuildDraftId), dataset $($initialReport.BuildDraftDatasetVersion)"
 Write-Output "Full build: $($initialReport.BuildId), $($initialReport.BuildStatCount) stats"
 Write-Output "Saved builds listed: $($initialReport.PersistedBuildCount)"

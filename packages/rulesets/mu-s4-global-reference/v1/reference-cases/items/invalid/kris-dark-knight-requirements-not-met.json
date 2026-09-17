@@ -1,0 +1,12 @@
+{
+  "id": "kris-dark-knight-requirements-not-met",
+  "itemId": "item-kris",
+  "classId": "class-dark-knight",
+  "stats": {
+    "strength": 26,
+    "agility": 40,
+    "vitality": 25,
+    "energy": 10
+  },
+  "expectedErrorCode": "item-equip-requirements-not-met"
+}

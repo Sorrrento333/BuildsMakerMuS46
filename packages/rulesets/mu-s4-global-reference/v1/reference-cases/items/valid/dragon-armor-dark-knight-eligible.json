@@ -1,0 +1,12 @@
+{
+  "id": "dragon-armor-dark-knight-eligible",
+  "itemId": "item-dragon-armor",
+  "classId": "class-dark-knight",
+  "stats": {
+    "strength": 232,
+    "agility": 73,
+    "vitality": 25,
+    "energy": 10
+  },
+  "expectedErrorCode": null
+}

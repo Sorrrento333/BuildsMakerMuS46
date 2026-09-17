@@ -6,6 +6,21 @@
 
 ### Added
 
+- Consumo acotado del catálogo de ítems (UC-04). `ItemDefinition` (Domain) y
+  `ItemCatalog`/`JsonItemCatalogSnapshotReader` (Application) materializan los
+  `items/*.json` exigiendo schema `1.0.0`, IDs únicos, un único ruleset,
+  `slots`/`allowedClassIds` no vacíos, `requiredStats` no negativos y `status`
+  `PUBLISHED` (fail-closed). `EquipItemUseCase` valida elegibilidad de equipado
+  por clase y `requiredStats` en +0 con códigos estables
+  `item-equip-not-found`, `item-equip-class-not-allowed` y
+  `item-equip-requirements-not-met`, sin bonificaciones ni instancia equipada.
+  Reference cases `reference-cases/items/{valid,invalid}` y
+  `ItemApplicationIntegrationTests` (12 pruebas) cubren 4 casos aprobados, 4
+  rechazos y los fallos cerrados (ítem no publicado, ruleset mixto, directorio
+  ausente). WPF añade el selector de ranura/ítem y el smoke verifica el catálogo
+  de 3 ítems y una evaluación de equipado. Diseño en
+  `docs/04-domain/items-consumption-design.md`; ruleset `1.0.0`, motor `0.2.0` y
+  dataset `2026-09-16.1` sin cambios.
 - Catálogo acotado de ítems materializado. `item-kris`, `item-dragon-armor` y
   `item-albatross-bow` nacen `PUBLISHED` `VERIFIED` en
   `packages/rulesets/mu-s4-global-reference/v1/items/` contra `item.schema.json`,
@@ -14,7 +29,7 @@
   `optionModules` NORMAL, `socketSlots` 0 y `evidenceRefs` `evd-0037`–`evd-0040`.
   `SchemaContractValidator.ValidateRulesetRecords` registra `("item","items")`
   (inventario canónico 116 → 119) y el smoke WPF exige el directorio `items`. El
-  dataset avanza a `2026-09-16.1`. Application todavía no consume el catálogo.
+  dataset avanza a `2026-09-16.1`.
 - Gate factual de ítems/equipo resuelto por axioma acotado del propietario.
   `RES-0003-items-equipment` queda `VERIFIED` con ocho claims y seis evidencias
   (`EVD-0035`–`EVD-0040`); los conflictos `DSP-0005` a `DSP-0007` quedan

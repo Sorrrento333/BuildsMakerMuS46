@@ -2372,17 +2372,39 @@
 - Master buys y pantallas restantes del flujo de la Calculadora (ítems,
   skills, buffs y gasto final de puntos de una build maximizada), pendientes de
   sus contratos factuales; no pueden inventarse.
-- Consumo del catálogo de ítems por Application/WPF (equipar, UC-04): sin
-  iniciar. El catálogo acotado (`item-kris`, `item-dragon-armor`,
-  `item-albatross-bow`) ya está materializado y validado, pero ninguna capa lo
-  selecciona ni equipa todavía.
+- Ampliación de UC-04 (bonificaciones ATK/DEF, `requiredLevel`, progresión de
+  `requiredStats`, sockets, instancia equipada): requiere nueva evidencia Season
+  4 o una nueva decisión del propietario; no puede inferirse.
 
 ## Decisiones abiertas
 
 - El canal público de actualización y firma continúa como decisión posterior de
   distribución.
 
-## Verificación más reciente — 2026-09-16 (catálogo acotado de ítems materializado)
+## Verificación más reciente — 2026-09-16 (consumo acotado del catálogo de ítems)
+
+- `ItemDefinition` (Domain) y `ItemCatalog`/`JsonItemCatalogSnapshotReader`
+  (Application) leen `items/*.json` exigiendo schema `1.0.0`, IDs únicos, un
+  único ruleset, `slots`/`allowedClassIds` no vacíos, `requiredStats` no
+  negativos y `status` `PUBLISHED` (fail-closed).
+- `EquipItemUseCase` valida elegibilidad de equipado (clase + `requiredStats`
+  en +0) con códigos estables `item-equip-not-found`,
+  `item-equip-class-not-allowed` y `item-equip-requirements-not-met`; no emite
+  bonificaciones ni modela una instancia equipada.
+- Reference cases `reference-cases/items/{valid,invalid}` y 12 pruebas
+  (`ItemApplicationIntegrationTests`) reproducen 4 casos aprobados y 4 rechazos
+  y fallan en cerrado ante ítem no publicado, ruleset mixto y directorio
+  ausente.
+- WPF añade selector de ranura/ítem y resultado de elegibilidad; el smoke exige
+  el catálogo de 3 ítems y una evaluación de equipado resuelta.
+- Verificación PASS: build Release 0/0; 797/797 pruebas (40 validator, 58 motor,
+  672 Application, 27 Data); `Test-SchemaStructure` 16/32; smoke WPF `win-x64`
+  (SQLite `3.53.3`, 1311 archivos, 150.436.499 bytes, 888 JSON del ruleset,
+  dataset `2026-09-16.1`).
+- Diseño en `docs/04-domain/items-consumption-design.md`; ruleset `1.0.0`,
+  motor `0.2.0` y dataset `2026-09-16.1` sin cambios.
+
+## Verificación anterior — 2026-09-16 (catálogo acotado de ítems materializado)
 
 - Tres `ItemDefinition` `PUBLISHED` `VERIFIED` (`item-kris`,
   `item-dragon-armor` y `item-albatross-bow`) en

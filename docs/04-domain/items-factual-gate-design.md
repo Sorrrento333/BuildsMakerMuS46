@@ -111,5 +111,6 @@ salir del subconjunto ni de los campos aprobados.
   `PUBLISHED` contra `item.schema.json`, con el catálogo y su validación.
 - Materialización completada: los tres registros viven en
   `packages/rulesets/mu-s4-global-reference/v1/items/`, el validador registra
-  `("item","items")` y el dataset avanza a `2026-09-16.1`. Application todavía
-  no consume el catálogo.
+  `("item","items")` y el dataset avanza a `2026-09-16.1`. Application consume
+  el catálogo en la vertical acotada de UC-04
+  (`docs/04-domain/items-consumption-design.md`).

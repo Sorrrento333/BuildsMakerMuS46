@@ -28,6 +28,8 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
@@ -372,6 +374,55 @@
                      TextWrapping="Wrap"
                      VerticalScrollBarVisibility="Auto"
                      AutomationProperties.Name="Resultado de build completa" />
+
+            <GroupBox Grid.Row="17"
+                      Grid.ColumnSpan="2"
+                      Margin="0,24,0,0"
+                      Header="Elegibilidad de equipado (catálogo de ítems)">
+                <Grid Margin="12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="180" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <TextBlock VerticalAlignment="Center"
+                               Text="Ranura" />
+                    <ComboBox x:Name="ItemSlotComboBox"
+                              Grid.Column="1"
+                              MinHeight="30"
+                              DisplayMemberPath="DisplayName"
+                              SelectionChanged="ItemSlotSelectionChanged"
+                              AutomationProperties.Name="Ranura de equipamiento" />
+
+                    <TextBlock Grid.Row="1"
+                               Margin="0,12,0,0"
+                               VerticalAlignment="Center"
+                               Text="Ítem" />
+                    <ComboBox x:Name="ItemComboBox"
+                              Grid.Row="1"
+                              Grid.Column="1"
+                              Margin="0,12,0,0"
+                              MinHeight="30"
+                              DisplayMemberPath="DisplayName"
+                              SelectionChanged="ItemSelectionChanged"
+                              AutomationProperties.Name="Ítem del catálogo" />
+                </Grid>
+            </GroupBox>
+
+            <TextBox x:Name="ItemResultTextBox"
+                     Grid.Row="18"
+                     Grid.ColumnSpan="2"
+                     Margin="0,16,0,0"
+                     Padding="12"
+                     MinHeight="72"
+                     IsReadOnly="True"
+                     TextWrapping="Wrap"
+                     VerticalScrollBarVisibility="Auto"
+                     AutomationProperties.Name="Resultado de elegibilidad de equipado" />
         </Grid>
     </ScrollViewer>
 </Window>

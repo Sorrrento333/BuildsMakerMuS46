@@ -4,10 +4,12 @@ using System.Text.Json;
 using Microsoft.Data.Sqlite;
 using MuOnline.BuildPlanner.Application.Builds;
 using MuOnline.BuildPlanner.Application.Formulas;
+using MuOnline.BuildPlanner.Application.Items;
 using MuOnline.BuildPlanner.Application.Progression;
 using MuOnline.BuildPlanner.Application.Stats;
 using MuOnline.BuildPlanner.Data;
 using MuOnline.BuildPlanner.Domain.Formulas;
+using MuOnline.BuildPlanner.Domain.Items;
 using MuOnline.BuildPlanner.Domain.Progression;
 using MuOnline.BuildPlanner.Domain.Stats;
 
@@ -39,6 +41,7 @@ internal static class PublicationSmokeRunner
         var progressionVerification = VerifyPublishedProgressionRuleset();
         var formulaVerification = VerifyPublishedCharacterFormulas();
         var buildVerification = VerifyPublishedCharacterBuild(progressionVerification);
+        var itemVerification = VerifyPublishedItems();
         var buildDraftServices = PublishedBuildDraftServices.Create(
             options.DataDirectory,
             [SyntheticMigration]);
@@ -55,6 +58,7 @@ internal static class PublicationSmokeRunner
                 progressionVerification,
                 formulaVerification,
                 buildVerification,
+                itemVerification,
                 buildDraftServices),
             PublicationSmokePhase.VerifyUpdate => VerifyUpdate(
                 databasePath,
@@ -63,6 +67,7 @@ internal static class PublicationSmokeRunner
                 progressionVerification,
                 formulaVerification,
                 buildVerification,
+                itemVerification,
                 buildDraftServices),
             _ => throw new ArgumentOutOfRangeException(nameof(options)),
         };
@@ -75,6 +80,7 @@ internal static class PublicationSmokeRunner
         ProgressionVerificationResult progressionVerification,
         PublishedFormulaVerification formulaVerification,
         VerifiedCharacterBuild buildVerification,
+        ItemVerification itemVerification,
         PublishedBuildDraftServices buildDraftServices)
     {
         if (!File.Exists(databasePath) || File.Exists(backupPath))
@@ -122,6 +128,7 @@ internal static class PublicationSmokeRunner
             progressionVerification,
             formulaVerification,
             buildVerification,
+            itemVerification,
             buildDraftServices,
             persistedBuildCount);
     }
@@ -133,6 +140,7 @@ internal static class PublicationSmokeRunner
         ProgressionVerificationResult progressionVerification,
         PublishedFormulaVerification formulaVerification,
         VerifiedCharacterBuild buildVerification,
+        ItemVerification itemVerification,
         PublishedBuildDraftServices buildDraftServices)
     {
         if (!File.Exists(databasePath) || !File.Exists(backupPath))
@@ -156,6 +164,7 @@ internal static class PublicationSmokeRunner
             progressionVerification,
             formulaVerification,
             buildVerification,
+            itemVerification,
             buildDraftServices,
             persistedBuildCount);
     }
@@ -169,6 +178,7 @@ internal static class PublicationSmokeRunner
         ProgressionVerificationResult progressionVerification,
         PublishedFormulaVerification formulaVerification,
         VerifiedCharacterBuild buildVerification,
+        ItemVerification itemVerification,
         PublishedBuildDraftServices buildDraftServices,
         int persistedBuildCount) => new(
             Success: true,
@@ -209,6 +219,10 @@ internal static class PublicationSmokeRunner
             ApprovedPublishedFormulaCaseCount: formulaVerification.ApprovedCaseCount,
             PublishedBuildEvaluationVerified: buildVerification.Verified,
             PublishedBuildFormulaCount: buildVerification.FormulaCount,
+            ItemCatalogVerified: itemVerification.CatalogVerified,
+            ItemCatalogItemCount: itemVerification.ItemCount,
+            ItemCatalogItemReferences: itemVerification.ItemReferences,
+            SyntheticItemEquipVerified: itemVerification.SyntheticEquipVerified,
             BuildDraftPersistenceVerified: true,
             BuildDraftId: BuildDraftId,
             BuildDraftDatasetVersion:
@@ -374,6 +388,63 @@ internal static class PublicationSmokeRunner
         }
 
         return new VerifiedCharacterBuild(true, evaluation.Formulas.Length);
+    }
+
+    private static ItemVerification VerifyPublishedItems()
+    {
+        var catalog = PublishedProgressionRuleset.ItemCatalog;
+        var expectedItems = new Dictionary<string, string[]>(StringComparer.Ordinal)
+        {
+            ["item-albatross-bow"] = ["weapon"],
+            ["item-dragon-armor"] = ["armor"],
+            ["item-kris"] = ["weapon"],
+        };
+        var references = catalog.Items
+            .Select(item => item.Id)
+            .Order(StringComparer.Ordinal)
+            .ToArray();
+        if (catalog.RulesetId != PublishedProgressionRuleset.Catalog.RulesetId ||
+            references.Length != expectedItems.Count ||
+            !references.SequenceEqual(expectedItems.Keys.Order(StringComparer.Ordinal)))
+        {
+            throw new InvalidOperationException(
+                "The published bounded item catalog did not match the approved item set.");
+        }
+
+        foreach (var item in catalog.Items)
+        {
+            if (item.Status != ItemDefinitionStatus.Published ||
+                item.RulesetId != catalog.RulesetId ||
+                !item.Slots.SetEquals(expectedItems[item.Id]))
+            {
+                throw new InvalidOperationException(
+                    $"Published item '{item.Id}' did not match its approved bounded definition.");
+            }
+        }
+
+        var equipUseCase = PublishedProgressionRuleset.CreateEquipItemUseCase();
+        var result = equipUseCase.Execute(new EquipItemRequest(
+            "class-dark-knight",
+            new Dictionary<string, long>(StringComparer.Ordinal)
+            {
+                ["strength"] = 27,
+                ["agility"] = 27,
+                ["vitality"] = 25,
+                ["energy"] = 10,
+            },
+            "item-kris"));
+        if (result.ItemId != "item-kris" ||
+            !result.Slots.Contains("weapon", StringComparer.Ordinal))
+        {
+            throw new InvalidOperationException(
+                "The published bounded equip evaluation did not resolve the approved item.");
+        }
+
+        return new ItemVerification(
+            CatalogVerified: true,
+            ItemCount: catalog.Items.Count,
+            ItemReferences: references,
+            SyntheticEquipVerified: true);
     }
 
     private static ProgressionVerificationResult VerifyPublishedProgressionRuleset()
@@ -867,6 +938,12 @@ internal static class PublicationSmokeRunner
     private sealed record VerifiedCharacterBuild(
         bool Verified,
         int FormulaCount);
+
+    private sealed record ItemVerification(
+        bool CatalogVerified,
+        int ItemCount,
+        string[] ItemReferences,
+        bool SyntheticEquipVerified);
 
     private sealed record PublishedFormulaReferenceCase(
         string Id,

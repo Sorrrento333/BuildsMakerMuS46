@@ -13,15 +13,31 @@ La instrucción de ejecutar sólo la primera tarea pendiente continúa vigente.
 
 ## Prioridad inmediata
 
-1. Catálogo acotado de ítems materializado (`item-kris`, `item-dragon-armor`,
-   `item-albatross-bow`) y validado contra `item.schema.json`; el validador
-   registra `("item","items")` y el dataset avanza a `2026-09-16.1`.
-2. Siguiente vertical candidata: consumo del catálogo (equipar ítems, UC-04) en
-   Application/WPF, sin salir de los campos del axioma.
-3. Alternativa documentada: skills, buffs y gasto final de puntos de una build
-   maximizada, pendientes de sus contratos factuales.
-4. Alternativa documentada: ampliar el catálogo de ítems exige nueva evidencia
-   Season 4 o una nueva decisión del propietario.
+1. Consumo acotado del catálogo de ítems implementado (`EquipItemUseCase`,
+   selector de ranura/ítem en WPF y smoke): valida clase y `requiredStats` en
+   +0, sin bonificaciones ni instancia equipada.
+2. Siguiente vertical candidata: skills, buffs y gasto final de puntos de una
+   build maximizada, pendientes de sus contratos factuales.
+3. Alternativa documentada: ampliar UC-04 (bonificaciones ATK/DEF,
+   `requiredLevel`, progresión de `requiredStats`, sockets) exige nueva
+   evidencia Season 4 o una nueva decisión del propietario.
+4. Alternativa documentada: master buys y pantallas restantes del flujo, sin
+   contrato factual todavía.
+
+## Consumo acotado del catálogo de ítems — implementado (2026-09-16)
+
+- `ItemDefinition` en Domain y `ItemCatalog`/`JsonItemCatalogSnapshotReader` en
+  Application leen `items/*.json` (schema `1.0.0`, `PUBLISHED`, un ruleset).
+- `EquipItemUseCase` valida elegibilidad por clase y `requiredStats` en +0 con
+  códigos estables `item-equip-not-found`, `item-equip-class-not-allowed` y
+  `item-equip-requirements-not-met`.
+- Reference cases `reference-cases/items/{valid,invalid}` y
+  `ItemApplicationIntegrationTests` (12 pruebas) reproducen 4 casos aprobados y
+  4 rechazos y fallan en cerrado ante ítem no publicado, ruleset mixto y
+  directorio ausente.
+- WPF añade el selector de ranura/ítem y el resultado de elegibilidad; el smoke
+  exige catálogo de 3 ítems y una evaluación de equipado.
+- Diseño en `docs/04-domain/items-consumption-design.md`.
 
 ## Catálogo acotado de ítems — materializado (2026-09-16)
 

@@ -151,10 +151,13 @@ propietario (`RES-0003`, `EVD-0040`): `item-kris`, `item-dragon-armor` y
 `item-albatross-bow` `PUBLISHED` en
 `packages/rulesets/mu-s4-global-reference/v1/items/`, validados contra
 `item.schema.json` y registrados como `("item","items")` en el validador. El
-dataset avanza a `2026-09-16.1`. Application todavía no consume el catálogo;
-hacerlo exige una vertical propia (equipar ítems, UC-04) y no puede salir de los
-campos aprobados. Quedan fuera del axioma `requiredLevel`, la progresión de
-`requiredStats`, los sockets y cualquier otro ítem, ranura, campo o grado; su
-ampliación exige nueva evidencia o una nueva decisión del propietario. La
-decisión completa está en `../04-domain/items-factual-gate-design.md` y el
-registro factual en `../05-research/registers/RES-0003-items-equipment.md`.
+dataset avanza a `2026-09-16.1`. Application ya consume el catálogo en la
+vertical acotada de UC-04: `JsonItemCatalogSnapshotReader` materializa
+`ItemDefinition` y `EquipItemUseCase` valida la elegibilidad de equipado por
+clase y `requiredStats` en +0, sin bonificaciones ni instancia equipada
+(`../04-domain/items-consumption-design.md`). Quedan fuera del axioma
+`requiredLevel`, la progresión de `requiredStats`, los sockets, las opciones y
+cualquier otro ítem, ranura, campo o grado; su ampliación exige nueva evidencia
+o una nueva decisión del propietario. La decisión del gate está en
+`../04-domain/items-factual-gate-design.md` y el registro factual en
+`../05-research/registers/RES-0003-items-equipment.md`.
