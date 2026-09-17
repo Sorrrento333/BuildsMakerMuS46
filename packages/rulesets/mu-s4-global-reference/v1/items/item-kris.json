@@ -1,0 +1,34 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "item-kris",
+  "version": "1.0.0",
+  "rulesetId": "mu-s4-global-reference",
+  "displayName": "Kris",
+  "status": "PUBLISHED",
+  "confidence": "VERIFIED",
+  "slots": ["weapon"],
+  "allowedClassIds": [
+    "class-dark-knight",
+    "class-dark-lord",
+    "class-dark-wizard",
+    "class-fairy-elf",
+    "class-magic-gladiator",
+    "class-summoner"
+  ],
+  "requiredStats": {
+    "strength": 27,
+    "agility": 27
+  },
+  "optionModules": [
+    {
+      "id": "option-kris-normal",
+      "kind": "NORMAL",
+      "evidenceRefs": ["evd-0037", "evd-0040"]
+    }
+  ],
+  "socketSlots": 0,
+  "maxItemLevel": 15,
+  "evidenceRefs": ["evd-0037", "evd-0040"],
+  "conflictIds": ["dsp-0005", "dsp-0006", "dsp-0007"],
+  "notes": "Axioma acotado del propietario (EVD-0040) sobre RES-0003. Valores de Fanz en nivel +0; la divergencia de temporada se conserva y no autoriza inferir ningun otro campo."
+}

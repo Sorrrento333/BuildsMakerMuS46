@@ -249,7 +249,9 @@ catálogo sin inventar datos:
 
 ## Pendiente
 
-- Materializar el catálogo acotado (siguiente vertical) sin salir del axioma.
+- Catálogo acotado materializado y validado: `item-kris`, `item-dragon-armor` y
+  `item-albatross-bow` en
+  `packages/rulesets/mu-s4-global-reference/v1/items/`.
 - Ampliar el catálogo exige nueva evidencia Season 4 o una nueva decisión del
   propietario; hoy queda fuera de alcance.
 - Segunda línea de evidencia independiente para futuros ítems.

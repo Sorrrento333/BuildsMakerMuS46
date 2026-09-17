@@ -8,6 +8,12 @@ declarar confianza y enlazar la evidencia que autoriza su uso.
 
 - `character-classes/`: seis clases base, estadísticas iniciales/distribuibles
   y evoluciones aprobadas.
+- `items/`: tres definiciones `PUBLISHED` del axioma acotado del propietario
+  (`RES-0003`, `EVD-0040`): `item-kris`, `item-dragon-armor` y
+  `item-albatross-bow`, con `displayName`, `slots`, `allowedClassIds`,
+  `requiredStats` en nivel +0, `maxItemLevel` 15, `optionModules` NORMAL y
+  `socketSlots` 0. Quedan fuera del axioma `requiredLevel`, la progresión de
+  `requiredStats`, los sockets y cualquier otro ítem, ranura, campo o grado.
 - `progression-rules/`: dos reglas de puntos por nivel `PUBLISHED`; sus
   `testCaseRefs` enlazan los siete casos positivos aprobados.
 - `formulas/`: `formula-hp-dark-wizard` `1.0.0` está `PUBLISHED` después de
@@ -112,8 +118,8 @@ declarar confianza y enlazar la evidencia que autoriza su uso.
   controles nunca se enlazan desde `testCaseRefs`.
 
 Los IDs usan prefijos de tipo (`class-`, `evolution-`, `progression-`,
-`quest-`) y son referencias estables; los nombres visibles no se usan como
-identidad. Los valores proceden del alcance cerrado de `RES-0001` y están
+`quest-`, `item-`) y son referencias estables; los nombres visibles no se usan
+como identidad. Los valores proceden del alcance cerrado de `RES-0001` y están
 clasificados `VERIFIED` por `EVD-0021`; las fórmulas de Dark Knight y Fairy Elf
 proceden de `EVD-0026`; Magic Gladiator y Dark Lord añaden sus mínimos
 factuales de Vitality trazados por `EVD-0021`. Mana de Dark Wizard y Dark
@@ -148,4 +154,5 @@ referencias clase/regla coherentes y reglas `PUBLISHED`; el caso de uso invoca e
 motor sin codificar números del juego. Las pruebas cargan directamente estos
 JSON y reproducen los siete casos positivos y tres rechazos. WPF los empaqueta
 bajo la misma estructura y calcula la identidad del dataset sobre rutas
-relativas y bytes exactos.
+relativas y bytes exactos. El catálogo de `items/` se distribuye y valida contra
+`item.schema.json`, pero Application todavía no lo consume.

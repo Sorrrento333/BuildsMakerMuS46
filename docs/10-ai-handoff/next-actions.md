@@ -13,16 +13,29 @@ La instrucción de ejecutar sólo la primera tarea pendiente continúa vigente.
 
 ## Prioridad inmediata
 
-1. Materializar el catálogo acotado de ítems desbloqueado por el axioma del
-   propietario (`EVD-0040`): tres `ItemDefinition` `PUBLISHED` (Kris, Dragon
-   Armor y Albatross Bow) contra `item.schema.json`, con su validación de
-   ruleset y sin salir de los campos aprobados.
-2. Tras el catálogo: skills, buffs y gasto final de puntos de una build
+1. Catálogo acotado de ítems materializado (`item-kris`, `item-dragon-armor`,
+   `item-albatross-bow`) y validado contra `item.schema.json`; el validador
+   registra `("item","items")` y el dataset avanza a `2026-09-16.1`.
+2. Siguiente vertical candidata: consumo del catálogo (equipar ítems, UC-04) en
+   Application/WPF, sin salir de los campos del axioma.
+3. Alternativa documentada: skills, buffs y gasto final de puntos de una build
    maximizada, pendientes de sus contratos factuales.
-3. Alternativa documentada: ampliar el catálogo de ítems exige nueva evidencia
+4. Alternativa documentada: ampliar el catálogo de ítems exige nueva evidencia
    Season 4 o una nueva decisión del propietario.
-4. Alternativa documentada: trazas de cálculo de alto nivel aún sin contrato
-   propio si el motor lo exige en una vertical posterior.
+
+## Catálogo acotado de ítems — materializado (2026-09-16)
+
+- Tres `ItemDefinition` `PUBLISHED` `VERIFIED`: `item-kris`, `item-dragon-armor`
+  y `item-albatross-bow`.
+- `slots` (`weapon`/`armor`), `allowedClassIds` del mapeo aprobado,
+  `requiredStats` en +0, `maxItemLevel` 15, `optionModules` NORMAL,
+  `socketSlots` 0, `evidenceRefs` `evd-0037`–`evd-0040`.
+- `SchemaContractValidator.ValidateRulesetRecords` incluye `("item","items")`;
+  inventario canónico 116 → 119.
+- Axioma y límites en `RES-0003` y `docs/04-domain/items-factual-gate-design.md`.
+- Verificación PASS: build Release 0/0, 785/785 tests, `Test-SchemaStructure`
+  16/32 y smoke WPF `win-x64` (SQLite `3.53.3`, 1303 archivos, 150.400.240 bytes,
+  880 JSON del ruleset, dataset `2026-09-16.1`).
 
 ## Gate factual de ítems — resuelto (2026-09-16)
 

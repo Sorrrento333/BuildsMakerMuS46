@@ -23,6 +23,13 @@ public sealed class SchemaContractValidatorTests
         "progression-seven-per-level",
     ];
 
+    private static readonly string[] ExpectedItemIds =
+    [
+        "item-albatross-bow",
+        "item-dragon-armor",
+        "item-kris",
+    ];
+
     private static readonly string[] ExpectedFormulaIdentities =
     [
         "formula-ag-dark-knight@1.0.0",
@@ -1083,7 +1090,7 @@ public sealed class SchemaContractValidatorTests
     {
         var results = SchemaContractValidator.ValidateRulesetRecords(FindRepositoryRoot());
 
-        Assert.Equal(116, results.Count);
+        Assert.Equal(119, results.Count);
         Assert.All(results, result => Assert.True(
             result.ActualValidity,
             $"{result.RecordId} does not match {result.ContractName}."));
@@ -1097,6 +1104,12 @@ public sealed class SchemaContractValidatorTests
             ExpectedProgressionRuleIds,
             results
                 .Where(result => result.ContractName == "progression-rule")
+                .Select(result => result.RecordId)
+                .Order(StringComparer.Ordinal));
+        Assert.Equal(
+            ExpectedItemIds,
+            results
+                .Where(result => result.ContractName == "item")
                 .Select(result => result.RecordId)
                 .Order(StringComparer.Ordinal));
         Assert.Equal(

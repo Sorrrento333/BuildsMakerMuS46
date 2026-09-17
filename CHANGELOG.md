@@ -6,6 +6,15 @@
 
 ### Added
 
+- Catálogo acotado de ítems materializado. `item-kris`, `item-dragon-armor` y
+  `item-albatross-bow` nacen `PUBLISHED` `VERIFIED` en
+  `packages/rulesets/mu-s4-global-reference/v1/items/` contra `item.schema.json`,
+  con `slots` (`weapon`/`armor`), `allowedClassIds` del mapeo aprobado,
+  `requiredStats` en +0 con claves `strength`/`agility`, `maxItemLevel` 15,
+  `optionModules` NORMAL, `socketSlots` 0 y `evidenceRefs` `evd-0037`–`evd-0040`.
+  `SchemaContractValidator.ValidateRulesetRecords` registra `("item","items")`
+  (inventario canónico 116 → 119) y el smoke WPF exige el directorio `items`. El
+  dataset avanza a `2026-09-16.1`. Application todavía no consume el catálogo.
 - Gate factual de ítems/equipo resuelto por axioma acotado del propietario.
   `RES-0003-items-equipment` queda `VERIFIED` con ocho claims y seis evidencias
   (`EVD-0035`–`EVD-0040`); los conflictos `DSP-0005` a `DSP-0007` quedan

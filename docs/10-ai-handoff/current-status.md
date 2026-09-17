@@ -2372,17 +2372,36 @@
 - Master buys y pantallas restantes del flujo de la Calculadora (ítems,
   skills, buffs y gasto final de puntos de una build maximizada), pendientes de
   sus contratos factuales; no pueden inventarse.
-- Gate factual de ítems/equipo (`RES-0003`): resuelto el 2026-09-16 por axioma
-  acotado del propietario (`EVD-0040`). El catálogo canónico materializado
-  (`PUBLISHED`) sigue sin iniciarse para el subconjunto Kris, Dragon Armor y
-  Albatross Bow.
+- Consumo del catálogo de ítems por Application/WPF (equipar, UC-04): sin
+  iniciar. El catálogo acotado (`item-kris`, `item-dragon-armor`,
+  `item-albatross-bow`) ya está materializado y validado, pero ninguna capa lo
+  selecciona ni equipa todavía.
 
 ## Decisiones abiertas
 
 - El canal público de actualización y firma continúa como decisión posterior de
   distribución.
 
-## Verificación más reciente — 2026-09-16 (gate factual de ítems resuelto)
+## Verificación más reciente — 2026-09-16 (catálogo acotado de ítems materializado)
+
+- Tres `ItemDefinition` `PUBLISHED` `VERIFIED` (`item-kris`,
+  `item-dragon-armor` y `item-albatross-bow`) en
+  `packages/rulesets/mu-s4-global-reference/v1/items/`, validados contra
+  `item.schema.json`.
+- `SchemaContractValidator.ValidateRulesetRecords` registra `("item","items")`;
+  el inventario canónico sube de 116 a 119 registros de ruleset.
+- `slots`: `weapon` (Kris, Albatross Bow) y `armor` (Dragon Armor);
+  `requiredStats` en +0 con claves `strength`/`agility`; `maxItemLevel` 15;
+  `optionModules` NORMAL; `socketSlots` 0; `evidenceRefs` `evd-0037`–`evd-0040`;
+  `conflictIds` `dsp-0005`–`dsp-0007`.
+- El smoke WPF exige ahora el directorio `items`; el dataset avanza a
+  `2026-09-16.1` y el hash se recalcula en tiempo de ejecución.
+- Verificación PASS: build Release 0/0, 785/785 tests, `Test-SchemaStructure`
+  16/32 y smoke WPF `win-x64` con SQLite `3.53.3`, 1303 archivos,
+  150.400.240 bytes, 880 JSON del ruleset y dataset `2026-09-16.1`.
+- Application todavía no consume el catálogo.
+
+## Verificación anterior — 2026-09-16 (gate factual de ítems resuelto)
 
 - `RES-0003-items-equipment` queda `VERIFIED`: ocho claims y seis evidencias
   (`EVD-0035`–`EVD-0040`); los conflictos `DSP-0005`, `DSP-0006` y `DSP-0007`
