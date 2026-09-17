@@ -2372,13 +2372,53 @@
 - Master buys y pantallas restantes del flujo de la Calculadora (ítems,
   skills, buffs y gasto final de puntos de una build maximizada), pendientes de
   sus contratos factuales; no pueden inventarse.
+- Gate factual de ítems/equipo (`RES-0003`): resuelto el 2026-09-16 por axioma
+  acotado del propietario (`EVD-0040`). El catálogo canónico materializado
+  (`PUBLISHED`) sigue sin iniciarse para el subconjunto Kris, Dragon Armor y
+  Albatross Bow.
 
 ## Decisiones abiertas
 
 - El canal público de actualización y firma continúa como decisión posterior de
   distribución.
 
-## Verificación más reciente — 2026-09-16 (listado de builds guardadas)
+## Verificación más reciente — 2026-09-16 (gate factual de ítems resuelto)
+
+- `RES-0003-items-equipment` queda `VERIFIED`: ocho claims y seis evidencias
+  (`EVD-0035`–`EVD-0040`); los conflictos `DSP-0005`, `DSP-0006` y `DSP-0007`
+  quedan `RESOLVED` por `OWNER_DECISION`.
+- El propietario aceptó como axioma acotado del ruleset tres ítems de grado
+  normal (Kris, Dragon Armor y Albatross Bow) con `displayName`, `slots`,
+  `allowedClassIds`, `requiredStats` en +0, `maxItemLevel` 15, `optionModules`
+  NORMAL y `socketSlots` 0. Mapeo aprobado: `All Classes` → las seis familias,
+  `DK` → `class-dark-knight`, `MG` → `class-magic-gladiator`, `ME` →
+  `class-fairy-elf`.
+- Quedan fuera del axioma `requiredLevel`, la progresión de `requiredStats`, los
+  sockets y cualquier otro ítem, ranura, campo o grado.
+- `docs/04-domain/items-factual-gate-design.md` queda `CLOSED`; el catálogo
+  acotado (`PUBLISHED` contra `item.schema.json`) es la siguiente vertical.
+- No se incorporaron JSON factuales, fixtures, constantes ni código: ruleset
+  `1.0.0`, motor `0.2.0` y dataset `2026-07-30.3` permanecen sin cambios.
+
+## Verificación anterior — 2026-09-16 (gate factual de ítems abierto)
+
+- Se abre `RES-0003-items-equipment` con ocho claims `PARTIAL` y tres conflictos
+  abiertos (`DSP-0005` a `DSP-0007`); ningún claim se promueve a `VERIFIED`.
+- Cinco evidencias nuevas (`EVD-0035`–`EVD-0039`) documentan el índice de Fanz,
+  su guía de combate y tres ítems de muestra (Kris, Dragon Armor, Albatross
+  Bow) con ranuras, grados, opciones, elegibilidad de clase y requisitos STR/AGI
+  en nivel +0.
+- Hallazgo del gate: Fanz expone la estructura necesaria pero no declara Season
+  4, mezcla sistemas y clases posteriores y usa códigos de clase (`DK`, `MG`,
+  `ME`, `All Classes`) que no mapean a `allowedClassIds`; `requiredStats` sólo
+  se publica en +0 sin progresión por nivel ni opciones.
+- Conclusión: el catálogo canónico de ítems continúa bloqueado. El desbloqueo
+  exige una fuente Season 4 o una decisión de axioma acotada del propietario
+  (`docs/04-domain/items-factual-gate-design.md`).
+- No se incorporaron JSON factuales, fixtures, constantes ni código: ruleset
+  `1.0.0`, motor `0.2.0` y dataset `2026-07-30.3` permanecen sin cambios.
+
+## Verificación anterior — 2026-09-16 (listado de builds guardadas)
 
 - Cierre del listado de builds guardadas: restauración y build Release
   aprobados con 0 advertencias/0 errores; 785/785 pruebas pasan: 40 validator,

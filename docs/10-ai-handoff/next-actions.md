@@ -13,14 +13,32 @@ La instrucción de ejecutar sólo la primera tarea pendiente continúa vigente.
 
 ## Prioridad inmediata
 
-1. Definir y cerrar la siguiente vertical coherente entre los candidatos
-   documentados: master buys y pantallas restantes del flujo de la Calculadora
-   (ítems, skills, buffs y gasto final de puntos de una build maximizada),
-   pendientes de sus contratos factuales. Si aún no existe el contrato factual
-   requerido, la vertical debe limitarse a un gate verificable (esquema o
-   catálogo con evidencia) sin inventar mecánicas.
-2. Alternativa documentada: trazas de cálculo de alto nivel aún sin contrato
+1. Materializar el catálogo acotado de ítems desbloqueado por el axioma del
+   propietario (`EVD-0040`): tres `ItemDefinition` `PUBLISHED` (Kris, Dragon
+   Armor y Albatross Bow) contra `item.schema.json`, con su validación de
+   ruleset y sin salir de los campos aprobados.
+2. Tras el catálogo: skills, buffs y gasto final de puntos de una build
+   maximizada, pendientes de sus contratos factuales.
+3. Alternativa documentada: ampliar el catálogo de ítems exige nueva evidencia
+   Season 4 o una nueva decisión del propietario.
+4. Alternativa documentada: trazas de cálculo de alto nivel aún sin contrato
    propio si el motor lo exige en una vertical posterior.
+
+## Gate factual de ítems — resuelto (2026-09-16)
+
+El gate se cerró por axioma acotado del propietario, sin inventar datos:
+
+- `RES-0003-items-equipment` queda `VERIFIED` con ocho claims y las evidencias
+  `EVD-0035`–`EVD-0040`; `DSP-0005`, `DSP-0006` y `DSP-0007` quedan `RESOLVED`
+  por `OWNER_DECISION`.
+- Axioma: tres ítems de grado normal (Kris, Dragon Armor, Albatross Bow) con
+  `displayName`, `slots`, `allowedClassIds`, `requiredStats` en +0,
+  `maxItemLevel` 15, `optionModules` NORMAL y `socketSlots` 0.
+- Mapeo aprobado: `All Classes` → las seis familias, `DK` →
+  `class-dark-knight`, `MG` → `class-magic-gladiator`, `ME` →
+  `class-fairy-elf`.
+- `docs/04-domain/items-factual-gate-design.md` queda `CLOSED`; no se añadieron
+  datos, fixtures, constantes ni código.
 
 ## Última tarea cerrada — listado de builds guardadas y carga desde la lista
 

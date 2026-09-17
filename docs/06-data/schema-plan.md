@@ -145,3 +145,18 @@ instancia con nivel, opciones y sockets elegidos sigue siendo dato del usuario
 en `build.schema.json`, sin datos factuales añadidos al ruleset canónico.
 
 ## Plan restante
+
+El catálogo canónico de ítems sigue sin datos factuales materializados, pero su
+gate quedó resuelto el 2026-09-16 por axioma acotado del propietario (`EVD-0040`).
+`RES-0003` queda `VERIFIED` para exactamente tres ítems de grado normal (Kris,
+Dragon Armor y Albatross Bow) con `displayName`, `slots`, `allowedClassIds`,
+`requiredStats` en +0, `maxItemLevel` 15, `optionModules` NORMAL y
+`socketSlots` 0; el mapeo clase-familia/evolución aprobado es `All Classes` → las
+seis familias, `DK` → `class-dark-knight`, `MG` → `class-magic-gladiator` y
+`ME` → `class-fairy-elf`. Quedan fuera del axioma `requiredLevel`, la progresión
+de `requiredStats`, los sockets y cualquier otro ítem, ranura, campo o grado; su
+ampliación exige nueva evidencia o una nueva decisión del propietario. La
+siguiente vertical materializa esos tres `ItemDefinition` `PUBLISHED` contra
+`item.schema.json`. La decisión completa está en
+`../04-domain/items-factual-gate-design.md` y el registro factual en
+`../05-research/registers/RES-0003-items-equipment.md`.

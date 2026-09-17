@@ -6,6 +6,19 @@
 
 ### Added
 
+- Gate factual de ítems/equipo resuelto por axioma acotado del propietario.
+  `RES-0003-items-equipment` queda `VERIFIED` con ocho claims y seis evidencias
+  (`EVD-0035`–`EVD-0040`); los conflictos `DSP-0005` a `DSP-0007` quedan
+  `RESOLVED` por `OWNER_DECISION`. El axioma acepta exactamente tres ítems de
+  grado normal (Kris, Dragon Armor y Albatross Bow) con `displayName`, `slots`,
+  `allowedClassIds`, `requiredStats` en +0, `maxItemLevel` 15, `optionModules`
+  NORMAL y `socketSlots` 0; el mapeo clase-familia/evolución aprobado es
+  `All Classes` → las seis familias, `DK` → `class-dark-knight`, `MG` →
+  `class-magic-gladiator` y `ME` → `class-fairy-elf`. Quedan fuera del axioma
+  `requiredLevel`, la progresión de `requiredStats`, los sockets y cualquier otro
+  ítem, ranura, campo o grado. `docs/04-domain/items-factual-gate-design.md`
+  queda `CLOSED`. No se añadieron datos, fixtures, constantes ni código: ruleset
+  `1.0.0`, motor `0.2.0` y dataset `2026-07-30.3` permanecen sin cambios.
 - Vertical funcional de Defense y SD de Summoner, que materializa el último
   claim `VERIFIED` de `RES-0002`.
   `formula-defense-summoner` y `formula-sd-summoner` `1.0.0` nacen
