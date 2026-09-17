@@ -111,7 +111,7 @@ internal static class PublicationSmokeRunner
             EnsureExpectedDatabaseState(reopenedConnection);
         }
         VerifyBuildDraft(buildDraftServices, progressionVerification);
-        VerifyBuild(buildDraftServices, progressionVerification);
+        var persistedBuildCount = VerifyBuild(buildDraftServices, progressionVerification);
 
         return CreateSuccessfulReport(
             options,
@@ -122,7 +122,8 @@ internal static class PublicationSmokeRunner
             progressionVerification,
             formulaVerification,
             buildVerification,
-            buildDraftServices);
+            buildDraftServices,
+            persistedBuildCount);
     }
 
     private static PublicationSmokeReport VerifyUpdate(
@@ -144,7 +145,7 @@ internal static class PublicationSmokeRunner
         var migrationResult = buildDraftServices.MigrationResult;
         EnsureExpectedDatabaseState(connection);
         VerifyBuildDraft(buildDraftServices, progressionVerification);
-        VerifyBuild(buildDraftServices, progressionVerification);
+        var persistedBuildCount = VerifyBuild(buildDraftServices, progressionVerification);
 
         return CreateSuccessfulReport(
             options,
@@ -155,7 +156,8 @@ internal static class PublicationSmokeRunner
             progressionVerification,
             formulaVerification,
             buildVerification,
-            buildDraftServices);
+            buildDraftServices,
+            persistedBuildCount);
     }
 
     private static PublicationSmokeReport CreateSuccessfulReport(
@@ -167,7 +169,8 @@ internal static class PublicationSmokeRunner
         ProgressionVerificationResult progressionVerification,
         PublishedFormulaVerification formulaVerification,
         VerifiedCharacterBuild buildVerification,
-        PublishedBuildDraftServices buildDraftServices) => new(
+        PublishedBuildDraftServices buildDraftServices,
+        int persistedBuildCount) => new(
             Success: true,
             Phase: options.Phase == PublicationSmokePhase.Initialize ? "initialize" : "verify-update",
             SqliteVersion: sqliteVersion,
@@ -216,6 +219,8 @@ internal static class PublicationSmokeRunner
             BuildId: BuildId,
             BuildStatCount:
                 progressionVerification.SyntheticDistribution.StatCount,
+            BuildListVerified: true,
+            PersistedBuildCount: persistedBuildCount,
             AppliedMigrationCount: migrationResult.AppliedCount,
             AlreadyAppliedMigrationCount: migrationResult.AlreadyAppliedCount,
             ErrorType: null,
@@ -485,10 +490,10 @@ internal static class PublicationSmokeRunner
             .GetAwaiter()
             .GetResult();
         VerifyBuildServices(saved, services, progressionVerification);
-        VerifyBuild(services, progressionVerification);
+        _ = VerifyBuild(services, progressionVerification);
     }
 
-    private static void VerifyBuild(
+    private static int VerifyBuild(
         PublishedBuildDraftServices services,
         ProgressionVerificationResult progressionVerification)
     {
@@ -496,6 +501,7 @@ internal static class PublicationSmokeRunner
             .GetAwaiter()
             .GetResult();
         VerifyBuildServices(build, services, progressionVerification);
+        return VerifyBuildList(services, progressionVerification);
     }
 
     private static void VerifyBuildServices(
@@ -525,6 +531,7 @@ internal static class PublicationSmokeRunner
             build.EvolutionId != synthetic.ProgressionInputs.EvolutionId ||
             build.Level != synthetic.ProgressionInputs.Level ||
             build.ResetCount != synthetic.ResetInputs.ResetCount ||
+            build.PointsPerReset != synthetic.ResetInputs.PointsPerReset ||
             !SameStats(build.Stats, expectedStats) ||
             !build.QuestIds.Order(StringComparer.Ordinal)
                 .SequenceEqual(
@@ -534,6 +541,74 @@ internal static class PublicationSmokeRunner
             throw new InvalidOperationException(
                 "The full character build did not survive persistence and Application revalidation.");
         }
+
+        var derivedAllocations = build.Stats.ToDictionary(
+            item => item.Key,
+            item =>
+                item.Value -
+                characterClass.BaseStats[item.Key].BaseValue,
+            StringComparer.Ordinal);
+        var budget = PublishedProgressionRuleset.CreateUseCase().Execute(
+            new ProgressionPointBudgetRequest(
+                build.CharacterClassId,
+                build.EvolutionId,
+                build.Level,
+                build.QuestIds));
+        var distribution = PublishedProgressionRuleset
+            .CreateStatDistributionUseCase()
+            .Execute(
+                budget,
+                new ResetPointInputs(
+                    build.ResetCount,
+                    build.PointsPerReset),
+                derivedAllocations);
+        if (distribution.ResetPoints != synthetic.ResetPoints ||
+            distribution.SpentPoints != synthetic.SpentPoints ||
+            !SameAllocations(
+                distribution.Allocations,
+                synthetic.Allocations))
+        {
+            throw new InvalidOperationException(
+                "The persisted build inputs did not reproduce the published synthetic distribution.");
+        }
+    }
+
+    private static int VerifyBuildList(
+        PublishedBuildDraftServices services,
+        ProgressionVerificationResult progressionVerification)
+    {
+        var summaries = services.ListBuildsUseCase.ExecuteAsync()
+            .GetAwaiter()
+            .GetResult();
+        var summary = summaries.SingleOrDefault(item => item.Id == BuildId);
+        if (summary is null)
+        {
+            throw new InvalidOperationException(
+                "The persisted build was not returned by the saved-build listing.");
+        }
+
+        var synthetic = progressionVerification.SyntheticDistribution;
+        if (summary.SchemaVersion != CharacterBuild.CurrentSchemaVersion ||
+            summary.CharacterClassId !=
+                synthetic.ProgressionInputs.CharacterClassId ||
+            summary.EvolutionId != synthetic.ProgressionInputs.EvolutionId ||
+            summary.Level != synthetic.ProgressionInputs.Level ||
+            summary.ResetCount != synthetic.ResetInputs.ResetCount ||
+            summary.PointsPerReset != synthetic.ResetInputs.PointsPerReset ||
+            summary.DatasetVersion != services.RuntimeContext.Dataset.Version)
+        {
+            throw new InvalidOperationException(
+                "The listed build summary did not match the persisted snapshot.");
+        }
+
+        var ordered = summaries.Select(item => item.Id).ToArray();
+        if (!ordered.SequenceEqual(ordered.Order(StringComparer.Ordinal)))
+        {
+            throw new InvalidOperationException(
+                "The saved-build listing was not ordered deterministically by id.");
+        }
+
+        return summaries.Count;
     }
 
     private static bool SameStats(

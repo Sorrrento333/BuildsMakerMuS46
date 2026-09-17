@@ -2,7 +2,9 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using MuOnline.BuildPlanner.Application.Builds;
 using MuOnline.BuildPlanner.Application.Progression;
+using MuOnline.BuildPlanner.Application.Stats;
 using MuOnline.BuildPlanner.Domain.Progression;
+using MuOnline.BuildPlanner.Domain.Stats;
 using Xunit;
 
 namespace MuOnline.BuildPlanner.Application.IntegrationTests;
@@ -36,6 +38,7 @@ public sealed class CharacterBuildPersistenceIntegrationTests
         Assert.Equal(9, saved.Stats["stat-beta"]);
         Assert.Equal(3, saved.Level);
         Assert.Equal(2, saved.ResetCount);
+        Assert.Equal(100, saved.PointsPerReset);
         Assert.Equal(["quest-synthetic"], saved.QuestIds);
         Assert.Equal("class-synthetic", saved.CharacterClassId);
         Assert.Equal("evolution-synthetic", saved.EvolutionId);
@@ -52,6 +55,7 @@ public sealed class CharacterBuildPersistenceIntegrationTests
         Assert.Equal(saved.EvolutionId, loaded.EvolutionId);
         Assert.Equal(saved.Level, loaded.Level);
         Assert.Equal(saved.ResetCount, loaded.ResetCount);
+        Assert.Equal(saved.PointsPerReset, loaded.PointsPerReset);
         Assert.Equal(saved.Stats.Count, loaded.Stats.Count);
         Assert.Equal(saved.Stats["stat-alpha"], loaded.Stats["stat-alpha"]);
         Assert.Equal(saved.Stats["stat-beta"], loaded.Stats["stat-beta"]);
@@ -97,6 +101,7 @@ public sealed class CharacterBuildPersistenceIntegrationTests
         Assert.Equal(replacement.EvolutionId, loaded.EvolutionId);
         Assert.Equal(replacement.Level, loaded.Level);
         Assert.Equal(replacement.ResetCount, loaded.ResetCount);
+        Assert.Equal(replacement.PointsPerReset, loaded.PointsPerReset);
         Assert.Equal(replacement.Stats, loaded.Stats);
         Assert.Equal(replacement.QuestIds, loaded.QuestIds);
     }
@@ -137,6 +142,92 @@ public sealed class CharacterBuildPersistenceIntegrationTests
 
         Assert.Equal(BuildDraftErrorCodes.NotFound, exception.Code);
         Assert.Equal(0, buildRepository.Count);
+    }
+
+    [Fact]
+    public async Task LoadInputsReproduceThePersistedDistribution()
+    {
+        var build = await CreateValidBuildAsync(
+            new InMemoryBuildRepository(),
+            TestContext.Current.CancellationToken);
+        var characterClass = RuntimeContext.Catalog.Classes.Single(
+            item => item.Id == build.CharacterClassId);
+        var derivedAllocations = build.Stats.ToDictionary(
+            item => item.Key,
+            item => item.Value -
+                characterClass.BaseStats[item.Key].BaseValue,
+            StringComparer.Ordinal);
+        var budget = new CalculateProgressionPointBudgetUseCase(RuntimeContext.Catalog)
+            .Execute(
+                new ProgressionPointBudgetRequest(
+                    build.CharacterClassId,
+                    build.EvolutionId,
+                    build.Level,
+                    build.QuestIds));
+        var distribution = new CalculateStatDistributionUseCase(RuntimeContext.Catalog)
+            .Execute(
+                budget,
+                new ResetPointInputs(
+                    build.ResetCount,
+                    build.PointsPerReset),
+                derivedAllocations);
+
+        Assert.Equal(200, distribution.ResetPoints);
+        Assert.Equal(7, distribution.SpentPoints);
+        Assert.Equal(
+            distribution.TotalDistributablePoints,
+            distribution.SpentPoints + distribution.RemainingPoints);
+        Assert.Equal(
+            new Dictionary<string, long>(StringComparer.Ordinal)
+            {
+                ["stat-alpha"] = 4,
+                ["stat-beta"] = 3,
+            },
+            distribution.Allocations);
+    }
+
+    [Fact]
+    public async Task ListOrdersSavedBuildsByOrdinalId()
+    {
+        var draftRepository = new InMemoryBuildDraftRepository();
+        var buildRepository = new InMemoryBuildRepository();
+        var loadDraft = new LoadBuildDraftUseCase(draftRepository, RuntimeContext);
+        var saveBuild = new SaveBuildUseCase(buildRepository, loadDraft, RuntimeContext);
+        var saveDraft = new SaveBuildDraftUseCase(draftRepository, RuntimeContext);
+        await saveDraft.ExecuteAsync(
+            CreateSaveDraftRequest("draft-second"),
+            TestContext.Current.CancellationToken);
+        await saveDraft.ExecuteAsync(
+            CreateSaveDraftRequest("draft-first"),
+            TestContext.Current.CancellationToken);
+        await saveBuild.ExecuteAsync(
+            new SaveBuildRequest("build-second", "draft-second"),
+            TestContext.Current.CancellationToken);
+        await saveBuild.ExecuteAsync(
+            new SaveBuildRequest("build-first", "draft-first"),
+            TestContext.Current.CancellationToken);
+
+        var listed = await new ListBuildsUseCase(buildRepository)
+            .ExecuteAsync(TestContext.Current.CancellationToken);
+
+        Assert.Equal(["build-first", "build-second"], listed.Select(item => item.Id));
+        var first = listed.Single(item => item.Id == "build-first");
+        Assert.Equal(CharacterBuild.CurrentSchemaVersion, first.SchemaVersion);
+        Assert.Equal("class-synthetic", first.CharacterClassId);
+        Assert.Equal("evolution-synthetic", first.EvolutionId);
+        Assert.Equal(3, first.Level);
+        Assert.Equal(2, first.ResetCount);
+        Assert.Equal(100, first.PointsPerReset);
+        Assert.Equal("synthetic-001", first.DatasetVersion);
+    }
+
+    [Fact]
+    public async Task ListReturnsEmptyWhenNoBuildWasSaved()
+    {
+        var listed = await new ListBuildsUseCase(new InMemoryBuildRepository())
+            .ExecuteAsync(TestContext.Current.CancellationToken);
+
+        Assert.Empty(listed);
     }
 
     [Fact]
@@ -281,6 +372,7 @@ public sealed class CharacterBuildPersistenceIntegrationTests
         Assert.Equal(build.EvolutionId, root.GetProperty("evolutionId").GetString());
         Assert.Equal(build.Level, root.GetProperty("level").GetInt32());
         Assert.Equal(build.ResetCount, root.GetProperty("resetCount").GetInt64());
+        Assert.Equal(build.PointsPerReset, root.GetProperty("pointsPerReset").GetInt64());
         Assert.Equal(
             build.Stats["stat-alpha"],
             root.GetProperty("stats").GetProperty("stat-alpha").GetInt64());
@@ -425,6 +517,26 @@ public sealed class CharacterBuildPersistenceIntegrationTests
             cancellationToken.ThrowIfCancellationRequested();
             _builds.TryGetValue(id, out var build);
             return Task.FromResult(build);
+        }
+
+        public Task<IReadOnlyList<CharacterBuildSummary>> ListAsync(
+            CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            IReadOnlyList<CharacterBuildSummary> summaries = _builds.Values
+                .Select(
+                    build => new CharacterBuildSummary(
+                        build.Id,
+                        build.SchemaVersion,
+                        build.CharacterClassId,
+                        build.EvolutionId,
+                        build.Level,
+                        build.ResetCount,
+                        build.PointsPerReset,
+                        build.Dataset.Version))
+                .OrderBy(item => item.Id, StringComparer.Ordinal)
+                .ToArray();
+            return Task.FromResult(summaries);
         }
     }
 }

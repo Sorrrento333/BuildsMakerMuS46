@@ -6,7 +6,8 @@
         Height="920"
         MinWidth="640"
         MinHeight="640"
-        WindowStartupLocation="CenterScreen">
+        WindowStartupLocation="CenterScreen"
+        Loaded="WindowLoaded">
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <Grid Margin="32">
             <Grid.RowDefinitions>
@@ -292,6 +293,8 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
 
                     <TextBlock VerticalAlignment="Center"
@@ -315,6 +318,46 @@
                                 Padding="12,6"
                                 Click="LoadBuildButtonClick"
                                 Content="Cargar" />
+                    </StackPanel>
+
+                    <TextBlock Grid.Row="2"
+                               Margin="0,16,0,0"
+                               VerticalAlignment="Top"
+                               Text="Builds guardadas" />
+                    <ListBox x:Name="SavedBuildsListBox"
+                             Grid.Row="2"
+                             Grid.Column="1"
+                             Margin="0,16,0,0"
+                             MinHeight="96"
+                             AutomationProperties.Name="Builds guardadas">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock TextWrapping="Wrap">
+                                    <Run FontWeight="SemiBold" Text="{Binding Id}" />
+                                    <Run Text=" · nivel " />
+                                    <Run Text="{Binding Level}" />
+                                    <Run Text=" · resets " />
+                                    <Run Text="{Binding ResetCount}" />
+                                    <Run Text=" · " />
+                                    <Run Text="{Binding DatasetVersion}" />
+                                </TextBlock>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+
+                    <StackPanel Grid.Row="3"
+                                Grid.Column="1"
+                                Margin="0,12,0,0"
+                                Orientation="Horizontal"
+                                VerticalAlignment="Center">
+                        <Button Width="180"
+                                Padding="12,6"
+                                Click="SavedBuildLoadClick"
+                                Content="Cargar seleccionada" />
+                        <TextBlock x:Name="SavedBuildsStatusTextBox"
+                                   Margin="12,0,0,0"
+                                   VerticalAlignment="Center"
+                                   TextWrapping="Wrap" />
                     </StackPanel>
                 </Grid>
             </GroupBox>

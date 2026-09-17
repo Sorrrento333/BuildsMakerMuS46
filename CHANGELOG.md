@@ -1122,6 +1122,48 @@
 
 ### Added
 
+- Incremento de listado de builds guardadas cerrado. Application añade
+  `CharacterBuildSummary` y `ListBuildsUseCase`, y amplía `IBuildRepository` con
+  `ListAsync`; Data implementa `SqliteBuildRepository.ListAsync` con
+  `SELECT payload_json FROM builds ORDER BY id;` sin nuevas columnas ni
+  migraciones (sólo lectura, sin mutación).
+- WPF muestra un `ListBox` con las builds guardadas y un botón «Cargar
+  seleccionada»: el listado se refresca al abrir la ventana y tras cada
+  guardado, y la selección reutiliza la ruta revalidada
+  (`LoadBuildByIdAsync` → `LoadBuildUseCase` → `ApplyLoadedBuild`) y la
+  traducción de errores existente.
+- El smoke verifica que `publication-smoke-build` aparece en el listado con la
+  paridad exacta de schema, clase, evolución, nivel, resets, puntos por reset y
+  dataset, y añade los campos `BuildListVerified` y `PersistedBuildCount`.
+- Dos pruebas de Application (`ListBuildsUseCase`) y tres de Data
+  (`ListAsync` ordenado, vacío y sin mutación); la solución alcanza 785/785
+  pruebas. No se incorporan JSON factuales: ruleset `1.0.0`, motor `0.2.0` y
+  dataset `2026-07-30.3` permanecen sin cambios. El smoke del 2026-09-16 pasa
+  con 1300 archivos, 150.397.632 bytes, `Saved builds listed: 1` y el hash de
+  dataset
+  `sha256:ef6fd756c2a69245906019d4c4cf01c3a7baba460067bbfffc4c4906361b0f18`.
+- Vertical de reaplicación de build en la Calculadora cerrada. `CharacterBuild`
+  avanza a `schemaVersion "1.1.0"` con `pointsPerReset`, que `SaveBuildUseCase`
+  toma de `draft.ResetInputs.PointsPerReset`; `build.schema.json` pasa a `1.1.0`
+  con `pointsPerReset` requerido y no negativo (sin columnas SQLite nuevas) y se
+  actualizan los fixtures `valid`/`invalid` y el inventario estructural (16
+  contratos/32 fixtures). `LoadBuildUseCase` no cambia sus validaciones.
+- WPF `ApplyLoadedBuild` devuelve la build cargada al formulario: selecciona
+  clase y evolución, nivel y estado de héroe, restaura resets y puntos por
+  reset, deriva las asignaciones como `stat final − base canónica`, recalcula
+  presupuesto y distribución con `ResetPointInputs(resetCount, pointsPerReset)`
+  y evalúa los atributos derivados; `LoadBuildButtonClick` lo invoca y traduce
+  los errores de distribución y progresión.
+- Application añade una prueba de reproducibilidad (asignaciones derivadas `4/3`,
+  `ResetPoints 200`, `SpentPoints 7`, `Total = Spent + Remaining`) además de la
+  paridad de `pointsPerReset` en promoción, recarga y modelo serializado; Data
+  conserva payload y metadata exactos. El smoke verifica la paridad de resets y
+  la reproducción de la distribución sintética de `publication-smoke-build`
+  antes del respaldo, tras restaurar y tras reemplazar binarios.
+- No se incorporan JSON factuales: ruleset `1.0.0`, motor `0.2.0` y dataset
+  `2026-07-30.3` permanecen sin cambios; 780/780 pruebas pasan. El smoke del
+  2026-09-16 pasa con 1300 archivos y 150.384.676 bytes y el hash de dataset
+  `sha256:ef6fd756c2a69245906019d4c4cf01c3a7baba460067bbfffc4c4906361b0f18`.
 - Vertical de persistencia de build completa cerrada: `SaveBuildUseCase`
   promueve un borrador a `CharacterBuild` (schema `1.0.0`; clase, evolución,
   nivel, stats finales, quests y resets) y `LoadBuildUseCase` recarga y

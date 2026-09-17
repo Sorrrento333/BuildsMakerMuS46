@@ -12,6 +12,7 @@ internal sealed record PublishedBuildDraftServices(
     LoadBuildDraftUseCase LoadUseCase,
     SaveBuildUseCase SaveBuildUseCase,
     LoadBuildUseCase LoadBuildUseCase,
+    ListBuildsUseCase ListBuildsUseCase,
     BuildDraftRuntimeContext RuntimeContext,
     string DatabasePath,
     MigrationApplicationResult MigrationResult)
@@ -85,6 +86,7 @@ internal sealed record PublishedBuildDraftServices(
             loadBuildDraftUseCase,
             new SaveBuildUseCase(buildRepository, loadBuildDraftUseCase, context),
             new LoadBuildUseCase(buildRepository, context),
+            new ListBuildsUseCase(buildRepository),
             context,
             databasePath,
             migrationResult);

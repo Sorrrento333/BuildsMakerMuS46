@@ -375,6 +375,14 @@ if (-not $initialReport.BuildPersistenceVerified -or
     throw "The full character build did not survive replacement and exact revalidation."
 }
 
+if (-not $initialReport.BuildListVerified -or
+    -not $replacementReport.BuildListVerified -or
+    $initialReport.PersistedBuildCount -lt 1 -or
+    $replacementReport.PersistedBuildCount -ne
+        $initialReport.PersistedBuildCount) {
+    throw "The saved-build listing did not expose the persisted build in both phases."
+}
+
 if (-not $initialReport.PublishedBuildEvaluationVerified -or
     -not $replacementReport.PublishedBuildEvaluationVerified -or
     $initialReport.PublishedBuildFormulaCount -le 0 -or
@@ -432,5 +440,6 @@ Write-Output "Published formulas: $($initialReport.PublishedFormulaReferences -j
 Write-Output "Full build evaluation: $($initialReport.PublishedBuildFormulaCount) formulas grouped"
 Write-Output "Build draft: $($initialReport.BuildDraftId), dataset $($initialReport.BuildDraftDatasetVersion)"
 Write-Output "Full build: $($initialReport.BuildId), $($initialReport.BuildStatCount) stats"
+Write-Output "Saved builds listed: $($initialReport.PersistedBuildCount)"
 Write-Output "Ruleset files: $($initialRulesetFiles.Count)"
 Write-Output "Artifacts: $runRoot"

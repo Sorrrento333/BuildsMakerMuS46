@@ -2369,16 +2369,60 @@
 
 ## No iniciado
 
-- Builds completas y flujos de UI posteriores al presupuesto ganado, los
-  borradores locales, la evaluación en lote y la persistencia local: master
-  buys y pantallas restantes del flujo.
+- Master buys y pantallas restantes del flujo de la Calculadora (ítems,
+  skills, buffs y gasto final de puntos de una build maximizada), pendientes de
+  sus contratos factuales; no pueden inventarse.
 
 ## Decisiones abiertas
 
 - El canal público de actualización y firma continúa como decisión posterior de
   distribución.
 
-## Verificación más reciente — 2026-09-15 (persistencia de build local)
+## Verificación más reciente — 2026-09-16 (listado de builds guardadas)
+
+- Cierre del listado de builds guardadas: restauración y build Release
+  aprobados con 0 advertencias/0 errores; 785/785 pruebas pasan: 40 validator,
+  58 motor, 660 Application y 27 Data.
+- Application añade `CharacterBuildSummary` y `ListBuildsUseCase`, y amplía
+  `IBuildRepository` con `ListAsync` (orden ordinal de `Id` como autoridad).
+  Data implementa `SqliteBuildRepository.ListAsync` con
+  `SELECT payload_json FROM builds ORDER BY id;` sin columnas ni migraciones
+  nuevas: enumera, proyecta los campos exactos y no muta la base.
+- WPF añade un `ListBox` de builds guardadas, el botón «Cargar seleccionada» y
+  un recuento de estado; refresca el listado al abrir la ventana y tras cada
+  guardado, y la selección reutiliza `LoadBuildByIdAsync` → `LoadBuildUseCase` →
+  `ApplyLoadedBuild` con la traducción de errores existente.
+- Smoke WPF `win-x64`: PASS con SQLite `3.53.3`, 1300 archivos, 150.397.632
+  bytes y `Saved builds listed: 1`; el smoke exige que `publication-smoke-build`
+  aparezca en el listado con paridad exacta y añade `BuildListVerified` y
+  `PersistedBuildCount`.
+- No se incorporaron JSON factuales nuevos: ruleset `1.0.0`, motor `0.2.0` y
+  dataset `2026-07-30.3` permanecen sin cambios.
+
+## Verificación anterior — 2026-09-16 (reaplicación de build en la Calculadora)
+
+- Cierre de la reaplicación de build: restauración y build Release aprobados
+  con 0 advertencias/0 errores; 780/780 pruebas pasan: 40 validator, 58 motor,
+  658 Application y 24 Data. La promoción persiste `pointsPerReset` (build
+  `schemaVersion` `1.1.0`, `2 × 100 = 200`), la recarga conserva la paridad y un
+  test nuevo deriva las asignaciones de los stats (`4` y `3`), recalcula la
+  distribución (`ResetPoints 200`, `SpentPoints 7`, `Total = Spent + Remaining`)
+  y fija el nombre de propiedad `pointsPerReset` del modelo serializado.
+- `build.schema.json` avanza a `1.1.0` con `pointsPerReset` requerido y no
+  negativo; fixtures `valid`/`invalid` e inventario estructural
+  (16 contratos/32 fixtures) actualizados. No hay columnas SQLite nuevas.
+- WPF `ApplyLoadedBuild` devuelve la build cargada al formulario (clase,
+  evolución, nivel, estado de héroe, resets, asignaciones derivadas) y recalcula
+  presupuesto, distribución y atributos derivados.
+- Smoke WPF `win-x64`: PASS con SQLite `3.53.3`, 1300 archivos y
+  150.384.676 bytes; la build `publication-smoke-build` conserva
+  `PointsPerReset` y reproduce la distribución sintética antes del respaldo,
+  tras restaurar y tras el reemplazo de binarios.
+- No se incorporaron JSON factuales nuevos: ruleset `1.0.0`, motor `0.2.0` y
+  dataset `2026-07-30.3` permanecen sin cambios; el validador no registra
+  diferencias sobre las ciento siete fórmulas `PUBLISHED`.
+
+## Verificación anterior — 2026-09-15 (persistencia de build local)
 
 - Cierre de la persistencia de build completa: restauración y build Release
   aprobados con 0 advertencias/0 errores; 779/779 pruebas pasan: 40 validator,

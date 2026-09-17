@@ -161,6 +161,71 @@ public sealed class SqliteBuildRepositoryTests
     }
 
     [Fact]
+    public async Task ListReturnsEveryPersistedBuildOrderedById()
+    {
+        using var database = new TemporarySqliteDatabase();
+        database.ApplyMigrations();
+        var repository = database.CreateRepository();
+        var second = CreateBuild("build-second");
+        var first = CreateBuild("build-first");
+        await repository.SaveAsync(second, TestContext.Current.CancellationToken);
+        await repository.SaveAsync(first, TestContext.Current.CancellationToken);
+
+        var listed = await repository.ListAsync(TestContext.Current.CancellationToken);
+
+        Assert.Equal(["build-first", "build-second"], listed.Select(item => item.Id));
+        var summary = listed[0];
+        Assert.Equal(CharacterBuild.CurrentSchemaVersion, summary.SchemaVersion);
+        Assert.Equal(first.CharacterClassId, summary.CharacterClassId);
+        Assert.Equal(first.EvolutionId, summary.EvolutionId);
+        Assert.Equal(first.Level, summary.Level);
+        Assert.Equal(first.ResetCount, summary.ResetCount);
+        Assert.Equal(first.PointsPerReset, summary.PointsPerReset);
+        Assert.Equal(first.Dataset.Version, summary.DatasetVersion);
+    }
+
+    [Fact]
+    public async Task ListOnEmptyDatabaseReturnsNoBuilds()
+    {
+        using var database = new TemporarySqliteDatabase();
+        database.ApplyMigrations();
+
+        var listed = await database.CreateRepository()
+            .ListAsync(TestContext.Current.CancellationToken);
+
+        Assert.Empty(listed);
+    }
+
+    [Fact]
+    public async Task ListPerformsNoDatabaseMutation()
+    {
+        using var database = new TemporarySqliteDatabase();
+        database.ApplyMigrations();
+        var repository = database.CreateRepository();
+        await repository.SaveAsync(
+            CreateBuild("build-synthetic"),
+            TestContext.Current.CancellationToken);
+        using var beforeConnection = database.OpenConnection();
+        var changesBefore = ExecuteScalar<long>(
+            beforeConnection,
+            "SELECT total_changes();");
+        var countBefore = ExecuteScalar<long>(
+            beforeConnection,
+            "SELECT COUNT(*) FROM builds;");
+
+        var listed = await repository.ListAsync(TestContext.Current.CancellationToken);
+
+        Assert.Single(listed);
+        using var afterConnection = database.OpenConnection();
+        Assert.Equal(countBefore, ExecuteScalar<long>(
+            afterConnection,
+            "SELECT COUNT(*) FROM builds;"));
+        Assert.Equal(changesBefore, ExecuteScalar<long>(
+            afterConnection,
+            "SELECT total_changes();"));
+    }
+
+    [Fact]
     public async Task LoadMissingBuildPerformsNoDatabaseMutation()
     {
         using var database = new TemporarySqliteDatabase();
@@ -251,7 +316,8 @@ public sealed class SqliteBuildRepositoryTests
                 ["stat-beta"] = 9,
             },
             ["quest-synthetic"],
-            2);
+            2,
+            100);
 
     private static T ExecuteScalar<T>(SqliteConnection connection, string sql)
     {

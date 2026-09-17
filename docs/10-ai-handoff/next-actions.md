@@ -13,56 +13,80 @@ La instrucción de ejecutar sólo la primera tarea pendiente continúa vigente.
 
 ## Prioridad inmediata
 
-1. Cerrar la documentación y el commit de la vertical de Defense/SD de Summoner
-   quedó pendiente solo de capturar el hash y la versión definitiva del dataset
-   (`2026-07-29.4`) con el smoke WPF de publicación. Ese smoke ya pasó localmente
-   el 2026-09-01 con SQLite `3.53.3`, 738 archivos, 149.256.211 bytes, 315 JSON
-   del ruleset, treinta fórmulas y 120 casos contextuales; el hash es
-   `sha256:3b9cdcb42b7c7f6eb18063b6697f402bda5ae7e16fca5dfafef58143696d03d0`.
-   Sólo resta el commit y, en su caso, la ejecución del CJ en un runner remoto.
-2. Definir la siguiente vertical coherente entre los candidatos documentados:
-   primeros contratos facticos restantes (daño y wizardry de Summoner/MG ya
-   aprobados y sin motor), o los schemas de alto nivel (ruleset, quests, ítems,
-   skills, escenarios y trazas), o builds completas/flujos de UI posteriores.
+1. Definir y cerrar la siguiente vertical coherente entre los candidatos
+   documentados: master buys y pantallas restantes del flujo de la Calculadora
+   (ítems, skills, buffs y gasto final de puntos de una build maximizada),
+   pendientes de sus contratos factuales. Si aún no existe el contrato factual
+   requerido, la vertical debe limitarse a un gate verificable (esquema o
+   catálogo con evidencia) sin inventar mecánicas.
+2. Alternativa documentada: trazas de cálculo de alto nivel aún sin contrato
+   propio si el motor lo exige en una vertical posterior.
 
-## Última tarea cerrada
+## Última tarea cerrada — listado de builds guardadas y carga desde la lista
 
-La vertical de Defense/SD de Summoner quedó cerrada sobre la decisión general
-`RAW` del propietario y sobre los truncamientos independientes de `EVD-0032`:
+El incremento hizo descubrible la build persistida y la cargó desde la lista,
+sin nuevos datos factuales:
 
-- `formula-defense-summoner` y `formula-sd-summoner` `1.0.0` están
-  `PUBLISHED` contra schema `2.1.0` y trazan `EVD-0021`, `EVD-0026`, `EVD-0032`
-  y `EVD-0034` (conflicto `DSP-0004` conservado y resuelto).
-- Defense conserva `agility / 3` sobre los mínimos STR 21/AGI 21/VIT 18/ENE 23.
-  SD conserva los tres truncamientos independientes
-  `trunc((str+agi+vit+ene)*1.2) + trunc(defense/2) + trunc((lvl*lvl)/30)`,
-  consumiendo Defense `RAW` por `FORMULA_OUTPUT`.
-- `CHECKED_DECIMAL_V1` y sus gates aceptan varios pasos intermedios
-  `APPLY_ROUNDING`; el último paso visible sigue siendo el redondeo que consume
-  `rawOutputStepId`. El intérprete entero se relaja de forma inocua.
-- Cuatro casos de Defense y cuatro de SD reproducen outputs/trazas.
-  `sd-summoner-base` fija SD 102 y discrimina la semántica independiente (a
-  plena precisión sería 103). No hay frontera RAW/VISIBLE para Summoner.
-- Application y WPF materializan treinta fórmulas ejecutables; el dataset avanza
-  a `2026-07-29.4` con hash
-  `sha256:3b9cdcb42b7c7f6eb18063b6697f402bda5ae7e16fca5dfafef58143696d03d0`.
+- Application añade `CharacterBuildSummary` y `ListBuildsUseCase`, y amplía
+  `IBuildRepository` con `ListAsync` (orden ordinal de `Id` como autoridad).
+- Data implementa `SqliteBuildRepository.ListAsync` con
+  `SELECT payload_json FROM builds ORDER BY id;`: proyecta el summary, no muta
+  la base y no añade columnas ni migraciones.
+- WPF añade un `ListBox` de builds guardadas, el botón «Cargar seleccionada» y
+  un recuento de estado; refresca el listado al abrir la ventana y tras cada
+  guardado, y la selección reutiliza `LoadBuildByIdAsync` →
+  `LoadBuildUseCase` → `ApplyLoadedBuild` con la traducción de errores existente.
+- El smoke exige que `publication-smoke-build` aparezca en el listado con
+  paridad exacta y añade `BuildListVerified` y `PersistedBuildCount`.
 
-## Verificación del cierre
+## Verificación del cierre — listado de builds guardadas y carga desde la lista
 
-- Restauración y build Release aprobados con 0 advertencias/0 errores; 320/320
-  pruebas pasan: 40 validator, 58 motor, 204 Application y 18 Data.
-- CLI del validador: las treinta fórmulas `PUBLISHED` pasan sin errores,
-  incluidos `formula-defense-summoner` (4 positivos/2 controles) y
-  `formula-sd-summoner` (4 positivos/7 controles).
-- Smoke WPF `win-x64` (30 fórmulas y 120 casos contextuales): PASS local el
-  2026-09-01 con SQLite `3.53.3`, 738 archivos, 149.256.211 bytes, 315 JSON del
-  ruleset y hash `sha256:3b9cdcb42b7c7f6eb18063b6697f402bda5ae7e16fca5dfafef58143696d03d0`.
+- Restauración y build Release aprobados con 0 advertencias/0 errores; 785/785
+  pruebas pasan: 40 validator, 58 motor, 660 Application y 27 Data.
+- Comprobación estructural: 16 contratos/32 fixtures, sin cambios en `build`
+  (`1.1.0`).
+- Smoke WPF `win-x64`: PASS local el 2026-09-16 con SQLite `3.53.3`, 1300
+  archivos, 150.397.632 bytes, 10 avisos legales, 877 JSON del ruleset,
+  `Saved builds listed: 1` y dataset `2026-07-30.3` con hash
+  `sha256:ef6fd756c2a69245906019d4c4cf01c3a7baba460067bbfffc4c4906361b0f18`.
+
+## Última tarea cerrada — reaplicación de build en la Calculadora
+
+La vertical devolvió la build persistida al formulario de la Calculadora sin
+nuevos datos factuales:
+
+- `CharacterBuild` avanza a `schemaVersion "1.1.0"` con `pointsPerReset`, que
+  `SaveBuildUseCase` toma de `draft.ResetInputs.PointsPerReset`;
+  `LoadBuildUseCase` no cambia sus validaciones. `build.schema.json` pasa a
+  `1.1.0` con `pointsPerReset` requerido y no negativo; sin columnas SQLite
+  nuevas.
+- WPF `ApplyLoadedBuild` selecciona clase y evolución, nivel y estado de héroe,
+  restaura resets y puntos por reset, deriva las asignaciones como
+  `stat final − base`, recalcula presupuesto y distribución y evalúa atributos
+  derivados; `LoadBuildButtonClick` lo invoca y traduce errores.
+- Application añade una prueba de reproducibilidad (asignaciones derivadas,
+  `ResetPoints 200`, `SpentPoints 7`, `Total = Spent + Remaining`) y fija la
+  paridad de `pointsPerReset`; Data conserva payload y metadata exactos.
+- El smoke verifica la paridad de resets y la reproducción de la distribución
+  sintética de `publication-smoke-build`.
+
+## Verificación del cierre — reaplicación de build en la Calculadora
+
+- Restauración y build Release aprobados con 0 advertencias/0 errores; 780/780
+  pruebas pasan: 40 validator, 58 motor, 658 Application y 24 Data.
+- Comprobación estructural: 16 contratos/32 fixtures, incluido `build` `1.1.0`.
+- CLI del validador: las ciento siete fórmulas `PUBLISHED` pasan sin errores
+  (los datos no cambian respecto al dataset `2026-07-30.3`).
+- Smoke WPF `win-x64`: PASS local el 2026-09-16 con SQLite `3.53.3`, 1300
+  archivos, 150.384.676 bytes, 10 avisos legales, 877 JSON del ruleset y
+  dataset `2026-07-30.3` con hash
+  `sha256:ef6fd756c2a69245906019d4c4cf01c3a7baba460067bbfffc4c4906361b0f18`.
 
 ## Primera acción concreta
 
-Confirmar con el mantenedor la siguiente vertical elegida entre los candidatos
-documentados (contratos facticos restantes, schemas de alto nivel o builds/
-flujos de UI) y actualizar esta documentación y `CHANGELOG.md` al cerrarla.
+Confirmar con el mantenedor si la siguiente vertical es master buys/pantallas
+restantes del flujo (con gate factual) o trazas de cálculo de alto nivel, y
+actualizar esta documentación y `CHANGELOG.md` al cerrarla.
 
 ---
 

@@ -22,6 +22,7 @@ public partial class MainWindow : Window
     private readonly LoadBuildDraftUseCase _loadBuildDraftUseCase;
     private readonly SaveBuildUseCase _saveBuildUseCase;
     private readonly LoadBuildUseCase _loadBuildUseCase;
+    private readonly ListBuildsUseCase _listBuildsUseCase;
     private readonly Dictionary<string, TextBox> _allocationInputs =
         new(StringComparer.Ordinal);
     private ProgressionPointBudgetResult? _currentBudget;
@@ -50,6 +51,7 @@ public partial class MainWindow : Window
         _loadBuildDraftUseCase = buildDraftServices.LoadUseCase;
         _saveBuildUseCase = buildDraftServices.SaveBuildUseCase;
         _loadBuildUseCase = buildDraftServices.LoadBuildUseCase;
+        _listBuildsUseCase = buildDraftServices.ListBuildsUseCase;
 
         ClassComboBox.ItemsSource = _catalog.CharacterOptions
             .OrderBy(item => item.DisplayName, StringComparer.CurrentCulture)
@@ -436,6 +438,54 @@ public partial class MainWindow : Window
                 draft.StatDistribution.Allocations,
                 draft.StatDistribution.SpentPoints,
                 draft.StatDistribution.RemainingPoints);
+        DistributionResultTextBox.Text = FormatDistributionResult(
+            _currentDistribution);
+        ConfigureAndCalculateApplicableFormula();
+    }
+
+    private void ApplyLoadedBuild(CharacterBuild build)
+    {
+        var selectedClass = _catalog.CharacterOptions.Single(
+            item => item.Id == build.CharacterClassId);
+        ClassComboBox.SelectedItem = selectedClass;
+        EvolutionComboBox.SelectedItem = selectedClass.Evolutions.Single(
+            item => item.Id == build.EvolutionId);
+        LevelTextBox.Text = build.Level.ToString(
+            System.Globalization.CultureInfo.InvariantCulture);
+
+        var questBonus = GetSelectedQuestBonus();
+        HeroStatusCheckBox.IsChecked =
+            questBonus is not null &&
+            build.QuestIds.Contains(questBonus.QuestId, StringComparer.Ordinal);
+        ResetCountTextBox.Text = build.ResetCount.ToString(
+            System.Globalization.CultureInfo.InvariantCulture);
+        PointsPerResetTextBox.Text = build.PointsPerReset.ToString(
+            System.Globalization.CultureInfo.InvariantCulture);
+
+        var characterClass = _catalog.Classes.Single(
+            item => item.Id == build.CharacterClassId);
+        var allocations = new Dictionary<string, long>(StringComparer.Ordinal);
+        foreach (var statId in characterClass.StatIds.Order(StringComparer.Ordinal))
+        {
+            var allocation = build.Stats[statId] -
+                characterClass.BaseStats[statId].BaseValue;
+            allocations.Add(statId, allocation);
+            _allocationInputs[statId].Text = allocation.ToString(
+                System.Globalization.CultureInfo.InvariantCulture);
+        }
+
+        _currentProgressionRequest = new ProgressionPointBudgetRequest(
+            build.CharacterClassId,
+            build.EvolutionId,
+            build.Level,
+            build.QuestIds);
+        _currentBudget = _useCase.Execute(_currentProgressionRequest);
+        DistributeStatsButton.IsEnabled = true;
+        ResultTextBox.Text = FormatResult(_currentBudget);
+        _currentDistribution = _statDistributionUseCase.Execute(
+            _currentBudget,
+            new ResetPointInputs(build.ResetCount, build.PointsPerReset),
+            allocations);
         DistributionResultTextBox.Text = FormatDistributionResult(
             _currentDistribution);
         ConfigureAndCalculateApplicableFormula();
@@ -896,6 +946,7 @@ public partial class MainWindow : Window
             BuildResultTextBox.Text =
                 $"Build '{build.Id}' guardada. " +
                 $"{build.Stats.Count} stats del snapshot exacto.";
+            RefreshSavedBuilds();
         }
         catch (BuildException exception)
         {
@@ -921,13 +972,32 @@ public partial class MainWindow : Window
             return;
         }
 
+        await LoadBuildByIdAsync(buildId);
+    }
+
+    private async void SavedBuildLoadClick(object sender, RoutedEventArgs e)
+    {
+        if (SavedBuildsListBox.SelectedItem is not CharacterBuildSummary summary)
+        {
+            BuildResultTextBox.Text =
+                "Selecciona una build guardada de la lista para cargarla.";
+            return;
+        }
+
+        BuildIdTextBox.Text = summary.Id;
+        await LoadBuildByIdAsync(summary.Id);
+    }
+
+    private async Task LoadBuildByIdAsync(string buildId)
+    {
         try
         {
             var build = await _loadBuildUseCase.ExecuteAsync(
                 buildId,
                 CancellationToken.None);
+            ApplyLoadedBuild(build);
             BuildResultTextBox.Text =
-                $"Build '{build.Id}' cargada. " +
+                $"Build '{build.Id}' cargada y aplicada al formulario. " +
                 $"{build.Stats.Count} stats revalidados contra el snapshot exacto.";
         }
         catch (BuildException exception)
@@ -941,6 +1011,40 @@ public partial class MainWindow : Window
             BuildResultTextBox.Text =
                 $"No se pudo cargar el borrador fuente ({exception.Code}): " +
                 TranslateBuildDraftError(exception.Code);
+        }
+        catch (StatDistributionException exception)
+        {
+            BuildResultTextBox.Text =
+                $"No se pudo reaplicar ({exception.Code}): " +
+                TranslateDistributionError(exception.Code);
+        }
+        catch (ProgressionPointBudgetException exception)
+        {
+            BuildResultTextBox.Text =
+                $"No se pudo reaplicar ({exception.Code}): {exception.Message}";
+        }
+    }
+
+    private void WindowLoaded(object sender, RoutedEventArgs e)
+    {
+        RefreshSavedBuilds();
+    }
+
+    private async void RefreshSavedBuilds()
+    {
+        try
+        {
+            var builds = await _listBuildsUseCase.ExecuteAsync(CancellationToken.None);
+            SavedBuildsListBox.ItemsSource = builds;
+            SavedBuildsStatusTextBox.Text = builds.Count == 1
+                ? "1 build guardada."
+                : $"{builds.Count} builds guardadas.";
+        }
+        catch (BuildException exception)
+        {
+            SavedBuildsStatusTextBox.Text =
+                $"No se pudo listar ({exception.Code}): " +
+                TranslateBuildError(exception.Code);
         }
     }
 
