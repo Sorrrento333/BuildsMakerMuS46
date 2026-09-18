@@ -14,6 +14,16 @@ declarar confianza y enlazar la evidencia que autoriza su uso.
   `requiredStats` en nivel +0, `maxItemLevel` 15, `optionModules` NORMAL y
   `socketSlots` 0. Quedan fuera del axioma `requiredLevel`, la progresión de
   `requiredStats`, los sockets y cualquier otro ítem, ranura, campo o grado.
+- `skills/`: ocho definiciones `PUBLISHED` del axioma acotado del propietario
+  (`RES-0004`, `EVD-0045`): `skill-impale`,
+  `skill-twisting-slash`, `skill-swell-life`, `skill-death-stab`,
+  `skill-rageful-blow`, `skill-strike-of-destruction` (Dark Knight) y
+  `skill-penetration`, `skill-multi-shot` (Fairy Elf). El mapeo
+  `kind` aprobado asigna `ATK`/`Non-ATK`/`Debuff` → `ACTIVE` y `Buff` → `BUFF`;
+  `requiredLevel` es el `Character Level` publicado, `allowedEvolutionIds` son
+  las tres evoluciones de cada familia, `prerequisiteSkillIds` queda vacío y
+  `buffRef` se omite. Quedan fuera del axioma cualquier otra skill, los
+  prerrequisitos por stat/quest/equipo, `PASSIVE` y cualquier efecto de buff.
 - `progression-rules/`: dos reglas de puntos por nivel `PUBLISHED`; sus
   `testCaseRefs` enlazan los siete casos positivos aprobados.
 - `formulas/`: `formula-hp-dark-wizard` `1.0.0` está `PUBLISHED` después de
@@ -118,8 +128,8 @@ declarar confianza y enlazar la evidencia que autoriza su uso.
   controles nunca se enlazan desde `testCaseRefs`.
 
 Los IDs usan prefijos de tipo (`class-`, `evolution-`, `progression-`,
-`quest-`, `item-`) y son referencias estables; los nombres visibles no se usan
-como identidad. Los valores proceden del alcance cerrado de `RES-0001` y están
+`quest-`, `item-`, `skill-`) y son referencias estables; los nombres visibles no
+se usan como identidad. Los valores proceden del alcance cerrado de `RES-0001` y están
 clasificados `VERIFIED` por `EVD-0021`; las fórmulas de Dark Knight y Fairy Elf
 proceden de `EVD-0026`; Magic Gladiator y Dark Lord añaden sus mínimos
 factuales de Vitality trazados por `EVD-0021`. Mana de Dark Wizard y Dark
@@ -155,4 +165,6 @@ motor sin codificar números del juego. Las pruebas cargan directamente estos
 JSON y reproducen los siete casos positivos y tres rechazos. WPF los empaqueta
 bajo la misma estructura y calcula la identidad del dataset sobre rutas
 relativas y bytes exactos. El catálogo de `items/` se distribuye y valida contra
-`item.schema.json`, pero Application todavía no lo consume.
+`item.schema.json`, pero Application todavía no lo consume. El catálogo de
+`skills/` se distribuye y valida contra `skill.schema.json`, igualmente sin
+consumo de Application todavía.

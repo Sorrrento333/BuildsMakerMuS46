@@ -13,16 +13,54 @@ La instrucción de ejecutar sólo la primera tarea pendiente continúa vigente.
 
 ## Prioridad inmediata
 
-1. Consumo acotado del catálogo de ítems implementado (`EquipItemUseCase`,
+1. Catálogo acotado de skills materializado (2026-09-17): ocho `SkillDefinition`
+   `PUBLISHED` del axioma `EVD-0045` contra `skill.schema.json`, con inventario
+   canónico 119 → 127 y dataset `2026-09-17.1`. Siguientes verticales: consumo de
+   skills y contrato de buff (`buffRef`).
+2. Consumo acotado del catálogo de ítems implementado (`EquipItemUseCase`,
    selector de ranura/ítem en WPF y smoke): valida clase y `requiredStats` en
    +0, sin bonificaciones ni instancia equipada.
-2. Siguiente vertical candidata: skills, buffs y gasto final de puntos de una
-   build maximizada, pendientes de sus contratos factuales.
 3. Alternativa documentada: ampliar UC-04 (bonificaciones ATK/DEF,
    `requiredLevel`, progresión de `requiredStats`, sockets) exige nueva
    evidencia Season 4 o una nueva decisión del propietario.
 4. Alternativa documentada: master buys y pantallas restantes del flujo, sin
    contrato factual todavía.
+
+## Catálogo acotado de skills — materializado (2026-09-17)
+
+- Ocho `SkillDefinition` `PUBLISHED` `VERIFIED`: `skill-impale`,
+  `skill-twisting-slash`, `skill-swell-life`, `skill-death-stab`,
+  `skill-rageful-blow`, `skill-strike-of-destruction` (Dark Knight) y
+  `skill-penetration`, `skill-multi-shot` (Fairy Elf).
+- `kind` del mapeo aprobado (ATK/Non-ATK/Debuff→ACTIVE, Buff→BUFF);
+  `requiredLevel` = `Character Level` publicado; `allowedEvolutionIds` = las
+  tres evoluciones de la familia; `prerequisiteSkillIds` vacío; `buffRef`
+  omitido; `evidenceRefs` `evd-0041`–`evd-0045` (minúsculas en JSON);
+  `conflictIds` `dsp-0008`–`dsp-0011`.
+- `SchemaContractValidator.ValidateRulesetRecords` registra `("skill","skills")`;
+  inventario canónico 119 → 127; el smoke WPF exige ahora el directorio `skills`.
+- Axioma y límites en `RES-0004` y `docs/04-domain/skills-factual-gate-design.md`.
+- Verificación PASS: build Release 0/0; 797/797 tests; `Test-SchemaStructure`
+  16/32; smoke WPF `win-x64` (SQLite `3.53.3`, 1319 archivos, 150.442.137
+  bytes, 896 archivos del ruleset, dataset `2026-09-17.1`).
+
+## Gate factual de skills y buffs — resuelto (2026-09-17)
+
+El gate se cerró por axioma acotado del propietario, sin inventar datos:
+
+- `RES-0004-skills-buffs` queda `VERIFIED` con nueve claims y las evidencias
+  `EVD-0041`–`EVD-0045`; `DSP-0008`, `DSP-0009`, `DSP-0010` y `DSP-0011` quedan
+  `RESOLVED` por `OWNER_DECISION`.
+- Axioma: ocho skills con `Character Level` publicado (Impale, Twisting Slash,
+  Swell Life, Death Stab, Rageful Blow y Strike of Destruction de Dark Knight;
+  Penetration y Multi-Shot de Fairy Elf) con `requiredLevel` = `Character Level`,
+  mapeo `kind` (ATK/Non-ATK/Debuff→ACTIVE, Buff→BUFF, Summon→SUMMON),
+  `allowedEvolutionIds` = las tres evoluciones de cada familia,
+  `prerequisiteSkillIds` vacío y `buffRef` omitido.
+- Excluidos: prerrequisitos por stat/quest/equipo, skills nivel ≥400 y sistemas
+  post-S4, categorías `WIZ`/`Curse`, `PASSIVE` y buffs con valores incompletos.
+- `docs/04-domain/skills-factual-gate-design.md` queda `CLOSED`; no se añadieron
+  datos, fixtures, constantes ni código.
 
 ## Consumo acotado del catálogo de ítems — implementado (2026-09-16)
 

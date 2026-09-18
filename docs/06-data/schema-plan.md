@@ -160,4 +160,20 @@ clase y `requiredStats` en +0, sin bonificaciones ni instancia equipada
 cualquier otro ítem, ranura, campo o grado; su ampliación exige nueva evidencia
 o una nueva decisión del propietario. La decisión del gate está en
 `../04-domain/items-factual-gate-design.md` y el registro factual en
-`../05-research/registers/RES-0003-items-equipment.md`.
+  `../05-research/registers/RES-0003-items-equipment.md`.
+
+El catálogo acotado de skills quedó materializado para el axioma del propietario
+(`RES-0004`, `EVD-0045`): ocho `SkillDefinition` `PUBLISHED` `VERIFIED` en
+`packages/rulesets/mu-s4-global-reference/v1/skills/`
+(`skill-impale`, `skill-twisting-slash`, `skill-swell-life`, `skill-death-stab`,
+`skill-rageful-blow`, `skill-strike-of-destruction`, `skill-penetration` y
+`skill-multi-shot`), validados contra `skill.schema.json` y registrados como
+`("skill","skills")` en el validador (inventario canónico 119 → 127). El mapeo
+`kind` aprobado asigna `ATK`/`Non-ATK`/`Debuff` → `ACTIVE` y `Buff` → `BUFF`;
+`requiredLevel` es el `Character Level` publicado y `allowedEvolutionIds` son las
+tres evoluciones de cada familia. El dataset avanza a `2026-09-17.1`. Quedan
+fuera del axioma cualquier otra skill o buff, los prerrequisitos por
+stat/quest/equipo y el `buffRef`; su ampliación exige nueva evidencia o una
+nueva decisión del propietario. La decisión completa está en
+`../04-domain/skills-factual-gate-design.md` y el registro factual en
+`../05-research/registers/RES-0004-skills-buffs.md`.

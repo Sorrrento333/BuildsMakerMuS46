@@ -36,6 +36,7 @@ $publishedRulesetRelativePath = "rulesets\mu-s4-global-reference\v1"
 $requiredRulesetDirectories = @(
     "character-classes",
     "items",
+    "skills",
     "progression-rules",
     "reference-cases\progression\valid",
     "reference-cases\progression\invalid"

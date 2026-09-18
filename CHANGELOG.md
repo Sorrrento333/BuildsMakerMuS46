@@ -6,6 +6,35 @@
 
 ### Added
 
+- Catálogo acotado de skills materializado. Ocho `SkillDefinition` `PUBLISHED`
+  `VERIFIED` nacen en `packages/rulesets/mu-s4-global-reference/v1/skills/`
+  contra `skill.schema.json`: `skill-impale` (ACTIVE, 28), `skill-twisting-slash`
+  (ACTIVE, 80), `skill-swell-life` (BUFF, 120), `skill-death-stab` (ACTIVE,
+  160), `skill-rageful-blow` (ACTIVE, 170), `skill-strike-of-destruction`
+  (ACTIVE, 220) de Dark Knight y `skill-penetration` (ACTIVE, 130),
+  `skill-multi-shot` (ACTIVE, 220) de Fairy Elf, con mapeo `kind` aprobado por el
+  axioma `EVD-0045`, `requiredLevel` = `Character Level` publicado,
+  `allowedEvolutionIds` = las tres evoluciones de cada familia,
+  `prerequisiteSkillIds` vacío, `buffRef` omitido y `evidenceRefs`
+  `evd-0041`–`evd-0045`. `SchemaContractValidator.ValidateRulesetRecords`
+  registra `("skill","skills")` (inventario canónico 119 → 127) y el smoke WPF
+  exige el directorio `skills`. El dataset avanza a `2026-09-17.1`. Application
+  todavía no consume el catálogo.
+- Gate factual de skills y buffs resuelto por axioma acotado del propietario.
+  `RES-0004-skills-buffs` queda `VERIFIED` con nueve claims y cinco evidencias
+  (`EVD-0041`–`EVD-0045`); `DSP-0008` a `DSP-0011` quedan `RESOLVED` por
+  `OWNER_DECISION`. El axioma (2026-09-17) acepta ocho skills con `Character
+  Level` publicado (Impale, Twisting Slash, Swell Life, Death Stab, Rageful
+  Blow y Strike of Destruction de Dark Knight; Penetration y Multi-Shot de Fairy
+  Elf) con `requiredLevel` = `Character Level`, mapeo `kind`
+  (ATK/Non-ATK/Debuff→ACTIVE, Buff→BUFF, Summon→SUMMON; `PASSIVE` no aceptado),
+  `allowedEvolutionIds` = las tres evoluciones de cada familia,
+  `prerequisiteSkillIds` vacío y `buffRef` omitido. Quedan fuera prerrequisitos
+  por stat/quest/equipo, skills nivel ≥400 y sistemas post-S4, categorías
+  `WIZ`/`Curse` y buffs con valores incompletos.
+  `docs/04-domain/skills-factual-gate-design.md` queda `CLOSED`. No se añadieron
+  datos, fixtures, constantes ni código: ruleset `1.0.0`, motor `0.2.0` y dataset
+  `2026-09-16.1` permanecen sin cambios.
 - Consumo acotado del catálogo de ítems (UC-04). `ItemDefinition` (Domain) y
   `ItemCatalog`/`JsonItemCatalogSnapshotReader` (Application) materializan los
   `items/*.json` exigiendo schema `1.0.0`, IDs únicos, un único ruleset,

@@ -166,6 +166,7 @@ public static class SchemaContractValidator
             (ContractName: "progression-rule", DirectoryName: "progression-rules"),
             (ContractName: "formula", DirectoryName: "formulas"),
             (ContractName: "item", DirectoryName: "items"),
+            (ContractName: "skill", DirectoryName: "skills"),
         };
         var results = new List<RulesetRecordValidationResult>();
 

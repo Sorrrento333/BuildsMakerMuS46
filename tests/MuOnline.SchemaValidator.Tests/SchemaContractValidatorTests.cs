@@ -30,6 +30,18 @@ public sealed class SchemaContractValidatorTests
         "item-kris",
     ];
 
+    private static readonly string[] ExpectedSkillIds =
+    [
+        "skill-death-stab",
+        "skill-impale",
+        "skill-multi-shot",
+        "skill-penetration",
+        "skill-rageful-blow",
+        "skill-strike-of-destruction",
+        "skill-swell-life",
+        "skill-twisting-slash",
+    ];
+
     private static readonly string[] ExpectedFormulaIdentities =
     [
         "formula-ag-dark-knight@1.0.0",
@@ -1090,7 +1102,7 @@ public sealed class SchemaContractValidatorTests
     {
         var results = SchemaContractValidator.ValidateRulesetRecords(FindRepositoryRoot());
 
-        Assert.Equal(119, results.Count);
+        Assert.Equal(127, results.Count);
         Assert.All(results, result => Assert.True(
             result.ActualValidity,
             $"{result.RecordId} does not match {result.ContractName}."));
@@ -1110,6 +1122,12 @@ public sealed class SchemaContractValidatorTests
             ExpectedItemIds,
             results
                 .Where(result => result.ContractName == "item")
+                .Select(result => result.RecordId)
+                .Order(StringComparer.Ordinal));
+        Assert.Equal(
+            ExpectedSkillIds,
+            results
+                .Where(result => result.ContractName == "skill")
                 .Select(result => result.RecordId)
                 .Order(StringComparer.Ordinal));
         Assert.Equal(

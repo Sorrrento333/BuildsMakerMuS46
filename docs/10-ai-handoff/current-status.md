@@ -2369,19 +2369,82 @@
 
 ## No iniciado
 
-- Master buys y pantallas restantes del flujo de la Calculadora (ítems,
-  skills, buffs y gasto final de puntos de una build maximizada), pendientes de
+- Master buys y pantallas restantes del flujo de la Calculadora, pendientes de
   sus contratos factuales; no pueden inventarse.
 - Ampliación de UC-04 (bonificaciones ATK/DEF, `requiredLevel`, progresión de
   `requiredStats`, sockets, instancia equipada): requiere nueva evidencia Season
   4 o una nueva decisión del propietario; no puede inferirse.
+- Consumo de skills y contrato de buff (`buffRef`): pendientes de verticales
+  futuras tras la materialización del catálogo acotado.
 
 ## Decisiones abiertas
 
 - El canal público de actualización y firma continúa como decisión posterior de
   distribución.
 
-## Verificación más reciente — 2026-09-16 (consumo acotado del catálogo de ítems)
+## Verificación más reciente — 2026-09-17 (catálogo acotado de skills materializado)
+
+- Ocho `SkillDefinition` `PUBLISHED` `VERIFIED` en
+  `packages/rulesets/mu-s4-global-reference/v1/skills/` (`skill-impale`,
+  `skill-twisting-slash`, `skill-swell-life`, `skill-death-stab`,
+  `skill-rageful-blow`, `skill-strike-of-destruction`, `skill-penetration`,
+  `skill-multi-shot`), validados contra `skill.schema.json`.
+- `SchemaContractValidator.ValidateRulesetRecords` registra `("skill","skills")`;
+  el inventario canónico sube de 119 a 127 registros de ruleset. El smoke WPF
+  exige ahora el directorio `skills`.
+- `kind` del mapeo aprobado (`EVD-0045`); `requiredLevel` = `Character Level`
+  publicado (28, 80, 120, 160, 170, 220, 130, 220); `allowedEvolutionIds` = las
+  tres evoluciones de la familia; `prerequisiteSkillIds` vacío; `buffRef`
+  omitido; `evidenceRefs` `evd-0041`–`evd-0045`; `conflictIds`
+  `dsp-0008`–`dsp-0011`.
+- El dataset avanza a `2026-09-17.1` y el hash se recalcula en tiempo de
+  ejecución.
+- Verificación PASS: build Release 0/0; 797/797 pruebas; `Test-SchemaStructure`
+  16/32; smoke WPF `win-x64` (SQLite `3.53.3`, 1319 archivos, 150.442.137
+  bytes, 896 archivos del ruleset, dataset `2026-09-17.1`).
+- Application todavía no consume el catálogo de skills; `buffRef` sigue diferido.
+
+## Verificación anterior — 2026-09-17 (gate factual de skills y buffs resuelto)
+
+- `RES-0004-skills-buffs` queda `VERIFIED`: nueve claims y cinco evidencias
+  (`EVD-0041`–`EVD-0045`); los conflictos `DSP-0008`, `DSP-0009`, `DSP-0010` y
+  `DSP-0011` quedan `RESOLVED` por `OWNER_DECISION`.
+- El propietario aceptó como axioma acotado del ruleset ocho skills con
+  `Character Level` publicado (Impale, Twisting Slash, Swell Life, Death Stab,
+  Rageful Blow y Strike of Destruction de Dark Knight; Penetration y Multi-Shot
+  de Fairy Elf), con mapeo `kind` (ATK/Non-ATK/Debuff→ACTIVE, Buff→BUFF,
+  Summon→SUMMON; `PASSIVE` no aceptado), `allowedEvolutionIds` = las tres
+  evoluciones de cada familia, `prerequisiteSkillIds` vacío y `buffRef` omitido.
+- Quedan fuera del axioma los prerrequisitos por stat/quest/equipo, las skills
+  nivel ≥400 y sistemas post-S4, las categorías `WIZ`/`Curse`, `PASSIVE` y los
+  buffs con valores incompletos (`?`).
+- `docs/04-domain/skills-factual-gate-design.md` queda `CLOSED`; la
+  materialización de las ocho `SkillDefinition` es la siguiente vertical.
+- No se incorporaron JSON factuales, fixtures, constantes ni código: ruleset
+  `1.0.0`, motor `0.2.0` y dataset `2026-09-16.1` permanecen sin cambios.
+- Verificación PASS: build Release 0/0; 797/797 pruebas; `Test-SchemaStructure`
+  16/32.
+
+## Verificación anterior — 2026-09-17 (gate factual de skills y buffs abierto)
+
+- Se abre `RES-0004-skills-buffs` con nueve claims `PARTIAL` y cuatro conflictos
+  `OPEN` (`DSP-0008` a `DSP-0011`); ningún claim se promueve a `VERIFIED`.
+- Cuatro evidencias nuevas (`EVD-0041`–`EVD-0044`) documentan las guías de
+  personaje de Fanz (Dark Knight, Fairy Elf, Summoner) y su índice de personajes:
+  categorías de skill (`ATK`/`Non-ATK`/`Buff`/`Debuff`/`Summon`), coste de Mana,
+  rango, requisitos por ítem de skill y umbral (`ENE Level`/`Character Level`) y
+  efectos numéricos de buffs concretos.
+- Hallazgo del gate: Fanz no declara Season 4 y mezcla sistemas posteriores
+  (`DSP-0008`); sus categorías no mapean a `kind` (`DSP-0009`); su modelo de
+  requisitos no mapea a `requiredLevel`/`prerequisiteSkillIds` (`DSP-0010`); y
+  algunos buffs tienen valores incompletos (`DSP-0011`).
+- Conclusión: la vertical de skills/buffs continúa bloqueada. El desbloqueo exige
+  una fuente Season 4 o una decisión de axioma acotada del propietario
+  (`docs/04-domain/skills-factual-gate-design.md`, `OPEN`).
+- No se incorporaron JSON factuales, fixtures, constantes ni código: ruleset
+  `1.0.0`, motor `0.2.0` y dataset `2026-09-16.1` permanecen sin cambios.
+
+## Verificación anterior — 2026-09-16 (consumo acotado del catálogo de ítems)
 
 - `ItemDefinition` (Domain) y `ItemCatalog`/`JsonItemCatalogSnapshotReader`
   (Application) leen `items/*.json` exigiendo schema `1.0.0`, IDs únicos, un
