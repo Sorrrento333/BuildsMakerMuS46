@@ -4,28 +4,23 @@
 
 ## [Unreleased]
 
+### Removed
+
+- Se retiró la vertical de consumo de catálogo de skills por la regla inviolable
+  de `docs/DECISIONES-PRODUCTO.md` (la skill sólo puede ser modificador de
+  cálculo dmg/buff): la sección "Aprendizaje de skills" de `MainWindow`
+  (`SkillComboBox`/`SkillResultTextBox`), `SkillApplicationIntegrationTests.cs`,
+  la verificación de catálogo del smoke (`SkillCatalogVerified`,
+  `SkillCatalogSkillCount`, `SkillCatalogSkillReferences`,
+  `SyntheticSkillLearnVerified`), sus aserciones en `Test-WpfPublishedArtifact.ps1`
+  y los fixtures `reference-cases/skills/{valid,invalid}`. Se conserva el backend
+  mínimo (`Domain.Skills` y `Application.Skills`) sin uso desde la app; los ocho
+  `skills/*.json` y su registro en `SchemaContractValidator` no cambian. Diseño
+  reorientado en `docs/04-domain/skills-consumption-design.md`. Ruleset `1.0.0`,
+  motor `0.2.0` y dataset `2026-09-17.1` sin cambios.
+
 ### Added
 
-- Consumo acotado del catálogo de skills (aprendizaje). `SkillDefinition`
-  (Domain) y `SkillCatalog`/`JsonSkillCatalogSnapshotReader` (Application)
-  materializan los `skills/*.json` exigiendo schema `1.0.0`, IDs únicos, un
-  único ruleset, `requiredLevel >= 1`, `allowedEvolutionIds` no vacíos y sin
-  duplicados y `status` `PUBLISHED` (fail-closed; directorio vacío es
-  `SnapshotInvalid`). `LearnSkillUseCase` valida la elegibilidad de aprendizaje
-  (`allowedEvolutionIds` + `requiredLevel`) con códigos estables
-  `skill-learn-skill-not-found`, `skill-learn-evolution-not-allowed` y
-  `skill-learn-requirements-not-met`; `FinalLevel` viene del presupuesto
-  validado y el `buffRef` de `kind BUFF` queda diferido. Reference cases
-  `reference-cases/skills/{valid,invalid}` y 12 pruebas
-  (`SkillApplicationIntegrationTests`) reproducen 3 aprobados y 3 rechazos y
-  fallan en cerrado ante skill no publicada, ruleset mixto, directorio ausente,
-  `requiredLevel` no positivo y `allowedEvolutionIds` vacío. Se corrige el caso
-  válido swell-life a la familia Dark Knight publicada
-  (`skill-swell-life-dark-knight-eligible`, `evolution-dark-knight`,
-  `finalLevel` 122). WPF añade el selector de skill por evolución y el resultado
-  de aprendizaje; el smoke exige el catálogo de 8 skills y una evaluación de
-  aprendizaje. Diseño en `docs/04-domain/skills-consumption-design.md`. Ruleset
-  `1.0.0`, motor `0.2.0` y dataset `2026-09-17.1` sin cambios.
 - Catálogo acotado de skills materializado. Ocho `SkillDefinition` `PUBLISHED`
   `VERIFIED` nacen en `packages/rulesets/mu-s4-global-reference/v1/skills/`
   contra `skill.schema.json`: `skill-impale` (ACTIVE, 28), `skill-twisting-slash`

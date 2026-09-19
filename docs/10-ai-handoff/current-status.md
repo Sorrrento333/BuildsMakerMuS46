@@ -2382,7 +2382,32 @@
 - El canal público de actualización y firma continúa como decisión posterior de
   distribución.
 
-## Verificación más reciente — 2026-09-19 (consumo acotado del catálogo de skills)
+## Verificación más reciente — 2026-09-19 (alineación con la regla inviolable de skills)
+
+- `docs/DECISIONES-PRODUCTO.md` (añadido por el propietario en `5a69fa5`) fija
+  que una skill sólo puede ser modificador de cálculo (dmg/buff): sin catálogo
+  ni UI en el cliente y sin pruebas del catálogo.
+- Se retiró la vertical de consumo de catálogo de skills que contradecía la
+  regla: la sección "Aprendizaje de skills" de `MainWindow` (selectores
+  `SkillComboBox`/`SkillResultTextBox`), `SkillApplicationIntegrationTests.cs`,
+  la verificación de catálogo en el smoke (`SkillCatalogVerified`,
+  `SkillCatalogSkillCount`, `SkillCatalogSkillReferences`,
+  `SyntheticSkillLearnVerified`) y las aserciones/dirs de skills del script PS1.
+- Se eliminaron los fixtures `reference-cases/skills/{valid,invalid}`.
+- Se conserva el backend mínimo sin uso desde la app: `Domain.Skills`
+  (`SkillDefinition`) y `Application.Skills` (`SkillCatalog`, reader,
+  `LearnSkillUseCase` y excepciones); los ocho `skills/*.json` y su registro en
+  `SchemaContractValidator` no cambian.
+- `PublishedProgressionRuleset` vuelve a no exponer
+  `Skills`/`CreateLearnSkillUseCase`.
+- Verificación PASS: build Release 0/0; 797/797 pruebas (40 validator, 58 motor,
+  672 Application, 27 Data); `Test-SchemaStructure` 16/32; smoke WPF `win-x64`
+  (SQLite `3.53.3`, 1319 archivos, 150.461.069 bytes, 896 archivos del ruleset,
+  dataset `2026-09-17.1`) con el catálogo de 3 ítems y sin sección de skills.
+- Dirección vigente: sumar la skill como modificador dentro de las fórmulas
+  derivadas; requiere datos de efecto autorizados (`buffRef` sigue omitido).
+
+## Verificación anterior — 2026-09-19 (consumo acotado del catálogo de skills)
 
 - `SkillDefinition` (Domain) y `SkillCatalog`/`JsonSkillCatalogSnapshotReader`
   (Application) leen `skills/*.json` exigiendo schema `1.0.0`, IDs únicos, un

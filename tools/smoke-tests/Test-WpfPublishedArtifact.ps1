@@ -39,9 +39,7 @@ $requiredRulesetDirectories = @(
     "skills",
     "progression-rules",
     "reference-cases\progression\valid",
-    "reference-cases\progression\invalid",
-    "reference-cases\skills\valid",
-    "reference-cases\skills\invalid"
+    "reference-cases\progression\invalid"
 )
 $expectedPublishedFormulaReferences = @(
     "formula-ag-dark-knight@1.0.0",
@@ -406,15 +404,6 @@ if (-not $initialReport.ItemCatalogVerified -or
     throw "The published bounded item catalog did not materialize or evaluate in both phases."
 }
 
-if (-not $initialReport.SkillCatalogVerified -or
-    -not $replacementReport.SkillCatalogVerified -or
-    $initialReport.SkillCatalogSkillCount -ne 8 -or
-    $replacementReport.SkillCatalogSkillCount -ne 8 -or
-    -not $initialReport.SyntheticSkillLearnVerified -or
-    -not $replacementReport.SyntheticSkillLearnVerified) {
-    throw "The published bounded skill catalog did not materialize or evaluate in both phases."
-}
-
 $initialRulesetRoot = Join-Path $initialPublishDirectory $publishedRulesetRelativePath
 $replacementRulesetRoot = Join-Path $replacementPublishDirectory $publishedRulesetRelativePath
 $initialRulesetFiles = Get-ChildItem -LiteralPath $initialRulesetRoot -Recurse -File
@@ -461,7 +450,6 @@ Write-Output "Reset configuration: $($initialReport.SyntheticResetCount) x $($in
 Write-Output "Published formulas: $($initialReport.PublishedFormulaReferences -join ', '), $($initialReport.ApprovedPublishedFormulaCaseCount) contextual cases"
 Write-Output "Full build evaluation: $($initialReport.PublishedBuildFormulaCount) formulas grouped"
 Write-Output "Bounded item catalog: $($initialReport.ItemCatalogItemCount) items, equip evaluated: $($initialReport.SyntheticItemEquipVerified)"
-Write-Output "Bounded skill catalog: $($initialReport.SkillCatalogSkillCount) skills, learn evaluated: $($initialReport.SyntheticSkillLearnVerified)"
 Write-Output "Build draft: $($initialReport.BuildDraftId), dataset $($initialReport.BuildDraftDatasetVersion)"
 Write-Output "Full build: $($initialReport.BuildId), $($initialReport.BuildStatCount) stats"
 Write-Output "Saved builds listed: $($initialReport.PersistedBuildCount)"

@@ -4,12 +4,10 @@ using MuOnline.BuildPlanner.Application.Builds;
 using MuOnline.BuildPlanner.Application.Formulas;
 using MuOnline.BuildPlanner.Application.Items;
 using MuOnline.BuildPlanner.Application.Progression;
-using MuOnline.BuildPlanner.Application.Skills;
 using MuOnline.BuildPlanner.Application.Stats;
 using MuOnline.BuildPlanner.Domain.Formulas;
 using MuOnline.BuildPlanner.Domain.Items;
 using MuOnline.BuildPlanner.Domain.Progression;
-using MuOnline.BuildPlanner.Domain.Skills;
 using MuOnline.BuildPlanner.Domain.Stats;
 
 namespace MuOnline.BuildPlanner.App;
@@ -29,8 +27,6 @@ public partial class MainWindow : Window
     private readonly ListBuildsUseCase _listBuildsUseCase;
     private readonly ItemCatalog _itemCatalog;
     private readonly EquipItemUseCase _equipItemUseCase;
-    private readonly SkillCatalog _skillCatalog;
-    private readonly LearnSkillUseCase _learnSkillUseCase;
     private readonly Dictionary<string, TextBox> _allocationInputs =
         new(StringComparer.Ordinal);
     private ProgressionPointBudgetResult? _currentBudget;
@@ -38,7 +34,6 @@ public partial class MainWindow : Window
     private StatDistributionResult? _currentDistribution;
     private bool _isUpdatingFormulaSelection;
     private bool _isUpdatingItemSelection;
-    private bool _isUpdatingSkillSelection;
 
     public MainWindow()
         : this(PublishedBuildDraftServices.CreateDefault())
@@ -64,8 +59,6 @@ public partial class MainWindow : Window
         _listBuildsUseCase = buildDraftServices.ListBuildsUseCase;
         _itemCatalog = PublishedProgressionRuleset.ItemCatalog;
         _equipItemUseCase = PublishedProgressionRuleset.CreateEquipItemUseCase();
-        _skillCatalog = PublishedProgressionRuleset.Skills;
-        _learnSkillUseCase = PublishedProgressionRuleset.CreateLearnSkillUseCase();
 
         ClassComboBox.ItemsSource = _catalog.CharacterOptions
             .OrderBy(item => item.DisplayName, StringComparer.CurrentCulture)
@@ -83,7 +76,6 @@ public partial class MainWindow : Window
             BuildStatAllocationInputs(null);
             InvalidateCurrentBudget();
             RefreshItemSelection();
-            RefreshSkillSelection();
             return;
         }
 
@@ -93,14 +85,12 @@ public partial class MainWindow : Window
         UpdateHeroStatusAvailability();
         InvalidateCurrentBudget();
         RefreshItemSelection();
-        RefreshSkillSelection();
     }
 
     private void EvolutionSelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         UpdateHeroStatusAvailability();
         InvalidateCurrentBudget();
-        RefreshSkillSelection();
     }
 
     private void UpdateHeroStatusAvailability()
@@ -330,11 +320,8 @@ public partial class MainWindow : Window
         }
     }
 
-    private void ProgressionInputChanged(object sender, RoutedEventArgs e)
-    {
+    private void ProgressionInputChanged(object sender, RoutedEventArgs e) =>
         InvalidateCurrentBudget();
-        EvaluateSelectedSkill();
-    }
 
     private void AllocationInputChanged(object sender, TextChangedEventArgs e)
     {
@@ -533,123 +520,6 @@ public partial class MainWindow : Window
 
     private sealed record ItemSlotOption(string Id, string DisplayName);
 
-    private void RefreshSkillSelection()
-    {
-        if (SkillComboBox is null)
-        {
-            return;
-        }
-
-        _isUpdatingSkillSelection = true;
-        try
-        {
-            if (EvolutionComboBox.SelectedItem is not ProgressionEvolutionOption selectedEvolution)
-            {
-                SkillComboBox.ItemsSource = null;
-                SkillResultTextBox?.Clear();
-                return;
-            }
-
-            var previousSkillId = (SkillComboBox.SelectedItem as SkillDefinition)?.Id;
-            var skills = _skillCatalog.Skills
-                .Where(skill =>
-                    skill.AllowedEvolutionIds.Contains(selectedEvolution.Id))
-                .OrderBy(skill => skill.RequiredLevel)
-                .ThenBy(skill => skill.DisplayName, StringComparer.CurrentCulture)
-                .ToArray();
-            SkillComboBox.ItemsSource = skills;
-            SkillComboBox.SelectedItem =
-                skills.FirstOrDefault(skill => skill.Id == previousSkillId) ??
-                skills.FirstOrDefault();
-        }
-        finally
-        {
-            _isUpdatingSkillSelection = false;
-        }
-
-        EvaluateSelectedSkill();
-    }
-
-    private void SkillSelectionChanged(object sender, SelectionChangedEventArgs e)
-    {
-        if (!_isUpdatingSkillSelection)
-        {
-            EvaluateSelectedSkill();
-        }
-    }
-
-    private void EvaluateSelectedSkill()
-    {
-        if (SkillResultTextBox is null)
-        {
-            return;
-        }
-
-        if (EvolutionComboBox.SelectedItem is not ProgressionEvolutionOption selectedEvolution)
-        {
-            SkillResultTextBox.Text =
-                "Selecciona una clase y una evolución para evaluar el aprendizaje.";
-            return;
-        }
-
-        if (SkillComboBox.SelectedItem is not SkillDefinition selectedSkill)
-        {
-            SkillResultTextBox.Text =
-                "No hay skills publicadas para la evolución seleccionada.";
-            return;
-        }
-
-        if (!int.TryParse(LevelTextBox.Text, out var level) || level < 1)
-        {
-            SkillResultTextBox.Text = "El nivel debe ser un número entero.";
-            return;
-        }
-
-        try
-        {
-            var result = _learnSkillUseCase.Execute(
-                new LearnSkillRequest(
-                    selectedEvolution.Id,
-                    level,
-                    selectedSkill.Id));
-            SkillResultTextBox.Text = FormatSkillLearnResult(result);
-        }
-        catch (SkillLearnException exception)
-        {
-            SkillResultTextBox.Text =
-                $"No aprendible ({exception.Code}): " +
-                TranslateSkillLearnError(exception.Code);
-        }
-    }
-
-    private static string FormatSkillLearnResult(LearnSkillResult result)
-    {
-        var lines = new List<string>
-        {
-            $"Aprendible: {result.DisplayName} ({result.SkillId})",
-            $"Tipo: {result.Kind}",
-            $"Nivel requerido: {result.RequiredLevel}",
-            "Evoluciones permitidas según el axioma:",
-        };
-        lines.AddRange(result.AllowedEvolutionIds
-            .OrderBy(id => id, StringComparer.Ordinal)
-            .Select(id => $"- {id}"));
-        lines.Add(
-            "Sin reducción de nivel ni buffRef: fuera del axioma acotado.");
-        return string.Join(Environment.NewLine, lines);
-    }
-
-    private static string TranslateSkillLearnError(string code) => code switch
-    {
-        SkillLearnErrorCodes.SkillNotFound =>
-            "la skill no existe en el catálogo publicado.",
-        SkillLearnErrorCodes.EvolutionNotAllowed =>
-            "la evolución seleccionada no puede aprender esta skill.",
-        SkillLearnErrorCodes.RequirementsNotMet =>
-            "el nivel final no alcanza el nivel requerido publicado de la skill.",
-        _ => "se produjo un error de aprendizaje no reconocido.",
-    };
-
     private bool TryReadDraftInputs(
         out BuildDraftProgressionInputs progressionInputs,
         out BuildDraftResetInputs resetInputs,
@@ -769,7 +639,6 @@ public partial class MainWindow : Window
             _currentDistribution);
         ConfigureAndCalculateApplicableFormula();
         RefreshItemSelection();
-        RefreshSkillSelection();
     }
 
     private void ApplyLoadedBuild(CharacterBuild build)
@@ -819,7 +688,6 @@ public partial class MainWindow : Window
             _currentDistribution);
         ConfigureAndCalculateApplicableFormula();
         RefreshItemSelection();
-        RefreshSkillSelection();
     }
 
     private void InvalidateCurrentBudget()
