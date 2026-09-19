@@ -121,11 +121,11 @@ public sealed class FormulaApplicationIntegrationTests
         using var historicalDocument = JsonDocument.Parse(
             File.ReadAllText(historicalPath));
 
-        Assert.Equal(107, catalog.Formulas.Length);
+        Assert.Equal(114, catalog.Formulas.Length);
         Assert.Equal(
             [
                 .. Enumerable.Repeat("2.0.0", 7),
-                .. Enumerable.Repeat("2.1.0", 100),
+                .. Enumerable.Repeat("2.1.0", 107),
             ],
             catalog.Formulas
                 .Select(ReadSchemaVersion)
@@ -441,7 +441,14 @@ public sealed class FormulaApplicationIntegrationTests
                     "formula-critical-damage-dark-lord" or
                     "formula-fireburst-bonus-min-damage-dark-lord" or
                     "formula-fireburst-bonus-max-damage-dark-lord" or
-                    "formula-guild-member-capacity-dark-lord")
+                    "formula-guild-member-capacity-dark-lord" or
+                    "formula-skill-damage-impale-dark-knight" or
+                    "formula-skill-damage-twisting-slash-dark-knight" or
+                    "formula-skill-damage-death-stab-dark-knight" or
+                    "formula-skill-damage-rageful-blow-dark-knight" or
+                    "formula-skill-hp-buff-swell-life-dark-knight" or
+                    "formula-skill-damage-penetration-fairy-elf" or
+                    "formula-skill-damage-multi-shot-fairy-elf")
             .Select(item => item.Reference)
             .ToHashSet();
 

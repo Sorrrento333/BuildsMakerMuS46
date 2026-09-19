@@ -142,6 +142,13 @@ public sealed class SchemaContractValidatorTests
         "formula-sd-fairy-elf@1.0.0",
         "formula-sd-magic-gladiator@1.0.0",
         "formula-sd-summoner@1.0.0",
+        "formula-skill-damage-death-stab-dark-knight@1.0.0",
+        "formula-skill-damage-impale-dark-knight@1.0.0",
+        "formula-skill-damage-multi-shot-fairy-elf@1.0.0",
+        "formula-skill-damage-penetration-fairy-elf@1.0.0",
+        "formula-skill-damage-rageful-blow-dark-knight@1.0.0",
+        "formula-skill-damage-twisting-slash-dark-knight@1.0.0",
+        "formula-skill-hp-buff-swell-life-dark-knight@1.0.0",
         "formula-skill-percent-dark-knight@1.0.0",
         "formula-skill-percent-dark-lord@1.0.0",
         "formula-soul-barrier-percent-dark-wizard@1.0.0",
@@ -1102,7 +1109,7 @@ public sealed class SchemaContractValidatorTests
     {
         var results = SchemaContractValidator.ValidateRulesetRecords(FindRepositoryRoot());
 
-        Assert.Equal(127, results.Count);
+        Assert.Equal(134, results.Count);
         Assert.All(results, result => Assert.True(
             result.ActualValidity,
             $"{result.RecordId} does not match {result.ContractName}."));
@@ -1140,7 +1147,7 @@ public sealed class SchemaContractValidatorTests
             [
                 "1.1.0",
                 .. Enumerable.Repeat("2.0.0", 7),
-                .. Enumerable.Repeat("2.1.0", 100),
+                .. Enumerable.Repeat("2.1.0", 107),
             ],
             results
                 .Where(result => result.ContractName == "formula")
@@ -1154,7 +1161,7 @@ public sealed class SchemaContractValidatorTests
         var results = FormulaReferenceCaseValidator.ValidateRepository(
             FindRepositoryRoot());
 
-        Assert.Equal(108, results.Count);
+        Assert.Equal(115, results.Count);
 
         var darkLordAg = Assert.Single(
             results,
@@ -1963,7 +1970,7 @@ public sealed class SchemaContractValidatorTests
                 .ValidateRepository(temporaryRoot)
                 .ToArray();
 
-            Assert.Equal(108, results.Length);
+            Assert.Equal(115, results.Length);
             Assert.All(results, result => Assert.False(result.IsValid));
             Assert.All(
                 results,

@@ -48,6 +48,10 @@ claims:
     statement: "Fanz publica algunos efectos de buff con valores incompletos (`?`); esas skills y buffs quedan fuera del subconjunto (Berserker `Decreases Max HP by ?`, Recorvery `Recover ? SD`, Focus Shot, Death Scythe, Fire Beast, Aqua Beast, Sword Blow)."
     status: VERIFIED
     evidence: [EVD-0041, EVD-0043, EVD-0045]
+  - id: SKL-CLM-010
+    statement: "Dentro del axioma acotado de valores de efecto del propietario (`EVD-0046`, 2026-09-19), los efectos numéricos publicados por Fanz para siete skills del subconjunto se aceptan como axioma y se materializan como fórmulas derivadas: Impale = 15 + trunc(STR/35), Twisting Slash = 15 + trunc(STR/40), Death Stab = 70 + trunc(STR/150), Rageful Blow = 60 + trunc(STR/150), Swell Life = 12 + trunc(ENE/20) + trunc(VIT/100) con un único truncamiento del total, Penetration = 70 + trunc(AGI/200) y Multi-Shot = 40 + trunc(AGI/200). `STA Level` se interpreta como Vitality. Strike of Destruction queda fuera por no publicar Skill DMG."
+    status: VERIFIED
+    evidence: [EVD-0041, EVD-0042, EVD-0046]
 conflicts:
   - id: DSP-0008
     statement: "Las guías de personaje y de skills de Fanz no declaran Season 4 y mezclan sistemas y clases posteriores (Master Skill Tree, Skill Enhancement Tree/Skill Imprint, elementos, cuarta clase a nivel 800), por lo que no demuestran la versión objetivo."
@@ -80,7 +84,7 @@ conflicts:
 test_plan: "Materializar las ocho `SkillDefinition` `PUBLISHED` del axioma contra `packages/schemas/v1/skill.schema.json` (1.0.0), enlazando `EVD-0041`–`EVD-0045`: `kind` del mapeo aprobado, `requiredLevel` igual al `Character Level` publicado, `allowedEvolutionIds` con las tres evoluciones de la familia, `prerequisiteSkillIds` vacío, `buffRef` omitido y `conflictIds` `dsp-0008`–`dsp-0011`. Quedan prohibidos por este registro cualquier otra skill, cualquier `buffRef`, cualquier prerrequisito por stat/quest/equipo modelado y cualquier `kind` fuera del mapeo aprobado; ampliarlos exige nueva evidencia o una nueva decisión del propietario."
 conclusion: "RES-0004 queda resuelto por decisión del propietario del 2026-09-17 (`EVD-0045`). Fanz no demuestra Season 4, por lo que el propietario acepta como axioma del ruleset un subconjunto acotado y estable: ocho skills de las guías Dark Knight y Fairy Elf cuyos requisitos publicados incluyen un `Character Level` explícito. El axioma fija el mapeo de `kind`, `allowedEvolutionIds` (las tres evoluciones de cada familia), `prerequisiteSkillIds` vacío, `buffRef` omitido y el límite de campos. Los nueve claims pasan a `VERIFIED` sólo dentro de ese alcance; `DSP-0008`, `DSP-0009`, `DSP-0010` y `DSP-0011` quedan `RESOLVED` por `OWNER_DECISION`. El catálogo de skills queda desbloqueado para el subconjunto acotado y sigue bloqueado para cualquier otra skill, buff, campo o grado."
 reviewed_by: ["project-owner"]
-last_reviewed_at: "2026-09-17"
+last_reviewed_at: "2026-09-19"
 ```
 
 ## Alcance y límites
@@ -90,8 +94,11 @@ last_reviewed_at: "2026-09-17"
   derivados (`RES-0002`).
 - Se investiga exclusivamente el eje de **skills, buffs e invocaciones** que
   alimentará `SkillDefinition` (`packages/schemas/v1/skill.schema.json`). Quedan
-  fuera daño, defensa, rates, PvM/PvP, precios y drops, y los efectos de buff
-  (`buffRef` se difiere a un contrato de buff pendiente).
+  fuera daño, defensa, rates, PvM/PvP, precios y drops. Los efectos de buff
+  (`buffRef`) siguen diferidos al contrato de buff pendiente; no obstante, los
+  siete valores numéricos de efecto del axioma `EVD-0046` (2026-09-19) quedan
+  cubiertos por `SKL-CLM-010` y se materializan como fórmulas derivadas, sin
+  ampliar el catálogo de skills ni habilitar `buffRef`.
 - Cada skill, campo y valor es un claim independiente. Una coincidencia entre
   skills o fuentes no autoriza reutilizar categorías, requisitos o efectos por
   inferencia.
@@ -306,11 +313,56 @@ catálogo de skills sin inventar datos:
   mantiene `DSP-0008` como límite de versión y `EVD-0041`–`EVD-0044` como
   procedencia.
 
+### EVD-0046 — Decisión del propietario: axioma acotado de valores de efecto
+
+- Fuente: decisión explícita del propietario comunicada el 2026-09-19, aprobada
+  como "Approve as drafted".
+- Alcance declarado: `mu-s4-global-reference`, Season 4 global/inglés, sólo los
+  valores numéricos de efecto publicados por Fanz para las skills del axioma
+  `EVD-0045`.
+- Valores aceptados como axioma (stat-base + crecimiento por nivel de stat,
+  truncado hacia cero una vez al final):
+  - Impale: `15 + trunc(STR/35)`.
+  - Twisting Slash: `15 + trunc(STR/40)`.
+  - Death Stab: `70 + trunc(STR/150)`.
+  - Rageful Blow: `60 + trunc(STR/150)`.
+  - Swell Life: `12 + trunc(ENE/20) + trunc(VIT/100)`, con un **único**
+    truncamiento del total (`STA Level` se interpreta como Vitality).
+  - Penetration: `70 + trunc(AGI/200)`.
+  - Multi-Shot: `40 + trunc(AGI/200)`.
+- Excluido: Strike of Destruction (Fanz no publica Skill DMG, sólo Mana 30);
+  cualquier otra skill, cualquier otro efecto, y cualquier valor fuera de los
+  listados.
+- Confianza y uso permitido: `VERIFIED` sólo para los siete valores anteriores.
+  Autoriza materializarlos como fórmulas derivadas (`schemaVersion` `2.1.0`)
+  contra `formula.schema.json`; no autoriza inferir ningún otro efecto.
+- Divergencia conservada: el axioma no reclasifica a Fanz como fuente Season 4;
+  mantiene `DSP-0008` como límite de versión y `EVD-0041`–`EVD-0042` como
+  procedencia.
+
+## Ampliación 2026-09-19 — axioma de valores de efecto (`EVD-0046`)
+
+- El propietario autorizó los valores de efecto del `SKL-CLM-010` como axioma
+  acotado, sin cambiar el alcance del catálogo de skills ni `buffRef` (que sigue
+  omitido).
+- La materialización se hizo como fórmulas normales (`schemaVersion` `2.1.0`)
+  dentro del ruleset, sin cambiar schema ni motor: no se introdujo ningún
+  contrato nuevo ni se inventó ningún valor.
+- Las siete fórmulas viven en
+  `packages/rulesets/mu-s4-global-reference/v1/formulas/` con casos reproducibles
+  en `reference-cases/formulas/{valid,invalid}`; su verificación se registra en
+  `docs/10-ai-handoff/current-status.md`.
+- `RES-0004` mantiene su alcance: `buffRef` y cualquier efecto numérico fuera de
+  los siete listados siguen bloqueados hasta nueva evidencia o nueva decisión.
+
 ## Pendiente
 
 - Catálogo acotado materializado y validado: ocho `SkillDefinition` en
   `packages/rulesets/mu-s4-global-reference/v1/skills/`.
 - Ampliar el catálogo exige nueva evidencia Season 4 o una nueva decisión del
   propietario; hoy queda fuera de alcance.
+- Valores de efecto del axioma `EVD-0046` materializados como siete fórmulas
+  derivadas (`SKL-CLM-010`) en el ruleset; Strike of Destruction sigue fuera por
+  no publicar Skill DMG.
 - Contrato de buff (`buffRef`) pendiente para modelar efectos de buff.
 - Segunda línea de evidencia independiente para futuras skills y buffs.

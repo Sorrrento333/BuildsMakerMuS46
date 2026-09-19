@@ -140,6 +140,13 @@ $expectedPublishedFormulaReferences = @(
     "formula-max-wizardry-dark-wizard@1.0.0",
     "formula-min-wizardry-dark-wizard@1.0.0",
     "formula-nova-max-spell-damage-dark-wizard@1.0.0",
+    "formula-skill-damage-death-stab-dark-knight@1.0.0",
+    "formula-skill-damage-impale-dark-knight@1.0.0",
+    "formula-skill-damage-multi-shot-fairy-elf@1.0.0",
+    "formula-skill-damage-penetration-fairy-elf@1.0.0",
+    "formula-skill-damage-rageful-blow-dark-knight@1.0.0",
+    "formula-skill-damage-twisting-slash-dark-knight@1.0.0",
+    "formula-skill-hp-buff-swell-life-dark-knight@1.0.0",
     "formula-skill-percent-dark-knight@1.0.0",
     "formula-skill-percent-dark-lord@1.0.0",
     "formula-soul-barrier-percent-dark-wizard@1.0.0",
@@ -341,16 +348,16 @@ $replacementReferenceDifference = Compare-Object `
     -DifferenceObject $replacementReport.PublishedFormulaReferences
 if (-not $initialReport.PublishedFormulaContextVerified -or
     -not $replacementReport.PublishedFormulaContextVerified -or
-    $initialReport.PublishedFormulaCount -ne 107 -or
-    $replacementReport.PublishedFormulaCount -ne 107 -or
-    $initialReport.PublishedFormulaReferences.Count -ne 107 -or
-    $replacementReport.PublishedFormulaReferences.Count -ne 107 -or
+    $initialReport.PublishedFormulaCount -ne 114 -or
+    $replacementReport.PublishedFormulaCount -ne 114 -or
+    $initialReport.PublishedFormulaReferences.Count -ne 114 -or
+    $replacementReport.PublishedFormulaReferences.Count -ne 114 -or
     $null -ne $initialReferenceDifference -or
     $null -ne $replacementReferenceDifference -or
     ($replacementReport.PublishedFormulaReferences -join "|") -ne
         ($initialReport.PublishedFormulaReferences -join "|") -or
-    $initialReport.ApprovedPublishedFormulaCaseCount -ne 428 -or
-    $replacementReport.ApprovedPublishedFormulaCaseCount -ne 428) {
+    $initialReport.ApprovedPublishedFormulaCaseCount -ne 456 -or
+    $replacementReport.ApprovedPublishedFormulaCaseCount -ne 456) {
     throw "The published artifact did not reproduce all contextual and arithmetic formula traces."
 }
 if (-not $initialReport.BuildDraftPersistenceVerified -or

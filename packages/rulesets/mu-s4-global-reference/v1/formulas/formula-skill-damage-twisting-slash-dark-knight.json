@@ -1,0 +1,140 @@
+{
+    "schemaVersion":  "2.1.0",
+    "id":  "formula-skill-damage-twisting-slash-dark-knight",
+    "version":  "1.0.0",
+    "rulesetId":  "mu-s4-global-reference",
+    "status":  "PUBLISHED",
+    "confidence":  "VERIFIED",
+    "purpose":  "Calculate visible Twisting Slash skill damage for the Dark Knight family before equipment, options, buffs, private profiles, or undeclared modifiers.",
+    "applicability":  {
+                          "characterClassId":  "class-dark-knight",
+                          "evolutionIds":  [
+                                               "evolution-dark-knight",
+                                               "evolution-blade-knight",
+                                               "evolution-blade-master"
+                                           ]
+                      },
+    "inputs":  [
+                   {
+                       "id":  "strength",
+                       "numericType":  "INT64",
+                       "unit":  "stat-point",
+                       "numericBounds":  {
+                                             "minimum":  28,
+                                             "minimumInclusive":  true,
+                                             "classification":  "FACTUAL",
+                                             "evidenceRefs":  [
+                                                                  "evd-0021"
+                                                              ]
+                                         },
+                       "rangeErrorCode":  "formula-stat-below-base",
+                       "source":  {
+                                      "kind":  "CONTEXT_VALUE",
+                                      "valueId":  "resolved-strength"
+                                  }
+                   }
+               ],
+    "output":  {
+                   "id":  "skill-damage",
+                   "numericType":  "INT64",
+                   "unit":  "damage-point"
+               },
+    "strategy":  {
+                     "kind":  "PROGRAM",
+                     "executionModel":  "CHECKED_DECIMAL_V1",
+                     "steps":  [
+                                   {
+                                       "id":  "strength-term",
+                                       "operation":  "DIVIDE",
+                                       "operands":  [
+                                                        {
+                                                            "kind":  "INPUT",
+                                                            "inputId":  "strength"
+                                                        },
+                                                        {
+                                                            "kind":  "LITERAL",
+                                                            "value":  40
+                                                        }
+                                                    ]
+                                   },
+                                   {
+                                       "id":  "raw-skill-damage",
+                                       "operation":  "ADD",
+                                       "operands":  [
+                                                        {
+                                                            "kind":  "STEP",
+                                                            "stepId":  "strength-term"
+                                                        },
+                                                        {
+                                                            "kind":  "LITERAL",
+                                                            "value":  15
+                                                        }
+                                                    ]
+                                   },
+                                   {
+                                       "id":  "visible-skill-damage",
+                                       "operation":  "APPLY_ROUNDING",
+                                       "operands":  [
+                                                        {
+                                                            "kind":  "STEP",
+                                                            "stepId":  "raw-skill-damage"
+                                                        }
+                                                    ]
+                                   }
+                               ],
+                     "dependencyFormulaRefs":  [
+
+                                               ]
+                 },
+    "rounding":  {
+                     "mode":  "TRUNCATE",
+                     "stage":  "visible-skill-damage",
+                     "decimalPlaces":  0
+                 },
+    "trace":  {
+                  "stepIds":  [
+                                  "strength-term",
+                                  "raw-skill-damage",
+                                  "visible-skill-damage"
+                              ],
+                  "rawOutputStepId":  "raw-skill-damage",
+                  "visibleOutputStepId":  "visible-skill-damage"
+              },
+    "constraints":  [
+                        "Resolve class and evolution applicability before evaluating arithmetic.",
+                        "Divide strength by the exact literal 40 using checked decimal arithmetic, then add the exact literal 15.",
+                        "Represent strength-term exactly as a base-10 decimal and add the constant with checked decimal arithmetic.",
+                        "Do not round strength-term or raw-skill-damage before visible-skill-damage.",
+                        "Truncate raw-skill-damage toward zero exactly once at visible-skill-damage."
+                    ],
+    "evidenceRefs":  [
+                         "evd-0021",
+                         "evd-0041",
+                         "evd-0045",
+                         "evd-0046"
+                     ],
+    "conflictIds":  [
+                        "dsp-0008",
+                        "dsp-0009",
+                        "dsp-0010",
+                        "dsp-0011"
+                    ],
+    "testCaseRefs":  [
+                         {
+                             "id":  "skill-damage-twisting-slash-dark-knight-base",
+                             "version":  "1.0.0"
+                         },
+                         {
+                             "id":  "skill-damage-twisting-slash-dark-knight-fraction-step",
+                             "version":  "1.0.0"
+                         },
+                         {
+                             "id":  "skill-damage-twisting-slash-dark-knight-integer-step",
+                             "version":  "1.0.0"
+                         },
+                         {
+                             "id":  "skill-damage-twisting-slash-dark-knight-blade-master-step",
+                             "version":  "1.0.0"
+                         }
+                     ]
+}

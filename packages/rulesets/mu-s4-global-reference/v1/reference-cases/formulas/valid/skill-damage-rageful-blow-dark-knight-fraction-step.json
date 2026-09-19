@@ -1,0 +1,65 @@
+{
+    "schemaVersion":  "1.0.0",
+    "id":  "skill-damage-rageful-blow-dark-knight-fraction-step",
+    "rulesetId":  "mu-s4-global-reference",
+    "formulaRef":  {
+                       "id":  "formula-skill-damage-rageful-blow-dark-knight",
+                       "version":  "1.0.0"
+                   },
+    "context":  {
+                    "characterClassId":  "class-dark-knight",
+                    "evolutionId":  "evolution-dark-knight"
+                },
+    "inputs":  {
+                   "strength":  29
+               },
+    "expectedTrace":  {
+                          "schemaVersion":  "1.0.0",
+                          "id":  "trace-skill-damage-rageful-blow-dark-knight-fraction-step",
+                          "rulesetId":  "mu-s4-global-reference",
+                          "formulaRef":  {
+                                             "id":  "formula-skill-damage-rageful-blow-dark-knight",
+                                             "version":  "1.0.0"
+                                         },
+                          "context":  {
+                                          "characterClassId":  "class-dark-knight",
+                                          "evolutionId":  "evolution-dark-knight"
+                                      },
+                          "inputs":  {
+                                         "strength":  29
+                                     },
+                          "steps":  [
+                                        {
+                                            "stepId":  "strength-term",
+                                            "value":  0.1933333333333333333333333333
+                                        },
+                                        {
+                                            "stepId":  "raw-skill-damage",
+                                            "value":  60.193333333333333333333333333
+                                        },
+                                        {
+                                            "stepId":  "visible-skill-damage",
+                                            "value":  60
+                                        }
+                                    ],
+                          "rounding":  {
+                                           "mode":  "TRUNCATE",
+                                           "stage":  "visible-skill-damage",
+                                           "decimalPlaces":  0
+                                       },
+                          "rawOutput":  60.193333333333333333333333333,
+                          "visibleOutput":  60,
+                          "evidenceRefs":  [
+                                               "evd-0021",
+                                               "evd-0041",
+                                               "evd-0045",
+                                               "evd-0046"
+                                           ],
+                          "conflictIds":  [
+                                              "dsp-0008",
+                                              "dsp-0009",
+                                              "dsp-0010",
+                                              "dsp-0011"
+                                          ]
+                      }
+}

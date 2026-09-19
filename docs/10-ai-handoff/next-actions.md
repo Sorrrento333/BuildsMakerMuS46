@@ -13,11 +13,10 @@ La instrucción de ejecutar sólo la primera tarea pendiente continúa vigente.
 
 ## Prioridad inmediata
 
-1. Skills alineadas con la regla inviolable de `docs/DECISIONES-PRODUCTO.md`
-   (2026-09-19): sólo como modificador de cálculo (dmg/buff); sin catálogo/UI en
-   el cliente ni pruebas del catálogo. Backend mínimo conservado; la suma de la
-   skill a las fórmulas derivadas requiere datos de efecto autorizados
-   (`buffRef` sigue omitido).
+1. Skills como modificador de cálculo implementado (2026-09-19): siete fórmulas
+   derivadas `2.1.0` por axioma `EVD-0046`; sin UI de skills ni `buffRef`.
+   Ampliar efectos fuera de los siete exige nueva evidencia Season 4 o una nueva
+   decisión del propietario. `buffRef` sigue omitido.
 2. Catálogo acotado de skills materializado (2026-09-17): ocho `SkillDefinition`
    `PUBLISHED` del axioma `EVD-0045` contra `skill.schema.json`, con inventario
    canónico 119 → 127 y dataset `2026-09-17.1`.
@@ -29,6 +28,24 @@ La instrucción de ejecutar sólo la primera tarea pendiente continúa vigente.
    evidencia Season 4 o una nueva decisión del propietario.
 5. Alternativa documentada: master buys y pantallas restantes del flujo, sin
    contrato factual todavía.
+
+## Skills como modificador de cálculo — implementado (2026-09-19)
+
+- Axioma acotado del propietario (`EVD-0046`, `SKL-CLM-010`) para los valores de
+  efecto publicados por Fanz; sin `buffRef` ni catálogo/UI.
+- Siete fórmulas `PUBLISHED` `VERIFIED` `2.1.0`: Impale (`15 + trunc(STR/35)`),
+  Twisting Slash (`15 + trunc(STR/40)`), Death Stab (`70 + trunc(STR/150)`),
+  Rageful Blow (`60 + trunc(STR/150)`), Swell Life
+  (`12 + trunc(ENE/20) + trunc(VIT/100)`, un solo truncamiento del total),
+  Penetration (`70 + trunc(AGI/200)`) y Multi-Shot (`40 + trunc(AGI/200)`).
+  Strike of Destruction excluida (sin Skill DMG publicado).
+- 28 casos válidos + 15 controles negativos en
+  `reference-cases/formulas/{valid,invalid}`; allow-list y conteos actualizados
+  en `FormulaApplicationIntegrationTests`, `SchemaContractValidatorTests` y el
+  smoke PS1.
+- Verificación PASS: build Release 0/0; 840/840 tests (40/58/715/27);
+  `Test-SchemaStructure` 16/32; smoke WPF `win-x64` (1369 archivos, 150.618.678
+  bytes, 946 archivos del ruleset, 456 casos, dataset `2026-09-17.1`).
 
 ## Skills: alineación con la regla solo-modificador — 2026-09-19
 

@@ -21,6 +21,29 @@
 
 ### Added
 
+- Skills como modificador de cálculo materializadas como fórmulas derivadas.
+  El axioma acotado del propietario (`EVD-0046`, `SKL-CLM-010`, 2026-09-19)
+  autoriza los valores de efecto publicados por Fanz para siete skills; nacen
+  siete fórmulas `PUBLISHED` `VERIFIED` (`schemaVersion` `2.1.0`) en
+  `packages/rulesets/mu-s4-global-reference/v1/formulas/`:
+  `formula-skill-damage-impale-dark-knight` (`15 + trunc(STR/35)`),
+  `formula-skill-damage-twisting-slash-dark-knight` (`15 + trunc(STR/40)`),
+  `formula-skill-damage-death-stab-dark-knight` (`70 + trunc(STR/150)`),
+  `formula-skill-damage-rageful-blow-dark-knight` (`60 + trunc(STR/150)`),
+  `formula-skill-hp-buff-swell-life-dark-knight`
+  (`12 + trunc(ENE/20) + trunc(VIT/100)`, un único truncamiento del total con
+  `STA Level` → Vitality),
+  `formula-skill-damage-penetration-fairy-elf` (`70 + trunc(AGI/200)`) y
+  `formula-skill-damage-multi-shot-fairy-elf` (`40 + trunc(AGI/200)`). Strike of
+  Destruction queda fuera (Fanz no publica Skill DMG) y `buffRef` sigue omitido.
+  Se añaden 28 casos válidos y 15 controles negativos en
+  `reference-cases/formulas/{valid,invalid}` (inventario de fórmulas 108 → 115,
+  casos aprobados 428 → 456), actualizando
+  `FormulaApplicationIntegrationTests.cs`, `SchemaContractValidatorTests.cs` y
+  `tools/smoke-tests/Test-WpfPublishedArtifact.ps1`. `RES-0004` incorpora
+  `SKL-CLM-010`/`EVD-0046` y `docs/04-domain/skills-consumption-design.md` queda
+  `IMPLEMENTED`. Ruleset `1.0.0`, motor `0.2.0` y dataset `2026-09-17.1` sin
+  cambios.
 - Catálogo acotado de skills materializado. Ocho `SkillDefinition` `PUBLISHED`
   `VERIFIED` nacen en `packages/rulesets/mu-s4-global-reference/v1/skills/`
   contra `skill.schema.json`: `skill-impale` (ACTIVE, 28), `skill-twisting-slash`

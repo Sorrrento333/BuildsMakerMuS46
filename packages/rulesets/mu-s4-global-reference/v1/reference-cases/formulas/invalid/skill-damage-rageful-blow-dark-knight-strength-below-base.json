@@ -1,0 +1,17 @@
+{
+    "schemaVersion":  "1.0.0",
+    "id":  "skill-damage-rageful-blow-dark-knight-strength-below-base",
+    "rulesetId":  "mu-s4-global-reference",
+    "formulaRef":  {
+                       "id":  "formula-skill-damage-rageful-blow-dark-knight",
+                       "version":  "1.0.0"
+                   },
+    "context":  {
+                    "characterClassId":  "class-dark-knight",
+                    "evolutionId":  "evolution-dark-knight"
+                },
+    "inputs":  {
+                   "strength":  27
+               },
+    "expectedErrorCode":  "formula-stat-below-base"
+}

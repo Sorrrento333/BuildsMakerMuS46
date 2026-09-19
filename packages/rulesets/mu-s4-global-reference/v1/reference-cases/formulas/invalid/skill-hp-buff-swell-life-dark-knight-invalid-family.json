@@ -1,0 +1,18 @@
+{
+    "schemaVersion":  "1.0.0",
+    "id":  "skill-hp-buff-swell-life-dark-knight-invalid-family",
+    "rulesetId":  "mu-s4-global-reference",
+    "formulaRef":  {
+                       "id":  "formula-skill-hp-buff-swell-life-dark-knight",
+                       "version":  "1.0.0"
+                   },
+    "context":  {
+                    "characterClassId":  "class-fairy-elf",
+                    "evolutionId":  "evolution-fairy-elf"
+                },
+    "inputs":  {
+                   "energy":  10,
+                   "vitality":  25
+               },
+    "expectedErrorCode":  "formula-not-applicable"
+}

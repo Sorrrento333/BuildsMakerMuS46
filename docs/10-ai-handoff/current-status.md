@@ -2382,7 +2382,41 @@
 - El canal público de actualización y firma continúa como decisión posterior de
   distribución.
 
-## Verificación más reciente — 2026-09-19 (alineación con la regla inviolable de skills)
+## Verificación más reciente — 2026-09-19 (skills como modificador de cálculo)
+
+- Vertical "skill como modificador de cálculo" implementada por axioma acotado
+  del propietario (`EVD-0046`, "Approve as drafted"), sin `buffRef` ni UI de
+  skills, respetando `docs/DECISIONES-PRODUCTO.md`.
+- Siete fórmulas `PUBLISHED` `VERIFIED` (`schemaVersion` `2.1.0`) nacen en
+  `packages/rulesets/mu-s4-global-reference/v1/formulas/`, siguiendo el patrón de
+  `formula-damage-buff-fairy-elf`:
+  `formula-skill-damage-impale-dark-knight` (`15 + trunc(STR/35)`),
+  `...-twisting-slash-dark-knight` (`15 + trunc(STR/40)`),
+  `...-death-stab-dark-knight` (`70 + trunc(STR/150)`),
+  `...-rageful-blow-dark-knight` (`60 + trunc(STR/150)`),
+  `formula-skill-hp-buff-swell-life-dark-knight`
+  (`12 + trunc(ENE/20) + trunc(VIT/100)`, un único truncamiento del total con
+  `STA Level` → Vitality),
+  `formula-skill-damage-penetration-fairy-elf` (`70 + trunc(AGI/200)`) y
+  `formula-skill-damage-multi-shot-fairy-elf` (`40 + trunc(AGI/200)`).
+  Strike of Destruction queda fuera (Fanz no publica Skill DMG).
+- Se añadieron 28 casos válidos (`4` por fórmula: `base`, `fraction-step`,
+  `integer-step` y `blade-master-step`/`high-elf-step`) y 15 controles negativos
+  (`formula-stat-below-base` / `formula-not-applicable`) en
+  `reference-cases/formulas/{valid,invalid}`, con trazas decimales exactas del
+  motor (`CHECKED_DECIMAL_V1`, `TRUNCATE` a 0 decimales).
+- Inventario canónico de fórmulas 108 → 115 archivos (107 → 114 ejecutables);
+  casos válidos 432 → 460 (aprobados 428 → 456). Se actualizaron el allow-list y
+  los conteos de `FormulaApplicationIntegrationTests.cs`, los conteos de
+  `SchemaContractValidatorTests.cs` y la lista/conteos del smoke PS1.
+- `RES-0004` incorpora `SKL-CLM-010` y la evidencia `EVD-0046`; el diseño
+  `docs/04-domain/skills-consumption-design.md` queda `IMPLEMENTED`.
+- Verificación PASS: build Release 0/0; 840/840 pruebas (40 validator, 58 motor,
+  715 Application, 27 Data); `Test-SchemaStructure` 16/32; smoke WPF `win-x64`
+  (SQLite `3.53.3`, 1369 archivos, 150.618.678 bytes, 946 archivos del ruleset,
+  456 casos contextuales, dataset `2026-09-17.1`).
+
+## Verificación anterior — 2026-09-19 (alineación con la regla inviolable de skills)
 
 - `docs/DECISIONES-PRODUCTO.md` (añadido por el propietario en `5a69fa5`) fija
   que una skill sólo puede ser modificador de cálculo (dmg/buff): sin catálogo

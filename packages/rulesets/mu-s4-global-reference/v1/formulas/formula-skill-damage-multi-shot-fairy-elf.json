@@ -1,0 +1,140 @@
+{
+    "schemaVersion":  "2.1.0",
+    "id":  "formula-skill-damage-multi-shot-fairy-elf",
+    "version":  "1.0.0",
+    "rulesetId":  "mu-s4-global-reference",
+    "status":  "PUBLISHED",
+    "confidence":  "VERIFIED",
+    "purpose":  "Calculate visible Multi-Shot skill damage for the Fairy Elf family before equipment, options, buffs, private profiles, or undeclared modifiers.",
+    "applicability":  {
+                          "characterClassId":  "class-fairy-elf",
+                          "evolutionIds":  [
+                                               "evolution-fairy-elf",
+                                               "evolution-muse-elf",
+                                               "evolution-high-elf"
+                                           ]
+                      },
+    "inputs":  [
+                   {
+                       "id":  "agility",
+                       "numericType":  "INT64",
+                       "unit":  "stat-point",
+                       "numericBounds":  {
+                                             "minimum":  25,
+                                             "minimumInclusive":  true,
+                                             "classification":  "FACTUAL",
+                                             "evidenceRefs":  [
+                                                                  "evd-0021"
+                                                              ]
+                                         },
+                       "rangeErrorCode":  "formula-stat-below-base",
+                       "source":  {
+                                      "kind":  "CONTEXT_VALUE",
+                                      "valueId":  "resolved-agility"
+                                  }
+                   }
+               ],
+    "output":  {
+                   "id":  "skill-damage",
+                   "numericType":  "INT64",
+                   "unit":  "damage-point"
+               },
+    "strategy":  {
+                     "kind":  "PROGRAM",
+                     "executionModel":  "CHECKED_DECIMAL_V1",
+                     "steps":  [
+                                   {
+                                       "id":  "agility-term",
+                                       "operation":  "DIVIDE",
+                                       "operands":  [
+                                                        {
+                                                            "kind":  "INPUT",
+                                                            "inputId":  "agility"
+                                                        },
+                                                        {
+                                                            "kind":  "LITERAL",
+                                                            "value":  200
+                                                        }
+                                                    ]
+                                   },
+                                   {
+                                       "id":  "raw-skill-damage",
+                                       "operation":  "ADD",
+                                       "operands":  [
+                                                        {
+                                                            "kind":  "STEP",
+                                                            "stepId":  "agility-term"
+                                                        },
+                                                        {
+                                                            "kind":  "LITERAL",
+                                                            "value":  40
+                                                        }
+                                                    ]
+                                   },
+                                   {
+                                       "id":  "visible-skill-damage",
+                                       "operation":  "APPLY_ROUNDING",
+                                       "operands":  [
+                                                        {
+                                                            "kind":  "STEP",
+                                                            "stepId":  "raw-skill-damage"
+                                                        }
+                                                    ]
+                                   }
+                               ],
+                     "dependencyFormulaRefs":  [
+
+                                               ]
+                 },
+    "rounding":  {
+                     "mode":  "TRUNCATE",
+                     "stage":  "visible-skill-damage",
+                     "decimalPlaces":  0
+                 },
+    "trace":  {
+                  "stepIds":  [
+                                  "agility-term",
+                                  "raw-skill-damage",
+                                  "visible-skill-damage"
+                              ],
+                  "rawOutputStepId":  "raw-skill-damage",
+                  "visibleOutputStepId":  "visible-skill-damage"
+              },
+    "constraints":  [
+                        "Resolve class and evolution applicability before evaluating arithmetic.",
+                        "Divide agility by the exact literal 200 using checked decimal arithmetic, then add the exact literal 40.",
+                        "Represent agility-term exactly as a base-10 decimal and add the constant with checked decimal arithmetic.",
+                        "Do not round agility-term or raw-skill-damage before visible-skill-damage.",
+                        "Truncate raw-skill-damage toward zero exactly once at visible-skill-damage."
+                    ],
+    "evidenceRefs":  [
+                         "evd-0021",
+                         "evd-0042",
+                         "evd-0045",
+                         "evd-0046"
+                     ],
+    "conflictIds":  [
+                        "dsp-0008",
+                        "dsp-0009",
+                        "dsp-0010",
+                        "dsp-0011"
+                    ],
+    "testCaseRefs":  [
+                         {
+                             "id":  "skill-damage-multi-shot-fairy-elf-base",
+                             "version":  "1.0.0"
+                         },
+                         {
+                             "id":  "skill-damage-multi-shot-fairy-elf-fraction-step",
+                             "version":  "1.0.0"
+                         },
+                         {
+                             "id":  "skill-damage-multi-shot-fairy-elf-integer-step",
+                             "version":  "1.0.0"
+                         },
+                         {
+                             "id":  "skill-damage-multi-shot-fairy-elf-high-elf-step",
+                             "version":  "1.0.0"
+                         }
+                     ]
+}
