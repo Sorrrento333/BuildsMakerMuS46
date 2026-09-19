@@ -807,7 +807,7 @@ public sealed class SchemaContractValidatorTests
     {
         var results = SchemaContractValidator.ValidateRepository(FindRepositoryRoot());
 
-        Assert.Equal(32, results.Count);
+        Assert.Equal(34, results.Count);
         Assert.Collection(
             results,
             result => AssertResult(result, "evidence", "valid", expectedValidity: true),
@@ -818,6 +818,8 @@ public sealed class SchemaContractValidatorTests
             result => AssertResult(result, "formula-v2", "invalid", expectedValidity: false),
             result => AssertResult(result, "calculation-trace", "valid", expectedValidity: true),
             result => AssertResult(result, "calculation-trace", "invalid", expectedValidity: false),
+            result => AssertResult(result, "build-calculation-trace", "valid", expectedValidity: true),
+            result => AssertResult(result, "build-calculation-trace", "invalid", expectedValidity: false),
             result => AssertResult(result, "formula-test-case", "valid", expectedValidity: true),
             result => AssertResult(result, "formula-test-case", "invalid", expectedValidity: false),
             result => AssertResult(result, "character-class", "valid", expectedValidity: true),
@@ -955,6 +957,41 @@ public sealed class SchemaContractValidatorTests
         }
 
         Assert.False(ValidateNode(repositoryRoot, "formula-v2", formula));
+    }
+
+    [Theory]
+    [InlineData("non-contiguous-positions")]
+    [InlineData("missing-dependency-source")]
+    [InlineData("duplicate-dependency-edge")]
+    public void BuildCalculationTraceContractRejectsIncoherentShapes(
+        string invalidShape)
+    {
+        var repositoryRoot = FindRepositoryRoot();
+        var trace = LoadFixture(repositoryRoot, "valid", "build-calculation-trace");
+        var sequence = trace["sequence"]!.AsArray();
+
+        switch (invalidShape)
+        {
+            case "non-contiguous-positions":
+                sequence[^1]!["position"] = 999;
+                break;
+            case "missing-dependency-source":
+                sequence[1]!["dependencies"]![0]!["sourceFormulaRef"]!["id"] =
+                    "formula-synthetic-missing";
+                break;
+            case "duplicate-dependency-edge":
+                sequence[2]!["dependencies"] = new JsonArray(
+                    sequence[2]!["dependencies"]![0]!.DeepClone(),
+                    sequence[2]!["dependencies"]![0]!.DeepClone());
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(
+                    nameof(invalidShape),
+                    invalidShape,
+                    "Unknown invalid build-calculation-trace shape.");
+        }
+
+        Assert.False(ValidateNode(repositoryRoot, "build-calculation-trace", trace));
     }
 
     [Theory]

@@ -11,5 +11,6 @@
   <ItemGroup>
     <ProjectReference Include="../../packages/application/MuOnline.BuildPlanner.Application/MuOnline.BuildPlanner.Application.csproj" />
     <ProjectReference Include="../../packages/domain/MuOnline.BuildPlanner.Domain/MuOnline.BuildPlanner.Domain.csproj" />
+    <ProjectReference Include="../../tools/validators/MuOnline.SchemaValidator/MuOnline.SchemaValidator.csproj" />
   </ItemGroup>
 </Project>

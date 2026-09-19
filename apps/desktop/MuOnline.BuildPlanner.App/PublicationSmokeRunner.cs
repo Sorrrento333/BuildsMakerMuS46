@@ -219,6 +219,9 @@ internal static class PublicationSmokeRunner
             ApprovedPublishedFormulaCaseCount: formulaVerification.ApprovedCaseCount,
             PublishedBuildEvaluationVerified: buildVerification.Verified,
             PublishedBuildFormulaCount: buildVerification.FormulaCount,
+            PublishedBuildCalculationTraceVerified: buildVerification.TraceVerified,
+            PublishedBuildCalculationTraceFormulaCount: buildVerification.FormulaCount,
+            PublishedBuildCalculationTraceDependencyCount: buildVerification.TraceDependencyCount,
             ItemCatalogVerified: itemVerification.CatalogVerified,
             ItemCatalogItemCount: itemVerification.ItemCount,
             ItemCatalogItemReferences: itemVerification.ItemReferences,
@@ -387,7 +390,106 @@ internal static class PublicationSmokeRunner
             }
         }
 
-        return new VerifiedCharacterBuild(true, evaluation.Formulas.Length);
+        var trace = BuildCalculationTraceFactory.Create(
+            evaluation,
+            "publication-smoke-build-calculation-trace");
+        var traceDependencyCount = VerifyBuildCalculationTrace(evaluation, trace);
+
+        return new VerifiedCharacterBuild(
+            true,
+            evaluation.Formulas.Length,
+            true,
+            traceDependencyCount);
+    }
+
+    private static int VerifyBuildCalculationTrace(
+        CharacterBuildEvaluation evaluation,
+        BuildCalculationTrace trace)
+    {
+        var expectedReferences = evaluation.Formulas
+            .Select(item => item.Formula.Reference)
+            .ToArray();
+        if (trace.SchemaVersion != BuildCalculationTrace.CurrentSchemaVersion ||
+            trace.Context.CharacterClassId !=
+                evaluation.State.ProgressionRequest.ClassId ||
+            trace.Context.EvolutionId !=
+                evaluation.State.ProgressionRequest.EvolutionId ||
+            trace.RulesetId != evaluation.State.Budget.RulesetId ||
+            trace.Sequence.Count != expectedReferences.Length)
+        {
+            throw new InvalidOperationException(
+                "The high-level build calculation trace did not reproduce the evaluated build context.");
+        }
+
+        var sequenceReferences = trace.Sequence
+            .Select(entry => $"{entry.FormulaRef.Id}@{entry.FormulaRef.Version}")
+            .ToHashSet(StringComparer.Ordinal);
+        var dependencyCount = 0;
+        for (var index = 0; index < expectedReferences.Length; index++)
+        {
+            var entry = trace.Sequence[index];
+            var expectedReference = expectedReferences[index];
+            if (entry.Position != index ||
+                entry.FormulaRef.Id != expectedReference.Id ||
+                entry.FormulaRef.Version != expectedReference.Version ||
+                !sequenceReferences.Contains(
+                    $"{entry.FormulaRef.Id}@{entry.FormulaRef.Version}"))
+            {
+                throw new InvalidOperationException(
+                    "The high-level build calculation trace did not reproduce the deterministic evaluation order.");
+            }
+
+            var formulaEvaluation = evaluation.Formulas[index];
+            if (entry.OutputId != formulaEvaluation.Formula.Output.Id ||
+                entry.OutputUnit != formulaEvaluation.Formula.Output.Unit ||
+                entry.RawOutput != formulaEvaluation.Calculation.RawOutput ||
+                entry.VisibleOutput != formulaEvaluation.Calculation.VisibleOutput)
+            {
+                throw new InvalidOperationException(
+                    $"The high-level trace diverged from the batch evaluation for " +
+                    $"'{expectedReference.Id}@{expectedReference.Version}'.");
+            }
+
+            var declaredInputs = formulaEvaluation.Formula.Inputs.Where(
+                input => input.Source.Kind == FormulaInputSourceKind.FormulaOutput)
+                .ToArray();
+            if (entry.Dependencies.Count != declaredInputs.Length)
+            {
+                throw new InvalidOperationException(
+                    $"The high-level trace exposed an incoherent dependency count for " +
+                    $"'{expectedReference.Id}@{expectedReference.Version}'.");
+            }
+
+            var dependencyEdges = new HashSet<string>(StringComparer.Ordinal);
+            for (var dependencyIndex = 0;
+                 dependencyIndex < declaredInputs.Length;
+                 dependencyIndex++)
+            {
+                var input = declaredInputs[dependencyIndex];
+                var dependency = entry.Dependencies[dependencyIndex];
+                var sourceReference = input.Source.FormulaReference!;
+                var sourceKey =
+                    $"{sourceReference.Id}@{sourceReference.Version}";
+                if (dependency.InputId != input.Id ||
+                    dependency.SourceFormulaRef.Id != sourceReference.Id ||
+                    dependency.SourceFormulaRef.Version != sourceReference.Version ||
+                    dependency.OutputStage !=
+                        (input.Source.OutputStage == FormulaOutputStage.Raw
+                            ? "RAW"
+                            : "VISIBLE") ||
+                    !sequenceReferences.Contains(sourceKey) ||
+                    !dependencyEdges.Add($"{dependency.InputId}@{sourceKey}"))
+                {
+                    throw new InvalidOperationException(
+                        $"The high-level trace exposed an incoherent dependency edge for " +
+                        $"input '{input.Id}' of '{expectedReference.Id}@{expectedReference.Version}'.");
+                }
+
+                dependencyCount++;
+            }
+        }
+
+        return dependencyCount;
     }
 
     private static ItemVerification VerifyPublishedItems()
@@ -937,7 +1039,9 @@ internal static class PublicationSmokeRunner
 
     private sealed record VerifiedCharacterBuild(
         bool Verified,
-        int FormulaCount);
+        int FormulaCount,
+        bool TraceVerified,
+        int TraceDependencyCount);
 
     private sealed record ItemVerification(
         bool CatalogVerified,

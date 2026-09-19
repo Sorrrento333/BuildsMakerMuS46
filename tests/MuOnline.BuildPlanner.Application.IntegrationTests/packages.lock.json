@@ -166,6 +166,18 @@
       },
       "muonline.buildplanner.domain": {
         "type": "Project"
+      },
+      "muonline.schemavalidator": {
+        "type": "Project",
+        "dependencies": {
+          "Humanizer.Core": "[3.0.10, )"
+        }
+      },
+      "Humanizer.Core": {
+        "type": "CentralTransitive",
+        "requested": "[3.0.10, )",
+        "resolved": "3.0.10",
+        "contentHash": "yZIhtw8sYuvsONzQbZxWpR60tMWYHXoo0DL6nyOqSFiU5POjBTSEyWFpTQtJEZuy+oqiYTXKXY/Mjx7KnqIQFw=="
       }
     }
   }

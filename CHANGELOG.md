@@ -21,6 +21,22 @@
 
 ### Added
 
+- Traza de cálculo de alto nivel implementada como artefacto del motor. Nuevo
+  contrato `build-calculation-trace` `1.0.0` en
+  `packages/schemas/v1/build-calculation-trace.schema.json` con fixture válido e
+  inválido en `packages/schemas/examples/{valid,invalid}` y gate semántico
+  (`MatchesBuildCalculationTraceSemantics`: posiciones contiguas `0..n-1`,
+  fuentes dentro de la secuencia y aristas únicas por entrada). El validador
+  pasa de 16 a 17 contratos y de 32 a 34 fixtures (harness fuente 2 × 34/34).
+  `BuildCalculationTrace` y `BuildCalculationTraceFactory`
+  (`packages/application/MuOnline.BuildPlanner.Application/Formulas`) emiten la
+  macro-traza desde `CharacterBuildEvaluation` con orden determinista, salidas
+  crudo/visible y dependencias directas por inputs declarados `FORMULA_OUTPUT`.
+  WPF agrega la sección "Traza de cálculo de alto nivel" y el smoke WPF verifica
+  la macro-traza en ambas fases (19 fórmulas, 3 aristas). Sin datos factuales
+  nuevos: ruleset `1.0.0`, motor `0.2.0` y dataset sin cambios; verificación
+  847/847 pruebas (43 validator, 58 motor, 719 Application, 27 Data).
+
 - Skills como modificador de cálculo materializadas como fórmulas derivadas.
   El axioma acotado del propietario (`EVD-0046`, `SKL-CLM-010`, 2026-09-19)
   autoriza los valores de efecto publicados por Fanz para siete skills; nacen

@@ -8,6 +8,7 @@ $contracts = @(
     @{ Name = 'formula'; SchemaDirectory = 'v1'; SchemaName = 'formula'; Version = '1.1.0' },
     @{ Name = 'formula-v2'; SchemaDirectory = 'v2'; SchemaName = 'formula'; Versions = @('2.0.0', '2.1.0') },
     @{ Name = 'calculation-trace'; SchemaDirectory = 'v1'; SchemaName = 'calculation-trace'; Version = '1.0.0' },
+    @{ Name = 'build-calculation-trace'; SchemaDirectory = 'v1'; SchemaName = 'build-calculation-trace'; Version = '1.0.0' },
     @{ Name = 'formula-test-case'; SchemaDirectory = 'v1'; SchemaName = 'formula-test-case'; Version = '1.0.0' },
     @{ Name = 'character-class'; SchemaDirectory = 'v1'; SchemaName = 'character-class'; Version = '1.0.0' },
     @{ Name = 'progression-rule'; SchemaDirectory = 'v1'; SchemaName = 'progression-rule'; Version = '1.0.0' },

@@ -65,7 +65,7 @@ La validación integral está implementada en .NET 10 bajo
 `tools/validators/MuOnline.SchemaValidator`, con `JsonSchema.Net 9.2.2`
 compilado reproduciblemente desde fuente MIT, validación de formatos y un
 registro de schemas aislado por ejecución. Las
-pruebas verifican que los dieciséis fixtures válidos sean aceptados, los dieciséis
+pruebas verifican que los diecisiete fixtures válidos sean aceptados, los diecisiete
 inválidos sean rechazados, que los veintiséis registros canónicos sean válidos y que
 los diez casos de progresión coincidan con su resultado esperado, además de que
 las dos reglas resuelvan exactamente sus siete casos positivos y de que el
@@ -137,7 +137,7 @@ reglaset, contenido habilitado, fórmulas y fuentes), `quest-rule` (series,
 etapas, prerrequisitos y elegibilidad con casos de prueba), `item` (definición
 canónica con módulos de opciones y sockets), `skill` (definiciones y buffs) y
 `scenario` (modalidad, objetivo, mapas y buffs externos). El inventario del
-validador pasa de once a dieciséis contratos y de veintidós a treinta y dos
+validador pasa de once a diecisiete contratos y de veintidós a treinta y cuatro
 fixtures.
 
 La definición canónica de item se materializa como `item.schema.json`; la

@@ -402,6 +402,19 @@ if (-not $initialReport.PublishedBuildEvaluationVerified -or
     throw "The published artifact did not reproduce the full-build grouped evaluation."
 }
 
+if (-not $initialReport.PublishedBuildCalculationTraceVerified -or
+    -not $replacementReport.PublishedBuildCalculationTraceVerified -or
+    $initialReport.PublishedBuildCalculationTraceFormulaCount -le 0 -or
+    $initialReport.PublishedBuildCalculationTraceFormulaCount -ne
+        $initialReport.PublishedBuildFormulaCount -or
+    $replacementReport.PublishedBuildCalculationTraceFormulaCount -ne
+        $initialReport.PublishedBuildCalculationTraceFormulaCount -or
+    $initialReport.PublishedBuildCalculationTraceDependencyCount -lt 0 -or
+    $replacementReport.PublishedBuildCalculationTraceDependencyCount -ne
+        $initialReport.PublishedBuildCalculationTraceDependencyCount) {
+    throw "The published artifact did not reproduce the high-level build calculation trace."
+}
+
 if (-not $initialReport.ItemCatalogVerified -or
     -not $replacementReport.ItemCatalogVerified -or
     $initialReport.ItemCatalogItemCount -ne 3 -or
@@ -456,6 +469,7 @@ Write-Output "Synthetic stat distribution: $($initialReport.SyntheticStatDistrib
 Write-Output "Reset configuration: $($initialReport.SyntheticResetCount) x $($initialReport.SyntheticPointsPerReset) = $($initialReport.SyntheticResetPoints)"
 Write-Output "Published formulas: $($initialReport.PublishedFormulaReferences -join ', '), $($initialReport.ApprovedPublishedFormulaCaseCount) contextual cases"
 Write-Output "Full build evaluation: $($initialReport.PublishedBuildFormulaCount) formulas grouped"
+Write-Output "High-level build calculation trace: $($initialReport.PublishedBuildCalculationTraceFormulaCount) formulas, $($initialReport.PublishedBuildCalculationTraceDependencyCount) dependency edges"
 Write-Output "Bounded item catalog: $($initialReport.ItemCatalogItemCount) items, equip evaluated: $($initialReport.SyntheticItemEquipVerified)"
 Write-Output "Build draft: $($initialReport.BuildDraftId), dataset $($initialReport.BuildDraftDatasetVersion)"
 Write-Output "Full build: $($initialReport.BuildId), $($initialReport.BuildStatCount) stats"

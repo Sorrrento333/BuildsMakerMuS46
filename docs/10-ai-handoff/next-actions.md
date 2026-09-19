@@ -13,21 +13,45 @@ La instrucción de ejecutar sólo la primera tarea pendiente continúa vigente.
 
 ## Prioridad inmediata
 
-1. Skills como modificador de cálculo implementado (2026-09-19): siete fórmulas
+1. Traza de cálculo de alto nivel implementada (2026-09-19): contrato
+   `build-calculation-trace` `1.0.0` con fixtures y gate semántico; emisión en
+   Application (`BuildCalculationTraceFactory`); WPF con la sección "Traza de
+   cálculo de alto nivel" y smoke en ambas fases (19 fórmulas, 3 aristas). Es un
+   artefacto del motor: no añade datos factuales.
+2. Skills como modificador de cálculo implementado (2026-09-19): siete fórmulas
    derivadas `2.1.0` por axioma `EVD-0046`; sin UI de skills ni `buffRef`.
    Ampliar efectos fuera de los siete exige nueva evidencia Season 4 o una nueva
    decisión del propietario. `buffRef` sigue omitido.
-2. Catálogo acotado de skills materializado (2026-09-17): ocho `SkillDefinition`
+3. Catálogo acotado de skills materializado (2026-09-17): ocho `SkillDefinition`
    `PUBLISHED` del axioma `EVD-0045` contra `skill.schema.json`, con inventario
    canónico 119 → 127 y dataset `2026-09-17.1`.
-3. Consumo acotado del catálogo de ítems implementado (`EquipItemUseCase`,
+4. Consumo acotado del catálogo de ítems implementado (`EquipItemUseCase`,
    selector de ranura/ítem en WPF y smoke): valida clase y `requiredStats` en
    +0, sin bonificaciones ni instancia equipada.
-4. Alternativa documentada: ampliar UC-04 (bonificaciones ATK/DEF,
+5. Alternativa documentada: ampliar UC-04 (bonificaciones ATK/DEF,
    `requiredLevel`, progresión de `requiredStats`, sockets) exige nueva
    evidencia Season 4 o una nueva decisión del propietario.
-5. Alternativa documentada: master buys y pantallas restantes del flujo, sin
+6. Alternativa documentada: master buys y pantallas restantes del flujo, sin
    contrato factual todavía.
+
+## Traza de cálculo de alto nivel — implementado (2026-09-19)
+
+- Nuevo contrato `build-calculation-trace` `1.0.0` en
+  `packages/schemas/v1/build-calculation-trace.schema.json`, fixture válido e
+  inválido en `packages/schemas/examples/{valid,invalid}` y registro en el
+  validador (16 → 17 contratos; 32 → 34 fixtures).
+- Gate semántico `MatchesBuildCalculationTraceSemantics`: posiciones contiguas
+  `0..n-1`, fuentes de dependencia dentro de la secuencia y aristas únicas por
+  entrada.
+- `BuildCalculationTrace` y `BuildCalculationTraceFactory` en
+  `packages/application/MuOnline.BuildPlanner.Application/Formulas` emiten la
+  macro-traza desde `CharacterBuildEvaluation`: orden determinista, salidas crudo/
+  visible, unidades y dependencias directas a partir de inputs declarados
+  `FORMULA_OUTPUT` (etapa `RAW`/`VISIBLE`). WPF la muestra en
+  "Traza de cálculo de alto nivel".
+- Verificación: 847/847 pruebas; `Test-SchemaStructure` 17/34; harness fuente
+  2 × 34/34; smoke WPF `win-x64` PASS con `TraceVerified` en ambas fases (19
+  fórmulas, 3 aristas). Sin datos factuales nuevos.
 
 ## Skills como modificador de cálculo — implementado (2026-09-19)
 
@@ -474,6 +498,6 @@ como axiomas del ruleset trazándose exclusivamente desde `EVD-0021` y
 ## Primera acción concreta
 
 Confirmar con el mantenedor el primer candidato restante (master buys y
-pantallas restantes del flujo, contratos fácticos de `EVD-0026` sin motor, o
-trazas de cálculo de alto nivel) y actualizar esta documentación y
-`CHANGELOG.md` al cerrarlo.
+pantallas restantes del flujo, o contratos fácticos de `EVD-0026` sin motor) y
+actualizar esta documentación y `CHANGELOG.md` al cerrarlo. La traza de cálculo
+de alto nivel, tercer candidato, quedó cerrada el 2026-09-19.

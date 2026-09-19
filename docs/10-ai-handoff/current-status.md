@@ -2328,9 +2328,9 @@
   pruebas: `ruleset` (reglaset con contenido habilitado, fórmulas y fuentes),
   `quest-rule` (series, etapas, prerrequisitos, elegibilidad y casos de prueba),
   `item` (definición canónica con módulos de opciones y sockets), `skill`
-  (definiciones activas/pasivas/buffs) y `scenario` (modalidad, objetivo, mapas
-  y buffs externos). El inventario pasa de once a dieciséis contratos y de
-  veintidós a treinta y dos fixtures, sin añadir datos factuales al ruleset.
+(definiciones activas/pasivas/buffs) y `scenario` (modalidad, objetivo, mapas
+   y buffs externos). El inventario pasa de once a diecisiete contratos y de
+   veintidós a treinta y cuatro fixtures, sin añadir datos factuales al ruleset.
 - El contrato `item` se define como `ItemDefinition` canónico; la instancia con
   nivel, opciones y sockets elegidos permanece como dato del usuario en
   `build.schema.json`.
@@ -2363,9 +2363,17 @@
   evolución no ofrecida, los stats no alcanzables o ajenos a la clase. Data
   implementa `SqliteBuildRepository` con la migración 2 `create_builds`,
   reemplazo atómico por ID y contención de escritura con código estable. WPF
-  compone el flujo de guardado/carga por ID. No se incorporan JSON factuales ni
-  se reutiliza la caché como verdad: ruleset `1.0.0`, motor `0.2.0` y dataset
-  `2026-07-30.3` permanecen sin cambios.
+compone el flujo de guardado/carga por ID. No se incorporan JSON factuales ni
+   se reutiliza la caché como verdad: ruleset `1.0.0`, motor `0.2.0` y dataset
+   `2026-07-30.3` permanecen sin cambios.
+- Traza de cálculo de alto nivel cerrada: `build-calculation-trace.schema.json`
+  `1.0.0` con fixtures sintéticos y gate semántico (posiciones contiguas,
+  fuentes dentro de la secuencia y aristas únicas); `BuildCalculationTrace`/
+  `BuildCalculationTraceFactory` en Application emiten el documento desde
+  `CharacterBuildEvaluation` con orden determinista, salidas y dependencias
+  directas. WPF muestra la sección "Traza de cálculo de alto nivel"; el smoke lo
+  verifica en ambas fases. El inventario pasa de dieciséis a diecisiete contratos
+  y de treinta y dos a treinta y cuatro fixtures, sin añadir datos factuales.
 
 ## No iniciado
 
@@ -2382,7 +2390,39 @@
 - El canal público de actualización y firma continúa como decisión posterior de
   distribución.
 
-## Verificación más reciente — 2026-09-19 (skills como modificador de cálculo)
+## Verificación más reciente — 2026-09-19 (traza de cálculo de alto nivel)
+
+- Contrato nuevo `build-calculation-trace` `1.0.0` en
+  `packages/schemas/v1/build-calculation-trace.schema.json`: documento de nivel
+  build con `context`, `sequence` ordenada (posición, `formulaRef` `id@version`,
+  `outputId`/`outputUnit`, crudo y visible) y aristas `dependencies` directas
+  entre fórmulas (`inputId`, `sourceFormulaRef`, `outputStage` `RAW`
+  o `VISIBLE`). Fixtures sintéticos válido e inválido en
+  `packages/schemas/examples/{valid,invalid}`.
+- Gate semántico `MatchesBuildCalculationTraceSemantics`: posiciones contiguas
+  `0..n-1`, toda `sourceFormulaRef` dentro de la secuencia y aristas únicas
+  `(inputId, sourceFormulaRef)` por entrada.
+- `BuildCalculationTrace`/`BuildCalculationTraceFactory` (Application) serializan
+  la macro-traza desde `CharacterBuildEvaluation` con JSON determinista que
+  respeta el contrato; las dependencias son los inputs declarados de cada
+  fórmula con origen `FORMULA_OUTPUT`. WPF la muestra como "Traza de cálculo de
+  alto nivel" (orden, salidas y dependencias directas).
+- Registro y conteos actualizados: validador 16 → 17 contratos y 32 → 34
+  fixtures (`AllVersionedFixturesMatchTheirExpectedValidity`),
+  `Test-SchemaStructure` 17/34 y harness fuente 2 × 34/34; nuevos shapes
+  rechazados de la traza (`non-contiguous-positions`,
+  `missing-dependency-source`, `duplicate-dependency-edge`).
+- El smoke WPF verifica la macro-traza en ambas fases (19 fórmulas, 3 aristas;
+  `TraceVerified` con paridad de orden, salidas y dependencias) y PS1 asevera la
+  verificación; el informe gana `PublishedBuildCalculationTrace{Verified,
+  FormulaCount, DependencyCount}`.
+- Verificación PASS: build Release 0/0; 847/847 pruebas (43 validator, 58 motor,
+  719 Application, 27 Data); `Test-SchemaStructure` 17/34; fuente 2 × 34/34;
+  smoke WPF `win-x64` (SQLite `3.53.3`, 1369 archivos, 150.638.938 bytes, 946
+  archivos del ruleset, 456 casos, dataset `2026-09-17.1`). Sin datos factuales
+  nuevos: ruleset `1.0.0`, motor `0.2.0` y dataset sin cambios.
+
+## Verificación anterior — 2026-09-19 (skills como modificador de cálculo)
 
 - Vertical "skill como modificador de cálculo" implementada por axioma acotado
   del propietario (`EVD-0046`, "Approve as drafted"), sin `buffRef` ni UI de

@@ -796,6 +796,33 @@ public partial class MainWindow : Window
                 $"(crudo {item.Calculation.RawOutput})"));
         }
 
+        var trace = BuildCalculationTraceFactory.Create(
+            evaluation,
+            "wpf-build-calculation-trace");
+        lines.Add(string.Empty);
+        lines.Add("== Traza de cálculo de alto nivel ==");
+        lines.Add(
+            $"Orden determinista ({trace.SchemaVersion}): " +
+            $"{trace.Sequence.Count} fórmulas, " +
+            $"{trace.Sequence.Sum(entry => entry.Dependencies.Count)} dependencias.");
+        lines.AddRange(trace.Sequence.Select(entry =>
+        {
+            var prefix =
+                $"{entry.Position + 1}. {entry.FormulaRef.Id}@{entry.FormulaRef.Version} → " +
+                $"{entry.OutputId} [{entry.OutputUnit}] = {entry.VisibleOutput} " +
+                $"(crudo {entry.RawOutput})";
+            if (entry.Dependencies.Count == 0)
+            {
+                return prefix;
+            }
+
+            return prefix + " | depende de: " + string.Join(
+                ", ",
+                entry.Dependencies.Select(dependency =>
+                    $"{dependency.InputId}←{dependency.SourceFormulaRef.Id}" +
+                    $"@{dependency.SourceFormulaRef.Version}:{dependency.OutputStage}"));
+        }));
+
         return string.Join(Environment.NewLine, lines);
     }
 
