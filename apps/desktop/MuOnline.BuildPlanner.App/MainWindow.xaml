@@ -193,10 +193,10 @@
                      VerticalScrollBarVisibility="Auto"
                      AutomationProperties.Name="Resultado de distribución" />
 
-            <GroupBox Grid.Row="12"
+            <GroupBox Grid.Row="19"
                       Grid.ColumnSpan="2"
                       Margin="0,24,0,0"
-                      Header="Atributo derivado publicado">
+                      Header="Toda la informacion derivada (dmg, dmg rate, def, def rate, speed...)" AutomationProperties.HelpText="Resultado completo de atributos derivados">
                 <Grid Margin="12">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
