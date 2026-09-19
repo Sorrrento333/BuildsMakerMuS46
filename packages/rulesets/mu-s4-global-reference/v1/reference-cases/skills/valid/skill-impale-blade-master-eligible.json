@@ -1,0 +1,10 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "skill-impale-blade-master-eligible",
+  "rulesetId": "mu-s4-global-reference",
+  "skillId": "skill-impale",
+  "evolutionId": "evolution-blade-master",
+  "finalLevel": 48,
+  "expectedErrorCode": null,
+  "notes": "Eligibilidad aprobada: nivel final 48 supera requiredLevel 28; evolution-blade-master está en allowedEvolutionIds."
+}

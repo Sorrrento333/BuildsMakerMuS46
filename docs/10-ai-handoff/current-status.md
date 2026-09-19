@@ -2382,7 +2382,37 @@
 - El canal público de actualización y firma continúa como decisión posterior de
   distribución.
 
-## Verificación más reciente — 2026-09-17 (catálogo acotado de skills materializado)
+## Verificación más reciente — 2026-09-19 (consumo acotado del catálogo de skills)
+
+- `SkillDefinition` (Domain) y `SkillCatalog`/`JsonSkillCatalogSnapshotReader`
+  (Application) leen `skills/*.json` exigiendo schema `1.0.0`, IDs únicos, un
+  único ruleset, `requiredLevel >= 1`, `allowedEvolutionIds` no vacíos y sin
+  duplicados y `status` `PUBLISHED` (fail-closed; un directorio vacío es
+  `SnapshotInvalid`).
+- `LearnSkillUseCase` valida la elegibilidad de aprendizaje (evolución +
+  `requiredLevel`) con códigos estables `skill-learn-skill-not-found`,
+  `skill-learn-evolution-not-allowed` y `skill-learn-requirements-not-met`;
+  `FinalLevel` es el nivel ya validado por el presupuesto y no se aplican
+  reducciones. El `buffRef` de `kind BUFF` queda diferido y no se interpreta.
+- Reference cases `reference-cases/skills/{valid,invalid}` y 12 pruebas
+  (`SkillApplicationIntegrationTests`) reproducen 3 casos aprobados y 3 rechazos
+  y fallan en cerrado ante skill no publicada, ruleset mixto, directorio
+  ausente, `requiredLevel` no positivo y `allowedEvolutionIds` vacío.
+- Se corrigió el caso válido `skill-swell-life-dark-knight-eligible.json`
+  (antes `skill-swell-life-dark-wizard-eligible`), inconsistente con la familia
+  publicada (Dark Knight) de `skill-swell-life`: queda con `evolutionId`
+  `evolution-dark-knight` y `finalLevel` 122.
+- WPF añade un selector de skill por evolución y resultado de aprendizaje; el
+  smoke WPF exige el catálogo de 8 skills y una evaluación de aprendizaje
+  resuelta (`skill-impale`/`evolution-dark-knight`/28).
+- Verificación PASS: build Release 0/0; 809/809 pruebas (40 validator, 58 motor,
+  684 Application, 27 Data); `Test-SchemaStructure` 16/32; smoke WPF `win-x64`
+  (SQLite `3.53.3`, 1325 archivos, 150.475.382 bytes, 902 archivos del ruleset,
+  dataset `2026-09-17.1`).
+- Diseño en `docs/04-domain/skills-consumption-design.md`; ruleset `1.0.0`,
+  motor `0.2.0` y dataset `2026-09-17.1` sin cambios; `buffRef` sigue diferido.
+
+## Verificación anterior — 2026-09-17 (catálogo acotado de skills materializado)
 
 - Ocho `SkillDefinition` `PUBLISHED` `VERIFIED` en
   `packages/rulesets/mu-s4-global-reference/v1/skills/` (`skill-impale`,

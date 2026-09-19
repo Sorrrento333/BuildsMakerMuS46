@@ -13,18 +13,42 @@ La instrucción de ejecutar sólo la primera tarea pendiente continúa vigente.
 
 ## Prioridad inmediata
 
-1. Catálogo acotado de skills materializado (2026-09-17): ocho `SkillDefinition`
+1. Consumo acotado del catálogo de skills implementado (2026-09-19):
+   `LearnSkillUseCase`, selector de skill por evolución en WPF y smoke: valida
+   evolución y `requiredLevel`, con `buffRef` diferido.
+2. Catálogo acotado de skills materializado (2026-09-17): ocho `SkillDefinition`
    `PUBLISHED` del axioma `EVD-0045` contra `skill.schema.json`, con inventario
-   canónico 119 → 127 y dataset `2026-09-17.1`. Siguientes verticales: consumo de
-   skills y contrato de buff (`buffRef`).
-2. Consumo acotado del catálogo de ítems implementado (`EquipItemUseCase`,
+   canónico 119 → 127 y dataset `2026-09-17.1`. Siguiente vertical: contrato de
+   buff (`buffRef`).
+3. Consumo acotado del catálogo de ítems implementado (`EquipItemUseCase`,
    selector de ranura/ítem en WPF y smoke): valida clase y `requiredStats` en
    +0, sin bonificaciones ni instancia equipada.
-3. Alternativa documentada: ampliar UC-04 (bonificaciones ATK/DEF,
+4. Alternativa documentada: ampliar UC-04 (bonificaciones ATK/DEF,
    `requiredLevel`, progresión de `requiredStats`, sockets) exige nueva
    evidencia Season 4 o una nueva decisión del propietario.
-4. Alternativa documentada: master buys y pantallas restantes del flujo, sin
+5. Alternativa documentada: master buys y pantallas restantes del flujo, sin
    contrato factual todavía.
+
+## Consumo acotado del catálogo de skills — implementado (2026-09-19)
+
+- `SkillDefinition` en Domain y `SkillCatalog`/`JsonSkillCatalogSnapshotReader`
+  en Application leen `skills/*.json` (schema `1.0.0`, `PUBLISHED`, un ruleset,
+  `requiredLevel >= 1`, `allowedEvolutionIds` no vacíos y sin duplicados).
+- `LearnSkillUseCase` valida la elegibilidad de aprendizaje por evolución y
+  `requiredLevel` con códigos estables `skill-learn-skill-not-found`,
+  `skill-learn-evolution-not-allowed` y `skill-learn-requirements-not-met`;
+  `FinalLevel` es el nivel ya validado por el presupuesto y el `buffRef` de
+  `kind BUFF` queda diferido.
+- Reference cases `reference-cases/skills/{valid,invalid}` y
+  `SkillApplicationIntegrationTests` (12 pruebas) reproducen 3 casos aprobados y
+  3 rechazos y fallan en cerrado ante skill no publicada, ruleset mixto,
+  directorio ausente, `requiredLevel` no positivo y `allowedEvolutionIds` vacío.
+- Se corrigió el caso válido `skill-swell-life-dark-knight-eligible` (antes
+  `...-dark-wizard-eligible`) a la familia Dark Knight publicada de
+  `skill-swell-life` (`evolution-dark-knight`, `finalLevel` 122).
+- WPF añade el selector de skill por evolución y el resultado de aprendizaje; el
+  smoke exige el catálogo de 8 skills y una evaluación de aprendizaje.
+- Diseño en `docs/04-domain/skills-consumption-design.md`.
 
 ## Catálogo acotado de skills — materializado (2026-09-17)
 

@@ -30,6 +30,8 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
@@ -193,7 +195,7 @@
                      VerticalScrollBarVisibility="Auto"
                      AutomationProperties.Name="Resultado de distribución" />
 
-            <GroupBox Grid.Row="19"
+            <GroupBox Grid.Row="21"
                       Grid.ColumnSpan="2"
                       Margin="0,24,0,0"
                       Header="Toda la informacion derivada (dmg, dmg rate, def, def rate, speed...)" AutomationProperties.HelpText="Resultado completo de atributos derivados">
@@ -423,6 +425,38 @@
                      TextWrapping="Wrap"
                      VerticalScrollBarVisibility="Auto"
                      AutomationProperties.Name="Resultado de elegibilidad de equipado" />
+
+            <GroupBox Grid.Row="19"
+                      Grid.ColumnSpan="2"
+                      Margin="0,24,0,0"
+                      Header="Aprendizaje de skills (catálogo acotado)">
+                <Grid Margin="12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="180" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock VerticalAlignment="Center"
+                               Text="Skill" />
+                    <ComboBox x:Name="SkillComboBox"
+                              Grid.Column="1"
+                              MinHeight="30"
+                              DisplayMemberPath="DisplayName"
+                              SelectionChanged="SkillSelectionChanged"
+                              AutomationProperties.Name="Skill del catálogo acotado" />
+                </Grid>
+            </GroupBox>
+
+            <TextBox x:Name="SkillResultTextBox"
+                     Grid.Row="20"
+                     Grid.ColumnSpan="2"
+                     Margin="0,16,0,0"
+                     Padding="12"
+                     MinHeight="72"
+                     IsReadOnly="True"
+                     TextWrapping="Wrap"
+                     VerticalScrollBarVisibility="Auto"
+                     AutomationProperties.Name="Resultado de aprendizaje de skill" />
         </Grid>
     </ScrollViewer>
 </Window>

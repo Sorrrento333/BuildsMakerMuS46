@@ -6,11 +6,13 @@ using MuOnline.BuildPlanner.Application.Builds;
 using MuOnline.BuildPlanner.Application.Formulas;
 using MuOnline.BuildPlanner.Application.Items;
 using MuOnline.BuildPlanner.Application.Progression;
+using MuOnline.BuildPlanner.Application.Skills;
 using MuOnline.BuildPlanner.Application.Stats;
 using MuOnline.BuildPlanner.Data;
 using MuOnline.BuildPlanner.Domain.Formulas;
 using MuOnline.BuildPlanner.Domain.Items;
 using MuOnline.BuildPlanner.Domain.Progression;
+using MuOnline.BuildPlanner.Domain.Skills;
 using MuOnline.BuildPlanner.Domain.Stats;
 
 namespace MuOnline.BuildPlanner.App;
@@ -42,6 +44,7 @@ internal static class PublicationSmokeRunner
         var formulaVerification = VerifyPublishedCharacterFormulas();
         var buildVerification = VerifyPublishedCharacterBuild(progressionVerification);
         var itemVerification = VerifyPublishedItems();
+        var skillVerification = VerifyPublishedSkills();
         var buildDraftServices = PublishedBuildDraftServices.Create(
             options.DataDirectory,
             [SyntheticMigration]);
@@ -59,6 +62,7 @@ internal static class PublicationSmokeRunner
                 formulaVerification,
                 buildVerification,
                 itemVerification,
+                skillVerification,
                 buildDraftServices),
             PublicationSmokePhase.VerifyUpdate => VerifyUpdate(
                 databasePath,
@@ -68,6 +72,7 @@ internal static class PublicationSmokeRunner
                 formulaVerification,
                 buildVerification,
                 itemVerification,
+                skillVerification,
                 buildDraftServices),
             _ => throw new ArgumentOutOfRangeException(nameof(options)),
         };
@@ -81,6 +86,7 @@ internal static class PublicationSmokeRunner
         PublishedFormulaVerification formulaVerification,
         VerifiedCharacterBuild buildVerification,
         ItemVerification itemVerification,
+        SkillVerification skillVerification,
         PublishedBuildDraftServices buildDraftServices)
     {
         if (!File.Exists(databasePath) || File.Exists(backupPath))
@@ -129,6 +135,7 @@ internal static class PublicationSmokeRunner
             formulaVerification,
             buildVerification,
             itemVerification,
+            skillVerification,
             buildDraftServices,
             persistedBuildCount);
     }
@@ -141,6 +148,7 @@ internal static class PublicationSmokeRunner
         PublishedFormulaVerification formulaVerification,
         VerifiedCharacterBuild buildVerification,
         ItemVerification itemVerification,
+        SkillVerification skillVerification,
         PublishedBuildDraftServices buildDraftServices)
     {
         if (!File.Exists(databasePath) || !File.Exists(backupPath))
@@ -165,6 +173,7 @@ internal static class PublicationSmokeRunner
             formulaVerification,
             buildVerification,
             itemVerification,
+            skillVerification,
             buildDraftServices,
             persistedBuildCount);
     }
@@ -179,6 +188,7 @@ internal static class PublicationSmokeRunner
         PublishedFormulaVerification formulaVerification,
         VerifiedCharacterBuild buildVerification,
         ItemVerification itemVerification,
+        SkillVerification skillVerification,
         PublishedBuildDraftServices buildDraftServices,
         int persistedBuildCount) => new(
             Success: true,
@@ -223,6 +233,10 @@ internal static class PublicationSmokeRunner
             ItemCatalogItemCount: itemVerification.ItemCount,
             ItemCatalogItemReferences: itemVerification.ItemReferences,
             SyntheticItemEquipVerified: itemVerification.SyntheticEquipVerified,
+            SkillCatalogVerified: skillVerification.CatalogVerified,
+            SkillCatalogSkillCount: skillVerification.SkillCount,
+            SkillCatalogSkillReferences: skillVerification.SkillReferences,
+            SyntheticSkillLearnVerified: skillVerification.SyntheticLearnVerified,
             BuildDraftPersistenceVerified: true,
             BuildDraftId: BuildDraftId,
             BuildDraftDatasetVersion:
@@ -445,6 +459,65 @@ internal static class PublicationSmokeRunner
             ItemCount: catalog.Items.Count,
             ItemReferences: references,
             SyntheticEquipVerified: true);
+    }
+
+    private static SkillVerification VerifyPublishedSkills()
+    {
+        var expectedSkills = new Dictionary<string, SkillKind>(StringComparer.Ordinal)
+        {
+            ["skill-impale"] = SkillKind.Active,
+            ["skill-twisting-slash"] = SkillKind.Active,
+            ["skill-swell-life"] = SkillKind.Buff,
+            ["skill-death-stab"] = SkillKind.Active,
+            ["skill-rageful-blow"] = SkillKind.Active,
+            ["skill-strike-of-destruction"] = SkillKind.Active,
+            ["skill-penetration"] = SkillKind.Active,
+            ["skill-multi-shot"] = SkillKind.Active,
+        };
+        var catalog = PublishedProgressionRuleset.Skills;
+        var references = catalog.Skills
+            .Select(skill => skill.Id)
+            .Order(StringComparer.Ordinal)
+            .ToArray();
+        if (catalog.RulesetId != PublishedProgressionRuleset.Catalog.RulesetId ||
+            references.Length != expectedSkills.Count ||
+            !references.SequenceEqual(expectedSkills.Keys.Order(StringComparer.Ordinal)))
+        {
+            throw new InvalidOperationException(
+                "The published bounded skill catalog did not match the approved skill set.");
+        }
+
+        foreach (var skill in catalog.Skills)
+        {
+            if (skill.Status != SkillDefinitionStatus.Published ||
+                skill.RulesetId != catalog.RulesetId ||
+                skill.Kind != expectedSkills[skill.Id] ||
+                skill.AllowedEvolutionIds.Count == 0)
+            {
+                throw new InvalidOperationException(
+                    $"Published skill '{skill.Id}' did not match its approved bounded definition.");
+            }
+        }
+
+        var learnUseCase = PublishedProgressionRuleset.CreateLearnSkillUseCase();
+        var result = learnUseCase.Execute(new LearnSkillRequest(
+            "evolution-dark-knight",
+            28,
+            "skill-impale"));
+        if (result.SkillId != "skill-impale" ||
+            !result.AllowedEvolutionIds.Contains(
+                "evolution-dark-knight",
+                StringComparer.Ordinal))
+        {
+            throw new InvalidOperationException(
+                "The published bounded skill evaluation did not resolve the approved learning case.");
+        }
+
+        return new SkillVerification(
+            CatalogVerified: true,
+            SkillCount: catalog.Skills.Count,
+            SkillReferences: references,
+            SyntheticLearnVerified: true);
     }
 
     private static ProgressionVerificationResult VerifyPublishedProgressionRuleset()
@@ -944,6 +1017,12 @@ internal static class PublicationSmokeRunner
         int ItemCount,
         string[] ItemReferences,
         bool SyntheticEquipVerified);
+
+    private sealed record SkillVerification(
+        bool CatalogVerified,
+        int SkillCount,
+        string[] SkillReferences,
+        bool SyntheticLearnVerified);
 
     private sealed record PublishedFormulaReferenceCase(
         string Id,
