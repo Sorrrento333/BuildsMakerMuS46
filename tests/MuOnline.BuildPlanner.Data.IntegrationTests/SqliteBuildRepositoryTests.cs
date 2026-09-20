@@ -317,7 +317,8 @@ public sealed class SqliteBuildRepositoryTests
             },
             ["quest-synthetic"],
             2,
-            100);
+            100,
+            []);
 
     private static T ExecuteScalar<T>(SqliteConnection connection, string sql)
     {

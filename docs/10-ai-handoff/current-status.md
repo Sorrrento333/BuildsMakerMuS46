@@ -2374,13 +2374,27 @@ compone el flujo de guardado/carga por ID. No se incorporan JSON factuales ni
   directas. WPF muestra la sección "Traza de cálculo de alto nivel"; el smoke lo
   verifica en ambas fases. El inventario pasa de dieciséis a diecisiete contratos
   y de treinta y dos a treinta y cuatro fixtures, sin añadir datos factuales.
+- Instancia equipada sin bonificaciones cerrada: `build-draft.schema.json` y
+  `build.schema.json` avanzan a `1.2.0` con el array `equipment` de
+  `{ itemId, itemVersion, level }`. `BuildEquipmentEntry`/
+  `BuildEquipmentValidator` y los códigos `equipment-*` de
+  `BuildErrorCodes`/`BuildDraftErrorCodes` validan en
+  `SaveBuildDraftUseCase` y revalidan en `LoadBuildDraftUseCase` y
+  `LoadBuildUseCase` contra el catálogo publicado; `SaveBuildUseCase` promueve el
+  equipo del draft; `EquipItemRequest/Result` ganan `Level`/`MaxItemLevel`
+  (`item-equip-level-out-of-range`). WPF añade la sección "Equipo" y el smoke
+  verifica el household equipado (`item-kris` nivel 15). La migración de carga
+  conserva `1.1.0+1.1.0` y legacy `1.0.0+1.0.0`; `BuildDraftStatDistribution`
+  permanece en `1.1.0`. Diseño en
+  `docs/04-domain/equipped-instance-design.md`. No incorpora datos factuales
+  nuevos: ruleset `1.0.0`, motor `0.2.0` y dataset `2026-09-17.1` sin cambios.
 
 ## No iniciado
 
 - Master buys y pantallas restantes del flujo de la Calculadora, pendientes de
   sus contratos factuales; no pueden inventarse.
 - Ampliación de UC-04 (bonificaciones ATK/DEF, `requiredLevel`, progresión de
-  `requiredStats`, sockets, instancia equipada): requiere nueva evidencia Season
+  `requiredStats`, sockets): requiere nueva evidencia Season
   4 o una nueva decisión del propietario; no puede inferirse.
 - Consumo de skills y contrato de buff (`buffRef`): pendientes de verticales
   futuras tras la materialización del catálogo acotado.
@@ -2390,7 +2404,39 @@ compone el flujo de guardado/carga por ID. No se incorporan JSON factuales ni
 - El canal público de actualización y firma continúa como decisión posterior de
   distribución.
 
-## Verificación más reciente — 2026-09-19 (traza de cálculo de alto nivel)
+## Verificación más reciente — 2026-09-19 (instancia equipada sin bonificaciones)
+
+- `BuildEquipmentEntry` (`{ itemId, itemVersion, level }`) serializa como
+  `equipment` en `CharacterBuild`/`BuildDraft` `1.2.0` (`CurrentSchemaVersion`
+  actualizado, `PreviousSchemaVersion` `1.1.0`); `BuildDraftRuntimeContext` gana
+  `ItemCatalog` y `BuildDraftStatDistribution` permanece en `1.1.0`.
+- `BuildEquipmentValidator` valida contra `ItemCatalog` (definición `PUBLISHED`
+  única, `itemVersion` exacta, `allowedClassIds`, `0 <= level <= MaxItemLevel`,
+  sin duplicados y `requiredStats` +0 sobre stats finales, que exigen base stats)
+  y lanza `BuildEquipmentValidationException`; los use cases mapean al prefijo
+  `build-equipment-*`/`build-draft-equipment-*`.
+- Guardado: `SaveBuildDraftUseCase` acepta `Equipment?` y valida sólo cuando hay
+  equipo; `SaveBuildUseCase` promueve `draft.Equipment` con guard `is null`.
+  Carga: `LoadBuildDraftUseCase`/`LoadBuildUseCase` revalidan contra el snapshot
+  y normatizan `1.1.0+1.1.0` → `Equipment = []` y legacy `1.0.0+1.0.0` con
+  defaults. `CharacterBuild`/`BuildDraft` protegidos con `Equipment ?? []`.
+- WPF: sección central "Equipo" (nivel, «Equipar/Desequipar seleccionado`,
+  `EquippedItemsListBox` e indicador de estado); `_equippedItems` se limpia al
+  cambiar clase y se rellena en `ApplyLoadedDraft`/`ApplyLoadedBuild`; el save
+  pasa `_equippedItems.ToArray()`.
+- Smoke: `publication-smoke-equip-draft`/`publication-smoke-equip-build` con
+  `class-dark-knight` nivel 7 (EB 30, agility 7 → 27 final, restante 23) y
+  `item-kris` `1.0.0` nivel 15; `PersistedBuildCount` pasa a 2; el informe gana
+  `EquippedBuild{Draft,Build}PersistenceVerified`,
+  `EquippedBuildDraftId`, `EquippedBuildItem{Verified,Id,Version,Level}`.
+- Verificación PASS: build Release 0/0; 858/858 pruebas (43 validator, 58 motor,
+  730 Application, 27 Data); `Test-SchemaStructure` 17/34; smoke WPF `win-x64`
+  PASS (SQLite `3.53.3`, 1369 archivos, 150.666.306 bytes, 946 archivos del
+  ruleset, 456 casos contextuales, 3 ítems con equipado verificado
+  (`item-kris` nivel 15), 2 builds listados, dataset `2026-09-17.1`). Sin datos
+  factuales nuevos.
+
+## Verificación anterior — 2026-09-19 (traza de cálculo de alto nivel)
 
 - Contrato nuevo `build-calculation-trace` `1.0.0` en
   `packages/schemas/v1/build-calculation-trace.schema.json`: documento de nivel

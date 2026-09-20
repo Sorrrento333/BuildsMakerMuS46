@@ -1,7 +1,9 @@
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using MuOnline.BuildPlanner.Application.Builds;
+using MuOnline.BuildPlanner.Application.Items;
 using MuOnline.BuildPlanner.Application.Progression;
+using MuOnline.BuildPlanner.Domain.Items;
 using MuOnline.BuildPlanner.Domain.Progression;
 using Xunit;
 
@@ -185,7 +187,7 @@ public sealed class BuildDraftApplicationIntegrationTests
                 TestContext.Current.CancellationToken);
         var legacy = current with
         {
-            SchemaVersion = BuildDraft.PreviousSchemaVersion,
+            SchemaVersion = BuildDraftStatDistribution.PreviousSchemaVersion,
             ResetInputs = null!,
             StatDistribution = current.StatDistribution with
             {
@@ -206,6 +208,180 @@ public sealed class BuildDraftApplicationIntegrationTests
         Assert.Equal(0, loaded.StatDistribution.ResetPoints);
         Assert.Equal(10, loaded.StatDistribution.TotalDistributablePoints);
         Assert.Equal(3, loaded.StatDistribution.RemainingPoints);
+    }
+
+    [Fact]
+    public async Task LoadUpgradesPreviousVersionDraftToEmptyEquipment()
+    {
+        var repository = new InMemoryBuildDraftRepository();
+        var current = await new SaveBuildDraftUseCase(repository, RuntimeContext)
+            .ExecuteAsync(
+                CreateSaveRequest("draft-upgrade"),
+                TestContext.Current.CancellationToken);
+        var previous = current with
+        {
+            SchemaVersion = BuildDraft.PreviousSchemaVersion,
+        };
+        await repository.SaveAsync(previous, TestContext.Current.CancellationToken);
+
+        var loaded = await new LoadBuildDraftUseCase(repository, RuntimeContext)
+            .ExecuteAsync(previous.Id, TestContext.Current.CancellationToken);
+
+        Assert.Equal(BuildDraft.CurrentSchemaVersion, loaded.SchemaVersion);
+        Assert.Equal(
+            previous.StatDistribution.Allocations,
+            loaded.StatDistribution.Allocations);
+        Assert.Empty(loaded.Equipment);
+    }
+
+    [Fact]
+    public async Task SaveAndLoadRoundTripsInstancedEquipment()
+    {
+        var context = CreateEquipmentContext();
+        var repository = new InMemoryBuildDraftRepository();
+        var equipment = new[]
+        {
+            new BuildEquipmentEntry("item-synthetic", "1.0.0", 3),
+        };
+        var saved = await new SaveBuildDraftUseCase(repository, context)
+            .ExecuteAsync(
+                CreateSaveRequest("draft-equipped") with { Equipment = equipment },
+                TestContext.Current.CancellationToken);
+
+        Assert.Equal(equipment, saved.Equipment);
+
+        var loaded = await new LoadBuildDraftUseCase(repository, context)
+            .ExecuteAsync(saved.Id, TestContext.Current.CancellationToken);
+
+        Assert.Equal(equipment, loaded.Equipment);
+    }
+
+    [Fact]
+    public async Task SaveRejectsEquipmentForUnknownItem()
+    {
+        var context = CreateEquipmentContext();
+
+        var exception = await Assert.ThrowsAsync<BuildDraftException>(
+            () => new SaveBuildDraftUseCase(new InMemoryBuildDraftRepository(), context)
+                .ExecuteAsync(
+                    CreateSaveRequest("draft-bad-equipment") with
+                    {
+                        Equipment =
+                        [
+                            new BuildEquipmentEntry("item-missing", "1.0.0", 3),
+                        ],
+                    },
+                    TestContext.Current.CancellationToken));
+
+        Assert.Equal(BuildDraftErrorCodes.EquipmentItemNotFound, exception.Code);
+    }
+
+    [Fact]
+    public async Task SaveRejectsEquipmentAtUnpublishedItemVersion()
+    {
+        var context = CreateEquipmentContext();
+
+        var exception = await Assert.ThrowsAsync<BuildDraftException>(
+            () => new SaveBuildDraftUseCase(new InMemoryBuildDraftRepository(), context)
+                .ExecuteAsync(
+                    CreateSaveRequest("draft-bad-equipment") with
+                    {
+                        Equipment =
+                        [
+                            new BuildEquipmentEntry("item-synthetic", "9.9.9", 3),
+                        ],
+                    },
+                    TestContext.Current.CancellationToken));
+
+        Assert.Equal(BuildDraftErrorCodes.EquipmentVersionMismatch, exception.Code);
+    }
+
+    [Fact]
+    public async Task SaveRejectsEquipmentForOtherClass()
+    {
+        var context = CreateEquipmentContext() with
+        {
+            ItemCatalog = new ItemCatalog(
+                "ruleset-synthetic",
+                [
+                    CreateItem("item-other-class", ["class-other"], 1),
+                ]),
+        };
+
+        var exception = await Assert.ThrowsAsync<BuildDraftException>(
+            () => new SaveBuildDraftUseCase(new InMemoryBuildDraftRepository(), context)
+                .ExecuteAsync(
+                    CreateSaveRequest("draft-bad-equipment") with
+                    {
+                        Equipment =
+                        [
+                            new BuildEquipmentEntry("item-other-class", "1.0.0", 3),
+                        ],
+                    },
+                    TestContext.Current.CancellationToken));
+
+        Assert.Equal(BuildDraftErrorCodes.EquipmentClassNotAllowed, exception.Code);
+    }
+
+    [Fact]
+    public async Task SaveRejectsEquipmentLevelAbovePublishedMaximum()
+    {
+        var context = CreateEquipmentContext();
+
+        var exception = await Assert.ThrowsAsync<BuildDraftException>(
+            () => new SaveBuildDraftUseCase(new InMemoryBuildDraftRepository(), context)
+                .ExecuteAsync(
+                    CreateSaveRequest("draft-bad-equipment") with
+                    {
+                        Equipment =
+                        [
+                            new BuildEquipmentEntry("item-synthetic", "1.0.0", 16),
+                        ],
+                    },
+                    TestContext.Current.CancellationToken));
+
+        Assert.Equal(BuildDraftErrorCodes.EquipmentLevelOutOfRange, exception.Code);
+    }
+
+    [Fact]
+    public async Task SaveRejectsEquipmentDuplicateReference()
+    {
+        var context = CreateEquipmentContext();
+
+        var exception = await Assert.ThrowsAsync<BuildDraftException>(
+            () => new SaveBuildDraftUseCase(new InMemoryBuildDraftRepository(), context)
+                .ExecuteAsync(
+                    CreateSaveRequest("draft-bad-equipment") with
+                    {
+                        Equipment =
+                        [
+                            new BuildEquipmentEntry("item-synthetic", "1.0.0", 3),
+                            new BuildEquipmentEntry("item-synthetic", "1.0.0", 4),
+                        ],
+                    },
+                    TestContext.Current.CancellationToken));
+
+        Assert.Equal(BuildDraftErrorCodes.EquipmentDuplicate, exception.Code);
+    }
+
+    [Fact]
+    public async Task SaveRejectsEquipmentWhenLevelZeroStatRequirementIsUnmet()
+    {
+        var context = CreateEquipmentContext();
+
+        var exception = await Assert.ThrowsAsync<BuildDraftException>(
+            () => new SaveBuildDraftUseCase(new InMemoryBuildDraftRepository(), context)
+                .ExecuteAsync(
+                    CreateSaveRequest("draft-bad-equipment") with
+                    {
+                        Equipment =
+                        [
+                            new BuildEquipmentEntry("item-heavy", "1.0.0", 3),
+                        ],
+                    },
+                    TestContext.Current.CancellationToken));
+
+        Assert.Equal(BuildDraftErrorCodes.EquipmentRequirementsNotMet, exception.Code);
     }
 
     [Fact]
@@ -268,6 +444,70 @@ public sealed class BuildDraftApplicationIntegrationTests
             .ExecuteAsync(CreateSaveRequest("draft-synthetic"), cancellationToken);
     }
 
+    private static BuildDraftRuntimeContext CreateEquipmentContext()
+    {
+        var characterClass = new CharacterProgressionDefinition(
+            "class-synthetic",
+            "ruleset-synthetic",
+            new HashSet<string>(["stat-alpha", "stat-beta"], StringComparer.Ordinal),
+            new HashSet<string>(["evolution-synthetic"], StringComparer.Ordinal),
+            ["progression-synthetic"],
+            [
+                new CharacterBaseStatDefinition("stat-alpha", 10, ["evidence-synthetic"]),
+                new CharacterBaseStatDefinition("stat-beta", 6, ["evidence-synthetic"]),
+            ]);
+        var rule = new ProgressionRuleDefinition(
+            "progression-synthetic",
+            "1.0.0",
+            "ruleset-synthetic",
+            ProgressionRuleStatus.Published,
+            new HashSet<string>(["class-synthetic"], StringComparer.Ordinal),
+            new LevelPointRule(5, 2),
+            null);
+        var catalog = new ProgressionRulesetCatalog(
+            "ruleset-synthetic",
+            [characterClass],
+            [rule],
+            [
+                new ProgressionCharacterOption(
+                    "class-synthetic",
+                    "Synthetic class",
+                    [new ProgressionEvolutionOption("evolution-synthetic", "Synthetic evolution", 0)]),
+            ]);
+
+        return new BuildDraftRuntimeContext(
+            catalog,
+            new BuildDraftVersionedReference("ruleset-synthetic", "1.0.0"),
+            new BuildDraftDatasetReference(
+                "synthetic-001",
+                $"sha256:{new string('0', 64)}"),
+            "0.1.0",
+            new ItemCatalog(
+                "ruleset-synthetic",
+                [
+                    CreateItem("item-synthetic", ["class-synthetic"], 12),
+                    CreateItem("item-heavy", ["class-synthetic"], 100),
+                ]));
+    }
+
+    private static ItemDefinition CreateItem(
+        string id,
+        string[] allowedClasses,
+        long requiredStatAlpha) =>
+        new(
+            id,
+            "1.0.0",
+            "ruleset-synthetic",
+            $"Item {id}",
+            ItemDefinitionStatus.Published,
+            new HashSet<string>(["weapon"], StringComparer.Ordinal),
+            new HashSet<string>(allowedClasses, StringComparer.Ordinal),
+            new Dictionary<string, long>(StringComparer.Ordinal)
+            {
+                ["stat-alpha"] = requiredStatAlpha,
+            },
+            15);
+
     private static BuildDraftRuntimeContext CreateRuntimeContext()
     {
         var characterClass = new CharacterProgressionDefinition(
@@ -301,7 +541,8 @@ public sealed class BuildDraftApplicationIntegrationTests
             new BuildDraftDatasetReference(
                 "synthetic-001",
                 $"sha256:{new string('0', 64)}"),
-            "0.1.0");
+            "0.1.0",
+            new ItemCatalog("ruleset-synthetic", []));
     }
 
     private sealed class InMemoryBuildDraftRepository : IBuildDraftRepository

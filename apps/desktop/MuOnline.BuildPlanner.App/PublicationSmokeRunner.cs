@@ -21,6 +21,11 @@ internal static class PublicationSmokeRunner
     private const string BackupFileName = "publication-smoke.backup.sqlite";
     private const string BuildDraftId = "publication-smoke-draft";
     private const string BuildId = "publication-smoke-build";
+    private const string EquippedBuildDraftId = "publication-smoke-equip-draft";
+    private const string EquippedBuildId = "publication-smoke-equip-build";
+    private const string EquippedItemId = "item-kris";
+    private const string EquippedItemVersion = "1.0.0";
+    private const int EquippedItemLevel = 15;
 
     private static readonly SqliteMigration SyntheticMigration = new(
         3,
@@ -48,6 +53,7 @@ internal static class PublicationSmokeRunner
 
         var databasePath = buildDraftServices.DatabasePath;
         var backupPath = Path.Combine(options.DataDirectory, BackupFileName);
+        var equippedVerification = CreateEquippedBuildDraftVerification();
 
         return options.Phase switch
         {
@@ -59,7 +65,8 @@ internal static class PublicationSmokeRunner
                 formulaVerification,
                 buildVerification,
                 itemVerification,
-                buildDraftServices),
+                buildDraftServices,
+                equippedVerification),
             PublicationSmokePhase.VerifyUpdate => VerifyUpdate(
                 databasePath,
                 backupPath,
@@ -68,7 +75,8 @@ internal static class PublicationSmokeRunner
                 formulaVerification,
                 buildVerification,
                 itemVerification,
-                buildDraftServices),
+                buildDraftServices,
+                equippedVerification),
             _ => throw new ArgumentOutOfRangeException(nameof(options)),
         };
     }
@@ -81,7 +89,8 @@ internal static class PublicationSmokeRunner
         PublishedFormulaVerification formulaVerification,
         VerifiedCharacterBuild buildVerification,
         ItemVerification itemVerification,
-        PublishedBuildDraftServices buildDraftServices)
+        PublishedBuildDraftServices buildDraftServices,
+        EquippedBuildDraftVerification equippedVerification)
     {
         if (!File.Exists(databasePath) || File.Exists(backupPath))
         {
@@ -102,6 +111,9 @@ internal static class PublicationSmokeRunner
                 ExpectedPersistedValue);
             SaveAndVerifyBuildDraft(buildDraftServices, progressionVerification);
             SaveAndVerifyBuild(buildDraftServices, progressionVerification);
+            SaveAndVerifyEquippedBuildDraftAndBuild(
+                buildDraftServices,
+                equippedVerification);
             SqliteBackupService.CreateVerifiedBackup(connection, backupPath);
             ExecuteNonQuery(
                 connection,
@@ -118,6 +130,8 @@ internal static class PublicationSmokeRunner
         }
         VerifyBuildDraft(buildDraftServices, progressionVerification);
         var persistedBuildCount = VerifyBuild(buildDraftServices, progressionVerification);
+        VerifyEquippedBuildDraft(buildDraftServices);
+        VerifyEquippedBuild(buildDraftServices);
 
         return CreateSuccessfulReport(
             options,
@@ -141,7 +155,8 @@ internal static class PublicationSmokeRunner
         PublishedFormulaVerification formulaVerification,
         VerifiedCharacterBuild buildVerification,
         ItemVerification itemVerification,
-        PublishedBuildDraftServices buildDraftServices)
+        PublishedBuildDraftServices buildDraftServices,
+        EquippedBuildDraftVerification equippedVerification)
     {
         if (!File.Exists(databasePath) || !File.Exists(backupPath))
         {
@@ -154,6 +169,8 @@ internal static class PublicationSmokeRunner
         EnsureExpectedDatabaseState(connection);
         VerifyBuildDraft(buildDraftServices, progressionVerification);
         var persistedBuildCount = VerifyBuild(buildDraftServices, progressionVerification);
+        VerifyEquippedBuildDraft(buildDraftServices);
+        VerifyEquippedBuild(buildDraftServices);
 
         return CreateSuccessfulReport(
             options,
@@ -226,6 +243,14 @@ internal static class PublicationSmokeRunner
             ItemCatalogItemCount: itemVerification.ItemCount,
             ItemCatalogItemReferences: itemVerification.ItemReferences,
             SyntheticItemEquipVerified: itemVerification.SyntheticEquipVerified,
+            EquippedBuildDraftPersistenceVerified: true,
+            EquippedBuildDraftId: EquippedBuildDraftId,
+            EquippedBuildItemVerified: true,
+            EquippedBuildItemId: EquippedItemId,
+            EquippedBuildItemVersion: EquippedItemVersion,
+            EquippedBuildItemLevel: EquippedItemLevel,
+            EquippedBuildPersistenceVerified: true,
+            EquippedBuildId: EquippedBuildId,
             BuildDraftPersistenceVerified: true,
             BuildDraftId: BuildDraftId,
             BuildDraftDatasetVersion:
@@ -845,6 +870,119 @@ internal static class PublicationSmokeRunner
             second.TryGetValue(item.Key, out var value) &&
             item.Value == value);
 
+    private static EquippedBuildDraftVerification CreateEquippedBuildDraftVerification() =>
+        new(
+            new BuildDraftProgressionInputs(
+                "class-dark-knight",
+                "evolution-dark-knight",
+                7,
+                []),
+            new BuildDraftResetInputs(0, 0),
+            new Dictionary<string, long>(StringComparer.Ordinal)
+            {
+                ["strength"] = 0,
+                ["agility"] = 7,
+                ["vitality"] = 0,
+                ["energy"] = 0,
+            },
+            new BuildEquipmentEntry(
+                EquippedItemId,
+                EquippedItemVersion,
+                EquippedItemLevel));
+
+    private static void SaveAndVerifyEquippedBuildDraftAndBuild(
+        PublishedBuildDraftServices services,
+        EquippedBuildDraftVerification verification)
+    {
+        var draft = services.SaveUseCase.ExecuteAsync(
+                new SaveBuildDraftRequest(
+                    EquippedBuildDraftId,
+                    verification.ProgressionInputs,
+                    verification.ResetInputs,
+                    verification.Allocations,
+                    [verification.Equipment]))
+            .GetAwaiter()
+            .GetResult();
+        VerifyEquippedBuildDraft(draft, verification);
+        var build = services.SaveBuildUseCase.ExecuteAsync(
+                new SaveBuildRequest(EquippedBuildId, EquippedBuildDraftId))
+            .GetAwaiter()
+            .GetResult();
+        VerifyEquippedBuild(build, verification);
+    }
+
+    private static void VerifyEquippedBuildDraft(
+        PublishedBuildDraftServices services)
+    {
+        var draft = services.LoadUseCase.ExecuteAsync(EquippedBuildDraftId)
+            .GetAwaiter()
+            .GetResult();
+        VerifyEquippedBuildDraft(draft, CreateEquippedBuildDraftVerification());
+    }
+
+    private static void VerifyEquippedBuildDraft(
+        BuildDraft draft,
+        EquippedBuildDraftVerification verification)
+    {
+        if (draft.Id != EquippedBuildDraftId ||
+            draft.SchemaVersion != BuildDraft.CurrentSchemaVersion ||
+            draft.ProgressionInputs.CharacterClassId !=
+                verification.ProgressionInputs.CharacterClassId ||
+            draft.ProgressionInputs.EvolutionId !=
+                verification.ProgressionInputs.EvolutionId ||
+            draft.ProgressionInputs.Level !=
+                verification.ProgressionInputs.Level ||
+            !draft.ProgressionInputs.CompletedQuestIds
+                .SequenceEqual(verification.ProgressionInputs.CompletedQuestIds) ||
+            draft.ResetInputs != verification.ResetInputs ||
+            draft.StatDistribution.EarnedPoints != 30 ||
+            draft.StatDistribution.SpentPoints != 7 ||
+            draft.StatDistribution.RemainingPoints != 23 ||
+            !SameAllocations(
+                draft.StatDistribution.Allocations,
+                verification.Allocations) ||
+            !draft.Equipment.SequenceEqual([verification.Equipment]))
+        {
+            throw new InvalidOperationException(
+                "The equipped build draft did not survive persistence and Application revalidation.");
+        }
+    }
+
+    private static void VerifyEquippedBuild(PublishedBuildDraftServices services)
+    {
+        var build = services.LoadBuildUseCase.ExecuteAsync(EquippedBuildId)
+            .GetAwaiter()
+            .GetResult();
+        VerifyEquippedBuild(build, CreateEquippedBuildDraftVerification());
+    }
+
+    private static void VerifyEquippedBuild(
+        CharacterBuild build,
+        EquippedBuildDraftVerification verification)
+    {
+        var expectedStats = new Dictionary<string, long>(StringComparer.Ordinal)
+        {
+            ["strength"] = 28,
+            ["agility"] = 27,
+            ["vitality"] = 25,
+            ["energy"] = 10,
+        };
+        if (build.Id != EquippedBuildId ||
+            build.SchemaVersion != CharacterBuild.CurrentSchemaVersion ||
+            build.CharacterClassId !=
+                verification.ProgressionInputs.CharacterClassId ||
+            build.EvolutionId != verification.ProgressionInputs.EvolutionId ||
+            build.Level != verification.ProgressionInputs.Level ||
+            build.ResetCount != verification.ResetInputs.ResetCount ||
+            build.PointsPerReset != verification.ResetInputs.PointsPerReset ||
+            !SameStats(build.Stats, expectedStats) ||
+            !build.Equipment.SequenceEqual([verification.Equipment]))
+        {
+            throw new InvalidOperationException(
+                "The equipped full build did not survive persistence and Application revalidation.");
+        }
+    }
+
     private static PublishedProgressionReferenceCase[] LoadReferenceCases(string directory)
     {
         if (!Directory.Exists(directory))
@@ -1048,6 +1186,12 @@ internal static class PublicationSmokeRunner
         int ItemCount,
         string[] ItemReferences,
         bool SyntheticEquipVerified);
+
+    private sealed record EquippedBuildDraftVerification(
+        BuildDraftProgressionInputs ProgressionInputs,
+        BuildDraftResetInputs ResetInputs,
+        IReadOnlyDictionary<string, long> Allocations,
+        BuildEquipmentEntry Equipment);
 
     private sealed record PublishedFormulaReferenceCase(
         string Id,

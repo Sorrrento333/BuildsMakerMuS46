@@ -2,8 +2,9 @@
 
 ## Estado
 
-Los primeros contratos están en `packages/schemas/v1`. Siete permanecen en
-`1.0.0`; fórmula, distribución y borrador están en `1.1.0`:
+Los primeros contratos están en `packages/schemas/v1`. Cinco
+permanecen en `1.0.0`; fórmula y distribución están en `1.1.0`; borrador y
+build están en `1.2.0` para la instancia equipada sin bonificaciones:
 
 - `evidence.schema.json`
 - `formula.schema.json`
@@ -35,14 +36,22 @@ catálogo de clases y se declaran como invariantes semánticas en
 `docs/04-domain/stat-distribution-contract.md`; no se simulan con datos del
 juego dentro del schema.
 
-El contrato de borrador `1.1.0` conserva metadata exacto del ruleset, dataset y
-motor, las entradas de progresión/resets y un `StatDistribution` completo compuesto
-mediante `$ref`. Se mantiene separado de `build.schema.json`: el borrador actual
-no trata asignaciones como stats finales. Sus totales
+El contrato de borrador `1.2.0` conserva metadata exacto del ruleset, dataset y
+motor, las entradas de progresión/resets, un `StatDistribution` completo compuesto
+mediante `$ref` y el array `equipment` de instancias
+`{ itemId, itemVersion, level }` (sin `uniqueItems`, el rechazo de duplicados es
+semántico en Application). Se mantiene separado de `build.schema.json`: el borrador
+actual no trata asignaciones como stats finales. Sus totales
 calculados son una caché que Application recalcula y contrasta al cargar. Data
 persiste payload y metadata atómicamente mediante la migración
 `1/create_build_drafts`, según
 `docs/06-data/build-draft-persistence-contract.md`.
+
+El contrato de build `1.2.0` añade el mismo array `equipment` a la snapshot
+validada de stats finales. Ambas versiones conservan la migración de carga
+(preservando la anterior `1.1.0` y la legacy `1.0.0`) y revalidan `equipment`
+contra el catálogo publicado al cargar. El diseño completo está en
+`../04-domain/equipped-instance-design.md`.
 
 Los registros canónicos viven en
 `packages/rulesets/mu-s4-global-reference/v1`: seis definiciones de clase, dos
@@ -142,7 +151,10 @@ fixtures.
 
 La definición canónica de item se materializa como `item.schema.json`; la
 instancia con nivel, opciones y sockets elegidos sigue siendo dato del usuario
-en `build.schema.json`, sin datos factuales añadidos al ruleset canónico.
+en `build.schema.json`. Desde `1.2.0`, la instancia guardada es acotada y sin
+bonificaciones: `equipment` de `{ itemId, itemVersion, level }`, donde el nivel
+es un entero 0..`maxItemLevel` declarado y la ranura, requisitos y atributos se
+derivan de la definición publicada del ítem (`../04-domain/equipped-instance-design.md`).
 
 ## Plan restante
 
@@ -155,7 +167,10 @@ dataset avanza a `2026-09-16.1`. Application ya consume el catálogo en la
 vertical acotada de UC-04: `JsonItemCatalogSnapshotReader` materializa
 `ItemDefinition` y `EquipItemUseCase` valida la elegibilidad de equipado por
 clase y `requiredStats` en +0, sin bonificaciones ni instancia equipada
-(`../04-domain/items-consumption-design.md`). Quedan fuera del axioma
+(`../04-domain/items-consumption-design.md`). La vertical `1.2.0` añade la
+instancia equipada persistible sin bonificaciones, la elegibilidad como nivel
+declarado 0..`maxItemLevel` y la revalidación al cargar
+(`../04-domain/equipped-instance-design.md`). Quedan fuera del axioma
 `requiredLevel`, la progresión de `requiredStats`, los sockets, las opciones y
 cualquier otro ítem, ranura, campo o grado; su ampliación exige nueva evidencia
 o una nueva decisión del propietario. La decisión del gate está en

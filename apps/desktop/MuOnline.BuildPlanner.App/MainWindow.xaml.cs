@@ -29,6 +29,7 @@ public partial class MainWindow : Window
     private readonly EquipItemUseCase _equipItemUseCase;
     private readonly Dictionary<string, TextBox> _allocationInputs =
         new(StringComparer.Ordinal);
+    private readonly List<BuildEquipmentEntry> _equippedItems = [];
     private ProgressionPointBudgetResult? _currentBudget;
     private ProgressionPointBudgetRequest? _currentProgressionRequest;
     private StatDistributionResult? _currentDistribution;
@@ -76,6 +77,7 @@ public partial class MainWindow : Window
             BuildStatAllocationInputs(null);
             InvalidateCurrentBudget();
             RefreshItemSelection();
+            ClearEquippedItems();
             return;
         }
 
@@ -85,6 +87,7 @@ public partial class MainWindow : Window
         UpdateHeroStatusAvailability();
         InvalidateCurrentBudget();
         RefreshItemSelection();
+        ClearEquippedItems();
     }
 
     private void EvolutionSelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -219,7 +222,8 @@ public partial class MainWindow : Window
                     BuildDraftIdTextBox.Text.Trim(),
                     progressionInputs,
                     resetInputs,
-                    allocations));
+                    allocations,
+                    _equippedItems.ToArray()));
             BuildDraftResultTextBox.Text =
                 $"Borrador '{draft.Id}' guardado. " +
                 $"Dataset {draft.Dataset.Version} ({draft.Dataset.Hash[..15]}…).";
@@ -518,6 +522,93 @@ public partial class MainWindow : Window
         _ => "se produjo un error de equipado no reconocido.",
     };
 
+    private void EquipSelectedItemButtonClick(object sender, RoutedEventArgs e)
+    {
+        if (ClassComboBox.SelectedItem is not ProgressionCharacterOption selectedClass)
+        {
+            EquipStatusTextBox.Text = "Selecciona una clase.";
+            return;
+        }
+
+        if (ItemComboBox.SelectedItem is not ItemDefinition item)
+        {
+            EquipStatusTextBox.Text =
+                "Selecciona un ítem del catálogo para equiparlo.";
+            return;
+        }
+
+        if (!int.TryParse(EquipItemLevelTextBox.Text, out var level))
+        {
+            EquipStatusTextBox.Text =
+                "El nivel del ítem debe ser un número entero.";
+            return;
+        }
+
+        if (!TryBuildFinalStats(out var finalStats))
+        {
+            EquipStatusTextBox.Text =
+                "Calcula el presupuesto y distribuye los puntos antes de equipar.";
+            return;
+        }
+
+        if (_equippedItems.Any(entry => entry.ItemId == item.Id))
+        {
+            EquipStatusTextBox.Text = $"El ítem '{item.Id}' ya está equipado.";
+            return;
+        }
+
+        try
+        {
+            var eligibility = _equipItemUseCase.Execute(
+                new EquipItemRequest(
+                    selectedClass.Id,
+                    finalStats,
+                    item.Id,
+                    level));
+            _equippedItems.Add(
+                new BuildEquipmentEntry(item.Id, item.Version, level));
+            RefreshEquippedItemsList();
+            EquipStatusTextBox.Text =
+                $"Equipado: {eligibility.DisplayName} a nivel {eligibility.Level}.";
+        }
+        catch (ItemEquipException exception)
+        {
+            EquipStatusTextBox.Text =
+                $"No elegible ({exception.Code}): " +
+                TranslateItemEquipError(exception.Code);
+        }
+    }
+
+    private void UnequipSelectedItemButtonClick(object sender, RoutedEventArgs e)
+    {
+        if (EquippedItemsListBox.SelectedItem is not BuildEquipmentEntry entry)
+        {
+            EquipStatusTextBox.Text =
+                "Selecciona un ítem equipado de la lista para desequiparlo.";
+            return;
+        }
+
+        _equippedItems.Remove(entry);
+        RefreshEquippedItemsList();
+        EquipStatusTextBox.Text = $"Desequipado: {entry.ItemId}.";
+    }
+
+    private void ClearEquippedItems()
+    {
+        _equippedItems.Clear();
+        RefreshEquippedItemsList();
+    }
+
+    private void RefreshEquippedItemsList()
+    {
+        if (EquippedItemsListBox is null)
+        {
+            return;
+        }
+
+        EquippedItemsListBox.ItemsSource = _equippedItems.ToArray();
+    }
+
     private sealed record ItemSlotOption(string Id, string DisplayName);
 
     private bool TryReadDraftInputs(
@@ -639,6 +730,14 @@ public partial class MainWindow : Window
             _currentDistribution);
         ConfigureAndCalculateApplicableFormula();
         RefreshItemSelection();
+
+        _equippedItems.Clear();
+        if (draft.Equipment is not null)
+        {
+            _equippedItems.AddRange(draft.Equipment);
+        }
+
+        RefreshEquippedItemsList();
     }
 
     private void ApplyLoadedBuild(CharacterBuild build)
@@ -688,6 +787,14 @@ public partial class MainWindow : Window
             _currentDistribution);
         ConfigureAndCalculateApplicableFormula();
         RefreshItemSelection();
+
+        _equippedItems.Clear();
+        if (build.Equipment is not null)
+        {
+            _equippedItems.AddRange(build.Equipment);
+        }
+
+        RefreshEquippedItemsList();
     }
 
     private void InvalidateCurrentBudget()
@@ -1289,6 +1396,18 @@ public partial class MainWindow : Window
             "el recálculo no reproduce la caché persistida.",
         BuildDraftErrorCodes.WriteConflict =>
             "la base local siguió ocupada después de los reintentos configurados.",
+        BuildDraftErrorCodes.EquipmentItemNotFound =>
+            "el equipamiento referencia un ítem que no está publicado.",
+        BuildDraftErrorCodes.EquipmentVersionMismatch =>
+            "el equipamiento referencia una versión de ítem no publicada.",
+        BuildDraftErrorCodes.EquipmentClassNotAllowed =>
+            "el equipamiento incluye un ítem que la clase no puede llevar.",
+        BuildDraftErrorCodes.EquipmentLevelOutOfRange =>
+            "el nivel del ítem equipado supera el máximo publicado.",
+        BuildDraftErrorCodes.EquipmentDuplicate =>
+            "el equipamiento repite un mismo ítem.",
+        BuildDraftErrorCodes.EquipmentRequirementsNotMet =>
+            "los stats finales no alcanzan los requisitos publicados del ítem equipado.",
         _ => "se produjo un error de borrador no reconocido.",
     };
 
@@ -1306,6 +1425,18 @@ public partial class MainWindow : Window
             "el recálculo no reproduce la caché persistida.",
         BuildErrorCodes.WriteConflict =>
             "la base local siguió ocupada después de los reintentos configurados.",
+        BuildErrorCodes.EquipmentItemNotFound =>
+            "el equipamiento referencia un ítem que no está publicado.",
+        BuildErrorCodes.EquipmentVersionMismatch =>
+            "el equipamiento referencia una versión de ítem no publicada.",
+        BuildErrorCodes.EquipmentClassNotAllowed =>
+            "el equipamiento incluye un ítem que la clase no puede llevar.",
+        BuildErrorCodes.EquipmentLevelOutOfRange =>
+            "el nivel del ítem equipado supera el máximo publicado.",
+        BuildErrorCodes.EquipmentDuplicate =>
+            "el equipamiento repite un mismo ítem.",
+        BuildErrorCodes.EquipmentRequirementsNotMet =>
+            "los stats finales no alcanzan los requisitos publicados del ítem equipado.",
         _ => "se produjo un error de build no reconocido.",
     };
 }

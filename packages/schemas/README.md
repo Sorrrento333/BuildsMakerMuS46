@@ -38,8 +38,8 @@ Los locks, SPDX, provenance y hashes revisados viven en
 `spikes/json-everything-source-build/`. El diseño, la integración y sus límites
 están en `docs/03-architecture/json-everything-source-integration.md`.
 
-El comando valida siete contratos `1.0.0`, los contratos `formula`,
-`stat-distribution` y `build-draft` `1.1.0`, y
+El comando valida siete contratos `1.0.0`, los contratos `formula` y
+`stat-distribution` `1.1.0`, los contratos `build-draft` y `build` `1.2.0`, y
 `v2/formula.schema.json` `2.0.0`/`2.1.0`. Acepta los once fixtures de
 `examples/valid`, rechaza los once de `examples/invalid` y devuelve un código
 distinto de cero si alguna expectativa no se cumple. También valida contra
@@ -124,12 +124,16 @@ lista de clases duplicada en el contrato. `StatDistributionCalculator` aplica
 ya estas invariantes semánticas sobre el presupuesto productivo; el schema
 continúa siendo el contrato serializable independiente.
 
-`build-draft.schema.json` `1.1.0` compone el contrato de distribución mediante `$ref` y
+`build-draft.schema.json` `1.2.0` compone el contrato de distribución mediante `$ref`,
 conserva identidad, metadata exacto de ruleset/dataset/motor y las entradas de
-progresión y resets. Las entradas y asignaciones son datos del usuario; los totales y la
-referencia de regla se guardan sólo como caché que Application deberá recalcular
-y comparar al cargar. No sustituye a `build.schema.json`, que representa una
-build más completa con otros campos aún fuera del flujo actual. El
+progresión y resets, y añade el array `equipment` de instancias
+`{ itemId, itemVersion, level }`. Las entradas y asignaciones son datos del usuario; los
+totales y la referencia de regla se guardan sólo como caché que Application deberá
+recalcular y comparar al cargar. `build.schema.json` `1.2.0` representa la build con
+stats finales y comparte el mismo array `equipment`; ambas versiones se deducen de la
+definición publicada del ítem, sin bonificaciones ni progresión de ítem. La revalidación
+contra el catálogo publicado al cargar está en
+`docs/04-domain/equipped-instance-design.md`. El
 límite y sus invariantes están en
 `docs/06-data/build-draft-persistence-contract.md`.
 
@@ -184,8 +188,8 @@ están en `docs/03-architecture/json-everything-source-integration.md`.
 El comando valida siete contratos `1.0.0` de progresión e identidad, los cinco
 contratos de alto nivel `ruleset`, `quest-rule`, `item`, `skill` y `scenario`
 `1.0.0`, las trazas `calculation-trace` y `build-calculation-trace` `1.0.0`, los
-contratos `formula`,
-`stat-distribution` y `build-draft` `1.1.0`, y
+contratos `formula` y
+`stat-distribution` `1.1.0`, los contratos `build-draft` y `build` `1.2.0`, y
 `v2/formula.schema.json` `2.0.0`/`2.1.0`. Acepta los diecisiete fixtures de
 `examples/valid`, rechaza los diecisiete de `examples/invalid` y devuelve un código
 distinto de cero si alguna expectativa no se cumple. También valida contra
@@ -270,12 +274,16 @@ lista de clases duplicada en el contrato. `StatDistributionCalculator` aplica
 ya estas invariantes semánticas sobre el presupuesto productivo; el schema
 continúa siendo el contrato serializable independiente.
 
-`build-draft.schema.json` `1.1.0` compone el contrato de distribución mediante `$ref` y
+`build-draft.schema.json` `1.2.0` compone el contrato de distribución mediante `$ref`,
 conserva identidad, metadata exacto de ruleset/dataset/motor y las entradas de
-progresión y resets. Las entradas y asignaciones son datos del usuario; los totales y la
-referencia de regla se guardan sólo como caché que Application deberá recalcular
-y comparar al cargar. No sustituye a `build.schema.json`, que representa una
-build más completa con otros campos aún fuera del flujo actual. El
+progresión y resets, y añade el array `equipment` de instancias
+`{ itemId, itemVersion, level }`. Las entradas y asignaciones son datos del usuario; los
+totales y la referencia de regla se guardan sólo como caché que Application deberá
+recalcular y comparar al cargar. `build.schema.json` `1.2.0` representa la build con
+stats finales y comparte el mismo array `equipment`; ambas versiones se deducen de la
+definición publicada del ítem, sin bonificaciones ni progresión de ítem. La revalidación
+contra el catálogo publicado al cargar está en
+`docs/04-domain/equipped-instance-design.md`. El
 límite y sus invariantes están en
 `docs/06-data/build-draft-persistence-contract.md`.
 

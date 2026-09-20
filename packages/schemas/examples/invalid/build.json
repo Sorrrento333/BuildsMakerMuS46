@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "1.0.0",
+  "schemaVersion": "1.2.0",
   "id": "build-synthetic",
   "ruleset": { "id": "ruleset-synthetic", "version": "0.1" },
   "dataset": { "version": "synthetic-001", "hash": "not-a-hash" },
@@ -9,5 +9,13 @@
   "level": 0,
   "stats": {},
   "questIds": [],
-  "resetCount": -1
+  "resetCount": -1,
+  "pointsPerReset": 100,
+  "equipment": [
+    {
+      "itemId": "item-synthetic",
+      "itemVersion": "1.0.0",
+      "level": -1
+    }
+  ]
 }

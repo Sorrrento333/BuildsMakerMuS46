@@ -13,26 +13,55 @@ La instrucción de ejecutar sólo la primera tarea pendiente continúa vigente.
 
 ## Prioridad inmediata
 
-1. Traza de cálculo de alto nivel implementada (2026-09-19): contrato
+1. Instancia equipada sin bonificaciones implementada (2026-09-19): contratos
+   `build-draft` y `build` a `1.2.0` con `equipment` de
+   `{ itemId, itemVersion, level }`, sección "Equipo" en WPF y household de smoke
+   equipado; sin opciones/sockets/bonificaciones ni progresión de ítem.
+2. Traza de cálculo de alto nivel implementada (2026-09-19): contrato
    `build-calculation-trace` `1.0.0` con fixtures y gate semántico; emisión en
    Application (`BuildCalculationTraceFactory`); WPF con la sección "Traza de
    cálculo de alto nivel" y smoke en ambas fases (19 fórmulas, 3 aristas). Es un
    artefacto del motor: no añade datos factuales.
-2. Skills como modificador de cálculo implementado (2026-09-19): siete fórmulas
+3. Skills como modificador de cálculo implementado (2026-09-19): siete fórmulas
    derivadas `2.1.0` por axioma `EVD-0046`; sin UI de skills ni `buffRef`.
    Ampliar efectos fuera de los siete exige nueva evidencia Season 4 o una nueva
    decisión del propietario. `buffRef` sigue omitido.
-3. Catálogo acotado de skills materializado (2026-09-17): ocho `SkillDefinition`
+4. Catálogo acotado de skills materializado (2026-09-17): ocho `SkillDefinition`
    `PUBLISHED` del axioma `EVD-0045` contra `skill.schema.json`, con inventario
    canónico 119 → 127 y dataset `2026-09-17.1`.
-4. Consumo acotado del catálogo de ítems implementado (`EquipItemUseCase`,
+5. Consumo acotado del catálogo de ítems implementado (`EquipItemUseCase`,
    selector de ranura/ítem en WPF y smoke): valida clase y `requiredStats` en
-   +0, sin bonificaciones ni instancia equipada.
-5. Alternativa documentada: ampliar UC-04 (bonificaciones ATK/DEF,
+   +0; la instancia equipada acotada cerró la vertical `1.2.0`.
+6. Alternativa documentada: ampliar UC-04 (bonificaciones ATK/DEF,
    `requiredLevel`, progresión de `requiredStats`, sockets) exige nueva
    evidencia Season 4 o una nueva decisión del propietario.
-6. Alternativa documentada: master buys y pantallas restantes del flujo, sin
+7. Alternativa documentada: master buys y pantallas restantes del flujo, sin
    contrato factual todavía.
+
+## Instancia equipada sin bonificaciones — implementado (2026-09-19)
+
+- `build-draft.schema.json` y `build.schema.json` a `1.2.0` con el array
+  `equipment` de `{ itemId, itemVersion, level }` (schema y fixtures ya
+  actualizados). La ranura y los atributos se deducen de la definición publicada
+  del ítem; el nivel es un entero declarado `0..maxItemLevel`.
+- `BuildEquipmentEntry` + `BuildEquipmentValidator` (códigos estables en
+  `BuildErrorCodes`/`BuildDraftErrorCodes`: `item-not-found`,
+  `version-mismatch`, `class-not-allowed`, `level-out-of-range`, `duplicate`,
+  `requirements-not-met`). Validan en `SaveBuildDraftUseCase`, revalidan en
+  `LoadBuildDraftUseCase`/`LoadBuildUseCase` contra el catálogo publicado y
+  `SaveBuildUseCase` promueve el equipo del draft. `EquipItemRequest/Result`
+  ganan `Level`/`MaxItemLevel` (`item-equip-level-out-of-range`).
+- Migración de carga conserva `1.1.0+1.1.0` → `Equipment = []` y legacy
+  `1.0.0+1.0.0`; `BuildDraftStatDistribution` queda en `1.1.0`.
+- WPF: sección central "Equipo" (nivel + equipar/desequipar + lista +
+  indicador); `_equippedItems` se rellena al cargar drafts/builds.
+- Smoke: `publication-smoke-equip-draft`/`publication-smoke-equip-build`
+  (`item-kris` `1.0.0` nivel 15, dark-knight 7, EB 30, agility 27, restante 23).
+- Verificación PASS: build Release 0/0; 858/858 pruebas (43 validator, 58 motor,
+  730 Application, 27 Data); `Test-SchemaStructure` 17/34; smoke WPF `win-x64`
+  (SQLite `3.53.3`, 1369 archivos, 150.666.306 bytes, 946 archivos del ruleset,
+  456 casos, 2 builds listados, dataset `2026-09-17.1`). Sin datos factuales
+  nuevos. Diseño en `docs/04-domain/equipped-instance-design.md`.
 
 ## Traza de cálculo de alto nivel — implementado (2026-09-19)
 

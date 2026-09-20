@@ -90,7 +90,8 @@ public sealed class JsonItemCatalogSnapshotReader : IItemCatalogSnapshotReader
             ParseStatus(RequiredString(element, "status")),
             slots,
             allowedClassIds,
-            ParseRequiredStats(element));
+            ParseRequiredStats(element),
+            ParseMaxItemLevel(element));
     }
 
     private static Dictionary<string, long> ParseRequiredStats(JsonElement element)
@@ -115,6 +116,26 @@ public sealed class JsonItemCatalogSnapshotReader : IItemCatalogSnapshotReader
         }
 
         return requiredStats;
+    }
+
+    private static int ParseMaxItemLevel(JsonElement element)
+    {
+        if (!element.TryGetProperty("maxItemLevel", out var levelElement))
+        {
+            throw Error(
+                ItemCatalogSnapshotErrorCodes.SnapshotInvalid,
+                "Item maximum level is missing.");
+        }
+
+        var level = levelElement.GetInt32();
+        if (level < 0)
+        {
+            throw Error(
+                ItemCatalogSnapshotErrorCodes.SnapshotInvalid,
+                "Item maximum level cannot be negative.");
+        }
+
+        return level;
     }
 
     private static ItemDefinitionStatus ParseStatus(string status) =>

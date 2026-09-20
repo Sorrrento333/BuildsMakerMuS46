@@ -21,6 +21,29 @@
 
 ### Added
 
+- Instancia equipada persistible sin bonificaciones (vertical `1.2.0`). Los
+  contratos `build-draft.schema.json` y `build.schema.json` avanzan a `1.2.0`
+  con el array `equipment` de `{ itemId, itemVersion, level }`: la ranura y los
+  atributos se deducen de la definición publicada del ítem y el nivel es un
+  entero declarado `0..maxItemLevel`, mientras la elegibilidad reutiliza la
+  validación de UC-04 (`requiredStats` en +0 sobre stats finales, sin
+  bonificaciones ni progresión de ítem). `BuildEquipmentEntry` y
+  `BuildEquipmentValidator` (`BuildErrorCodes`/`BuildDraftErrorCodes`:
+  `item-not-found`, `version-mismatch`, `class-not-allowed`,
+  `level-out-of-range`, `duplicate`, `requirements-not-met`) validan en
+  `SaveBuildDraftUseCase` y revalidan en `LoadBuildDraftUseCase` y
+  `LoadBuildUseCase` contra el catálogo publicado; `SaveBuildUseCase` promueve
+  el equipo del draft; `EquipItemRequest/Result` ganan `Level`/`MaxItemLevel`
+  (`item-equip-level-out-of-range`). Migración de carga: `1.1.0+1.1.0` →
+  `Equipment = []` y legacy `1.0.0+1.0.0` con defaults; `BuildDraftStatDistribution`
+  queda en `1.1.0`. WPF añade la sección "Equipo" (nivel, equipar/desequipar,
+  lista e indicador de estado) y el smoke WPF verifica el household equipado
+  (`item-kris` nivel 15 en dark-knight nivel 7, EB 30, agility 27). Sin datos
+  factuales nuevos: ruleset `1.0.0`, motor `0.2.0` y dataset `2026-09-17.1`;
+  verificación completa (build Release 0/0, 858/858 pruebas, estructura
+  17/34, smoke WPF PASS). Diseño en
+  `docs/04-domain/equipped-instance-design.md`.
+
 - Traza de cálculo de alto nivel implementada como artefacto del motor. Nuevo
   contrato `build-calculation-trace` `1.0.0` en
   `packages/schemas/v1/build-calculation-trace.schema.json` con fixture válido e

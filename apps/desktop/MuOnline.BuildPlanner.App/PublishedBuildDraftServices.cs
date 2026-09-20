@@ -78,7 +78,8 @@ internal sealed record PublishedBuildDraftServices(
             new BuildDraftDatasetReference(
                 DatasetVersion,
                 ComputeDatasetHash(PublishedProgressionRuleset.SnapshotRoot)),
-            EngineVersion);
+            EngineVersion,
+            PublishedProgressionRuleset.ItemCatalog);
         var loadBuildDraftUseCase = new LoadBuildDraftUseCase(repository, context);
 
         return new PublishedBuildDraftServices(

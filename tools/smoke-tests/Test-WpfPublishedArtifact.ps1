@@ -424,6 +424,32 @@ if (-not $initialReport.ItemCatalogVerified -or
     throw "The published bounded item catalog did not materialize or evaluate in both phases."
 }
 
+if (-not $initialReport.EquippedBuildDraftPersistenceVerified -or
+    -not $replacementReport.EquippedBuildDraftPersistenceVerified -or
+    $initialReport.EquippedBuildDraftId -ne "publication-smoke-equip-draft" -or
+    $replacementReport.EquippedBuildDraftId -ne
+        $initialReport.EquippedBuildDraftId) {
+    throw "The equipped build draft did not survive replacement and exact revalidation."
+}
+
+if (-not $initialReport.EquippedBuildPersistenceVerified -or
+    -not $replacementReport.EquippedBuildPersistenceVerified -or
+    $initialReport.EquippedBuildId -ne "publication-smoke-equip-build" -or
+    $replacementReport.EquippedBuildId -ne
+        $initialReport.EquippedBuildId -or
+    -not $initialReport.EquippedBuildItemVerified -or
+    -not $replacementReport.EquippedBuildItemVerified -or
+    $initialReport.EquippedBuildItemId -ne "item-kris" -or
+    $replacementReport.EquippedBuildItemId -ne
+        $initialReport.EquippedBuildItemId -or
+    $initialReport.EquippedBuildItemVersion -ne "1.0.0" -or
+    $replacementReport.EquippedBuildItemVersion -ne
+        $initialReport.EquippedBuildItemVersion -or
+    $initialReport.EquippedBuildItemLevel -ne 15 -or
+    $replacementReport.EquippedBuildItemLevel -ne 15) {
+    throw "The instanced item equipment did not survive replacement and exact revalidation."
+}
+
 $initialRulesetRoot = Join-Path $initialPublishDirectory $publishedRulesetRelativePath
 $replacementRulesetRoot = Join-Path $replacementPublishDirectory $publishedRulesetRelativePath
 $initialRulesetFiles = Get-ChildItem -LiteralPath $initialRulesetRoot -Recurse -File
@@ -471,6 +497,7 @@ Write-Output "Published formulas: $($initialReport.PublishedFormulaReferences -j
 Write-Output "Full build evaluation: $($initialReport.PublishedBuildFormulaCount) formulas grouped"
 Write-Output "High-level build calculation trace: $($initialReport.PublishedBuildCalculationTraceFormulaCount) formulas, $($initialReport.PublishedBuildCalculationTraceDependencyCount) dependency edges"
 Write-Output "Bounded item catalog: $($initialReport.ItemCatalogItemCount) items, equip evaluated: $($initialReport.SyntheticItemEquipVerified)"
+Write-Output "Equipped build: $($initialReport.EquippedBuildId), item $($initialReport.EquippedBuildItemId) at level $($initialReport.EquippedBuildItemLevel)"
 Write-Output "Build draft: $($initialReport.BuildDraftId), dataset $($initialReport.BuildDraftDatasetVersion)"
 Write-Output "Full build: $($initialReport.BuildId), $($initialReport.BuildStatCount) stats"
 Write-Output "Saved builds listed: $($initialReport.PersistedBuildCount)"

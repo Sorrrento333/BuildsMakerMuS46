@@ -1,8 +1,10 @@
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using MuOnline.BuildPlanner.Application.Builds;
+using MuOnline.BuildPlanner.Application.Items;
 using MuOnline.BuildPlanner.Application.Progression;
 using MuOnline.BuildPlanner.Application.Stats;
+using MuOnline.BuildPlanner.Domain.Items;
 using MuOnline.BuildPlanner.Domain.Progression;
 using MuOnline.BuildPlanner.Domain.Stats;
 using Xunit;
@@ -259,6 +261,84 @@ public sealed class CharacterBuildPersistenceIntegrationTests
     }
 
     [Fact]
+    public async Task LoadUpgradesPreviousVersionBuildToEmptyEquipment()
+    {
+        var repository = new InMemoryBuildRepository();
+        var build = await CreateValidBuildAsync(repository, TestContext.Current.CancellationToken);
+        await repository.SaveAsync(
+            build with { SchemaVersion = CharacterBuild.PreviousSchemaVersion },
+            TestContext.Current.CancellationToken);
+
+        var loaded = await new LoadBuildUseCase(repository, RuntimeContext)
+            .ExecuteAsync(build.Id, TestContext.Current.CancellationToken);
+
+        Assert.Equal(CharacterBuild.CurrentSchemaVersion, loaded.SchemaVersion);
+        Assert.Empty(loaded.Equipment);
+        Assert.Equal(build.Stats, loaded.Stats);
+    }
+
+    [Fact]
+    public async Task SavePromotesDraftEquipmentAndLoadRevalidatesIt()
+    {
+        var context = CreateEquipmentContext();
+        var draftRepository = new InMemoryBuildDraftRepository();
+        var buildRepository = new InMemoryBuildRepository();
+        var loadDraft = new LoadBuildDraftUseCase(draftRepository, context);
+        await new SaveBuildDraftUseCase(draftRepository, context)
+            .ExecuteAsync(
+                CreateSaveDraftRequest("draft-equipped") with
+                {
+                    Equipment =
+                    [
+                        new BuildEquipmentEntry("item-synthetic", "1.0.0", 3),
+                    ],
+                },
+                TestContext.Current.CancellationToken);
+
+        var saved = await new SaveBuildUseCase(buildRepository, loadDraft, context)
+            .ExecuteAsync(
+                new SaveBuildRequest("build-equipped", "draft-equipped"),
+                TestContext.Current.CancellationToken);
+
+        Assert.Equal(
+            [new BuildEquipmentEntry("item-synthetic", "1.0.0", 3)],
+            saved.Equipment);
+
+        var loaded = await new LoadBuildUseCase(buildRepository, context)
+            .ExecuteAsync(saved.Id, TestContext.Current.CancellationToken);
+
+        Assert.Equal(
+            [new BuildEquipmentEntry("item-synthetic", "1.0.0", 3)],
+            loaded.Equipment);
+    }
+
+    [Fact]
+    public async Task LoadRejectsBuildEquipmentThatNoLongerMeetsItemRules()
+    {
+        var context = CreateEquipmentContext();
+        var buildRepository = new InMemoryBuildRepository();
+        var build = await CreateValidBuildWithEquipmentAsync(
+            buildRepository,
+            context,
+            TestContext.Current.CancellationToken);
+        await buildRepository.SaveAsync(
+            build with
+            {
+                Equipment =
+                [
+                    new BuildEquipmentEntry("item-heavy", "1.0.0", 3),
+                ],
+            },
+            TestContext.Current.CancellationToken);
+
+        var exception = await Assert.ThrowsAsync<BuildException>(
+            () => new LoadBuildUseCase(buildRepository, context)
+                .ExecuteAsync(build.Id, TestContext.Current.CancellationToken));
+
+        Assert.Equal(BuildErrorCodes.EquipmentRequirementsNotMet, exception.Code);
+    }
+
+    [Fact]
     public async Task LoadRejectsUnavailableExactDependencyMetadata()
     {
         var repository = new InMemoryBuildRepository();
@@ -419,6 +499,100 @@ public sealed class CharacterBuildPersistenceIntegrationTests
                 cancellationToken);
     }
 
+    private static async Task<CharacterBuild> CreateValidBuildWithEquipmentAsync(
+        IBuildRepository buildRepository,
+        BuildDraftRuntimeContext context,
+        CancellationToken cancellationToken)
+    {
+        var draftRepository = new InMemoryBuildDraftRepository();
+        await new SaveBuildDraftUseCase(draftRepository, context)
+            .ExecuteAsync(
+                CreateSaveDraftRequest("draft-equipped") with
+                {
+                    Equipment =
+                    [
+                        new BuildEquipmentEntry("item-synthetic", "1.0.0", 3),
+                    ],
+                },
+                cancellationToken);
+        return await new SaveBuildUseCase(
+                buildRepository,
+                new LoadBuildDraftUseCase(draftRepository, context),
+                context)
+            .ExecuteAsync(
+                new SaveBuildRequest("build-equipped", "draft-equipped"),
+                cancellationToken);
+    }
+
+    private static BuildDraftRuntimeContext CreateEquipmentContext()
+    {
+        var characterClass = new CharacterProgressionDefinition(
+            "class-synthetic",
+            "ruleset-synthetic",
+            new HashSet<string>(["stat-alpha", "stat-beta"], StringComparer.Ordinal),
+            new HashSet<string>(["evolution-synthetic"], StringComparer.Ordinal),
+            ["progression-synthetic"],
+            [
+                new CharacterBaseStatDefinition("stat-alpha", 10, ["evidence-synthetic"]),
+                new CharacterBaseStatDefinition("stat-beta", 6, ["evidence-synthetic"]),
+            ]);
+        var rule = new ProgressionRuleDefinition(
+            "progression-synthetic",
+            "1.0.0",
+            "ruleset-synthetic",
+            ProgressionRuleStatus.Published,
+            new HashSet<string>(["class-synthetic"], StringComparer.Ordinal),
+            new LevelPointRule(5, 2),
+            new QuestPointBonusRule(
+                "quest-synthetic",
+                1,
+                new HashSet<string>(["evolution-synthetic"], StringComparer.Ordinal),
+                2,
+                1));
+        var catalog = new ProgressionRulesetCatalog(
+            "ruleset-synthetic",
+            [characterClass],
+            [rule],
+            [
+                new ProgressionCharacterOption(
+                    "class-synthetic",
+                    "Synthetic class",
+                    [new ProgressionEvolutionOption("evolution-synthetic", "Synthetic evolution", 0)]),
+            ]);
+
+        return new BuildDraftRuntimeContext(
+            catalog,
+            new BuildDraftVersionedReference("ruleset-synthetic", "1.0.0"),
+            new BuildDraftDatasetReference(
+                "synthetic-001",
+                $"sha256:{new string('0', 64)}"),
+            "0.1.0",
+            new ItemCatalog(
+                "ruleset-synthetic",
+                [
+                    CreateItem("item-synthetic", ["class-synthetic"], 12),
+                    CreateItem("item-heavy", ["class-synthetic"], 100),
+                ]));
+    }
+
+    private static ItemDefinition CreateItem(
+        string id,
+        string[] allowedClasses,
+        long requiredStatAlpha) =>
+        new(
+            id,
+            "1.0.0",
+            "ruleset-synthetic",
+            $"Item {id}",
+            ItemDefinitionStatus.Published,
+            new HashSet<string>(["weapon"], StringComparer.Ordinal),
+            new HashSet<string>(allowedClasses, StringComparer.Ordinal),
+            new Dictionary<string, long>(StringComparer.Ordinal)
+            {
+                ["stat-alpha"] = requiredStatAlpha,
+            },
+            15);
+
     private static BuildDraftRuntimeContext CreateRuntimeContext()
     {
         var characterClass = new CharacterProgressionDefinition(
@@ -467,7 +641,8 @@ public sealed class CharacterBuildPersistenceIntegrationTests
             new BuildDraftDatasetReference(
                 "synthetic-001",
                 $"sha256:{new string('0', 64)}"),
-            "0.1.0");
+            "0.1.0",
+            new ItemCatalog("ruleset-synthetic", []));
     }
 
     private sealed class InMemoryBuildDraftRepository : IBuildDraftRepository

@@ -63,7 +63,10 @@ public sealed class SaveBuildUseCase
             stats,
             draft.ProgressionInputs.CompletedQuestIds.ToArray(),
             draft.ResetInputs.ResetCount,
-            draft.ResetInputs.PointsPerReset);
+            draft.ResetInputs.PointsPerReset,
+            draft.Equipment is null
+                ? Array.Empty<BuildEquipmentEntry>()
+                : draft.Equipment.ToArray());
 
         await _repository.SaveAsync(build, cancellationToken);
         return build;

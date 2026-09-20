@@ -3,14 +3,17 @@ namespace MuOnline.BuildPlanner.Application.Items;
 public sealed record EquipItemRequest(
     string CharacterClassId,
     IReadOnlyDictionary<string, long> FinalStats,
-    string ItemId);
+    string ItemId,
+    int Level = 0);
 
 public sealed record EquipItemResult(
     string ItemId,
     string DisplayName,
     string RulesetId,
     IReadOnlyList<string> Slots,
-    IReadOnlyDictionary<string, long> RequiredStats);
+    IReadOnlyDictionary<string, long> RequiredStats,
+    int Level,
+    int MaxItemLevel);
 
 public sealed class EquipItemUseCase
 {
@@ -47,6 +50,14 @@ public sealed class EquipItemUseCase
                 $"Class '{request.CharacterClassId}' cannot equip item '{item.Id}'.");
         }
 
+        if (request.Level < 0 || request.Level > item.MaxItemLevel)
+        {
+            throw Error(
+                ItemEquipErrorCodes.LevelOutOfRange,
+                $"Item '{item.Id}' cannot be equipped at level '{request.Level}' " +
+                $"when its published maximum is '{item.MaxItemLevel}'.");
+        }
+
         var unmetStats = item.RequiredStats
             .Where(requirement =>
                 !request.FinalStats.TryGetValue(requirement.Key, out var finalValue) ||
@@ -66,7 +77,9 @@ public sealed class EquipItemUseCase
             item.DisplayName,
             item.RulesetId,
             item.Slots.Order(StringComparer.Ordinal).ToArray(),
-            item.RequiredStats);
+            item.RequiredStats,
+            request.Level,
+            item.MaxItemLevel);
     }
 
     private static ItemEquipException Error(string code, string message) =>

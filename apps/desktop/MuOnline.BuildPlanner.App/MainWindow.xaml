@@ -233,6 +233,78 @@
                 </Grid>
             </GroupBox>
 
+            <GroupBox Grid.Row="12"
+                      Grid.ColumnSpan="2"
+                      Margin="0,24,0,0"
+                      Header="Equipo">
+                <Grid Margin="12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="180" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <TextBlock VerticalAlignment="Center"
+                               Text="Nivel del ítem" />
+                    <TextBox x:Name="EquipItemLevelTextBox"
+                             Grid.Column="1"
+                             MinHeight="30"
+                             VerticalContentAlignment="Center"
+                             Text="0" />
+
+                    <StackPanel Grid.Row="1"
+                                Grid.Column="1"
+                                Margin="0,12,0,0"
+                                Orientation="Horizontal">
+                        <Button Width="200"
+                                Padding="12,6"
+                                Click="EquipSelectedItemButtonClick"
+                                Content="Equipar seleccionado"
+                                AutomationProperties.Name="Equipar el ítem seleccionado" />
+                        <Button Width="200"
+                                Margin="12,0,0,0"
+                                Padding="12,6"
+                                Click="UnequipSelectedItemButtonClick"
+                                Content="Desequipar seleccionado"
+                                AutomationProperties.Name="Desequipar el ítem equipado seleccionado de la lista" />
+                    </StackPanel>
+
+                    <TextBlock Grid.Row="2"
+                               Margin="0,16,0,0"
+                               VerticalAlignment="Center"
+                               Text="Equipado" />
+                    <ListBox x:Name="EquippedItemsListBox"
+                             Grid.Row="2"
+                             Grid.Column="1"
+                             Margin="0,16,0,0"
+                             MinHeight="72"
+                             AutomationProperties.Name="Ítems equipados">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock TextWrapping="Wrap">
+                                    <Run FontWeight="SemiBold" Text="{Binding ItemId}" />
+                                    <Run Text=" · v" />
+                                    <Run Text="{Binding ItemVersion}" />
+                                    <Run Text=" · nivel " />
+                                    <Run Text="{Binding Level}" />
+                                </TextBlock>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+
+                    <TextBlock x:Name="EquipStatusTextBox"
+                               Grid.Row="3"
+                               Grid.ColumnSpan="2"
+                               Margin="0,12,0,0"
+                               TextWrapping="Wrap" />
+                </Grid>
+            </GroupBox>
+
             <GroupBox Grid.Row="13"
                       Grid.ColumnSpan="2"
                       Margin="0,24,0,0"

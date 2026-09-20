@@ -15,7 +15,7 @@
     "statDistribution"
   ],
   "properties": {
-    "schemaVersion": { "const": "1.1.0" },
+    "schemaVersion": { "const": "1.2.0" },
     "id": { "$ref": "#/$defs/id" },
     "ruleset": { "$ref": "#/$defs/versionedRef" },
     "dataset": {
@@ -52,6 +52,10 @@
       }
     },
     "resetInputs": { "$ref": "#/$defs/resetInputs" },
+    "equipment": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/equipmentEntry" }
+    },
     "statDistribution": {
       "$ref": "https://schemas.mu46.local/v1/stat-distribution.schema.json"
     }
@@ -86,6 +90,16 @@
       "properties": {
         "id": { "$ref": "#/$defs/id" },
         "version": { "$ref": "#/$defs/semver" }
+      }
+    },
+    "equipmentEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["itemId", "itemVersion", "level"],
+      "properties": {
+        "itemId": { "$ref": "#/$defs/id" },
+        "itemVersion": { "$ref": "#/$defs/semver" },
+        "level": { "type": "integer", "minimum": 0 }
       }
     }
   }
