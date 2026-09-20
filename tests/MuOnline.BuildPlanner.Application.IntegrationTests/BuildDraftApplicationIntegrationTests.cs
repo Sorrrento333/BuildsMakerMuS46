@@ -506,7 +506,8 @@ public sealed class BuildDraftApplicationIntegrationTests
             {
                 ["stat-alpha"] = requiredStatAlpha,
             },
-            15);
+            15,
+            null);
 
     private static BuildDraftRuntimeContext CreateRuntimeContext()
     {

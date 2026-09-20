@@ -549,8 +549,35 @@ internal static class PublicationSmokeRunner
             }
         }
 
+        var dragonArmor = catalog.Items.Single(
+            item => item.Id == "item-dragon-armor");
+        if (dragonArmor.Defense != 37)
+        {
+            throw new InvalidOperationException(
+                "The published Dragon Armor base defense did not match EVD-0048.");
+        }
+
         var equipUseCase = PublishedProgressionRuleset.CreateEquipItemUseCase();
         var result = equipUseCase.Execute(new EquipItemRequest(
+            "class-dark-knight",
+            new Dictionary<string, long>(StringComparer.Ordinal)
+            {
+                ["strength"] = 232,
+                ["agility"] = 73,
+                ["vitality"] = 25,
+                ["energy"] = 10,
+            },
+            "item-dragon-armor",
+            Level: 7));
+        if (result.ItemId != "item-dragon-armor" ||
+            result.Defense != 37 ||
+            result.DefenseAtLevel != 49)
+        {
+            throw new InvalidOperationException(
+                "The published bounded defense progression did not resolve the approved +5% rule at +7.");
+        }
+
+        var krisResult = equipUseCase.Execute(new EquipItemRequest(
             "class-dark-knight",
             new Dictionary<string, long>(StringComparer.Ordinal)
             {
@@ -560,11 +587,13 @@ internal static class PublicationSmokeRunner
                 ["energy"] = 10,
             },
             "item-kris"));
-        if (result.ItemId != "item-kris" ||
-            !result.Slots.Contains("weapon", StringComparer.Ordinal))
+        if (krisResult.ItemId != "item-kris" ||
+            krisResult.Defense is not null ||
+            krisResult.DefenseAtLevel is not null ||
+            !krisResult.Slots.Contains("weapon", StringComparer.Ordinal))
         {
             throw new InvalidOperationException(
-                "The published bounded equip evaluation did not resolve the approved item.");
+                "The published bounded equip evaluation did not resolve the approved weapon item.");
         }
 
         return new ItemVerification(

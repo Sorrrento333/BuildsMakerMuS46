@@ -1,13 +1,14 @@
 {
-  "schemaVersion": "1.0.0",
+  "schemaVersion": "1.1.0",
   "id": "item-dragon-armor",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "rulesetId": "mu-s4-global-reference",
   "displayName": "Dragon Armor",
   "status": "PUBLISHED",
   "confidence": "VERIFIED",
   "slots": ["armor"],
   "allowedClassIds": ["class-dark-knight", "class-magic-gladiator"],
+  "defense": 37,
   "requiredStats": {
     "strength": 232,
     "agility": 73
@@ -21,7 +22,7 @@
   ],
   "socketSlots": 0,
   "maxItemLevel": 15,
-  "evidenceRefs": ["evd-0038", "evd-0040"],
+  "evidenceRefs": ["evd-0038", "evd-0040", "evd-0048", "evd-0053"],
   "conflictIds": ["dsp-0005", "dsp-0006", "dsp-0007"],
-  "notes": "Axioma acotado del propietario (EVD-0040) sobre RES-0003. Valores de Fanz en nivel +0; la divergencia de temporada se conserva y no autoriza inferir ningun otro campo."
+  "notes": "Axioma acotado del propietario (EVD-0040) sobre RES-0003. Valores de Fanz en nivel +0; la divergencia de temporada se conserva y no autoriza inferir ningun otro campo. La defensa base +0 (37) procede de la re-captura EVD-0048; la progresion defensiva por nivel de item esta autorizada por el axio-axioma parcial EVD-0053 (regla Webzen +5% de defensa final por upgrade, solo cambios de contenido en Application)."
 }

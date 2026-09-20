@@ -12,8 +12,15 @@ declarar confianza y enlazar la evidencia que autoriza su uso.
   (`RES-0003`, `EVD-0040`): `item-kris`, `item-dragon-armor` y
   `item-albatross-bow`, con `displayName`, `slots`, `allowedClassIds`,
   `requiredStats` en nivel +0, `maxItemLevel` 15, `optionModules` NORMAL y
-  `socketSlots` 0. Quedan fuera del axioma `requiredLevel`, la progresión de
-  `requiredStats`, los sockets y cualquier otro ítem, ranura, campo o grado.
+  `socketSlots` 0. `item-dragon-armor` (schema `1.1.0`) declara además
+  `defense` 37 en +0 (`EVD-0048`) y su `evidenceRefs` enlaza el axio-axioma
+  parcial `EVD-0053`; Kris y Albatross Bow (`schemaVersion` `1.1.0`,
+  `version` `1.0.0`) no publican defensa porque son armas. La progresión
+  defensiva por nivel de ítem `DEF(n) = trunc(base × (1 + 0,05·n))` es la regla
+  Webzen adoptada como axioma parcial (`EVD-0053`) y se implementa como valor
+  derivado en Application. Quedan fuera del axioma `requiredLevel`, la
+  progresión de `requiredStats`, los sockets, el JOL (`+5 STR` por opción,
+  diferido) y cualquier otro ítem, ranura, campo o grado.
 - `skills/`: ocho definiciones `PUBLISHED` del axioma acotado del propietario
   (`RES-0004`, `EVD-0045`): `skill-impale`,
   `skill-twisting-slash`, `skill-swell-life`, `skill-death-stab`,
@@ -165,6 +172,7 @@ motor sin codificar números del juego. Las pruebas cargan directamente estos
 JSON y reproducen los siete casos positivos y tres rechazos. WPF los empaqueta
 bajo la misma estructura y calcula la identidad del dataset sobre rutas
 relativas y bytes exactos. El catálogo de `items/` se distribuye y valida contra
-`item.schema.json`, pero Application todavía no lo consume. El catálogo de
-`skills/` se distribuye y valida contra `skill.schema.json`, igualmente sin
-consumo de Application todavía.
+`item.schema.json`, y Application lo consume para UC-04 (elegibilidad de
+equipado) y para proyectar la defensa derivada por nivel de ítem según
+`EVD-0053`. El catálogo de `skills/` se distribuye y valida contra
+`skill.schema.json`, igualmente sin consumo de Application todavía.

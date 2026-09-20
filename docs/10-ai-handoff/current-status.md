@@ -14,6 +14,13 @@
 
 ## Completado
 
+- Progresión defensiva de armadura por nivel de ítem implementada (2026-09-20):
+  schema item `1.1.0` con `defense` opcional, `item-dragon-armor` `1.1.0` con
+  `defense` 37 (`EVD-0048`), `JsonItemCatalogSnapshotReader` `1.1.0`,
+  `ItemDefenseBonusCalculator` (`DEF(n) = trunc(base × (1 + 0,05·n))`, axioma
+  `EVD-0053`), `EquipItemResult` con `Defense`/`DefenseAtLevel`, WPF y smoke a
+  +7 (49) y kris sin defensa; dataset `2026-09-20.1`, JOL diferido.
+
 - Diseño documental v1.0: visión, alcance, requisitos, roadmap, arquitectura,
   dominio, estrategia de datos, investigación, pruebas, seguridad y continuidad.
 - Spikes equivalentes de TypeScript/Node.js 24 y C#/.NET 10 para cálculo
@@ -1402,6 +1409,13 @@
   confianza y pruebas.
 
 ## Completado
+
+- Progresión defensiva de armadura por nivel de ítem implementada (2026-09-20):
+  schema item `1.1.0` con `defense` opcional, `item-dragon-armor` `1.1.0` con
+  `defense` 37 (`EVD-0048`), `JsonItemCatalogSnapshotReader` `1.1.0`,
+  `ItemDefenseBonusCalculator` (`DEF(n) = trunc(base × (1 + 0,05·n))`, axioma
+  `EVD-0053`), `EquipItemResult` con `Defense`/`DefenseAtLevel`, WPF y smoke a
+  +7 (49) y kris sin defensa; dataset `2026-09-20.1`, JOL diferido.
 
 - Diseño documental v1.0: visión, alcance, requisitos, roadmap, arquitectura,
   dominio, estrategia de datos, investigación, pruebas, seguridad y continuidad.
@@ -3269,6 +3283,38 @@ compone el flujo de guardado/carga por ID. No se incorporan JSON factuales ni
   compilación propia MIT integrada demuestra hashes idénticos entre dos rutas
   fuente, 2 × 32/32 fixtures, formatos, SBOM, locks, auditoría y publicación
   inspeccionada. Corvus 4.6.7 se conserva como contingencia sin asumir paridad.
+
+## Gate de ampliación de UC-04 — resuelto (2026-09-20)
+
+- `RES-0005` queda `VERIFIED` con cinco claims y `DSP-0012` `RESOLVED` por
+  `OWNER_DECISION`; `EVD-0053` (2026-09-20) fija el axio-axioma parcial.
+- Evidencias `EVD-0047`–`EVD-0049`: re-captura 2026-09-20 de Kris, Dragon
+  Armor y Albatross Bow en Fanz, coincidente con `EVD-0037`–`EVD-0039` (+0) y
+  sin valores por nivel +1..+15 en el HTML estático ni `requiredLevel`.
+- Contraste `EVD-0050`–`EVD-0052` (Webzen, StrategyWiki, RaGEZONE,
+  ViciadosMU, muonline.net): sólo reglas genéricas sin alcance Season 4 ni
+  valores por ítem.
+- Alcance adoptado: regla Webzen de armadura (`+5% de defensa final por nivel
+  de ítem`) y regla JOL (`+5 STR` por nivel de opción) como axiomas del
+  ruleset para el subconjunto; se descartan `requiredLevel`, ATK por nivel de
+  armas, progresión de `requiredStats` por nivel y sockets (sin fuente).
+- El 2026-09-20 el propietario fijó la semántica: aditiva
+  `DEF(n) = trunc(base × (1 + 0,05·n))`, materializar `defense` +0 y diferir
+  JOL; el diseño de la vertical quedó en
+  `docs/04-domain/items-defense-level-bonus-design.md`.
+- El mismo día la vertical quedó `IMPLEMENTED`: `item.schema.json` avanza a
+  `1.1.0` con `defense` opcional, `item-dragon-armor` `1.1.0` declara
+  `defense` 37 (`EVD-0048`) y enlaza `evd-0048`/`evd-0053`; Kris y Albatross
+  Bow sólo actualizan `schemaVersion` a `1.1.0`. `ItemDefinition` gana
+  `Defense`; el lector acepta `1.1.0`; `ItemDefenseBonusCalculator` implementa
+  la regla con un único truncamiento hacia cero; `EquipItemResult` expone
+  `Defense`/`DefenseAtLevel`; WPF muestra DEF base/derivado y el smoke verifica
+  dragon armor a +7 (49) y kris sin defensa. Dataset `2026-09-20.1`, JOL
+  diferido.
+- No se incorporaron JSON factuales sustantivos fuera del subconjunto, ni
+  constantes del juego en Application: la regla es un coeficiente trazado a
+  `EVD-0050`/`EVD-0053`; ruleset `1.0.0` y motor `0.2.0` permanecen sin
+  cambios.
 
 ## Decisión del propietario — 2026-07-18
 

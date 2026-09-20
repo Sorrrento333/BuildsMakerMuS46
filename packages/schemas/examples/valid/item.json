@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "1.0.0",
+  "schemaVersion": "1.1.0",
   "id": "item-synthetic",
   "version": "1.0.0",
   "rulesetId": "ruleset-synthetic",
@@ -8,6 +8,7 @@
   "confidence": "UNVERIFIED",
   "slots": ["main-hand"],
   "allowedClassIds": ["class-synthetic"],
+  "defense": 37,
   "requiredLevel": 1,
   "requiredStats": { "stat-synthetic": 0 },
   "optionModules": [

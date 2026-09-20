@@ -32,9 +32,13 @@ La instrucción de ejecutar sólo la primera tarea pendiente continúa vigente.
 5. Consumo acotado del catálogo de ítems implementado (`EquipItemUseCase`,
    selector de ranura/ítem en WPF y smoke): valida clase y `requiredStats` en
    +0; la instancia equipada acotada cerró la vertical `1.2.0`.
-6. Alternativa documentada: ampliar UC-04 (bonificaciones ATK/DEF,
-   `requiredLevel`, progresión de `requiredStats`, sockets) exige nueva
-   evidencia Season 4 o una nueva decisión del propietario.
+6. Progresión defensiva de armadura por nivel de ítem implementada (2026-09-20):
+   schema item `1.1.0` con `defense` opcional, `ItemDefinition.Defense`,
+   `JsonItemCatalogSnapshotReader` `1.1.0`, `ItemDefenseBonusCalculator`
+   (`DEF(n) = trunc(base × (1 + 0,05·n))`, axioma parcial `EVD-0053`),
+   `EquipItemResult` con `Defense`/`DefenseAtLevel`, `item-dragon-armor`
+   `1.1.0` con `defense` 37 (`EVD-0048`), WPF y smoke con DEF a +7 (49) y kris
+   sin defensa. Dataset `2026-09-20.1`. JOL diferido (requiere opciones).
 7. Alternativa documentada: master buys y pantallas restantes del flujo, sin
    contrato factual todavía.
 
@@ -270,6 +274,45 @@ nuevos datos factuales:
 - Los candidatos 6 y 7 siguen como alternativa documentada (ver «Prioridad
   inmediata»): ambos exigen nueva evidencia Season 4 o una nueva decisión del
   propietario para iniciarse.
+
+## Gate de ampliación de UC-04 — resuelto (2026-09-20)
+
+- Se investigó el candidato 6 (ampliar UC-04 con bonificaciones ATK/DEF,
+  `requiredLevel`, progresión de `requiredStats` y sockets) con re-captura de las
+  páginas Fanz (Kris, Dragon Armor, Albatross Bow) y contraste con fuentes
+  autorizadas (Webzen, StrategyWiki, RaGEZONE, ViciadosMU, muonline.net).
+- `RES-0005` documenta las evidencias `EVD-0047`–`EVD-0052`; `DSP-0012` quedó
+  `RESOLVED` por `OWNER_DECISION` con el axio-axioma parcial `EVD-0053`:
+  - Se adoptan como reglas del ruleset dentro del subconjunto acotado: la regla
+    Webzen de armadura (`+5% de defensa final por nivel de ítem`) y la regla JOL
+    (`+5 STR` por nivel de opción).
+  - Se descartan (sin fuente Season 4 con valores) `requiredLevel`, los valores
+    de ATK por nivel de ítem de armas, la progresión de `requiredStats` por
+    nivel y los sockets.
+- Diseño completado el 2026-09-20 en
+  `docs/04-domain/items-defense-level-bonus-design.md` (semántica aditiva
+  `DEF(n) = trunc(base × (1 + 0,05·n))`, `defense` +0, JOL diferido).
+
+## Progresión defensiva de armadura por nivel — implementado (2026-09-20)
+
+- `item.schema.json` avanza a `1.1.0` con la propiedad opcional `defense`
+  (integer `>= 0`); los tres registros canónicos actualizan `schemaVersion` a
+  `1.1.0` e `item-dragon-armor` sube a `version` `1.1.0` declarando
+  `defense` 37 (`EVD-0048`) y enlazando `evd-0048`/`evd-0053`; Kris y Albatross
+  Bow permanecen en `1.0.0` sin `defense` (armas). Fixtures sintéticos y
+  `Test-SchemaStructure` actualizados (item `1.1.0`).
+- `ItemDefinition` gana `Defense` (`long?`); `JsonItemCatalogSnapshotReader`
+  acepta `1.1.0` y materializa `defense` opcional (negativo → fail-closed).
+- Nuevo `ItemDefenseBonusCalculator` (Application, `Items/`): aritmética decimal
+  comprobada y un único truncamiento hacia cero en la salida. Verificación en
+  `0..15`: n=0 → 37, n=1 → 38, n=7 → 49, n=10 → 55, n=15 → 64.
+- `EquipItemResult` expone `Defense` (base) y `DefenseAtLevel` (derivada);
+  `EquipItemUseCase` lo rellena desde el catálogo. WPF muestra DEF base y
+  derivado en la sección Equipo; el smoke verifica dragon armor a +7 (DEF 49) y
+  kris sin defensa.
+- Dataset `2026-09-20.1`; ruleset `1.0.0` y motor `0.2.0` sin cambios.
+  Verificación: build 0/0 (Debug y Release previsto), 858+ pruebas, validador
+  CLI exit 0, `Test-SchemaStructure` 17/34, smoke WPF `win-x64` PASS.
 
 ---
 

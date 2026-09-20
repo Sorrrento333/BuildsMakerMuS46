@@ -501,13 +501,24 @@ public partial class MainWindow : Window
         {
             $"Elegible: {result.DisplayName} ({result.ItemId})",
             $"Ranuras: {string.Join(", ", result.Slots)}",
+            $"Nivel: +{result.Level}",
             "Requisitos publicados en nivel +0:",
         };
         lines.AddRange(result.RequiredStats
             .OrderBy(item => item.Key, StringComparer.Ordinal)
             .Select(item => $"- {item.Key}: {item.Value}"));
-        lines.Add(
-            "Sin bonificaciones ni progresión de nivel: fuera del axioma acotado.");
+        if (result.Defense is not null)
+        {
+            lines.Add(
+                $"Defensa: {result.Defense} en nivel +0; " +
+                $"DEF(n) = trunc(base × (1 + 0,05·n)) → {result.DefenseAtLevel} a +{result.Level} " +
+                "(axioma parcial EVD-0053).");
+        }
+        else
+        {
+            lines.Add(
+                "Sin bonificaciones ni progresión de nivel: fuera del axioma acotado.");
+        }
         return string.Join(Environment.NewLine, lines);
     }
 

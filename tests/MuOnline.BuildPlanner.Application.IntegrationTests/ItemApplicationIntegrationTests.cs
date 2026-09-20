@@ -53,7 +53,32 @@ public sealed class ItemApplicationIntegrationTests
                 .EnumerateObject()
                 .ToDictionary(stat => stat.Name, stat => stat.Value.GetInt64());
             Assert.Equal(expectedStats, item.RequiredStats);
+            var expectedDefense = element.TryGetProperty("defense", out var defenseElement)
+                ? defenseElement.GetInt64()
+                : (long?)null;
+            Assert.Equal(expectedDefense, item.Defense);
         }
+    }
+
+    [Fact]
+    public void UseCaseExposesBaseAndDerivedDefenseFromCanonicalSnapshot()
+    {
+        var useCase = CreateUseCase(CanonicalSnapshotRoot);
+
+        var result = useCase.Execute(new EquipItemRequest(
+            "class-dark-knight",
+            new Dictionary<string, long>(StringComparer.Ordinal)
+            {
+                ["strength"] = 232,
+                ["agility"] = 73,
+                ["vitality"] = 25,
+                ["energy"] = 10,
+            },
+            "item-dragon-armor",
+            Level: 7));
+
+        Assert.Equal(37, result.Defense);
+        Assert.Equal(49, result.DefenseAtLevel);
     }
 
     [Theory]
@@ -114,6 +139,46 @@ public sealed class ItemApplicationIntegrationTests
         Assert.Equal(
             ItemCatalogSnapshotErrorCodes.RulesetMismatch,
             exception.Code);
+    }
+
+    [Fact]
+    public void ReaderFailsClosedWhenItemDefenseIsNegative()
+    {
+        using var snapshot = TemporarySnapshot.CopyFrom(CanonicalSnapshotRoot);
+        var itemPath = Directory.GetFiles(snapshot.ItemsDirectory, "*.json")
+            .Order(StringComparer.Ordinal)
+            .First(path => File.ReadAllText(path).Contains("\"defense\""));
+        UpdateJson(itemPath, root => root["defense"] = -1);
+
+        var exception = Assert.Throws<ItemCatalogSnapshotException>(
+            () => new JsonItemCatalogSnapshotReader().Read(snapshot.Root));
+
+        Assert.Equal(
+            ItemCatalogSnapshotErrorCodes.SnapshotInvalid,
+            exception.Code);
+    }
+
+    [Theory]
+    [InlineData(0, 37)]
+    [InlineData(1, 38)]
+    [InlineData(7, 49)]
+    [InlineData(10, 55)]
+    [InlineData(15, 64)]
+    public void DefenseCalculatorTruncatesOnlyAtOutputAcrossTheApprovedLevelRange(
+        int level,
+        long expectedDefenseAtLevel)
+    {
+        Assert.Equal(
+            expectedDefenseAtLevel,
+            ItemDefenseBonusCalculator.Calculate(37, level));
+    }
+
+    [Fact]
+    public void DefenseCalculatorReturnsNullWithoutABaseDefense()
+    {
+        Assert.Null(ItemDefenseBonusCalculator.Calculate(null, 7));
+        Assert.Throws<ArgumentOutOfRangeException>(
+            () => ItemDefenseBonusCalculator.Calculate(37, -1));
     }
 
     [Fact]

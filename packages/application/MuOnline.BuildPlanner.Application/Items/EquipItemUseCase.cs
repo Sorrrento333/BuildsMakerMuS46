@@ -13,7 +13,9 @@ public sealed record EquipItemResult(
     IReadOnlyList<string> Slots,
     IReadOnlyDictionary<string, long> RequiredStats,
     int Level,
-    int MaxItemLevel);
+    int MaxItemLevel,
+    long? Defense,
+    long? DefenseAtLevel);
 
 public sealed class EquipItemUseCase
 {
@@ -79,7 +81,9 @@ public sealed class EquipItemUseCase
             item.Slots.Order(StringComparer.Ordinal).ToArray(),
             item.RequiredStats,
             request.Level,
-            item.MaxItemLevel);
+            item.MaxItemLevel,
+            item.Defense,
+            ItemDefenseBonusCalculator.Calculate(item.Defense, request.Level));
     }
 
     private static ItemEquipException Error(string code, string message) =>

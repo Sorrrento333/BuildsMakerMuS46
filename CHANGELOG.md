@@ -21,6 +21,26 @@
 
 ### Added
 
+- Progresión defensiva de armadura por nivel de ítem (ampliación de UC-04,
+  vertical del axio-axioma parcial `EVD-0053`). `item.schema.json` avanza a
+  `1.1.0` con la propiedad opcional `defense` (integer `>= 0`); los tres
+  registros canónicos actualizan `schemaVersion` a `1.1.0` e
+  `item-dragon-armor` sube a `version` `1.1.0` declarando `defense` 37 en +0
+  (`EVD-0048`) y enlazando `evd-0048`/`evd-0053` en `evidenceRefs`; Kris y
+  Albatross Bow permanecen en `1.0.0` sin `defense` (armas).
+  `ItemDefinition` gana `Defense` (`long?`); `JsonItemCatalogSnapshotReader`
+  acepta `1.1.0` y materializa `defense` opcional (ausente → `null`, negativo →
+  fail-closed); el nuevo `ItemDefenseBonusCalculator` aplica la regla Webzen
+  `DEF(n) = trunc(base × (1 + 0,05·n))` con aritmética decimal comprobada y un
+  único truncamiento hacia cero en la salida; `EquipItemResult` expone `Defense`
+  (base) y `DefenseAtLevel` (derivada). WPF muestra DEF base y derivado en la
+  sección Equipo y el smoke WPF verifica el dragon armor a +7 (DEF 49) y el
+  kris sin defensa. El JOL (`+5 STR` por opción), `requiredLevel`, ATK por nivel
+  de armas, progresión de `requiredStats` por nivel y sockets quedan excluidos o
+  diferidos. El dataset avanza a `2026-09-20.1`; ruleset `1.0.0` y motor `0.2.0`
+  sin cambios. Diseño en `docs/04-domain/items-defense-level-bonus-design.md` y
+  registro factual en `docs/05-research/registers/RES-0005-uc04-bono-required-sockets.md`.
+
 - Instancia equipada persistible sin bonificaciones (vertical `1.2.0`). Los
   contratos `build-draft.schema.json` y `build.schema.json` avanzan a `1.2.0`
   con el array `equipment` de `{ itemId, itemVersion, level }`: la ranura y los

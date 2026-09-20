@@ -177,6 +177,21 @@ o una nueva decisión del propietario. La decisión del gate está en
 `../04-domain/items-factual-gate-design.md` y el registro factual en
   `../05-research/registers/RES-0003-items-equipment.md`.
 
+La vertical `2026-09-20.1` amplía UC-04 con la progresión defensiva de armadura
+por nivel de ítem (`../04-domain/items-defense-level-bonus-design.md`):
+`item.schema.json` avanza a `1.1.0` con la propiedad opcional `defense`
+(integer `>= 0`); `ItemDefinition` gana `Defense` (`long?`); el lector
+materializa `defense` opcional (ausente → `null`; negativo → fail-closed);
+`ItemDefenseBonusCalculator` implementa la regla Webzen adoptada como axioma
+parcial `EVD-0053`, `DEF(n) = trunc(base × (1 + 0,05·n))` con un único
+truncamiento hacia cero en la salida, y `EquipItemResult` expone `Defense`
+(base) y `DefenseAtLevel` (derivada). `item-dragon-armor` sube a `1.1.0` con
+`defense` 37 (`EVD-0048`); Kris y Albatross Bow sólo actualizan `schemaVersion`
+a `1.1.0` y no declaran `defense` (armas). El JOL (`+5 STR` por opción),
+`requiredLevel`, la progresión de `requiredStats`, los sockets y los ATK por
+nivel de armas quedan diferidos o excluidos; el dataset avanza a
+`2026-09-20.1`.
+
 El catálogo acotado de skills quedó materializado para el axioma del propietario
 (`RES-0004`, `EVD-0045`): ocho `SkillDefinition` `PUBLISHED` `VERIFIED` en
 `packages/rulesets/mu-s4-global-reference/v1/skills/`

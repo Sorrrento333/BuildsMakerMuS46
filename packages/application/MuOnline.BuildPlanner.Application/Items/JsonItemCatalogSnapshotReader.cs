@@ -5,7 +5,7 @@ namespace MuOnline.BuildPlanner.Application.Items;
 
 public sealed class JsonItemCatalogSnapshotReader : IItemCatalogSnapshotReader
 {
-    private const string SupportedSchemaVersion = "1.0.0";
+    private const string SupportedSchemaVersion = "1.1.0";
 
     public ItemCatalog Read(string snapshotRoot)
     {
@@ -91,7 +91,8 @@ public sealed class JsonItemCatalogSnapshotReader : IItemCatalogSnapshotReader
             slots,
             allowedClassIds,
             ParseRequiredStats(element),
-            ParseMaxItemLevel(element));
+            ParseMaxItemLevel(element),
+            ParseDefense(element));
     }
 
     private static Dictionary<string, long> ParseRequiredStats(JsonElement element)
@@ -136,6 +137,24 @@ public sealed class JsonItemCatalogSnapshotReader : IItemCatalogSnapshotReader
         }
 
         return level;
+    }
+
+    private static long? ParseDefense(JsonElement element)
+    {
+        if (!element.TryGetProperty("defense", out var defenseElement))
+        {
+            return null;
+        }
+
+        var defense = defenseElement.GetInt64();
+        if (defense < 0)
+        {
+            throw Error(
+                ItemCatalogSnapshotErrorCodes.SnapshotInvalid,
+                "Item defense cannot be negative.");
+        }
+
+        return defense;
     }
 
     private static ItemDefinitionStatus ParseStatus(string status) =>

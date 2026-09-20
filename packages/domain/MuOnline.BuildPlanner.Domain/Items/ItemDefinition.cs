@@ -17,4 +17,5 @@ public sealed record ItemDefinition(
     IReadOnlySet<string> Slots,
     IReadOnlySet<string> AllowedClassIds,
     IReadOnlyDictionary<string, long> RequiredStats,
-    int MaxItemLevel);
+    int MaxItemLevel,
+    long? Defense);

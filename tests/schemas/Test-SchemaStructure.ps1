@@ -18,7 +18,7 @@ $contracts = @(
     @{ Name = 'build'; SchemaDirectory = 'v1'; SchemaName = 'build'; Version = '1.2.0' },
     @{ Name = 'ruleset'; SchemaDirectory = 'v1'; SchemaName = 'ruleset'; Version = '1.0.0' },
     @{ Name = 'quest-rule'; SchemaDirectory = 'v1'; SchemaName = 'quest-rule'; Version = '1.0.0' },
-    @{ Name = 'item'; SchemaDirectory = 'v1'; SchemaName = 'item'; Version = '1.0.0' },
+    @{ Name = 'item'; SchemaDirectory = 'v1'; SchemaName = 'item'; Version = '1.1.0' },
     @{ Name = 'skill'; SchemaDirectory = 'v1'; SchemaName = 'skill'; Version = '1.0.0' },
     @{ Name = 'scenario'; SchemaDirectory = 'v1'; SchemaName = 'scenario'; Version = '1.0.0' }
 )
