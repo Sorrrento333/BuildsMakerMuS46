@@ -1,2 +1,0 @@
-﻿## codex/reset-aware-drafts-traced-formulas...origin/codex/reset-aware-drafts-traced-formulas
-?? .opencode-wire/

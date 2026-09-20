@@ -2404,7 +2404,23 @@ compone el flujo de guardado/carga por ID. No se incorporan JSON factuales ni
 - El canal público de actualización y firma continúa como decisión posterior de
   distribución.
 
-## Verificación más reciente — 2026-09-19 (instancia equipada sin bonificaciones)
+## Verificación más reciente — 2026-09-20 (cierre de ciclo, sin vertical nueva)
+
+- El mantenedor decidió el 2026-09-20 no abrir ninguna vertical nueva: el ciclo
+  se cierra con actualización de documentación y limpieza de artefactos
+  obsoletos (ver «Próximas acciones», sección «Cierre de ciclo — 2026-09-20»).
+- Estado estable re-verificado: build Release `0/0`; `dotnet test` Release
+  858/858 pruebas (43 validator, 58 motor, 730 Application, 27 Data); CI verde
+  sobre el head `bd9632c` (`build-and-test` id `106011392709` success y
+  `wpf-publication-smoke` id `106011392751` success, run `35485648642`);
+  PR #7 `MERGED`; sin PR abierto; `git status` limpio salvo la limpieza y
+  documentación de este cierre.
+- Los candidatos restantes (ampliar UC-04 con bonificaciones/`requiredLevel`/
+  `requiredStats` por nivel/sockets, y master buys + pantallas restantes del
+  flujo) permanecen como «Alternativa documentada» en «Próximas acciones»:
+  ambos exigen nueva evidencia Season 4 o una nueva decisión del propietario.
+
+## Verificación anterior — 2026-09-19 (instancia equipada sin bonificaciones)
 
 - `BuildEquipmentEntry` (`{ itemId, itemVersion, level }`) serializa como
   `equipment` en `CharacterBuild`/`BuildDraft` `1.2.0` (`CurrentSchemaVersion`

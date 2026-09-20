@@ -1,2 +1,0 @@
-﻿40f5bbb wire build save/load via draft services in MainWindow
-eac8bec feat: persist a full character build locally

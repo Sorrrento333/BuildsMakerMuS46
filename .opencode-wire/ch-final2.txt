@@ -1,5 +1,0 @@
-﻿build-and-test	fail	23s	https://github.com/Sorrrento333/BuildsMakerMuS46/actions/runs/34748245362/job/103700019033	
-build-and-test	fail	27s	https://github.com/Sorrrento333/BuildsMakerMuS46/actions/runs/34748247796/job/103700025690	
-wpf-publication-smoke	pass	1m30s	https://github.com/Sorrrento333/BuildsMakerMuS46/actions/runs/34748245362/job/103700019127	
-wpf-publication-smoke	pass	1m31s	https://github.com/Sorrrento333/BuildsMakerMuS46/actions/runs/34748247796/job/103700025671	
-

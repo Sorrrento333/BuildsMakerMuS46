@@ -255,11 +255,21 @@ nuevos datos factuales:
   dataset `2026-07-30.3` con hash
   `sha256:ef6fd756c2a69245906019d4c4cf01c3a7baba460067bbfffc4c4906361b0f18`.
 
-## Primera acción concreta
+## Cierre de ciclo — 2026-09-20 (sin vertical nueva)
 
-Confirmar con el mantenedor si la siguiente vertical es master buys/pantallas
-restantes del flujo (con gate factual) o trazas de cálculo de alto nivel, y
-actualizar esta documentación y `CHANGELOG.md` al cerrarla.
+- El mantenedor decidió no abrir ninguna vertical nueva en este ciclo: se cierra
+  con actualización de documentación y limpieza de artefactos obsoletos.
+- Se eliminaron los artefactos stale de sesión que referenciaban el commit
+  `40f5bbb` y el PR #7 como `OPEN/BLOCKED`: `gitwire-final/`, `.opencode-wire/`,
+  `checks-current.txt`, `head-current.txt`, `branche-current.txt`,
+  `pr-current.json`, `githead-build.txt`, `gitlog-build.txt` y
+  `gitstatus-build.txt`.
+- Verificación del estado estable: build Release 0/0; 858/858 pruebas; CI verde
+  sobre `bd9632c` (`build-and-test` y `wpf-publication-smoke` success);
+  PR #7 ya `MERGED`; sin PR abierto.
+- Los candidatos 6 y 7 siguen como alternativa documentada (ver «Prioridad
+  inmediata»): ambos exigen nueva evidencia Season 4 o una nueva decisión del
+  propietario para iniciarse.
 
 ---
 

@@ -1,8 +1,0 @@
-﻿git : Everything up-to-date
-En línea: 10 Carácter: 1
-+ git push origin codex/reset-aware-drafts-traced-formulas 2>&1 | Out-S ...
-+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    + CategoryInfo          : NotSpecified: (Everything up-to-date:String) [], RemoteException
-    + FullyQualifiedErrorId : NativeCommandError
- 
-
