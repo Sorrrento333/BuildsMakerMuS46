@@ -245,6 +245,7 @@ public sealed class SqliteBuildDraftRepositoryTests
                 3,
                 []),
             new BuildDraftResetInputs(2, 100),
+            [],
             new BuildDraftStatDistribution(
                 BuildDraftStatDistribution.CurrentSchemaVersion,
                 "ruleset-synthetic",

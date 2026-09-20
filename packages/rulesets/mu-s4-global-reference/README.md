@@ -8,6 +8,29 @@ declarar confianza y enlazar la evidencia que autoriza su uso.
 
 - `character-classes/`: seis clases base, estadísticas iniciales/distribuibles
   y evoluciones aprobadas.
+- `items/`: tres definiciones `PUBLISHED` del axioma acotado del propietario
+  (`RES-0003`, `EVD-0040`): `item-kris`, `item-dragon-armor` y
+  `item-albatross-bow`, con `displayName`, `slots`, `allowedClassIds`,
+  `requiredStats` en nivel +0, `maxItemLevel` 15, `optionModules` NORMAL y
+  `socketSlots` 0. `item-dragon-armor` (schema `1.1.0`) declara además
+  `defense` 37 en +0 (`EVD-0048`) y su `evidenceRefs` enlaza el axio-axioma
+  parcial `EVD-0053`; Kris y Albatross Bow (`schemaVersion` `1.1.0`,
+  `version` `1.0.0`) no publican defensa porque son armas. La progresión
+  defensiva por nivel de ítem `DEF(n) = trunc(base × (1 + 0,05·n))` es la regla
+  Webzen adoptada como axioma parcial (`EVD-0053`) y se implementa como valor
+  derivado en Application. Quedan fuera del axioma `requiredLevel`, la
+  progresión de `requiredStats`, los sockets, el JOL (`+5 STR` por opción,
+  diferido) y cualquier otro ítem, ranura, campo o grado.
+- `skills/`: ocho definiciones `PUBLISHED` del axioma acotado del propietario
+  (`RES-0004`, `EVD-0045`): `skill-impale`,
+  `skill-twisting-slash`, `skill-swell-life`, `skill-death-stab`,
+  `skill-rageful-blow`, `skill-strike-of-destruction` (Dark Knight) y
+  `skill-penetration`, `skill-multi-shot` (Fairy Elf). El mapeo
+  `kind` aprobado asigna `ATK`/`Non-ATK`/`Debuff` → `ACTIVE` y `Buff` → `BUFF`;
+  `requiredLevel` es el `Character Level` publicado, `allowedEvolutionIds` son
+  las tres evoluciones de cada familia, `prerequisiteSkillIds` queda vacío y
+  `buffRef` se omite. Quedan fuera del axioma cualquier otra skill, los
+  prerrequisitos por stat/quest/equipo, `PASSIVE` y cualquier efecto de buff.
 - `progression-rules/`: dos reglas de puntos por nivel `PUBLISHED`; sus
   `testCaseRefs` enlazan los siete casos positivos aprobados.
 - `formulas/`: `formula-hp-dark-wizard` `1.0.0` está `PUBLISHED` después de
@@ -112,8 +135,8 @@ declarar confianza y enlazar la evidencia que autoriza su uso.
   controles nunca se enlazan desde `testCaseRefs`.
 
 Los IDs usan prefijos de tipo (`class-`, `evolution-`, `progression-`,
-`quest-`) y son referencias estables; los nombres visibles no se usan como
-identidad. Los valores proceden del alcance cerrado de `RES-0001` y están
+`quest-`, `item-`, `skill-`) y son referencias estables; los nombres visibles no
+se usan como identidad. Los valores proceden del alcance cerrado de `RES-0001` y están
 clasificados `VERIFIED` por `EVD-0021`; las fórmulas de Dark Knight y Fairy Elf
 proceden de `EVD-0026`; Magic Gladiator y Dark Lord añaden sus mínimos
 factuales de Vitality trazados por `EVD-0021`. Mana de Dark Wizard y Dark
@@ -148,4 +171,8 @@ referencias clase/regla coherentes y reglas `PUBLISHED`; el caso de uso invoca e
 motor sin codificar números del juego. Las pruebas cargan directamente estos
 JSON y reproducen los siete casos positivos y tres rechazos. WPF los empaqueta
 bajo la misma estructura y calcula la identidad del dataset sobre rutas
-relativas y bytes exactos.
+relativas y bytes exactos. El catálogo de `items/` se distribuye y valida contra
+`item.schema.json`, y Application lo consume para UC-04 (elegibilidad de
+equipado) y para proyectar la defensa derivada por nivel de ítem según
+`EVD-0053`. El catálogo de `skills/` se distribuye y valida contra
+`skill.schema.json`, igualmente sin consumo de Application todavía.

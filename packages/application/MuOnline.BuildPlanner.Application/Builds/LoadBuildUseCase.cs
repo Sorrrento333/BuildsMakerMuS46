@@ -29,7 +29,15 @@ public sealed class LoadBuildUseCase
                 $"Build '{id}' was not found.");
         }
 
-        if (stored.SchemaVersion != CharacterBuild.CurrentSchemaVersion)
+        if (stored.SchemaVersion == CharacterBuild.PreviousSchemaVersion)
+        {
+            stored = stored with
+            {
+                SchemaVersion = CharacterBuild.CurrentSchemaVersion,
+                Equipment = [],
+            };
+        }
+        else if (stored.SchemaVersion != CharacterBuild.CurrentSchemaVersion)
         {
             throw Error(
                 BuildErrorCodes.SchemaUnsupported,
@@ -59,6 +67,20 @@ public sealed class LoadBuildUseCase
             characterClass,
             stored.Stats,
             stored.Id);
+        try
+        {
+            BuildEquipmentValidator.EnsureValid(
+                _context.ItemCatalog,
+                stored.CharacterClassId,
+                stored.Stats,
+                stored.Equipment ?? []);
+        }
+        catch (BuildEquipmentValidationException exception)
+        {
+            throw Error(
+                MapEquipmentCode(exception.Code),
+                exception.Message);
+        }
 
         return stored with
         {
@@ -66,8 +88,19 @@ public sealed class LoadBuildUseCase
             Stats = new Dictionary<string, long>(
                 stored.Stats,
                 StringComparer.Ordinal),
+            Equipment = stored.Equipment ?? [],
         };
     }
+
+    private static string MapEquipmentCode(string code) => code switch
+    {
+        "item-not-found" => BuildErrorCodes.EquipmentItemNotFound,
+        "version-mismatch" => BuildErrorCodes.EquipmentVersionMismatch,
+        "class-not-allowed" => BuildErrorCodes.EquipmentClassNotAllowed,
+        "level-out-of-range" => BuildErrorCodes.EquipmentLevelOutOfRange,
+        "duplicate" => BuildErrorCodes.EquipmentDuplicate,
+        _ => BuildErrorCodes.EquipmentRequirementsNotMet,
+    };
 
     private static BuildException Error(string code, string message) =>
         new(code, message);

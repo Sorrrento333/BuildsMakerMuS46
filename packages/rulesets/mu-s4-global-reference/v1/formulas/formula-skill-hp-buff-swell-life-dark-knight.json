@@ -1,0 +1,177 @@
+{
+    "schemaVersion":  "2.1.0",
+    "id":  "formula-skill-hp-buff-swell-life-dark-knight",
+    "version":  "1.0.0",
+    "rulesetId":  "mu-s4-global-reference",
+    "status":  "PUBLISHED",
+    "confidence":  "VERIFIED",
+    "purpose":  "Calculate visible Swell Life HP buff for the Dark Knight family before equipment, options, buffs, private profiles, or undeclared modifiers.",
+    "applicability":  {
+                          "characterClassId":  "class-dark-knight",
+                          "evolutionIds":  [
+                                               "evolution-dark-knight",
+                                               "evolution-blade-knight",
+                                               "evolution-blade-master"
+                                           ]
+                      },
+    "inputs":  [
+                   {
+                       "id":  "energy",
+                       "numericType":  "INT64",
+                       "unit":  "stat-point",
+                       "numericBounds":  {
+                                             "minimum":  10,
+                                             "minimumInclusive":  true,
+                                             "classification":  "FACTUAL",
+                                             "evidenceRefs":  [
+                                                                  "evd-0021"
+                                                              ]
+                                         },
+                       "rangeErrorCode":  "formula-stat-below-base",
+                       "source":  {
+                                      "kind":  "CONTEXT_VALUE",
+                                      "valueId":  "resolved-energy"
+                                  }
+                   },
+                   {
+                       "id":  "vitality",
+                       "numericType":  "INT64",
+                       "unit":  "stat-point",
+                       "numericBounds":  {
+                                             "minimum":  25,
+                                             "minimumInclusive":  true,
+                                             "classification":  "FACTUAL",
+                                             "evidenceRefs":  [
+                                                                  "evd-0021"
+                                                              ]
+                                         },
+                       "rangeErrorCode":  "formula-stat-below-base",
+                       "source":  {
+                                      "kind":  "CONTEXT_VALUE",
+                                      "valueId":  "resolved-vitality"
+                                  }
+                   }
+               ],
+    "output":  {
+                   "id":  "hp-buff",
+                   "numericType":  "INT64",
+                   "unit":  "percent"
+               },
+    "strategy":  {
+                     "kind":  "PROGRAM",
+                     "executionModel":  "CHECKED_DECIMAL_V1",
+                     "steps":  [
+                                   {
+                                       "id":  "energy-term",
+                                       "operation":  "DIVIDE",
+                                       "operands":  [
+                                                        {
+                                                            "kind":  "INPUT",
+                                                            "inputId":  "energy"
+                                                        },
+                                                        {
+                                                            "kind":  "LITERAL",
+                                                            "value":  20
+                                                        }
+                                                    ]
+                                   },
+                                   {
+                                       "id":  "vitality-term",
+                                       "operation":  "DIVIDE",
+                                       "operands":  [
+                                                        {
+                                                            "kind":  "INPUT",
+                                                            "inputId":  "vitality"
+                                                        },
+                                                        {
+                                                            "kind":  "LITERAL",
+                                                            "value":  100
+                                                        }
+                                                    ]
+                                   },
+                                   {
+                                       "id":  "raw-hp-buff",
+                                       "operation":  "ADD",
+                                       "operands":  [
+                                                        {
+                                                            "kind":  "STEP",
+                                                            "stepId":  "energy-term"
+                                                        },
+                                                        {
+                                                            "kind":  "STEP",
+                                                            "stepId":  "vitality-term"
+                                                        },
+                                                        {
+                                                            "kind":  "LITERAL",
+                                                            "value":  12
+                                                        }
+                                                    ]
+                                   },
+                                   {
+                                       "id":  "visible-hp-buff",
+                                       "operation":  "APPLY_ROUNDING",
+                                       "operands":  [
+                                                        {
+                                                            "kind":  "STEP",
+                                                            "stepId":  "raw-hp-buff"
+                                                        }
+                                                    ]
+                                   }
+                               ],
+                     "dependencyFormulaRefs":  [
+
+                                               ]
+                 },
+    "rounding":  {
+                     "mode":  "TRUNCATE",
+                     "stage":  "visible-hp-buff",
+                     "decimalPlaces":  0
+                 },
+    "trace":  {
+                  "stepIds":  [
+                                  "energy-term",
+                                  "vitality-term",
+                                  "raw-hp-buff",
+                                  "visible-hp-buff"
+                              ],
+                  "rawOutputStepId":  "raw-hp-buff",
+                  "visibleOutputStepId":  "visible-hp-buff"
+              },
+    "constraints":  [
+                        "Resolve class and evolution applicability before evaluating arithmetic.",
+                        "Divide Energy by the exact literal 20 and Vitality by the exact literal 100 using checked decimal arithmetic, then add the exact literal 12.",
+                        "Represent energy-term and vitality-term exactly as base-10 decimals and add both terms and the constant with checked decimal arithmetic.",
+                        "Do not round energy-term, vitality-term or raw-hp-buff before visible-hp-buff.",
+                        "Truncate raw-hp-buff toward zero exactly once at visible-hp-buff."
+                    ],
+    "evidenceRefs":  [
+                         "evd-0021",
+                         "evd-0041",
+                         "evd-0045",
+                         "evd-0046"
+                     ],
+    "conflictIds":  [
+                        "dsp-0008",
+                        "dsp-0009",
+                        "dsp-0010",
+                        "dsp-0011"
+                    ],
+    "testCaseRefs":  [
+                         {
+                             "id":  "skill-hp-buff-swell-life-dark-knight-base",
+                             "version":  "1.0.0"
+                         },
+                         {
+                             "id":  "skill-hp-buff-swell-life-dark-knight-fraction-step",
+                             "version":  "1.0.0"
+                         },
+                         {
+                             "id":  "skill-hp-buff-swell-life-dark-knight-integer-step",
+                             "version":  "1.0.0"
+                         },
+                         {
+                             "id":  "skill-hp-buff-swell-life-dark-knight-blade-master-step",
+                             "version":  "1.0.0"
+                         }
+                     ]
+}

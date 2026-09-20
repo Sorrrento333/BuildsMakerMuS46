@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "1.1.0",
+  "schemaVersion": "1.2.0",
   "id": "build-draft-synthetic",
   "ruleset": {
     "id": "ruleset-synthetic",
@@ -20,6 +20,13 @@
     "resetCount": 2,
     "pointsPerReset": 100
   },
+  "equipment": [
+    {
+      "itemId": "item-synthetic",
+      "itemVersion": "1.0.0",
+      "level": 0
+    }
+  ],
   "statDistribution": {
     "schemaVersion": "1.1.0",
     "rulesetId": "ruleset-synthetic",

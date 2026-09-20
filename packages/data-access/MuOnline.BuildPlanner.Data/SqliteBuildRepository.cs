@@ -49,6 +49,12 @@ public sealed class SqliteBuildRepository : IBuildRepository
         WHERE id = $id;
         """;
 
+    private const string ListSql = """
+        SELECT payload_json
+        FROM builds
+        ORDER BY id;
+        """;
+
     private readonly string connectionString;
     private readonly SqliteWriteContentionPolicy writePolicy;
 
@@ -126,6 +132,37 @@ public sealed class SqliteBuildRepository : IBuildRepository
         var build = JsonSerializer.Deserialize<CharacterBuild>(payload)
             ?? throw new JsonException($"Stored build '{id}' deserialized to null.");
         return Task.FromResult<CharacterBuild?>(build);
+    }
+
+    public Task<IReadOnlyList<CharacterBuildSummary>> ListAsync(
+        CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+
+        var summaries = new List<CharacterBuildSummary>();
+        using var connection = OpenConnection();
+        using var command = connection.CreateCommand();
+        command.CommandText = ListSql;
+        using var reader = command.ExecuteReader();
+        while (reader.Read())
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            var payload = reader.GetString(0);
+            var build = JsonSerializer.Deserialize<CharacterBuild>(payload)
+                ?? throw new JsonException("A stored build deserialized to null while listing.");
+            summaries.Add(
+                new CharacterBuildSummary(
+                    build.Id,
+                    build.SchemaVersion,
+                    build.CharacterClassId,
+                    build.EvolutionId,
+                    build.Level,
+                    build.ResetCount,
+                    build.PointsPerReset,
+                    build.Dataset.Version));
+        }
+
+        return Task.FromResult<IReadOnlyList<CharacterBuildSummary>>(summaries);
     }
 
     private SqliteConnection OpenConnection()

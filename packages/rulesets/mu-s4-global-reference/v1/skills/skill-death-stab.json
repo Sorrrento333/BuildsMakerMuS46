@@ -1,0 +1,20 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "skill-death-stab",
+  "version": "1.0.0",
+  "rulesetId": "mu-s4-global-reference",
+  "displayName": "Death Stab",
+  "status": "PUBLISHED",
+  "confidence": "VERIFIED",
+  "kind": "ACTIVE",
+  "requiredLevel": 160,
+  "allowedEvolutionIds": [
+    "evolution-dark-knight",
+    "evolution-blade-knight",
+    "evolution-blade-master"
+  ],
+  "prerequisiteSkillIds": [],
+  "evidenceRefs": ["evd-0041", "evd-0042", "evd-0045"],
+  "conflictIds": ["dsp-0008", "dsp-0009", "dsp-0010", "dsp-0011"],
+  "notes": "Axioma acotado del propietario (EVD-0045) sobre RES-0004. `Character Level` de Fanz: 160 (Orb of Death Stab); el ítem de skill no se modela."
+}

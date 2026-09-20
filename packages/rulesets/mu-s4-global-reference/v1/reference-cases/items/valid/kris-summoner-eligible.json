@@ -1,0 +1,12 @@
+{
+  "id": "kris-summoner-eligible",
+  "itemId": "item-kris",
+  "classId": "class-summoner",
+  "stats": {
+    "strength": 40,
+    "agility": 40,
+    "vitality": 20,
+    "energy": 20
+  },
+  "expectedErrorCode": null
+}

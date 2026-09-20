@@ -1,0 +1,90 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.mu46.local/v1/build-calculation-trace.schema.json",
+  "title": "BuildCalculationTrace",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "id",
+    "rulesetId",
+    "context",
+    "sequence"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "1.0.0" },
+    "id": { "$ref": "#/$defs/id" },
+    "rulesetId": { "$ref": "#/$defs/id" },
+    "context": { "$ref": "#/$defs/context" },
+    "sequence": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/formulaResult" }
+    }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+    },
+    "semver": {
+      "type": "string",
+      "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)$"
+    },
+    "versionedRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "version"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "version": { "$ref": "#/$defs/semver" }
+      }
+    },
+    "context": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["characterClassId", "evolutionId"],
+      "properties": {
+        "characterClassId": { "$ref": "#/$defs/id" },
+        "evolutionId": { "$ref": "#/$defs/id" }
+      }
+    },
+    "formulaResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "position",
+        "formulaRef",
+        "outputId",
+        "outputUnit",
+        "rawOutput",
+        "visibleOutput",
+        "dependencies"
+      ],
+      "properties": {
+        "position": { "type": "integer", "minimum": 0 },
+        "formulaRef": { "$ref": "#/$defs/versionedRef" },
+        "outputId": { "$ref": "#/$defs/id" },
+        "outputUnit": { "$ref": "#/$defs/id" },
+        "rawOutput": { "type": "number" },
+        "visibleOutput": { "type": "number" },
+        "dependencies": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/dependencyEdge" }
+        }
+      }
+    },
+    "dependencyEdge": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["inputId", "sourceFormulaRef", "outputStage"],
+      "properties": {
+        "inputId": { "$ref": "#/$defs/id" },
+        "sourceFormulaRef": { "$ref": "#/$defs/versionedRef" },
+        "outputStage": {
+          "enum": ["RAW", "VISIBLE"]
+        }
+      }
+    }
+  }
+}

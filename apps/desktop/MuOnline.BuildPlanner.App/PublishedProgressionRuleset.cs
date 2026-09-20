@@ -1,5 +1,6 @@
 using System.IO;
 using MuOnline.BuildPlanner.Application.Formulas;
+using MuOnline.BuildPlanner.Application.Items;
 using MuOnline.BuildPlanner.Application.Progression;
 using MuOnline.BuildPlanner.Application.Stats;
 
@@ -11,6 +12,8 @@ internal static class PublishedProgressionRuleset
         new(() => new JsonProgressionRulesetSnapshotReader().Read(SnapshotRoot));
     private static readonly Lazy<ExecutableFormulaCatalog> FormulaCatalogValue =
         new(() => new JsonExecutableFormulaSnapshotReader().Read(SnapshotRoot));
+    private static readonly Lazy<ItemCatalog> ItemCatalogValue =
+        new(() => new JsonItemCatalogSnapshotReader().Read(SnapshotRoot));
 
     public static string SnapshotRoot => Path.Combine(
         AppContext.BaseDirectory,
@@ -23,6 +26,8 @@ internal static class PublishedProgressionRuleset
     public static ExecutableFormulaCatalog FormulaCatalog =>
         FormulaCatalogValue.Value;
 
+    public static ItemCatalog ItemCatalog => ItemCatalogValue.Value;
+
     public static CalculateProgressionPointBudgetUseCase CreateUseCase() =>
         new(Catalog);
 
@@ -34,4 +39,7 @@ internal static class PublishedProgressionRuleset
 
     public static CalculateCharacterBuildUseCase CreateCharacterBuildUseCase() =>
         new(Catalog, FormulaCatalog);
+
+    public static EquipItemUseCase CreateEquipItemUseCase() =>
+        new(ItemCatalog);
 }

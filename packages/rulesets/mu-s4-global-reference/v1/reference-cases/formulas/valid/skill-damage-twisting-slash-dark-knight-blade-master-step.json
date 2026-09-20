@@ -1,0 +1,65 @@
+{
+    "schemaVersion":  "1.0.0",
+    "id":  "skill-damage-twisting-slash-dark-knight-blade-master-step",
+    "rulesetId":  "mu-s4-global-reference",
+    "formulaRef":  {
+                       "id":  "formula-skill-damage-twisting-slash-dark-knight",
+                       "version":  "1.0.0"
+                   },
+    "context":  {
+                    "characterClassId":  "class-dark-knight",
+                    "evolutionId":  "evolution-blade-master"
+                },
+    "inputs":  {
+                   "strength":  108
+               },
+    "expectedTrace":  {
+                          "schemaVersion":  "1.0.0",
+                          "id":  "trace-skill-damage-twisting-slash-dark-knight-blade-master-step",
+                          "rulesetId":  "mu-s4-global-reference",
+                          "formulaRef":  {
+                                             "id":  "formula-skill-damage-twisting-slash-dark-knight",
+                                             "version":  "1.0.0"
+                                         },
+                          "context":  {
+                                          "characterClassId":  "class-dark-knight",
+                                          "evolutionId":  "evolution-blade-master"
+                                      },
+                          "inputs":  {
+                                         "strength":  108
+                                     },
+                          "steps":  [
+                                        {
+                                            "stepId":  "strength-term",
+                                            "value":  2.7
+                                        },
+                                        {
+                                            "stepId":  "raw-skill-damage",
+                                            "value":  17.7
+                                        },
+                                        {
+                                            "stepId":  "visible-skill-damage",
+                                            "value":  17
+                                        }
+                                    ],
+                          "rounding":  {
+                                           "mode":  "TRUNCATE",
+                                           "stage":  "visible-skill-damage",
+                                           "decimalPlaces":  0
+                                       },
+                          "rawOutput":  17.7,
+                          "visibleOutput":  17,
+                          "evidenceRefs":  [
+                                               "evd-0021",
+                                               "evd-0041",
+                                               "evd-0045",
+                                               "evd-0046"
+                                           ],
+                          "conflictIds":  [
+                                              "dsp-0008",
+                                              "dsp-0009",
+                                              "dsp-0010",
+                                              "dsp-0011"
+                                          ]
+                      }
+}

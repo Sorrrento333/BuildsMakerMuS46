@@ -1,0 +1,12 @@
+{
+  "id": "kris-unknown-item",
+  "itemId": "item-not-present",
+  "classId": "class-dark-knight",
+  "stats": {
+    "strength": 1000,
+    "agility": 1000,
+    "vitality": 25,
+    "energy": 10
+  },
+  "expectedErrorCode": "item-equip-not-found"
+}

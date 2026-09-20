@@ -12,13 +12,14 @@ internal sealed record PublishedBuildDraftServices(
     LoadBuildDraftUseCase LoadUseCase,
     SaveBuildUseCase SaveBuildUseCase,
     LoadBuildUseCase LoadBuildUseCase,
+    ListBuildsUseCase ListBuildsUseCase,
     BuildDraftRuntimeContext RuntimeContext,
     string DatabasePath,
     MigrationApplicationResult MigrationResult)
 {
     private const string DatabaseFileName = "build-planner.sqlite";
     private const string RulesetVersion = "1.0.0";
-    private const string DatasetVersion = "2026-07-30.3";
+    private const string DatasetVersion = "2026-09-20.1";
     private const string EngineVersion = "0.2.0";
 
     public static PublishedBuildDraftServices CreateDefault()
@@ -77,7 +78,8 @@ internal sealed record PublishedBuildDraftServices(
             new BuildDraftDatasetReference(
                 DatasetVersion,
                 ComputeDatasetHash(PublishedProgressionRuleset.SnapshotRoot)),
-            EngineVersion);
+            EngineVersion,
+            PublishedProgressionRuleset.ItemCatalog);
         var loadBuildDraftUseCase = new LoadBuildDraftUseCase(repository, context);
 
         return new PublishedBuildDraftServices(
@@ -85,6 +87,7 @@ internal sealed record PublishedBuildDraftServices(
             loadBuildDraftUseCase,
             new SaveBuildUseCase(buildRepository, loadBuildDraftUseCase, context),
             new LoadBuildUseCase(buildRepository, context),
+            new ListBuildsUseCase(buildRepository),
             context,
             databasePath,
             migrationResult);

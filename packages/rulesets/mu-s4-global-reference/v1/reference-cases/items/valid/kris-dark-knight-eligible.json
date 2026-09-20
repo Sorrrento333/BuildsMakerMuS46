@@ -1,0 +1,12 @@
+{
+  "id": "kris-dark-knight-eligible",
+  "itemId": "item-kris",
+  "classId": "class-dark-knight",
+  "stats": {
+    "strength": 27,
+    "agility": 27,
+    "vitality": 25,
+    "energy": 10
+  },
+  "expectedErrorCode": null
+}

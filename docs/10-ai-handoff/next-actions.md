@@ -13,56 +13,306 @@ La instrucción de ejecutar sólo la primera tarea pendiente continúa vigente.
 
 ## Prioridad inmediata
 
-1. Cerrar la documentación y el commit de la vertical de Defense/SD de Summoner
-   quedó pendiente solo de capturar el hash y la versión definitiva del dataset
-   (`2026-07-29.4`) con el smoke WPF de publicación. Ese smoke ya pasó localmente
-   el 2026-09-01 con SQLite `3.53.3`, 738 archivos, 149.256.211 bytes, 315 JSON
-   del ruleset, treinta fórmulas y 120 casos contextuales; el hash es
-   `sha256:3b9cdcb42b7c7f6eb18063b6697f402bda5ae7e16fca5dfafef58143696d03d0`.
-   Sólo resta el commit y, en su caso, la ejecución del CJ en un runner remoto.
-2. Definir la siguiente vertical coherente entre los candidatos documentados:
-   primeros contratos facticos restantes (daño y wizardry de Summoner/MG ya
-   aprobados y sin motor), o los schemas de alto nivel (ruleset, quests, ítems,
-   skills, escenarios y trazas), o builds completas/flujos de UI posteriores.
+1. Instancia equipada sin bonificaciones implementada (2026-09-19): contratos
+   `build-draft` y `build` a `1.2.0` con `equipment` de
+   `{ itemId, itemVersion, level }`, sección "Equipo" en WPF y household de smoke
+   equipado; sin opciones/sockets/bonificaciones ni progresión de ítem.
+2. Traza de cálculo de alto nivel implementada (2026-09-19): contrato
+   `build-calculation-trace` `1.0.0` con fixtures y gate semántico; emisión en
+   Application (`BuildCalculationTraceFactory`); WPF con la sección "Traza de
+   cálculo de alto nivel" y smoke en ambas fases (19 fórmulas, 3 aristas). Es un
+   artefacto del motor: no añade datos factuales.
+3. Skills como modificador de cálculo implementado (2026-09-19): siete fórmulas
+   derivadas `2.1.0` por axioma `EVD-0046`; sin UI de skills ni `buffRef`.
+   Ampliar efectos fuera de los siete exige nueva evidencia Season 4 o una nueva
+   decisión del propietario. `buffRef` sigue omitido.
+4. Catálogo acotado de skills materializado (2026-09-17): ocho `SkillDefinition`
+   `PUBLISHED` del axioma `EVD-0045` contra `skill.schema.json`, con inventario
+   canónico 119 → 127 y dataset `2026-09-17.1`.
+5. Consumo acotado del catálogo de ítems implementado (`EquipItemUseCase`,
+   selector de ranura/ítem en WPF y smoke): valida clase y `requiredStats` en
+   +0; la instancia equipada acotada cerró la vertical `1.2.0`.
+6. Progresión defensiva de armadura por nivel de ítem implementada (2026-09-20):
+   schema item `1.1.0` con `defense` opcional, `ItemDefinition.Defense`,
+   `JsonItemCatalogSnapshotReader` `1.1.0`, `ItemDefenseBonusCalculator`
+   (`DEF(n) = trunc(base × (1 + 0,05·n))`, axioma parcial `EVD-0053`),
+   `EquipItemResult` con `Defense`/`DefenseAtLevel`, `item-dragon-armor`
+   `1.1.0` con `defense` 37 (`EVD-0048`), WPF y smoke con DEF a +7 (49) y kris
+   sin defensa. Dataset `2026-09-20.1`. JOL diferido (requiere opciones).
+7. Alternativa documentada: master buys y pantallas restantes del flujo, sin
+   contrato factual todavía.
 
-## Última tarea cerrada
+## Instancia equipada sin bonificaciones — implementado (2026-09-19)
 
-La vertical de Defense/SD de Summoner quedó cerrada sobre la decisión general
-`RAW` del propietario y sobre los truncamientos independientes de `EVD-0032`:
+- `build-draft.schema.json` y `build.schema.json` a `1.2.0` con el array
+  `equipment` de `{ itemId, itemVersion, level }` (schema y fixtures ya
+  actualizados). La ranura y los atributos se deducen de la definición publicada
+  del ítem; el nivel es un entero declarado `0..maxItemLevel`.
+- `BuildEquipmentEntry` + `BuildEquipmentValidator` (códigos estables en
+  `BuildErrorCodes`/`BuildDraftErrorCodes`: `item-not-found`,
+  `version-mismatch`, `class-not-allowed`, `level-out-of-range`, `duplicate`,
+  `requirements-not-met`). Validan en `SaveBuildDraftUseCase`, revalidan en
+  `LoadBuildDraftUseCase`/`LoadBuildUseCase` contra el catálogo publicado y
+  `SaveBuildUseCase` promueve el equipo del draft. `EquipItemRequest/Result`
+  ganan `Level`/`MaxItemLevel` (`item-equip-level-out-of-range`).
+- Migración de carga conserva `1.1.0+1.1.0` → `Equipment = []` y legacy
+  `1.0.0+1.0.0`; `BuildDraftStatDistribution` queda en `1.1.0`.
+- WPF: sección central "Equipo" (nivel + equipar/desequipar + lista +
+  indicador); `_equippedItems` se rellena al cargar drafts/builds.
+- Smoke: `publication-smoke-equip-draft`/`publication-smoke-equip-build`
+  (`item-kris` `1.0.0` nivel 15, dark-knight 7, EB 30, agility 27, restante 23).
+- Verificación PASS: build Release 0/0; 858/858 pruebas (43 validator, 58 motor,
+  730 Application, 27 Data); `Test-SchemaStructure` 17/34; smoke WPF `win-x64`
+  (SQLite `3.53.3`, 1369 archivos, 150.666.306 bytes, 946 archivos del ruleset,
+  456 casos, 2 builds listados, dataset `2026-09-17.1`). Sin datos factuales
+  nuevos. Diseño en `docs/04-domain/equipped-instance-design.md`.
 
-- `formula-defense-summoner` y `formula-sd-summoner` `1.0.0` están
-  `PUBLISHED` contra schema `2.1.0` y trazan `EVD-0021`, `EVD-0026`, `EVD-0032`
-  y `EVD-0034` (conflicto `DSP-0004` conservado y resuelto).
-- Defense conserva `agility / 3` sobre los mínimos STR 21/AGI 21/VIT 18/ENE 23.
-  SD conserva los tres truncamientos independientes
-  `trunc((str+agi+vit+ene)*1.2) + trunc(defense/2) + trunc((lvl*lvl)/30)`,
-  consumiendo Defense `RAW` por `FORMULA_OUTPUT`.
-- `CHECKED_DECIMAL_V1` y sus gates aceptan varios pasos intermedios
-  `APPLY_ROUNDING`; el último paso visible sigue siendo el redondeo que consume
-  `rawOutputStepId`. El intérprete entero se relaja de forma inocua.
-- Cuatro casos de Defense y cuatro de SD reproducen outputs/trazas.
-  `sd-summoner-base` fija SD 102 y discrimina la semántica independiente (a
-  plena precisión sería 103). No hay frontera RAW/VISIBLE para Summoner.
-- Application y WPF materializan treinta fórmulas ejecutables; el dataset avanza
-  a `2026-07-29.4` con hash
-  `sha256:3b9cdcb42b7c7f6eb18063b6697f402bda5ae7e16fca5dfafef58143696d03d0`.
+## Traza de cálculo de alto nivel — implementado (2026-09-19)
 
-## Verificación del cierre
+- Nuevo contrato `build-calculation-trace` `1.0.0` en
+  `packages/schemas/v1/build-calculation-trace.schema.json`, fixture válido e
+  inválido en `packages/schemas/examples/{valid,invalid}` y registro en el
+  validador (16 → 17 contratos; 32 → 34 fixtures).
+- Gate semántico `MatchesBuildCalculationTraceSemantics`: posiciones contiguas
+  `0..n-1`, fuentes de dependencia dentro de la secuencia y aristas únicas por
+  entrada.
+- `BuildCalculationTrace` y `BuildCalculationTraceFactory` en
+  `packages/application/MuOnline.BuildPlanner.Application/Formulas` emiten la
+  macro-traza desde `CharacterBuildEvaluation`: orden determinista, salidas crudo/
+  visible, unidades y dependencias directas a partir de inputs declarados
+  `FORMULA_OUTPUT` (etapa `RAW`/`VISIBLE`). WPF la muestra en
+  "Traza de cálculo de alto nivel".
+- Verificación: 847/847 pruebas; `Test-SchemaStructure` 17/34; harness fuente
+  2 × 34/34; smoke WPF `win-x64` PASS con `TraceVerified` en ambas fases (19
+  fórmulas, 3 aristas). Sin datos factuales nuevos.
 
-- Restauración y build Release aprobados con 0 advertencias/0 errores; 320/320
-  pruebas pasan: 40 validator, 58 motor, 204 Application y 18 Data.
-- CLI del validador: las treinta fórmulas `PUBLISHED` pasan sin errores,
-  incluidos `formula-defense-summoner` (4 positivos/2 controles) y
-  `formula-sd-summoner` (4 positivos/7 controles).
-- Smoke WPF `win-x64` (30 fórmulas y 120 casos contextuales): PASS local el
-  2026-09-01 con SQLite `3.53.3`, 738 archivos, 149.256.211 bytes, 315 JSON del
-  ruleset y hash `sha256:3b9cdcb42b7c7f6eb18063b6697f402bda5ae7e16fca5dfafef58143696d03d0`.
+## Skills como modificador de cálculo — implementado (2026-09-19)
 
-## Primera acción concreta
+- Axioma acotado del propietario (`EVD-0046`, `SKL-CLM-010`) para los valores de
+  efecto publicados por Fanz; sin `buffRef` ni catálogo/UI.
+- Siete fórmulas `PUBLISHED` `VERIFIED` `2.1.0`: Impale (`15 + trunc(STR/35)`),
+  Twisting Slash (`15 + trunc(STR/40)`), Death Stab (`70 + trunc(STR/150)`),
+  Rageful Blow (`60 + trunc(STR/150)`), Swell Life
+  (`12 + trunc(ENE/20) + trunc(VIT/100)`, un solo truncamiento del total),
+  Penetration (`70 + trunc(AGI/200)`) y Multi-Shot (`40 + trunc(AGI/200)`).
+  Strike of Destruction excluida (sin Skill DMG publicado).
+- 28 casos válidos + 15 controles negativos en
+  `reference-cases/formulas/{valid,invalid}`; allow-list y conteos actualizados
+  en `FormulaApplicationIntegrationTests`, `SchemaContractValidatorTests` y el
+  smoke PS1.
+- Verificación PASS: build Release 0/0; 840/840 tests (40/58/715/27);
+  `Test-SchemaStructure` 16/32; smoke WPF `win-x64` (1369 archivos, 150.618.678
+  bytes, 946 archivos del ruleset, 456 casos, dataset `2026-09-17.1`).
 
-Confirmar con el mantenedor la siguiente vertical elegida entre los candidatos
-documentados (contratos facticos restantes, schemas de alto nivel o builds/
-flujos de UI) y actualizar esta documentación y `CHANGELOG.md` al cerrarla.
+## Skills: alineación con la regla solo-modificador — 2026-09-19
+
+- `docs/DECISIONES-PRODUCTO.md` (regla inviolable) exige que la skill sea sólo
+  modificador de cálculo (dmg/buff) y prohíbe el catálogo/UI en el cliente y las
+  pruebas del catálogo de skills.
+- Se retiró la vertical previa de consumo de catálogo: la sección de skills de
+  `MainWindow`, `SkillApplicationIntegrationTests.cs`, la verificación de
+  catálogo en el smoke y los fixtures `reference-cases/skills/{valid,invalid}`.
+- Se conserva el backend mínimo (`Domain.Skills` y `Application.Skills`) sin uso
+  desde la app; los datos `skills/*.json` y su registro en
+  `SchemaContractValidator` no cambian.
+- Diseño en `docs/04-domain/skills-consumption-design.md`, reorientado a
+  modificador de cálculo.
+
+## Catálogo acotado de skills — materializado (2026-09-17)
+
+- Ocho `SkillDefinition` `PUBLISHED` `VERIFIED`: `skill-impale`,
+  `skill-twisting-slash`, `skill-swell-life`, `skill-death-stab`,
+  `skill-rageful-blow`, `skill-strike-of-destruction` (Dark Knight) y
+  `skill-penetration`, `skill-multi-shot` (Fairy Elf).
+- `kind` del mapeo aprobado (ATK/Non-ATK/Debuff→ACTIVE, Buff→BUFF);
+  `requiredLevel` = `Character Level` publicado; `allowedEvolutionIds` = las
+  tres evoluciones de la familia; `prerequisiteSkillIds` vacío; `buffRef`
+  omitido; `evidenceRefs` `evd-0041`–`evd-0045` (minúsculas en JSON);
+  `conflictIds` `dsp-0008`–`dsp-0011`.
+- `SchemaContractValidator.ValidateRulesetRecords` registra `("skill","skills")`;
+  inventario canónico 119 → 127; el smoke WPF exige ahora el directorio `skills`.
+- Axioma y límites en `RES-0004` y `docs/04-domain/skills-factual-gate-design.md`.
+- Verificación PASS: build Release 0/0; 797/797 tests; `Test-SchemaStructure`
+  16/32; smoke WPF `win-x64` (SQLite `3.53.3`, 1319 archivos, 150.442.137
+  bytes, 896 archivos del ruleset, dataset `2026-09-17.1`).
+
+## Gate factual de skills y buffs — resuelto (2026-09-17)
+
+El gate se cerró por axioma acotado del propietario, sin inventar datos:
+
+- `RES-0004-skills-buffs` queda `VERIFIED` con nueve claims y las evidencias
+  `EVD-0041`–`EVD-0045`; `DSP-0008`, `DSP-0009`, `DSP-0010` y `DSP-0011` quedan
+  `RESOLVED` por `OWNER_DECISION`.
+- Axioma: ocho skills con `Character Level` publicado (Impale, Twisting Slash,
+  Swell Life, Death Stab, Rageful Blow y Strike of Destruction de Dark Knight;
+  Penetration y Multi-Shot de Fairy Elf) con `requiredLevel` = `Character Level`,
+  mapeo `kind` (ATK/Non-ATK/Debuff→ACTIVE, Buff→BUFF, Summon→SUMMON),
+  `allowedEvolutionIds` = las tres evoluciones de cada familia,
+  `prerequisiteSkillIds` vacío y `buffRef` omitido.
+- Excluidos: prerrequisitos por stat/quest/equipo, skills nivel ≥400 y sistemas
+  post-S4, categorías `WIZ`/`Curse`, `PASSIVE` y buffs con valores incompletos.
+- `docs/04-domain/skills-factual-gate-design.md` queda `CLOSED`; no se añadieron
+  datos, fixtures, constantes ni código.
+
+## Consumo acotado del catálogo de ítems — implementado (2026-09-16)
+
+- `ItemDefinition` en Domain y `ItemCatalog`/`JsonItemCatalogSnapshotReader` en
+  Application leen `items/*.json` (schema `1.0.0`, `PUBLISHED`, un ruleset).
+- `EquipItemUseCase` valida elegibilidad por clase y `requiredStats` en +0 con
+  códigos estables `item-equip-not-found`, `item-equip-class-not-allowed` y
+  `item-equip-requirements-not-met`.
+- Reference cases `reference-cases/items/{valid,invalid}` y
+  `ItemApplicationIntegrationTests` (12 pruebas) reproducen 4 casos aprobados y
+  4 rechazos y fallan en cerrado ante ítem no publicado, ruleset mixto y
+  directorio ausente.
+- WPF añade el selector de ranura/ítem y el resultado de elegibilidad; el smoke
+  exige catálogo de 3 ítems y una evaluación de equipado.
+- Diseño en `docs/04-domain/items-consumption-design.md`.
+
+## Catálogo acotado de ítems — materializado (2026-09-16)
+
+- Tres `ItemDefinition` `PUBLISHED` `VERIFIED`: `item-kris`, `item-dragon-armor`
+  y `item-albatross-bow`.
+- `slots` (`weapon`/`armor`), `allowedClassIds` del mapeo aprobado,
+  `requiredStats` en +0, `maxItemLevel` 15, `optionModules` NORMAL,
+  `socketSlots` 0, `evidenceRefs` `evd-0037`–`evd-0040`.
+- `SchemaContractValidator.ValidateRulesetRecords` incluye `("item","items")`;
+  inventario canónico 116 → 119.
+- Axioma y límites en `RES-0003` y `docs/04-domain/items-factual-gate-design.md`.
+- Verificación PASS: build Release 0/0, 785/785 tests, `Test-SchemaStructure`
+  16/32 y smoke WPF `win-x64` (SQLite `3.53.3`, 1303 archivos, 150.400.240 bytes,
+  880 JSON del ruleset, dataset `2026-09-16.1`).
+
+## Gate factual de ítems — resuelto (2026-09-16)
+
+El gate se cerró por axioma acotado del propietario, sin inventar datos:
+
+- `RES-0003-items-equipment` queda `VERIFIED` con ocho claims y las evidencias
+  `EVD-0035`–`EVD-0040`; `DSP-0005`, `DSP-0006` y `DSP-0007` quedan `RESOLVED`
+  por `OWNER_DECISION`.
+- Axioma: tres ítems de grado normal (Kris, Dragon Armor, Albatross Bow) con
+  `displayName`, `slots`, `allowedClassIds`, `requiredStats` en +0,
+  `maxItemLevel` 15, `optionModules` NORMAL y `socketSlots` 0.
+- Mapeo aprobado: `All Classes` → las seis familias, `DK` →
+  `class-dark-knight`, `MG` → `class-magic-gladiator`, `ME` →
+  `class-fairy-elf`.
+- `docs/04-domain/items-factual-gate-design.md` queda `CLOSED`; no se añadieron
+  datos, fixtures, constantes ni código.
+
+## Última tarea cerrada — listado de builds guardadas y carga desde la lista
+
+El incremento hizo descubrible la build persistida y la cargó desde la lista,
+sin nuevos datos factuales:
+
+- Application añade `CharacterBuildSummary` y `ListBuildsUseCase`, y amplía
+  `IBuildRepository` con `ListAsync` (orden ordinal de `Id` como autoridad).
+- Data implementa `SqliteBuildRepository.ListAsync` con
+  `SELECT payload_json FROM builds ORDER BY id;`: proyecta el summary, no muta
+  la base y no añade columnas ni migraciones.
+- WPF añade un `ListBox` de builds guardadas, el botón «Cargar seleccionada» y
+  un recuento de estado; refresca el listado al abrir la ventana y tras cada
+  guardado, y la selección reutiliza `LoadBuildByIdAsync` →
+  `LoadBuildUseCase` → `ApplyLoadedBuild` con la traducción de errores existente.
+- El smoke exige que `publication-smoke-build` aparezca en el listado con
+  paridad exacta y añade `BuildListVerified` y `PersistedBuildCount`.
+
+## Verificación del cierre — listado de builds guardadas y carga desde la lista
+
+- Restauración y build Release aprobados con 0 advertencias/0 errores; 785/785
+  pruebas pasan: 40 validator, 58 motor, 660 Application y 27 Data.
+- Comprobación estructural: 16 contratos/32 fixtures, sin cambios en `build`
+  (`1.1.0`).
+- Smoke WPF `win-x64`: PASS local el 2026-09-16 con SQLite `3.53.3`, 1300
+  archivos, 150.397.632 bytes, 10 avisos legales, 877 JSON del ruleset,
+  `Saved builds listed: 1` y dataset `2026-07-30.3` con hash
+  `sha256:ef6fd756c2a69245906019d4c4cf01c3a7baba460067bbfffc4c4906361b0f18`.
+
+## Última tarea cerrada — reaplicación de build en la Calculadora
+
+La vertical devolvió la build persistida al formulario de la Calculadora sin
+nuevos datos factuales:
+
+- `CharacterBuild` avanza a `schemaVersion "1.1.0"` con `pointsPerReset`, que
+  `SaveBuildUseCase` toma de `draft.ResetInputs.PointsPerReset`;
+  `LoadBuildUseCase` no cambia sus validaciones. `build.schema.json` pasa a
+  `1.1.0` con `pointsPerReset` requerido y no negativo; sin columnas SQLite
+  nuevas.
+- WPF `ApplyLoadedBuild` selecciona clase y evolución, nivel y estado de héroe,
+  restaura resets y puntos por reset, deriva las asignaciones como
+  `stat final − base`, recalcula presupuesto y distribución y evalúa atributos
+  derivados; `LoadBuildButtonClick` lo invoca y traduce errores.
+- Application añade una prueba de reproducibilidad (asignaciones derivadas,
+  `ResetPoints 200`, `SpentPoints 7`, `Total = Spent + Remaining`) y fija la
+  paridad de `pointsPerReset`; Data conserva payload y metadata exactos.
+- El smoke verifica la paridad de resets y la reproducción de la distribución
+  sintética de `publication-smoke-build`.
+
+## Verificación del cierre — reaplicación de build en la Calculadora
+
+- Restauración y build Release aprobados con 0 advertencias/0 errores; 780/780
+  pruebas pasan: 40 validator, 58 motor, 658 Application y 24 Data.
+- Comprobación estructural: 16 contratos/32 fixtures, incluido `build` `1.1.0`.
+- CLI del validador: las ciento siete fórmulas `PUBLISHED` pasan sin errores
+  (los datos no cambian respecto al dataset `2026-07-30.3`).
+- Smoke WPF `win-x64`: PASS local el 2026-09-16 con SQLite `3.53.3`, 1300
+  archivos, 150.384.676 bytes, 10 avisos legales, 877 JSON del ruleset y
+  dataset `2026-07-30.3` con hash
+  `sha256:ef6fd756c2a69245906019d4c4cf01c3a7baba460067bbfffc4c4906361b0f18`.
+
+## Cierre de ciclo — 2026-09-20 (sin vertical nueva)
+
+- El mantenedor decidió no abrir ninguna vertical nueva en este ciclo: se cierra
+  con actualización de documentación y limpieza de artefactos obsoletos.
+- Se eliminaron los artefactos stale de sesión que referenciaban el commit
+  `40f5bbb` y el PR #7 como `OPEN/BLOCKED`: `gitwire-final/`, `.opencode-wire/`,
+  `checks-current.txt`, `head-current.txt`, `branche-current.txt`,
+  `pr-current.json`, `githead-build.txt`, `gitlog-build.txt` y
+  `gitstatus-build.txt`.
+- Verificación del estado estable: build Release 0/0; 858/858 pruebas; CI verde
+  sobre `bd9632c` (`build-and-test` y `wpf-publication-smoke` success);
+  PR #7 ya `MERGED`; sin PR abierto.
+- Los candidatos 6 y 7 siguen como alternativa documentada (ver «Prioridad
+  inmediata»): ambos exigen nueva evidencia Season 4 o una nueva decisión del
+  propietario para iniciarse.
+
+## Gate de ampliación de UC-04 — resuelto (2026-09-20)
+
+- Se investigó el candidato 6 (ampliar UC-04 con bonificaciones ATK/DEF,
+  `requiredLevel`, progresión de `requiredStats` y sockets) con re-captura de las
+  páginas Fanz (Kris, Dragon Armor, Albatross Bow) y contraste con fuentes
+  autorizadas (Webzen, StrategyWiki, RaGEZONE, ViciadosMU, muonline.net).
+- `RES-0005` documenta las evidencias `EVD-0047`–`EVD-0052`; `DSP-0012` quedó
+  `RESOLVED` por `OWNER_DECISION` con el axio-axioma parcial `EVD-0053`:
+  - Se adoptan como reglas del ruleset dentro del subconjunto acotado: la regla
+    Webzen de armadura (`+5% de defensa final por nivel de ítem`) y la regla JOL
+    (`+5 STR` por nivel de opción).
+  - Se descartan (sin fuente Season 4 con valores) `requiredLevel`, los valores
+    de ATK por nivel de ítem de armas, la progresión de `requiredStats` por
+    nivel y los sockets.
+- Diseño completado el 2026-09-20 en
+  `docs/04-domain/items-defense-level-bonus-design.md` (semántica aditiva
+  `DEF(n) = trunc(base × (1 + 0,05·n))`, `defense` +0, JOL diferido).
+
+## Progresión defensiva de armadura por nivel — implementado (2026-09-20)
+
+- `item.schema.json` avanza a `1.1.0` con la propiedad opcional `defense`
+  (integer `>= 0`); los tres registros canónicos actualizan `schemaVersion` a
+  `1.1.0` e `item-dragon-armor` sube a `version` `1.1.0` declarando
+  `defense` 37 (`EVD-0048`) y enlazando `evd-0048`/`evd-0053`; Kris y Albatross
+  Bow permanecen en `1.0.0` sin `defense` (armas). Fixtures sintéticos y
+  `Test-SchemaStructure` actualizados (item `1.1.0`).
+- `ItemDefinition` gana `Defense` (`long?`); `JsonItemCatalogSnapshotReader`
+  acepta `1.1.0` y materializa `defense` opcional (negativo → fail-closed).
+- Nuevo `ItemDefenseBonusCalculator` (Application, `Items/`): aritmética decimal
+  comprobada y un único truncamiento hacia cero en la salida. Verificación en
+  `0..15`: n=0 → 37, n=1 → 38, n=7 → 49, n=10 → 55, n=15 → 64.
+- `EquipItemResult` expone `Defense` (base) y `DefenseAtLevel` (derivada);
+  `EquipItemUseCase` lo rellena desde el catálogo. WPF muestra DEF base y
+  derivado en la sección Equipo; el smoke verifica dragon armor a +7 (DEF 49) y
+  kris sin defensa.
+- Dataset `2026-09-20.1`; ruleset `1.0.0` y motor `0.2.0` sin cambios.
+  Verificación: build 0/0 (Debug y Release previsto), 858+ pruebas, validador
+  CLI exit 0, `Test-SchemaStructure` 17/34, smoke WPF `win-x64` PASS.
 
 ---
 
@@ -85,10 +335,45 @@ Confirmar con el mantenedor la siguiente vertical entre los candidatos
 documentados y cerrarla con integración, pruebas, documentación y smoke:
 
 1. Builds completas y flujos de UI posteriores al presupuesto ganado, los
-   borradores locales y la evaluación en lote: master buys, persistencia de la
-   build completa y pantallas restantes del flujo.
+   borradores locales, la evaluación en lote y la persistencia local: master
+   buys y pantallas restantes del flujo.
 2. Trazas de cálculo de alto nivel aún sin contrato propio si el motor lo
    exige en una vertical posterior.
+
+## Última tarea cerrada — persistencia de build completa local
+
+La vertical de persistencia de la build completa quedó cerrada sobre la capa de
+datos local sin nuevos datos factuales:
+
+- `SaveBuildUseCase` promueve un borrador a `CharacterBuild` (schema `1.0.0`)
+  con clase, evolución, nivel, stats finales (base + asignación), quests y
+  resets, y `LoadBuildUseCase` recarga y revalida contra el contexto exacto
+  (ruleset, dataset y motor) con códigos estables para ausencia, schema no
+  soportado, dependencia indisponible, identidad incoherente, evolución no
+  ofrecida y stats no alcanzables o ajenos a la clase; entrega copias
+  defensivas de stats y quest ids.
+- Data implementa `SqliteBuildRepository` con la migración 2 `create_builds`,
+  payload y metadata exactos, reemplazo atómico por ID y rollback ante fallo
+  intermedio; la contención de escritura usa el código estable `WriteConflict`.
+- El smoke verifica el round-trip del borrador sintético
+  `publication-smoke-draft` a la build `publication-smoke-build` (cinco stats,
+  resets `2 × 100 = 200`) y su supervivencia al respaldo/restauración y al
+  reemplazo simulado de binarios. Nuevos campos `BuildPersistenceVerified`,
+  `BuildId` y `BuildStatCount`.
+- Doce pruebas de integración de Application y seis de Data cierran la
+  vertical; ruleset `1.0.0`, motor `0.2.0` y dataset `2026-07-30.3` permanecen
+  sin cambios.
+
+## Verificación del cierre — persistencia de build completa local
+
+- Restauración y build Release aprobados con 0 advertencias/0 errores; 779/779
+  pruebas pasan: 40 validator, 58 motor, 657 Application y 24 Data.
+- CLI del validador: las ciento siete fórmulas `PUBLISHED` pasan sin errores
+  (los datos no cambian respecto al dataset `2026-07-30.3`).
+- Smoke WPF `win-x64`: PASS local el 2026-09-15 con SQLite `3.53.3`, 1300
+  archivos, 150.382.040 bytes, 10 avisos legales, 877 JSON del ruleset y
+  dataset `2026-07-30.3` con hash
+  `sha256:ef6fd756c2a69245906019d4c4cf01c3a7baba460067bbfffc4c4906361b0f18`.
 
 ## Última tarea cerrada — evaluación de build en lote
 
@@ -294,7 +579,7 @@ como axiomas del ruleset trazándose exclusivamente desde `EVD-0021` y
 
 ## Primera acción concreta
 
-Confirmar con el mantenedor el primer candidato restante (contratos fácticos de
-`EVD-0026` sin motor, builds/flujos de UI posteriores al borrador, o trazas de
-cálculo de alto nivel) y actualizar esta documentación y `CHANGELOG.md` al
-cerrarlo.
+Confirmar con el mantenedor el primer candidato restante (master buys y
+pantallas restantes del flujo, o contratos fácticos de `EVD-0026` sin motor) y
+actualizar esta documentación y `CHANGELOG.md` al cerrarlo. La traza de cálculo
+de alto nivel, tercer candidato, quedó cerrada el 2026-09-19.

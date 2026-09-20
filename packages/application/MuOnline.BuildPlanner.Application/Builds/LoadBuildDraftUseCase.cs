@@ -63,12 +63,48 @@ public sealed class LoadBuildDraftUseCase
                 $"Build draft '{id}' does not match its recalculated cache.");
         }
 
+        try
+        {
+            if (stored.Equipment is { Count: > 0 })
+            {
+                var characterClass = BuildValidation.ResolveCharacterClass(
+                    _context.Catalog,
+                    id,
+                    stored.ProgressionInputs.CharacterClassId,
+                    stored.ProgressionInputs.EvolutionId);
+                var finalStats = BuildValidation.ComputeFinalStats(
+                    characterClass,
+                    stored.StatDistribution.Allocations,
+                    id);
+                BuildEquipmentValidator.EnsureValid(
+                    _context.ItemCatalog,
+                    stored.ProgressionInputs.CharacterClassId,
+                    finalStats,
+                    stored.Equipment ?? []);
+            }
+        }
+        catch (BuildEquipmentValidationException exception)
+        {
+            throw Error(
+                MapEquipmentCode(exception.Code),
+                exception.Message);
+        }
+        catch (BuildException exception)
+        {
+            throw Error(
+                exception.Code == BuildErrorCodes.SourceMismatch
+                    ? BuildDraftErrorCodes.SourceMismatch
+                    : BuildDraftErrorCodes.RevalidationFailed,
+                exception.Message);
+        }
+
         return stored with
         {
             ProgressionInputs = stored.ProgressionInputs with
             {
                 CompletedQuestIds = stored.ProgressionInputs.CompletedQuestIds.ToArray(),
             },
+            Equipment = stored.Equipment ?? [],
             StatDistribution = recalculated,
         };
     }
@@ -98,6 +134,18 @@ public sealed class LoadBuildDraftUseCase
 
         if (stored.SchemaVersion == BuildDraft.PreviousSchemaVersion &&
             stored.StatDistribution.SchemaVersion ==
+                BuildDraftStatDistribution.CurrentSchemaVersion)
+        {
+            return stored with
+            {
+                SchemaVersion = BuildDraft.CurrentSchemaVersion,
+                Equipment = [],
+            };
+        }
+
+        if (stored.SchemaVersion ==
+                BuildDraftStatDistribution.PreviousSchemaVersion &&
+            stored.StatDistribution.SchemaVersion ==
                 BuildDraftStatDistribution.PreviousSchemaVersion)
         {
             var zeroResetInputs = new BuildDraftResetInputs(0, 0);
@@ -105,6 +153,7 @@ public sealed class LoadBuildDraftUseCase
             {
                 SchemaVersion = BuildDraft.CurrentSchemaVersion,
                 ResetInputs = zeroResetInputs,
+                Equipment = [],
                 StatDistribution = stored.StatDistribution with
                 {
                     SchemaVersion = BuildDraftStatDistribution.CurrentSchemaVersion,
@@ -155,6 +204,16 @@ public sealed class LoadBuildDraftUseCase
         stored.All(allocation =>
             recalculated.TryGetValue(allocation.Key, out var value) &&
             value == allocation.Value);
+
+    private static string MapEquipmentCode(string code) => code switch
+    {
+        "item-not-found" => BuildDraftErrorCodes.EquipmentItemNotFound,
+        "version-mismatch" => BuildDraftErrorCodes.EquipmentVersionMismatch,
+        "class-not-allowed" => BuildDraftErrorCodes.EquipmentClassNotAllowed,
+        "level-out-of-range" => BuildDraftErrorCodes.EquipmentLevelOutOfRange,
+        "duplicate" => BuildDraftErrorCodes.EquipmentDuplicate,
+        _ => BuildDraftErrorCodes.EquipmentRequirementsNotMet,
+    };
 
     private static BuildDraftException Error(string code, string message) =>
         new(code, message);

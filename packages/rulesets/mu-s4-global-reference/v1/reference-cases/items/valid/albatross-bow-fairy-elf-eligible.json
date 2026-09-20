@@ -1,0 +1,12 @@
+{
+  "id": "albatross-bow-fairy-elf-eligible",
+  "itemId": "item-albatross-bow",
+  "classId": "class-fairy-elf",
+  "stats": {
+    "strength": 218,
+    "agility": 894,
+    "vitality": 20,
+    "energy": 15
+  },
+  "expectedErrorCode": null
+}

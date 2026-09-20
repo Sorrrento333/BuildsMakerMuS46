@@ -19,7 +19,7 @@
     "evidenceRefs"
   ],
   "properties": {
-    "schemaVersion": { "const": "1.0.0" },
+    "schemaVersion": { "const": "1.1.0" },
     "id": { "$ref": "#/$defs/id" },
     "version": { "$ref": "#/$defs/semver" },
     "rulesetId": { "$ref": "#/$defs/id" },
@@ -38,6 +38,7 @@
       "items": { "$ref": "#/$defs/id" },
       "uniqueItems": true
     },
+    "defense": { "type": "integer", "minimum": 0 },
     "requiredLevel": { "type": "integer", "minimum": 1 },
     "requiredStats": {
       "type": "object",

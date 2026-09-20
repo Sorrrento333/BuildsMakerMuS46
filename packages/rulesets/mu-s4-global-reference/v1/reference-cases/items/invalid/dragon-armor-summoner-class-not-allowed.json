@@ -1,0 +1,12 @@
+{
+  "id": "dragon-armor-summoner-class-not-allowed",
+  "itemId": "item-dragon-armor",
+  "classId": "class-summoner",
+  "stats": {
+    "strength": 1000,
+    "agility": 1000,
+    "vitality": 20,
+    "energy": 20
+  },
+  "expectedErrorCode": "item-equip-class-not-allowed"
+}

@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using MuOnline.BuildPlanner.Application.Items;
 using MuOnline.BuildPlanner.Application.Progression;
 
 namespace MuOnline.BuildPlanner.Application.Builds;
@@ -11,10 +12,11 @@ public sealed record BuildDraft(
     [property: JsonPropertyName("engineVersion")] string EngineVersion,
     [property: JsonPropertyName("progressionInputs")] BuildDraftProgressionInputs ProgressionInputs,
     [property: JsonPropertyName("resetInputs")] BuildDraftResetInputs ResetInputs,
+    [property: JsonPropertyName("equipment")] IReadOnlyList<BuildEquipmentEntry> Equipment,
     [property: JsonPropertyName("statDistribution")] BuildDraftStatDistribution StatDistribution)
 {
-    public const string CurrentSchemaVersion = "1.1.0";
-    public const string PreviousSchemaVersion = "1.0.0";
+    public const string CurrentSchemaVersion = "1.2.0";
+    public const string PreviousSchemaVersion = "1.1.0";
 }
 
 public sealed record BuildDraftVersionedReference(
@@ -56,4 +58,5 @@ public sealed record BuildDraftRuntimeContext(
     ProgressionRulesetCatalog Catalog,
     BuildDraftVersionedReference Ruleset,
     BuildDraftDatasetReference Dataset,
-    string EngineVersion);
+    string EngineVersion,
+    ItemCatalog ItemCatalog);

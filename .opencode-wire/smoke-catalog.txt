@@ -1,5 +1,0 @@
-﻿SqliteBuildDraftMigrations.cs:8:new SqliteMigration(
-SqliteBuildDraftMigrations.cs:10:"create_build_drafts",
-SqliteBuildDraftMigrations.cs:23:new SqliteMigration(
-SqliteBuildDraftMigrations.cs:25:"create_builds",
-SqliteMigration.cs:9:public SqliteMigration(long version, string name, string sql)

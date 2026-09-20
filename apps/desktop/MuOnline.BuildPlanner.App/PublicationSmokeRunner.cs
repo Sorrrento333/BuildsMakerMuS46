@@ -4,10 +4,12 @@ using System.Text.Json;
 using Microsoft.Data.Sqlite;
 using MuOnline.BuildPlanner.Application.Builds;
 using MuOnline.BuildPlanner.Application.Formulas;
+using MuOnline.BuildPlanner.Application.Items;
 using MuOnline.BuildPlanner.Application.Progression;
 using MuOnline.BuildPlanner.Application.Stats;
 using MuOnline.BuildPlanner.Data;
 using MuOnline.BuildPlanner.Domain.Formulas;
+using MuOnline.BuildPlanner.Domain.Items;
 using MuOnline.BuildPlanner.Domain.Progression;
 using MuOnline.BuildPlanner.Domain.Stats;
 
@@ -18,6 +20,12 @@ internal static class PublicationSmokeRunner
     private const string ExpectedPersistedValue = "persisted-across-update";
     private const string BackupFileName = "publication-smoke.backup.sqlite";
     private const string BuildDraftId = "publication-smoke-draft";
+    private const string BuildId = "publication-smoke-build";
+    private const string EquippedBuildDraftId = "publication-smoke-equip-draft";
+    private const string EquippedBuildId = "publication-smoke-equip-build";
+    private const string EquippedItemId = "item-kris";
+    private const string EquippedItemVersion = "1.0.0";
+    private const int EquippedItemLevel = 15;
 
     private static readonly SqliteMigration SyntheticMigration = new(
         3,
@@ -38,12 +46,14 @@ internal static class PublicationSmokeRunner
         var progressionVerification = VerifyPublishedProgressionRuleset();
         var formulaVerification = VerifyPublishedCharacterFormulas();
         var buildVerification = VerifyPublishedCharacterBuild(progressionVerification);
+        var itemVerification = VerifyPublishedItems();
         var buildDraftServices = PublishedBuildDraftServices.Create(
             options.DataDirectory,
             [SyntheticMigration]);
 
         var databasePath = buildDraftServices.DatabasePath;
         var backupPath = Path.Combine(options.DataDirectory, BackupFileName);
+        var equippedVerification = CreateEquippedBuildDraftVerification();
 
         return options.Phase switch
         {
@@ -54,7 +64,9 @@ internal static class PublicationSmokeRunner
                 progressionVerification,
                 formulaVerification,
                 buildVerification,
-                buildDraftServices),
+                itemVerification,
+                buildDraftServices,
+                equippedVerification),
             PublicationSmokePhase.VerifyUpdate => VerifyUpdate(
                 databasePath,
                 backupPath,
@@ -62,7 +74,9 @@ internal static class PublicationSmokeRunner
                 progressionVerification,
                 formulaVerification,
                 buildVerification,
-                buildDraftServices),
+                itemVerification,
+                buildDraftServices,
+                equippedVerification),
             _ => throw new ArgumentOutOfRangeException(nameof(options)),
         };
     }
@@ -74,7 +88,9 @@ internal static class PublicationSmokeRunner
         ProgressionVerificationResult progressionVerification,
         PublishedFormulaVerification formulaVerification,
         VerifiedCharacterBuild buildVerification,
-        PublishedBuildDraftServices buildDraftServices)
+        ItemVerification itemVerification,
+        PublishedBuildDraftServices buildDraftServices,
+        EquippedBuildDraftVerification equippedVerification)
     {
         if (!File.Exists(databasePath) || File.Exists(backupPath))
         {
@@ -94,6 +110,10 @@ internal static class PublicationSmokeRunner
                 "INSERT INTO publication_smoke_probe (id, value) VALUES (2, $value);",
                 ExpectedPersistedValue);
             SaveAndVerifyBuildDraft(buildDraftServices, progressionVerification);
+            SaveAndVerifyBuild(buildDraftServices, progressionVerification);
+            SaveAndVerifyEquippedBuildDraftAndBuild(
+                buildDraftServices,
+                equippedVerification);
             SqliteBackupService.CreateVerifiedBackup(connection, backupPath);
             ExecuteNonQuery(
                 connection,
@@ -109,6 +129,9 @@ internal static class PublicationSmokeRunner
             EnsureExpectedDatabaseState(reopenedConnection);
         }
         VerifyBuildDraft(buildDraftServices, progressionVerification);
+        var persistedBuildCount = VerifyBuild(buildDraftServices, progressionVerification);
+        VerifyEquippedBuildDraft(buildDraftServices);
+        VerifyEquippedBuild(buildDraftServices);
 
         return CreateSuccessfulReport(
             options,
@@ -119,7 +142,9 @@ internal static class PublicationSmokeRunner
             progressionVerification,
             formulaVerification,
             buildVerification,
-            buildDraftServices);
+            itemVerification,
+            buildDraftServices,
+            persistedBuildCount);
     }
 
     private static PublicationSmokeReport VerifyUpdate(
@@ -129,7 +154,9 @@ internal static class PublicationSmokeRunner
         ProgressionVerificationResult progressionVerification,
         PublishedFormulaVerification formulaVerification,
         VerifiedCharacterBuild buildVerification,
-        PublishedBuildDraftServices buildDraftServices)
+        ItemVerification itemVerification,
+        PublishedBuildDraftServices buildDraftServices,
+        EquippedBuildDraftVerification equippedVerification)
     {
         if (!File.Exists(databasePath) || !File.Exists(backupPath))
         {
@@ -141,6 +168,9 @@ internal static class PublicationSmokeRunner
         var migrationResult = buildDraftServices.MigrationResult;
         EnsureExpectedDatabaseState(connection);
         VerifyBuildDraft(buildDraftServices, progressionVerification);
+        var persistedBuildCount = VerifyBuild(buildDraftServices, progressionVerification);
+        VerifyEquippedBuildDraft(buildDraftServices);
+        VerifyEquippedBuild(buildDraftServices);
 
         return CreateSuccessfulReport(
             options,
@@ -151,7 +181,9 @@ internal static class PublicationSmokeRunner
             progressionVerification,
             formulaVerification,
             buildVerification,
-            buildDraftServices);
+            itemVerification,
+            buildDraftServices,
+            persistedBuildCount);
     }
 
     private static PublicationSmokeReport CreateSuccessfulReport(
@@ -163,7 +195,9 @@ internal static class PublicationSmokeRunner
         ProgressionVerificationResult progressionVerification,
         PublishedFormulaVerification formulaVerification,
         VerifiedCharacterBuild buildVerification,
-        PublishedBuildDraftServices buildDraftServices) => new(
+        ItemVerification itemVerification,
+        PublishedBuildDraftServices buildDraftServices,
+        int persistedBuildCount) => new(
             Success: true,
             Phase: options.Phase == PublicationSmokePhase.Initialize ? "initialize" : "verify-update",
             SqliteVersion: sqliteVersion,
@@ -202,12 +236,33 @@ internal static class PublicationSmokeRunner
             ApprovedPublishedFormulaCaseCount: formulaVerification.ApprovedCaseCount,
             PublishedBuildEvaluationVerified: buildVerification.Verified,
             PublishedBuildFormulaCount: buildVerification.FormulaCount,
+            PublishedBuildCalculationTraceVerified: buildVerification.TraceVerified,
+            PublishedBuildCalculationTraceFormulaCount: buildVerification.FormulaCount,
+            PublishedBuildCalculationTraceDependencyCount: buildVerification.TraceDependencyCount,
+            ItemCatalogVerified: itemVerification.CatalogVerified,
+            ItemCatalogItemCount: itemVerification.ItemCount,
+            ItemCatalogItemReferences: itemVerification.ItemReferences,
+            SyntheticItemEquipVerified: itemVerification.SyntheticEquipVerified,
+            EquippedBuildDraftPersistenceVerified: true,
+            EquippedBuildDraftId: EquippedBuildDraftId,
+            EquippedBuildItemVerified: true,
+            EquippedBuildItemId: EquippedItemId,
+            EquippedBuildItemVersion: EquippedItemVersion,
+            EquippedBuildItemLevel: EquippedItemLevel,
+            EquippedBuildPersistenceVerified: true,
+            EquippedBuildId: EquippedBuildId,
             BuildDraftPersistenceVerified: true,
             BuildDraftId: BuildDraftId,
             BuildDraftDatasetVersion:
                 buildDraftServices.RuntimeContext.Dataset.Version,
             BuildDraftDatasetHash:
                 buildDraftServices.RuntimeContext.Dataset.Hash,
+            BuildPersistenceVerified: true,
+            BuildId: BuildId,
+            BuildStatCount:
+                progressionVerification.SyntheticDistribution.StatCount,
+            BuildListVerified: true,
+            PersistedBuildCount: persistedBuildCount,
             AppliedMigrationCount: migrationResult.AppliedCount,
             AlreadyAppliedMigrationCount: migrationResult.AlreadyAppliedCount,
             ErrorType: null,
@@ -360,7 +415,192 @@ internal static class PublicationSmokeRunner
             }
         }
 
-        return new VerifiedCharacterBuild(true, evaluation.Formulas.Length);
+        var trace = BuildCalculationTraceFactory.Create(
+            evaluation,
+            "publication-smoke-build-calculation-trace");
+        var traceDependencyCount = VerifyBuildCalculationTrace(evaluation, trace);
+
+        return new VerifiedCharacterBuild(
+            true,
+            evaluation.Formulas.Length,
+            true,
+            traceDependencyCount);
+    }
+
+    private static int VerifyBuildCalculationTrace(
+        CharacterBuildEvaluation evaluation,
+        BuildCalculationTrace trace)
+    {
+        var expectedReferences = evaluation.Formulas
+            .Select(item => item.Formula.Reference)
+            .ToArray();
+        if (trace.SchemaVersion != BuildCalculationTrace.CurrentSchemaVersion ||
+            trace.Context.CharacterClassId !=
+                evaluation.State.ProgressionRequest.ClassId ||
+            trace.Context.EvolutionId !=
+                evaluation.State.ProgressionRequest.EvolutionId ||
+            trace.RulesetId != evaluation.State.Budget.RulesetId ||
+            trace.Sequence.Count != expectedReferences.Length)
+        {
+            throw new InvalidOperationException(
+                "The high-level build calculation trace did not reproduce the evaluated build context.");
+        }
+
+        var sequenceReferences = trace.Sequence
+            .Select(entry => $"{entry.FormulaRef.Id}@{entry.FormulaRef.Version}")
+            .ToHashSet(StringComparer.Ordinal);
+        var dependencyCount = 0;
+        for (var index = 0; index < expectedReferences.Length; index++)
+        {
+            var entry = trace.Sequence[index];
+            var expectedReference = expectedReferences[index];
+            if (entry.Position != index ||
+                entry.FormulaRef.Id != expectedReference.Id ||
+                entry.FormulaRef.Version != expectedReference.Version ||
+                !sequenceReferences.Contains(
+                    $"{entry.FormulaRef.Id}@{entry.FormulaRef.Version}"))
+            {
+                throw new InvalidOperationException(
+                    "The high-level build calculation trace did not reproduce the deterministic evaluation order.");
+            }
+
+            var formulaEvaluation = evaluation.Formulas[index];
+            if (entry.OutputId != formulaEvaluation.Formula.Output.Id ||
+                entry.OutputUnit != formulaEvaluation.Formula.Output.Unit ||
+                entry.RawOutput != formulaEvaluation.Calculation.RawOutput ||
+                entry.VisibleOutput != formulaEvaluation.Calculation.VisibleOutput)
+            {
+                throw new InvalidOperationException(
+                    $"The high-level trace diverged from the batch evaluation for " +
+                    $"'{expectedReference.Id}@{expectedReference.Version}'.");
+            }
+
+            var declaredInputs = formulaEvaluation.Formula.Inputs.Where(
+                input => input.Source.Kind == FormulaInputSourceKind.FormulaOutput)
+                .ToArray();
+            if (entry.Dependencies.Count != declaredInputs.Length)
+            {
+                throw new InvalidOperationException(
+                    $"The high-level trace exposed an incoherent dependency count for " +
+                    $"'{expectedReference.Id}@{expectedReference.Version}'.");
+            }
+
+            var dependencyEdges = new HashSet<string>(StringComparer.Ordinal);
+            for (var dependencyIndex = 0;
+                 dependencyIndex < declaredInputs.Length;
+                 dependencyIndex++)
+            {
+                var input = declaredInputs[dependencyIndex];
+                var dependency = entry.Dependencies[dependencyIndex];
+                var sourceReference = input.Source.FormulaReference!;
+                var sourceKey =
+                    $"{sourceReference.Id}@{sourceReference.Version}";
+                if (dependency.InputId != input.Id ||
+                    dependency.SourceFormulaRef.Id != sourceReference.Id ||
+                    dependency.SourceFormulaRef.Version != sourceReference.Version ||
+                    dependency.OutputStage !=
+                        (input.Source.OutputStage == FormulaOutputStage.Raw
+                            ? "RAW"
+                            : "VISIBLE") ||
+                    !sequenceReferences.Contains(sourceKey) ||
+                    !dependencyEdges.Add($"{dependency.InputId}@{sourceKey}"))
+                {
+                    throw new InvalidOperationException(
+                        $"The high-level trace exposed an incoherent dependency edge for " +
+                        $"input '{input.Id}' of '{expectedReference.Id}@{expectedReference.Version}'.");
+                }
+
+                dependencyCount++;
+            }
+        }
+
+        return dependencyCount;
+    }
+
+    private static ItemVerification VerifyPublishedItems()
+    {
+        var catalog = PublishedProgressionRuleset.ItemCatalog;
+        var expectedItems = new Dictionary<string, string[]>(StringComparer.Ordinal)
+        {
+            ["item-albatross-bow"] = ["weapon"],
+            ["item-dragon-armor"] = ["armor"],
+            ["item-kris"] = ["weapon"],
+        };
+        var references = catalog.Items
+            .Select(item => item.Id)
+            .Order(StringComparer.Ordinal)
+            .ToArray();
+        if (catalog.RulesetId != PublishedProgressionRuleset.Catalog.RulesetId ||
+            references.Length != expectedItems.Count ||
+            !references.SequenceEqual(expectedItems.Keys.Order(StringComparer.Ordinal)))
+        {
+            throw new InvalidOperationException(
+                "The published bounded item catalog did not match the approved item set.");
+        }
+
+        foreach (var item in catalog.Items)
+        {
+            if (item.Status != ItemDefinitionStatus.Published ||
+                item.RulesetId != catalog.RulesetId ||
+                !item.Slots.SetEquals(expectedItems[item.Id]))
+            {
+                throw new InvalidOperationException(
+                    $"Published item '{item.Id}' did not match its approved bounded definition.");
+            }
+        }
+
+        var dragonArmor = catalog.Items.Single(
+            item => item.Id == "item-dragon-armor");
+        if (dragonArmor.Defense != 37)
+        {
+            throw new InvalidOperationException(
+                "The published Dragon Armor base defense did not match EVD-0048.");
+        }
+
+        var equipUseCase = PublishedProgressionRuleset.CreateEquipItemUseCase();
+        var result = equipUseCase.Execute(new EquipItemRequest(
+            "class-dark-knight",
+            new Dictionary<string, long>(StringComparer.Ordinal)
+            {
+                ["strength"] = 232,
+                ["agility"] = 73,
+                ["vitality"] = 25,
+                ["energy"] = 10,
+            },
+            "item-dragon-armor",
+            Level: 7));
+        if (result.ItemId != "item-dragon-armor" ||
+            result.Defense != 37 ||
+            result.DefenseAtLevel != 49)
+        {
+            throw new InvalidOperationException(
+                "The published bounded defense progression did not resolve the approved +5% rule at +7.");
+        }
+
+        var krisResult = equipUseCase.Execute(new EquipItemRequest(
+            "class-dark-knight",
+            new Dictionary<string, long>(StringComparer.Ordinal)
+            {
+                ["strength"] = 27,
+                ["agility"] = 27,
+                ["vitality"] = 25,
+                ["energy"] = 10,
+            },
+            "item-kris"));
+        if (krisResult.ItemId != "item-kris" ||
+            krisResult.Defense is not null ||
+            krisResult.DefenseAtLevel is not null ||
+            !krisResult.Slots.Contains("weapon", StringComparer.Ordinal))
+        {
+            throw new InvalidOperationException(
+                "The published bounded equip evaluation did not resolve the approved weapon item.");
+        }
+
+        return new ItemVerification(
+            CatalogVerified: true,
+            ItemCount: catalog.Items.Count,
+            ItemReferences: references,
+            SyntheticEquipVerified: true);
     }
 
     private static ProgressionVerificationResult VerifyPublishedProgressionRuleset()
@@ -468,6 +708,144 @@ internal static class PublicationSmokeRunner
             Allocations: allocations);
     }
 
+    private static void SaveAndVerifyBuild(
+        PublishedBuildDraftServices services,
+        ProgressionVerificationResult progressionVerification)
+    {
+        var saved = services.SaveBuildUseCase.ExecuteAsync(
+                new SaveBuildRequest(BuildId, BuildDraftId))
+            .GetAwaiter()
+            .GetResult();
+        VerifyBuildServices(saved, services, progressionVerification);
+        _ = VerifyBuild(services, progressionVerification);
+    }
+
+    private static int VerifyBuild(
+        PublishedBuildDraftServices services,
+        ProgressionVerificationResult progressionVerification)
+    {
+        var build = services.LoadBuildUseCase.ExecuteAsync(BuildId)
+            .GetAwaiter()
+            .GetResult();
+        VerifyBuildServices(build, services, progressionVerification);
+        return VerifyBuildList(services, progressionVerification);
+    }
+
+    private static void VerifyBuildServices(
+        CharacterBuild build,
+        PublishedBuildDraftServices services,
+        ProgressionVerificationResult progressionVerification)
+    {
+        var synthetic = progressionVerification.SyntheticDistribution;
+        var characterClass = services.RuntimeContext.Catalog.Classes.Single(
+            characterClass =>
+                characterClass.Id ==
+                synthetic.ProgressionInputs.CharacterClassId);
+        var expectedStats = characterClass.StatIds
+            .Order(StringComparer.Ordinal)
+            .ToDictionary(
+                statId => statId,
+                statId =>
+                    characterClass.BaseStats[statId].BaseValue +
+                    synthetic.Allocations[statId],
+                StringComparer.Ordinal);
+        if (build.Id != BuildId ||
+            build.SchemaVersion != CharacterBuild.CurrentSchemaVersion ||
+            build.Ruleset != services.RuntimeContext.Ruleset ||
+            build.Dataset != services.RuntimeContext.Dataset ||
+            build.EngineVersion != services.RuntimeContext.EngineVersion ||
+            build.CharacterClassId != synthetic.ProgressionInputs.CharacterClassId ||
+            build.EvolutionId != synthetic.ProgressionInputs.EvolutionId ||
+            build.Level != synthetic.ProgressionInputs.Level ||
+            build.ResetCount != synthetic.ResetInputs.ResetCount ||
+            build.PointsPerReset != synthetic.ResetInputs.PointsPerReset ||
+            !SameStats(build.Stats, expectedStats) ||
+            !build.QuestIds.Order(StringComparer.Ordinal)
+                .SequenceEqual(
+                    synthetic.ProgressionInputs.CompletedQuestIds
+                        .Order(StringComparer.Ordinal)))
+        {
+            throw new InvalidOperationException(
+                "The full character build did not survive persistence and Application revalidation.");
+        }
+
+        var derivedAllocations = build.Stats.ToDictionary(
+            item => item.Key,
+            item =>
+                item.Value -
+                characterClass.BaseStats[item.Key].BaseValue,
+            StringComparer.Ordinal);
+        var budget = PublishedProgressionRuleset.CreateUseCase().Execute(
+            new ProgressionPointBudgetRequest(
+                build.CharacterClassId,
+                build.EvolutionId,
+                build.Level,
+                build.QuestIds));
+        var distribution = PublishedProgressionRuleset
+            .CreateStatDistributionUseCase()
+            .Execute(
+                budget,
+                new ResetPointInputs(
+                    build.ResetCount,
+                    build.PointsPerReset),
+                derivedAllocations);
+        if (distribution.ResetPoints != synthetic.ResetPoints ||
+            distribution.SpentPoints != synthetic.SpentPoints ||
+            !SameAllocations(
+                distribution.Allocations,
+                synthetic.Allocations))
+        {
+            throw new InvalidOperationException(
+                "The persisted build inputs did not reproduce the published synthetic distribution.");
+        }
+    }
+
+    private static int VerifyBuildList(
+        PublishedBuildDraftServices services,
+        ProgressionVerificationResult progressionVerification)
+    {
+        var summaries = services.ListBuildsUseCase.ExecuteAsync()
+            .GetAwaiter()
+            .GetResult();
+        var summary = summaries.SingleOrDefault(item => item.Id == BuildId);
+        if (summary is null)
+        {
+            throw new InvalidOperationException(
+                "The persisted build was not returned by the saved-build listing.");
+        }
+
+        var synthetic = progressionVerification.SyntheticDistribution;
+        if (summary.SchemaVersion != CharacterBuild.CurrentSchemaVersion ||
+            summary.CharacterClassId !=
+                synthetic.ProgressionInputs.CharacterClassId ||
+            summary.EvolutionId != synthetic.ProgressionInputs.EvolutionId ||
+            summary.Level != synthetic.ProgressionInputs.Level ||
+            summary.ResetCount != synthetic.ResetInputs.ResetCount ||
+            summary.PointsPerReset != synthetic.ResetInputs.PointsPerReset ||
+            summary.DatasetVersion != services.RuntimeContext.Dataset.Version)
+        {
+            throw new InvalidOperationException(
+                "The listed build summary did not match the persisted snapshot.");
+        }
+
+        var ordered = summaries.Select(item => item.Id).ToArray();
+        if (!ordered.SequenceEqual(ordered.Order(StringComparer.Ordinal)))
+        {
+            throw new InvalidOperationException(
+                "The saved-build listing was not ordered deterministically by id.");
+        }
+
+        return summaries.Count;
+    }
+
+    private static bool SameStats(
+        IReadOnlyDictionary<string, long> first,
+        Dictionary<string, long> second) =>
+        first.Count == second.Count &&
+        first.All(item =>
+            second.TryGetValue(item.Key, out var value) &&
+            item.Value == value);
+
     private static void SaveAndVerifyBuildDraft(
         PublishedBuildDraftServices services,
         ProgressionVerificationResult progressionVerification)
@@ -520,6 +898,119 @@ internal static class PublicationSmokeRunner
         first.All(item =>
             second.TryGetValue(item.Key, out var value) &&
             item.Value == value);
+
+    private static EquippedBuildDraftVerification CreateEquippedBuildDraftVerification() =>
+        new(
+            new BuildDraftProgressionInputs(
+                "class-dark-knight",
+                "evolution-dark-knight",
+                7,
+                []),
+            new BuildDraftResetInputs(0, 0),
+            new Dictionary<string, long>(StringComparer.Ordinal)
+            {
+                ["strength"] = 0,
+                ["agility"] = 7,
+                ["vitality"] = 0,
+                ["energy"] = 0,
+            },
+            new BuildEquipmentEntry(
+                EquippedItemId,
+                EquippedItemVersion,
+                EquippedItemLevel));
+
+    private static void SaveAndVerifyEquippedBuildDraftAndBuild(
+        PublishedBuildDraftServices services,
+        EquippedBuildDraftVerification verification)
+    {
+        var draft = services.SaveUseCase.ExecuteAsync(
+                new SaveBuildDraftRequest(
+                    EquippedBuildDraftId,
+                    verification.ProgressionInputs,
+                    verification.ResetInputs,
+                    verification.Allocations,
+                    [verification.Equipment]))
+            .GetAwaiter()
+            .GetResult();
+        VerifyEquippedBuildDraft(draft, verification);
+        var build = services.SaveBuildUseCase.ExecuteAsync(
+                new SaveBuildRequest(EquippedBuildId, EquippedBuildDraftId))
+            .GetAwaiter()
+            .GetResult();
+        VerifyEquippedBuild(build, verification);
+    }
+
+    private static void VerifyEquippedBuildDraft(
+        PublishedBuildDraftServices services)
+    {
+        var draft = services.LoadUseCase.ExecuteAsync(EquippedBuildDraftId)
+            .GetAwaiter()
+            .GetResult();
+        VerifyEquippedBuildDraft(draft, CreateEquippedBuildDraftVerification());
+    }
+
+    private static void VerifyEquippedBuildDraft(
+        BuildDraft draft,
+        EquippedBuildDraftVerification verification)
+    {
+        if (draft.Id != EquippedBuildDraftId ||
+            draft.SchemaVersion != BuildDraft.CurrentSchemaVersion ||
+            draft.ProgressionInputs.CharacterClassId !=
+                verification.ProgressionInputs.CharacterClassId ||
+            draft.ProgressionInputs.EvolutionId !=
+                verification.ProgressionInputs.EvolutionId ||
+            draft.ProgressionInputs.Level !=
+                verification.ProgressionInputs.Level ||
+            !draft.ProgressionInputs.CompletedQuestIds
+                .SequenceEqual(verification.ProgressionInputs.CompletedQuestIds) ||
+            draft.ResetInputs != verification.ResetInputs ||
+            draft.StatDistribution.EarnedPoints != 30 ||
+            draft.StatDistribution.SpentPoints != 7 ||
+            draft.StatDistribution.RemainingPoints != 23 ||
+            !SameAllocations(
+                draft.StatDistribution.Allocations,
+                verification.Allocations) ||
+            !draft.Equipment.SequenceEqual([verification.Equipment]))
+        {
+            throw new InvalidOperationException(
+                "The equipped build draft did not survive persistence and Application revalidation.");
+        }
+    }
+
+    private static void VerifyEquippedBuild(PublishedBuildDraftServices services)
+    {
+        var build = services.LoadBuildUseCase.ExecuteAsync(EquippedBuildId)
+            .GetAwaiter()
+            .GetResult();
+        VerifyEquippedBuild(build, CreateEquippedBuildDraftVerification());
+    }
+
+    private static void VerifyEquippedBuild(
+        CharacterBuild build,
+        EquippedBuildDraftVerification verification)
+    {
+        var expectedStats = new Dictionary<string, long>(StringComparer.Ordinal)
+        {
+            ["strength"] = 28,
+            ["agility"] = 27,
+            ["vitality"] = 25,
+            ["energy"] = 10,
+        };
+        if (build.Id != EquippedBuildId ||
+            build.SchemaVersion != CharacterBuild.CurrentSchemaVersion ||
+            build.CharacterClassId !=
+                verification.ProgressionInputs.CharacterClassId ||
+            build.EvolutionId != verification.ProgressionInputs.EvolutionId ||
+            build.Level != verification.ProgressionInputs.Level ||
+            build.ResetCount != verification.ResetInputs.ResetCount ||
+            build.PointsPerReset != verification.ResetInputs.PointsPerReset ||
+            !SameStats(build.Stats, expectedStats) ||
+            !build.Equipment.SequenceEqual([verification.Equipment]))
+        {
+            throw new InvalidOperationException(
+                "The equipped full build did not survive persistence and Application revalidation.");
+        }
+    }
 
     private static PublishedProgressionReferenceCase[] LoadReferenceCases(string directory)
     {
@@ -715,7 +1206,21 @@ internal static class PublicationSmokeRunner
 
     private sealed record VerifiedCharacterBuild(
         bool Verified,
-        int FormulaCount);
+        int FormulaCount,
+        bool TraceVerified,
+        int TraceDependencyCount);
+
+    private sealed record ItemVerification(
+        bool CatalogVerified,
+        int ItemCount,
+        string[] ItemReferences,
+        bool SyntheticEquipVerified);
+
+    private sealed record EquippedBuildDraftVerification(
+        BuildDraftProgressionInputs ProgressionInputs,
+        BuildDraftResetInputs ResetInputs,
+        IReadOnlyDictionary<string, long> Allocations,
+        BuildEquipmentEntry Equipment);
 
     private sealed record PublishedFormulaReferenceCase(
         string Id,

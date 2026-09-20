@@ -6,10 +6,13 @@
         Height="920"
         MinWidth="640"
         MinHeight="640"
-        WindowStartupLocation="CenterScreen">
+        WindowStartupLocation="CenterScreen"
+        Loaded="WindowLoaded">
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <Grid Margin="32">
             <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
@@ -190,10 +193,10 @@
                      VerticalScrollBarVisibility="Auto"
                      AutomationProperties.Name="Resultado de distribución" />
 
-            <GroupBox Grid.Row="12"
+            <GroupBox Grid.Row="19"
                       Grid.ColumnSpan="2"
                       Margin="0,24,0,0"
-                      Header="Atributo derivado publicado">
+                      Header="Toda la informacion derivada (dmg, dmg rate, def, def rate, speed...)" AutomationProperties.HelpText="Resultado completo de atributos derivados">
                 <Grid Margin="12">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
@@ -227,6 +230,78 @@
                              TextWrapping="Wrap"
                              VerticalScrollBarVisibility="Auto"
                              AutomationProperties.Name="Resultado y trazas de fórmula" />
+                </Grid>
+            </GroupBox>
+
+            <GroupBox Grid.Row="12"
+                      Grid.ColumnSpan="2"
+                      Margin="0,24,0,0"
+                      Header="Equipo">
+                <Grid Margin="12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="180" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <TextBlock VerticalAlignment="Center"
+                               Text="Nivel del ítem" />
+                    <TextBox x:Name="EquipItemLevelTextBox"
+                             Grid.Column="1"
+                             MinHeight="30"
+                             VerticalContentAlignment="Center"
+                             Text="0" />
+
+                    <StackPanel Grid.Row="1"
+                                Grid.Column="1"
+                                Margin="0,12,0,0"
+                                Orientation="Horizontal">
+                        <Button Width="200"
+                                Padding="12,6"
+                                Click="EquipSelectedItemButtonClick"
+                                Content="Equipar seleccionado"
+                                AutomationProperties.Name="Equipar el ítem seleccionado" />
+                        <Button Width="200"
+                                Margin="12,0,0,0"
+                                Padding="12,6"
+                                Click="UnequipSelectedItemButtonClick"
+                                Content="Desequipar seleccionado"
+                                AutomationProperties.Name="Desequipar el ítem equipado seleccionado de la lista" />
+                    </StackPanel>
+
+                    <TextBlock Grid.Row="2"
+                               Margin="0,16,0,0"
+                               VerticalAlignment="Center"
+                               Text="Equipado" />
+                    <ListBox x:Name="EquippedItemsListBox"
+                             Grid.Row="2"
+                             Grid.Column="1"
+                             Margin="0,16,0,0"
+                             MinHeight="72"
+                             AutomationProperties.Name="Ítems equipados">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock TextWrapping="Wrap">
+                                    <Run FontWeight="SemiBold" Text="{Binding ItemId}" />
+                                    <Run Text=" · v" />
+                                    <Run Text="{Binding ItemVersion}" />
+                                    <Run Text=" · nivel " />
+                                    <Run Text="{Binding Level}" />
+                                </TextBlock>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+
+                    <TextBlock x:Name="EquipStatusTextBox"
+                               Grid.Row="3"
+                               Grid.ColumnSpan="2"
+                               Margin="0,12,0,0"
+                               TextWrapping="Wrap" />
                 </Grid>
             </GroupBox>
 
@@ -292,6 +367,8 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
 
                     <TextBlock VerticalAlignment="Center"
@@ -316,6 +393,46 @@
                                 Click="LoadBuildButtonClick"
                                 Content="Cargar" />
                     </StackPanel>
+
+                    <TextBlock Grid.Row="2"
+                               Margin="0,16,0,0"
+                               VerticalAlignment="Top"
+                               Text="Builds guardadas" />
+                    <ListBox x:Name="SavedBuildsListBox"
+                             Grid.Row="2"
+                             Grid.Column="1"
+                             Margin="0,16,0,0"
+                             MinHeight="96"
+                             AutomationProperties.Name="Builds guardadas">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock TextWrapping="Wrap">
+                                    <Run FontWeight="SemiBold" Text="{Binding Id}" />
+                                    <Run Text=" · nivel " />
+                                    <Run Text="{Binding Level}" />
+                                    <Run Text=" · resets " />
+                                    <Run Text="{Binding ResetCount}" />
+                                    <Run Text=" · " />
+                                    <Run Text="{Binding DatasetVersion}" />
+                                </TextBlock>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+
+                    <StackPanel Grid.Row="3"
+                                Grid.Column="1"
+                                Margin="0,12,0,0"
+                                Orientation="Horizontal"
+                                VerticalAlignment="Center">
+                        <Button Width="180"
+                                Padding="12,6"
+                                Click="SavedBuildLoadClick"
+                                Content="Cargar seleccionada" />
+                        <TextBlock x:Name="SavedBuildsStatusTextBox"
+                                   Margin="12,0,0,0"
+                                   VerticalAlignment="Center"
+                                   TextWrapping="Wrap" />
+                    </StackPanel>
                 </Grid>
             </GroupBox>
 
@@ -329,6 +446,55 @@
                      TextWrapping="Wrap"
                      VerticalScrollBarVisibility="Auto"
                      AutomationProperties.Name="Resultado de build completa" />
+
+            <GroupBox Grid.Row="17"
+                      Grid.ColumnSpan="2"
+                      Margin="0,24,0,0"
+                      Header="Elegibilidad de equipado (catálogo de ítems)">
+                <Grid Margin="12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="180" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <TextBlock VerticalAlignment="Center"
+                               Text="Ranura" />
+                    <ComboBox x:Name="ItemSlotComboBox"
+                              Grid.Column="1"
+                              MinHeight="30"
+                              DisplayMemberPath="DisplayName"
+                              SelectionChanged="ItemSlotSelectionChanged"
+                              AutomationProperties.Name="Ranura de equipamiento" />
+
+                    <TextBlock Grid.Row="1"
+                               Margin="0,12,0,0"
+                               VerticalAlignment="Center"
+                               Text="Ítem" />
+                    <ComboBox x:Name="ItemComboBox"
+                              Grid.Row="1"
+                              Grid.Column="1"
+                              Margin="0,12,0,0"
+                              MinHeight="30"
+                              DisplayMemberPath="DisplayName"
+                              SelectionChanged="ItemSelectionChanged"
+                              AutomationProperties.Name="Ítem del catálogo" />
+                </Grid>
+            </GroupBox>
+
+            <TextBox x:Name="ItemResultTextBox"
+                     Grid.Row="18"
+                     Grid.ColumnSpan="2"
+                     Margin="0,16,0,0"
+                     Padding="12"
+                     MinHeight="72"
+                     IsReadOnly="True"
+                     TextWrapping="Wrap"
+                     VerticalScrollBarVisibility="Auto"
+                     AutomationProperties.Name="Resultado de elegibilidad de equipado" />
         </Grid>
     </ScrollViewer>
 </Window>

@@ -2,9 +2,11 @@ using System.Windows;
 using System.Windows.Controls;
 using MuOnline.BuildPlanner.Application.Builds;
 using MuOnline.BuildPlanner.Application.Formulas;
+using MuOnline.BuildPlanner.Application.Items;
 using MuOnline.BuildPlanner.Application.Progression;
 using MuOnline.BuildPlanner.Application.Stats;
 using MuOnline.BuildPlanner.Domain.Formulas;
+using MuOnline.BuildPlanner.Domain.Items;
 using MuOnline.BuildPlanner.Domain.Progression;
 using MuOnline.BuildPlanner.Domain.Stats;
 
@@ -22,12 +24,17 @@ public partial class MainWindow : Window
     private readonly LoadBuildDraftUseCase _loadBuildDraftUseCase;
     private readonly SaveBuildUseCase _saveBuildUseCase;
     private readonly LoadBuildUseCase _loadBuildUseCase;
+    private readonly ListBuildsUseCase _listBuildsUseCase;
+    private readonly ItemCatalog _itemCatalog;
+    private readonly EquipItemUseCase _equipItemUseCase;
     private readonly Dictionary<string, TextBox> _allocationInputs =
         new(StringComparer.Ordinal);
+    private readonly List<BuildEquipmentEntry> _equippedItems = [];
     private ProgressionPointBudgetResult? _currentBudget;
     private ProgressionPointBudgetRequest? _currentProgressionRequest;
     private StatDistributionResult? _currentDistribution;
     private bool _isUpdatingFormulaSelection;
+    private bool _isUpdatingItemSelection;
 
     public MainWindow()
         : this(PublishedBuildDraftServices.CreateDefault())
@@ -50,6 +57,9 @@ public partial class MainWindow : Window
         _loadBuildDraftUseCase = buildDraftServices.LoadUseCase;
         _saveBuildUseCase = buildDraftServices.SaveBuildUseCase;
         _loadBuildUseCase = buildDraftServices.LoadBuildUseCase;
+        _listBuildsUseCase = buildDraftServices.ListBuildsUseCase;
+        _itemCatalog = PublishedProgressionRuleset.ItemCatalog;
+        _equipItemUseCase = PublishedProgressionRuleset.CreateEquipItemUseCase();
 
         ClassComboBox.ItemsSource = _catalog.CharacterOptions
             .OrderBy(item => item.DisplayName, StringComparer.CurrentCulture)
@@ -66,6 +76,8 @@ public partial class MainWindow : Window
             HeroStatusCheckBox.IsChecked = false;
             BuildStatAllocationInputs(null);
             InvalidateCurrentBudget();
+            RefreshItemSelection();
+            ClearEquippedItems();
             return;
         }
 
@@ -74,6 +86,8 @@ public partial class MainWindow : Window
         BuildStatAllocationInputs(selectedClass.Id);
         UpdateHeroStatusAvailability();
         InvalidateCurrentBudget();
+        RefreshItemSelection();
+        ClearEquippedItems();
     }
 
     private void EvolutionSelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -179,6 +193,7 @@ public partial class MainWindow : Window
             _currentDistribution = result;
             DistributionResultTextBox.Text = FormatDistributionResult(result);
             ConfigureAndCalculateApplicableFormula();
+            RefreshItemSelection();
         }
         catch (StatDistributionException exception)
         {
@@ -207,7 +222,8 @@ public partial class MainWindow : Window
                     BuildDraftIdTextBox.Text.Trim(),
                     progressionInputs,
                     resetInputs,
-                    allocations));
+                    allocations,
+                    _equippedItems.ToArray()));
             BuildDraftResultTextBox.Text =
                 $"Borrador '{draft.Id}' guardado. " +
                 $"Dataset {draft.Dataset.Version} ({draft.Dataset.Hash[..15]}…).";
@@ -319,7 +335,292 @@ public partial class MainWindow : Window
             _currentDistribution = null;
             InvalidateFormulaResult();
         }
+
+        EvaluateSelectedItem();
     }
+
+    private void RefreshItemSelection()
+    {
+        if (ItemComboBox is null)
+        {
+            return;
+        }
+
+        _isUpdatingItemSelection = true;
+        try
+        {
+            if (ClassComboBox.SelectedItem is not ProgressionCharacterOption selectedClass)
+            {
+                ItemSlotComboBox.ItemsSource = null;
+                ItemComboBox.ItemsSource = null;
+                return;
+            }
+
+            var previousSlot =
+                (ItemSlotComboBox.SelectedItem as ItemSlotOption)?.Id;
+            var slots = _itemCatalog.Items
+                .Where(item => item.AllowedClassIds.Contains(selectedClass.Id))
+                .SelectMany(item => item.Slots)
+                .Distinct(StringComparer.Ordinal)
+                .Order(StringComparer.Ordinal)
+                .Select(slot => new ItemSlotOption(slot, slot))
+                .ToArray();
+            ItemSlotComboBox.ItemsSource = slots;
+            ItemSlotComboBox.SelectedItem =
+                slots.FirstOrDefault(slot => slot.Id == previousSlot) ??
+                slots.FirstOrDefault();
+            UpdateItemOptions(selectedClass.Id);
+        }
+        finally
+        {
+            _isUpdatingItemSelection = false;
+        }
+
+        EvaluateSelectedItem();
+    }
+
+    private void UpdateItemOptions(string characterClassId)
+    {
+        var slot = (ItemSlotComboBox.SelectedItem as ItemSlotOption)?.Id;
+        var previousItemId = (ItemComboBox.SelectedItem as ItemDefinition)?.Id;
+        var items = _itemCatalog.Items
+            .Where(item =>
+                item.AllowedClassIds.Contains(characterClassId) &&
+                (slot is null || item.Slots.Contains(slot)))
+            .OrderBy(item => item.DisplayName, StringComparer.CurrentCulture)
+            .ToArray();
+        ItemComboBox.ItemsSource = items;
+        ItemComboBox.SelectedItem =
+            items.FirstOrDefault(item => item.Id == previousItemId) ??
+            items.FirstOrDefault();
+    }
+
+    private void ItemSlotSelectionChanged(
+        object sender,
+        SelectionChangedEventArgs e)
+    {
+        if (_isUpdatingItemSelection ||
+            ClassComboBox.SelectedItem is not ProgressionCharacterOption selectedClass)
+        {
+            return;
+        }
+
+        _isUpdatingItemSelection = true;
+        try
+        {
+            UpdateItemOptions(selectedClass.Id);
+        }
+        finally
+        {
+            _isUpdatingItemSelection = false;
+        }
+
+        EvaluateSelectedItem();
+    }
+
+    private void ItemSelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (!_isUpdatingItemSelection)
+        {
+            EvaluateSelectedItem();
+        }
+    }
+
+    private void EvaluateSelectedItem()
+    {
+        if (ItemResultTextBox is null)
+        {
+            return;
+        }
+
+        if (ClassComboBox.SelectedItem is not ProgressionCharacterOption selectedClass)
+        {
+            ItemResultTextBox.Text = "Selecciona una clase.";
+            return;
+        }
+
+        if (ItemComboBox.SelectedItem is not ItemDefinition item)
+        {
+            ItemResultTextBox.Text =
+                "No hay ítems publicados para la clase y ranura seleccionadas.";
+            return;
+        }
+
+        if (!TryBuildFinalStats(out var finalStats))
+        {
+            ItemResultTextBox.Text =
+                "Calcula el presupuesto y distribuye los puntos para validar el equipado.";
+            return;
+        }
+
+        try
+        {
+            var result = _equipItemUseCase.Execute(
+                new EquipItemRequest(selectedClass.Id, finalStats, item.Id));
+            ItemResultTextBox.Text = FormatItemEquipResult(result);
+        }
+        catch (ItemEquipException exception)
+        {
+            ItemResultTextBox.Text =
+                $"No elegible ({exception.Code}): " +
+                TranslateItemEquipError(exception.Code);
+        }
+    }
+
+    private bool TryBuildFinalStats(
+        out IReadOnlyDictionary<string, long> finalStats)
+    {
+        finalStats = null!;
+        if (_currentProgressionRequest is null ||
+            _currentDistribution is null)
+        {
+            return false;
+        }
+
+        var characterClass = _catalog.Classes.Single(
+            item => item.Id == _currentProgressionRequest.ClassId);
+        var stats = new Dictionary<string, long>(StringComparer.Ordinal);
+        foreach (var statId in characterClass.StatIds)
+        {
+            var allocation = _currentDistribution.Allocations.TryGetValue(
+                statId,
+                out var value)
+                ? value
+                : 0L;
+            stats[statId] = checked(
+                characterClass.BaseStats[statId].BaseValue + allocation);
+        }
+
+        finalStats = stats;
+        return true;
+    }
+
+    private static string FormatItemEquipResult(EquipItemResult result)
+    {
+        var lines = new List<string>
+        {
+            $"Elegible: {result.DisplayName} ({result.ItemId})",
+            $"Ranuras: {string.Join(", ", result.Slots)}",
+            $"Nivel: +{result.Level}",
+            "Requisitos publicados en nivel +0:",
+        };
+        lines.AddRange(result.RequiredStats
+            .OrderBy(item => item.Key, StringComparer.Ordinal)
+            .Select(item => $"- {item.Key}: {item.Value}"));
+        if (result.Defense is not null)
+        {
+            lines.Add(
+                $"Defensa: {result.Defense} en nivel +0; " +
+                $"DEF(n) = trunc(base × (1 + 0,05·n)) → {result.DefenseAtLevel} a +{result.Level} " +
+                "(axioma parcial EVD-0053).");
+        }
+        else
+        {
+            lines.Add(
+                "Sin bonificaciones ni progresión de nivel: fuera del axioma acotado.");
+        }
+        return string.Join(Environment.NewLine, lines);
+    }
+
+    private static string TranslateItemEquipError(string code) => code switch
+    {
+        ItemEquipErrorCodes.ItemNotFound =>
+            "el ítem no existe en el catálogo publicado.",
+        ItemEquipErrorCodes.ClassNotAllowed =>
+            "la clase seleccionada no puede equipar este ítem.",
+        ItemEquipErrorCodes.RequirementsNotMet =>
+            "los stats finales no alcanzan los requisitos publicados del ítem.",
+        _ => "se produjo un error de equipado no reconocido.",
+    };
+
+    private void EquipSelectedItemButtonClick(object sender, RoutedEventArgs e)
+    {
+        if (ClassComboBox.SelectedItem is not ProgressionCharacterOption selectedClass)
+        {
+            EquipStatusTextBox.Text = "Selecciona una clase.";
+            return;
+        }
+
+        if (ItemComboBox.SelectedItem is not ItemDefinition item)
+        {
+            EquipStatusTextBox.Text =
+                "Selecciona un ítem del catálogo para equiparlo.";
+            return;
+        }
+
+        if (!int.TryParse(EquipItemLevelTextBox.Text, out var level))
+        {
+            EquipStatusTextBox.Text =
+                "El nivel del ítem debe ser un número entero.";
+            return;
+        }
+
+        if (!TryBuildFinalStats(out var finalStats))
+        {
+            EquipStatusTextBox.Text =
+                "Calcula el presupuesto y distribuye los puntos antes de equipar.";
+            return;
+        }
+
+        if (_equippedItems.Any(entry => entry.ItemId == item.Id))
+        {
+            EquipStatusTextBox.Text = $"El ítem '{item.Id}' ya está equipado.";
+            return;
+        }
+
+        try
+        {
+            var eligibility = _equipItemUseCase.Execute(
+                new EquipItemRequest(
+                    selectedClass.Id,
+                    finalStats,
+                    item.Id,
+                    level));
+            _equippedItems.Add(
+                new BuildEquipmentEntry(item.Id, item.Version, level));
+            RefreshEquippedItemsList();
+            EquipStatusTextBox.Text =
+                $"Equipado: {eligibility.DisplayName} a nivel {eligibility.Level}.";
+        }
+        catch (ItemEquipException exception)
+        {
+            EquipStatusTextBox.Text =
+                $"No elegible ({exception.Code}): " +
+                TranslateItemEquipError(exception.Code);
+        }
+    }
+
+    private void UnequipSelectedItemButtonClick(object sender, RoutedEventArgs e)
+    {
+        if (EquippedItemsListBox.SelectedItem is not BuildEquipmentEntry entry)
+        {
+            EquipStatusTextBox.Text =
+                "Selecciona un ítem equipado de la lista para desequiparlo.";
+            return;
+        }
+
+        _equippedItems.Remove(entry);
+        RefreshEquippedItemsList();
+        EquipStatusTextBox.Text = $"Desequipado: {entry.ItemId}.";
+    }
+
+    private void ClearEquippedItems()
+    {
+        _equippedItems.Clear();
+        RefreshEquippedItemsList();
+    }
+
+    private void RefreshEquippedItemsList()
+    {
+        if (EquippedItemsListBox is null)
+        {
+            return;
+        }
+
+        EquippedItemsListBox.ItemsSource = _equippedItems.ToArray();
+    }
+
+    private sealed record ItemSlotOption(string Id, string DisplayName);
 
     private bool TryReadDraftInputs(
         out BuildDraftProgressionInputs progressionInputs,
@@ -439,6 +740,72 @@ public partial class MainWindow : Window
         DistributionResultTextBox.Text = FormatDistributionResult(
             _currentDistribution);
         ConfigureAndCalculateApplicableFormula();
+        RefreshItemSelection();
+
+        _equippedItems.Clear();
+        if (draft.Equipment is not null)
+        {
+            _equippedItems.AddRange(draft.Equipment);
+        }
+
+        RefreshEquippedItemsList();
+    }
+
+    private void ApplyLoadedBuild(CharacterBuild build)
+    {
+        var selectedClass = _catalog.CharacterOptions.Single(
+            item => item.Id == build.CharacterClassId);
+        ClassComboBox.SelectedItem = selectedClass;
+        EvolutionComboBox.SelectedItem = selectedClass.Evolutions.Single(
+            item => item.Id == build.EvolutionId);
+        LevelTextBox.Text = build.Level.ToString(
+            System.Globalization.CultureInfo.InvariantCulture);
+
+        var questBonus = GetSelectedQuestBonus();
+        HeroStatusCheckBox.IsChecked =
+            questBonus is not null &&
+            build.QuestIds.Contains(questBonus.QuestId, StringComparer.Ordinal);
+        ResetCountTextBox.Text = build.ResetCount.ToString(
+            System.Globalization.CultureInfo.InvariantCulture);
+        PointsPerResetTextBox.Text = build.PointsPerReset.ToString(
+            System.Globalization.CultureInfo.InvariantCulture);
+
+        var characterClass = _catalog.Classes.Single(
+            item => item.Id == build.CharacterClassId);
+        var allocations = new Dictionary<string, long>(StringComparer.Ordinal);
+        foreach (var statId in characterClass.StatIds.Order(StringComparer.Ordinal))
+        {
+            var allocation = build.Stats[statId] -
+                characterClass.BaseStats[statId].BaseValue;
+            allocations.Add(statId, allocation);
+            _allocationInputs[statId].Text = allocation.ToString(
+                System.Globalization.CultureInfo.InvariantCulture);
+        }
+
+        _currentProgressionRequest = new ProgressionPointBudgetRequest(
+            build.CharacterClassId,
+            build.EvolutionId,
+            build.Level,
+            build.QuestIds);
+        _currentBudget = _useCase.Execute(_currentProgressionRequest);
+        DistributeStatsButton.IsEnabled = true;
+        ResultTextBox.Text = FormatResult(_currentBudget);
+        _currentDistribution = _statDistributionUseCase.Execute(
+            _currentBudget,
+            new ResetPointInputs(build.ResetCount, build.PointsPerReset),
+            allocations);
+        DistributionResultTextBox.Text = FormatDistributionResult(
+            _currentDistribution);
+        ConfigureAndCalculateApplicableFormula();
+        RefreshItemSelection();
+
+        _equippedItems.Clear();
+        if (build.Equipment is not null)
+        {
+            _equippedItems.AddRange(build.Equipment);
+        }
+
+        RefreshEquippedItemsList();
     }
 
     private void InvalidateCurrentBudget()
@@ -486,6 +853,7 @@ public partial class MainWindow : Window
         _currentDistribution = null;
         InvalidateFormulaResult();
         BuildDraftResultTextBox?.Clear();
+        EvaluateSelectedItem();
     }
 
     private void EvaluateBuildButtonClick(object sender, RoutedEventArgs e)
@@ -545,6 +913,33 @@ public partial class MainWindow : Window
                 $"[{item.Formula.Reference.Id} v{item.Formula.Reference.Version}] " +
                 $"(crudo {item.Calculation.RawOutput})"));
         }
+
+        var trace = BuildCalculationTraceFactory.Create(
+            evaluation,
+            "wpf-build-calculation-trace");
+        lines.Add(string.Empty);
+        lines.Add("== Traza de cálculo de alto nivel ==");
+        lines.Add(
+            $"Orden determinista ({trace.SchemaVersion}): " +
+            $"{trace.Sequence.Count} fórmulas, " +
+            $"{trace.Sequence.Sum(entry => entry.Dependencies.Count)} dependencias.");
+        lines.AddRange(trace.Sequence.Select(entry =>
+        {
+            var prefix =
+                $"{entry.Position + 1}. {entry.FormulaRef.Id}@{entry.FormulaRef.Version} → " +
+                $"{entry.OutputId} [{entry.OutputUnit}] = {entry.VisibleOutput} " +
+                $"(crudo {entry.RawOutput})";
+            if (entry.Dependencies.Count == 0)
+            {
+                return prefix;
+            }
+
+            return prefix + " | depende de: " + string.Join(
+                ", ",
+                entry.Dependencies.Select(dependency =>
+                    $"{dependency.InputId}←{dependency.SourceFormulaRef.Id}" +
+                    $"@{dependency.SourceFormulaRef.Version}:{dependency.OutputStage}"));
+        }));
 
         return string.Join(Environment.NewLine, lines);
     }
@@ -896,6 +1291,7 @@ public partial class MainWindow : Window
             BuildResultTextBox.Text =
                 $"Build '{build.Id}' guardada. " +
                 $"{build.Stats.Count} stats del snapshot exacto.";
+            RefreshSavedBuilds();
         }
         catch (BuildException exception)
         {
@@ -921,13 +1317,32 @@ public partial class MainWindow : Window
             return;
         }
 
+        await LoadBuildByIdAsync(buildId);
+    }
+
+    private async void SavedBuildLoadClick(object sender, RoutedEventArgs e)
+    {
+        if (SavedBuildsListBox.SelectedItem is not CharacterBuildSummary summary)
+        {
+            BuildResultTextBox.Text =
+                "Selecciona una build guardada de la lista para cargarla.";
+            return;
+        }
+
+        BuildIdTextBox.Text = summary.Id;
+        await LoadBuildByIdAsync(summary.Id);
+    }
+
+    private async Task LoadBuildByIdAsync(string buildId)
+    {
         try
         {
             var build = await _loadBuildUseCase.ExecuteAsync(
                 buildId,
                 CancellationToken.None);
+            ApplyLoadedBuild(build);
             BuildResultTextBox.Text =
-                $"Build '{build.Id}' cargada. " +
+                $"Build '{build.Id}' cargada y aplicada al formulario. " +
                 $"{build.Stats.Count} stats revalidados contra el snapshot exacto.";
         }
         catch (BuildException exception)
@@ -941,6 +1356,40 @@ public partial class MainWindow : Window
             BuildResultTextBox.Text =
                 $"No se pudo cargar el borrador fuente ({exception.Code}): " +
                 TranslateBuildDraftError(exception.Code);
+        }
+        catch (StatDistributionException exception)
+        {
+            BuildResultTextBox.Text =
+                $"No se pudo reaplicar ({exception.Code}): " +
+                TranslateDistributionError(exception.Code);
+        }
+        catch (ProgressionPointBudgetException exception)
+        {
+            BuildResultTextBox.Text =
+                $"No se pudo reaplicar ({exception.Code}): {exception.Message}";
+        }
+    }
+
+    private void WindowLoaded(object sender, RoutedEventArgs e)
+    {
+        RefreshSavedBuilds();
+    }
+
+    private async void RefreshSavedBuilds()
+    {
+        try
+        {
+            var builds = await _listBuildsUseCase.ExecuteAsync(CancellationToken.None);
+            SavedBuildsListBox.ItemsSource = builds;
+            SavedBuildsStatusTextBox.Text = builds.Count == 1
+                ? "1 build guardada."
+                : $"{builds.Count} builds guardadas.";
+        }
+        catch (BuildException exception)
+        {
+            SavedBuildsStatusTextBox.Text =
+                $"No se pudo listar ({exception.Code}): " +
+                TranslateBuildError(exception.Code);
         }
     }
 
@@ -958,6 +1407,18 @@ public partial class MainWindow : Window
             "el recálculo no reproduce la caché persistida.",
         BuildDraftErrorCodes.WriteConflict =>
             "la base local siguió ocupada después de los reintentos configurados.",
+        BuildDraftErrorCodes.EquipmentItemNotFound =>
+            "el equipamiento referencia un ítem que no está publicado.",
+        BuildDraftErrorCodes.EquipmentVersionMismatch =>
+            "el equipamiento referencia una versión de ítem no publicada.",
+        BuildDraftErrorCodes.EquipmentClassNotAllowed =>
+            "el equipamiento incluye un ítem que la clase no puede llevar.",
+        BuildDraftErrorCodes.EquipmentLevelOutOfRange =>
+            "el nivel del ítem equipado supera el máximo publicado.",
+        BuildDraftErrorCodes.EquipmentDuplicate =>
+            "el equipamiento repite un mismo ítem.",
+        BuildDraftErrorCodes.EquipmentRequirementsNotMet =>
+            "los stats finales no alcanzan los requisitos publicados del ítem equipado.",
         _ => "se produjo un error de borrador no reconocido.",
     };
 
@@ -975,6 +1436,18 @@ public partial class MainWindow : Window
             "el recálculo no reproduce la caché persistida.",
         BuildErrorCodes.WriteConflict =>
             "la base local siguió ocupada después de los reintentos configurados.",
+        BuildErrorCodes.EquipmentItemNotFound =>
+            "el equipamiento referencia un ítem que no está publicado.",
+        BuildErrorCodes.EquipmentVersionMismatch =>
+            "el equipamiento referencia una versión de ítem no publicada.",
+        BuildErrorCodes.EquipmentClassNotAllowed =>
+            "el equipamiento incluye un ítem que la clase no puede llevar.",
+        BuildErrorCodes.EquipmentLevelOutOfRange =>
+            "el nivel del ítem equipado supera el máximo publicado.",
+        BuildErrorCodes.EquipmentDuplicate =>
+            "el equipamiento repite un mismo ítem.",
+        BuildErrorCodes.EquipmentRequirementsNotMet =>
+            "los stats finales no alcanzan los requisitos publicados del ítem equipado.",
         _ => "se produjo un error de build no reconocido.",
     };
 }

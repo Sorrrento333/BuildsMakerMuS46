@@ -1,3 +1,0 @@
-﻿295: if ($initialReport.AppliedMigrationCount -ne 2 -or
-296: $initialReport.AlreadyAppliedMigrationCount -ne 0 -or
-297: $replacementReport.AlreadyAppliedMigrationCount -ne 2) {

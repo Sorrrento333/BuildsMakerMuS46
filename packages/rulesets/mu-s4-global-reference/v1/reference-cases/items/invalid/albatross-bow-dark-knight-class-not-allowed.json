@@ -1,0 +1,12 @@
+{
+  "id": "albatross-bow-dark-knight-class-not-allowed",
+  "itemId": "item-albatross-bow",
+  "classId": "class-dark-knight",
+  "stats": {
+    "strength": 1000,
+    "agility": 1000,
+    "vitality": 25,
+    "energy": 10
+  },
+  "expectedErrorCode": "item-equip-class-not-allowed"
+}

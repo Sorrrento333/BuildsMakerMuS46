@@ -35,6 +35,8 @@ $requiredLegalFiles = @(
 $publishedRulesetRelativePath = "rulesets\mu-s4-global-reference\v1"
 $requiredRulesetDirectories = @(
     "character-classes",
+    "items",
+    "skills",
     "progression-rules",
     "reference-cases\progression\valid",
     "reference-cases\progression\invalid"
@@ -138,6 +140,13 @@ $expectedPublishedFormulaReferences = @(
     "formula-max-wizardry-dark-wizard@1.0.0",
     "formula-min-wizardry-dark-wizard@1.0.0",
     "formula-nova-max-spell-damage-dark-wizard@1.0.0",
+    "formula-skill-damage-death-stab-dark-knight@1.0.0",
+    "formula-skill-damage-impale-dark-knight@1.0.0",
+    "formula-skill-damage-multi-shot-fairy-elf@1.0.0",
+    "formula-skill-damage-penetration-fairy-elf@1.0.0",
+    "formula-skill-damage-rageful-blow-dark-knight@1.0.0",
+    "formula-skill-damage-twisting-slash-dark-knight@1.0.0",
+    "formula-skill-hp-buff-swell-life-dark-knight@1.0.0",
     "formula-skill-percent-dark-knight@1.0.0",
     "formula-skill-percent-dark-lord@1.0.0",
     "formula-soul-barrier-percent-dark-wizard@1.0.0",
@@ -339,16 +348,16 @@ $replacementReferenceDifference = Compare-Object `
     -DifferenceObject $replacementReport.PublishedFormulaReferences
 if (-not $initialReport.PublishedFormulaContextVerified -or
     -not $replacementReport.PublishedFormulaContextVerified -or
-    $initialReport.PublishedFormulaCount -ne 107 -or
-    $replacementReport.PublishedFormulaCount -ne 107 -or
-    $initialReport.PublishedFormulaReferences.Count -ne 107 -or
-    $replacementReport.PublishedFormulaReferences.Count -ne 107 -or
+    $initialReport.PublishedFormulaCount -ne 114 -or
+    $replacementReport.PublishedFormulaCount -ne 114 -or
+    $initialReport.PublishedFormulaReferences.Count -ne 114 -or
+    $replacementReport.PublishedFormulaReferences.Count -ne 114 -or
     $null -ne $initialReferenceDifference -or
     $null -ne $replacementReferenceDifference -or
     ($replacementReport.PublishedFormulaReferences -join "|") -ne
         ($initialReport.PublishedFormulaReferences -join "|") -or
-    $initialReport.ApprovedPublishedFormulaCaseCount -ne 428 -or
-    $replacementReport.ApprovedPublishedFormulaCaseCount -ne 428) {
+    $initialReport.ApprovedPublishedFormulaCaseCount -ne 456 -or
+    $replacementReport.ApprovedPublishedFormulaCaseCount -ne 456) {
     throw "The published artifact did not reproduce all contextual and arithmetic formula traces."
 }
 if (-not $initialReport.BuildDraftPersistenceVerified -or
@@ -363,6 +372,26 @@ if (-not $initialReport.BuildDraftPersistenceVerified -or
     throw "The external build draft did not survive replacement and exact revalidation."
 }
 
+if (-not $initialReport.BuildPersistenceVerified -or
+    -not $replacementReport.BuildPersistenceVerified -or
+    $initialReport.BuildId -ne "publication-smoke-build" -or
+    $replacementReport.BuildId -ne $initialReport.BuildId -or
+    $initialReport.BuildStatCount -le 0 -or
+    $initialReport.BuildStatCount -ne
+        $replacementReport.BuildStatCount -or
+    $initialReport.BuildStatCount -ne
+        $initialReport.SyntheticStatDistributionStatCount) {
+    throw "The full character build did not survive replacement and exact revalidation."
+}
+
+if (-not $initialReport.BuildListVerified -or
+    -not $replacementReport.BuildListVerified -or
+    $initialReport.PersistedBuildCount -lt 1 -or
+    $replacementReport.PersistedBuildCount -ne
+        $initialReport.PersistedBuildCount) {
+    throw "The saved-build listing did not expose the persisted build in both phases."
+}
+
 if (-not $initialReport.PublishedBuildEvaluationVerified -or
     -not $replacementReport.PublishedBuildEvaluationVerified -or
     $initialReport.PublishedBuildFormulaCount -le 0 -or
@@ -371,6 +400,54 @@ if (-not $initialReport.PublishedBuildEvaluationVerified -or
     $initialReport.PublishedBuildFormulaCount -gt
         $initialReport.PublishedFormulaCount) {
     throw "The published artifact did not reproduce the full-build grouped evaluation."
+}
+
+if (-not $initialReport.PublishedBuildCalculationTraceVerified -or
+    -not $replacementReport.PublishedBuildCalculationTraceVerified -or
+    $initialReport.PublishedBuildCalculationTraceFormulaCount -le 0 -or
+    $initialReport.PublishedBuildCalculationTraceFormulaCount -ne
+        $initialReport.PublishedBuildFormulaCount -or
+    $replacementReport.PublishedBuildCalculationTraceFormulaCount -ne
+        $initialReport.PublishedBuildCalculationTraceFormulaCount -or
+    $initialReport.PublishedBuildCalculationTraceDependencyCount -lt 0 -or
+    $replacementReport.PublishedBuildCalculationTraceDependencyCount -ne
+        $initialReport.PublishedBuildCalculationTraceDependencyCount) {
+    throw "The published artifact did not reproduce the high-level build calculation trace."
+}
+
+if (-not $initialReport.ItemCatalogVerified -or
+    -not $replacementReport.ItemCatalogVerified -or
+    $initialReport.ItemCatalogItemCount -ne 3 -or
+    $replacementReport.ItemCatalogItemCount -ne 3 -or
+    -not $initialReport.SyntheticItemEquipVerified -or
+    -not $replacementReport.SyntheticItemEquipVerified) {
+    throw "The published bounded item catalog did not materialize or evaluate in both phases."
+}
+
+if (-not $initialReport.EquippedBuildDraftPersistenceVerified -or
+    -not $replacementReport.EquippedBuildDraftPersistenceVerified -or
+    $initialReport.EquippedBuildDraftId -ne "publication-smoke-equip-draft" -or
+    $replacementReport.EquippedBuildDraftId -ne
+        $initialReport.EquippedBuildDraftId) {
+    throw "The equipped build draft did not survive replacement and exact revalidation."
+}
+
+if (-not $initialReport.EquippedBuildPersistenceVerified -or
+    -not $replacementReport.EquippedBuildPersistenceVerified -or
+    $initialReport.EquippedBuildId -ne "publication-smoke-equip-build" -or
+    $replacementReport.EquippedBuildId -ne
+        $initialReport.EquippedBuildId -or
+    -not $initialReport.EquippedBuildItemVerified -or
+    -not $replacementReport.EquippedBuildItemVerified -or
+    $initialReport.EquippedBuildItemId -ne "item-kris" -or
+    $replacementReport.EquippedBuildItemId -ne
+        $initialReport.EquippedBuildItemId -or
+    $initialReport.EquippedBuildItemVersion -ne "1.0.0" -or
+    $replacementReport.EquippedBuildItemVersion -ne
+        $initialReport.EquippedBuildItemVersion -or
+    $initialReport.EquippedBuildItemLevel -ne 15 -or
+    $replacementReport.EquippedBuildItemLevel -ne 15) {
+    throw "The instanced item equipment did not survive replacement and exact revalidation."
 }
 
 $initialRulesetRoot = Join-Path $initialPublishDirectory $publishedRulesetRelativePath
@@ -418,6 +495,11 @@ Write-Output "Synthetic stat distribution: $($initialReport.SyntheticStatDistrib
 Write-Output "Reset configuration: $($initialReport.SyntheticResetCount) x $($initialReport.SyntheticPointsPerReset) = $($initialReport.SyntheticResetPoints)"
 Write-Output "Published formulas: $($initialReport.PublishedFormulaReferences -join ', '), $($initialReport.ApprovedPublishedFormulaCaseCount) contextual cases"
 Write-Output "Full build evaluation: $($initialReport.PublishedBuildFormulaCount) formulas grouped"
+Write-Output "High-level build calculation trace: $($initialReport.PublishedBuildCalculationTraceFormulaCount) formulas, $($initialReport.PublishedBuildCalculationTraceDependencyCount) dependency edges"
+Write-Output "Bounded item catalog: $($initialReport.ItemCatalogItemCount) items, equip evaluated: $($initialReport.SyntheticItemEquipVerified)"
+Write-Output "Equipped build: $($initialReport.EquippedBuildId), item $($initialReport.EquippedBuildItemId) at level $($initialReport.EquippedBuildItemLevel)"
 Write-Output "Build draft: $($initialReport.BuildDraftId), dataset $($initialReport.BuildDraftDatasetVersion)"
+Write-Output "Full build: $($initialReport.BuildId), $($initialReport.BuildStatCount) stats"
+Write-Output "Saved builds listed: $($initialReport.PersistedBuildCount)"
 Write-Output "Ruleset files: $($initialRulesetFiles.Count)"
 Write-Output "Artifacts: $runRoot"

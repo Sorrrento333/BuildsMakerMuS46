@@ -2,8 +2,9 @@
 
 ## Estado
 
-Los primeros contratos están en `packages/schemas/v1`. Siete permanecen en
-`1.0.0`; fórmula, distribución y borrador están en `1.1.0`:
+Los primeros contratos están en `packages/schemas/v1`. Cinco
+permanecen en `1.0.0`; fórmula y distribución están en `1.1.0`; borrador y
+build están en `1.2.0` para la instancia equipada sin bonificaciones:
 
 - `evidence.schema.json`
 - `formula.schema.json`
@@ -35,14 +36,22 @@ catálogo de clases y se declaran como invariantes semánticas en
 `docs/04-domain/stat-distribution-contract.md`; no se simulan con datos del
 juego dentro del schema.
 
-El contrato de borrador `1.1.0` conserva metadata exacto del ruleset, dataset y
-motor, las entradas de progresión/resets y un `StatDistribution` completo compuesto
-mediante `$ref`. Se mantiene separado de `build.schema.json`: el borrador actual
-no trata asignaciones como stats finales. Sus totales
+El contrato de borrador `1.2.0` conserva metadata exacto del ruleset, dataset y
+motor, las entradas de progresión/resets, un `StatDistribution` completo compuesto
+mediante `$ref` y el array `equipment` de instancias
+`{ itemId, itemVersion, level }` (sin `uniqueItems`, el rechazo de duplicados es
+semántico en Application). Se mantiene separado de `build.schema.json`: el borrador
+actual no trata asignaciones como stats finales. Sus totales
 calculados son una caché que Application recalcula y contrasta al cargar. Data
 persiste payload y metadata atómicamente mediante la migración
 `1/create_build_drafts`, según
 `docs/06-data/build-draft-persistence-contract.md`.
+
+El contrato de build `1.2.0` añade el mismo array `equipment` a la snapshot
+validada de stats finales. Ambas versiones conservan la migración de carga
+(preservando la anterior `1.1.0` y la legacy `1.0.0`) y revalidan `equipment`
+contra el catálogo publicado al cargar. El diseño completo está en
+`../04-domain/equipped-instance-design.md`.
 
 Los registros canónicos viven en
 `packages/rulesets/mu-s4-global-reference/v1`: seis definiciones de clase, dos
@@ -65,7 +74,7 @@ La validación integral está implementada en .NET 10 bajo
 `tools/validators/MuOnline.SchemaValidator`, con `JsonSchema.Net 9.2.2`
 compilado reproduciblemente desde fuente MIT, validación de formatos y un
 registro de schemas aislado por ejecución. Las
-pruebas verifican que los dieciséis fixtures válidos sean aceptados, los dieciséis
+pruebas verifican que los diecisiete fixtures válidos sean aceptados, los diecisiete
 inválidos sean rechazados, que los veintiséis registros canónicos sean válidos y que
 los diez casos de progresión coincidan con su resultado esperado, además de que
 las dos reglas resuelvan exactamente sus siete casos positivos y de que el
@@ -137,11 +146,64 @@ reglaset, contenido habilitado, fórmulas y fuentes), `quest-rule` (series,
 etapas, prerrequisitos y elegibilidad con casos de prueba), `item` (definición
 canónica con módulos de opciones y sockets), `skill` (definiciones y buffs) y
 `scenario` (modalidad, objetivo, mapas y buffs externos). El inventario del
-validador pasa de once a dieciséis contratos y de veintidós a treinta y dos
+validador pasa de once a diecisiete contratos y de veintidós a treinta y cuatro
 fixtures.
 
 La definición canónica de item se materializa como `item.schema.json`; la
 instancia con nivel, opciones y sockets elegidos sigue siendo dato del usuario
-en `build.schema.json`, sin datos factuales añadidos al ruleset canónico.
+en `build.schema.json`. Desde `1.2.0`, la instancia guardada es acotada y sin
+bonificaciones: `equipment` de `{ itemId, itemVersion, level }`, donde el nivel
+es un entero 0..`maxItemLevel` declarado y la ranura, requisitos y atributos se
+derivan de la definición publicada del ítem (`../04-domain/equipped-instance-design.md`).
 
 ## Plan restante
+
+El catálogo canónico de ítems quedó materializado para el axioma acotado del
+propietario (`RES-0003`, `EVD-0040`): `item-kris`, `item-dragon-armor` y
+`item-albatross-bow` `PUBLISHED` en
+`packages/rulesets/mu-s4-global-reference/v1/items/`, validados contra
+`item.schema.json` y registrados como `("item","items")` en el validador. El
+dataset avanza a `2026-09-16.1`. Application ya consume el catálogo en la
+vertical acotada de UC-04: `JsonItemCatalogSnapshotReader` materializa
+`ItemDefinition` y `EquipItemUseCase` valida la elegibilidad de equipado por
+clase y `requiredStats` en +0, sin bonificaciones ni instancia equipada
+(`../04-domain/items-consumption-design.md`). La vertical `1.2.0` añade la
+instancia equipada persistible sin bonificaciones, la elegibilidad como nivel
+declarado 0..`maxItemLevel` y la revalidación al cargar
+(`../04-domain/equipped-instance-design.md`). Quedan fuera del axioma
+`requiredLevel`, la progresión de `requiredStats`, los sockets, las opciones y
+cualquier otro ítem, ranura, campo o grado; su ampliación exige nueva evidencia
+o una nueva decisión del propietario. La decisión del gate está en
+`../04-domain/items-factual-gate-design.md` y el registro factual en
+  `../05-research/registers/RES-0003-items-equipment.md`.
+
+La vertical `2026-09-20.1` amplía UC-04 con la progresión defensiva de armadura
+por nivel de ítem (`../04-domain/items-defense-level-bonus-design.md`):
+`item.schema.json` avanza a `1.1.0` con la propiedad opcional `defense`
+(integer `>= 0`); `ItemDefinition` gana `Defense` (`long?`); el lector
+materializa `defense` opcional (ausente → `null`; negativo → fail-closed);
+`ItemDefenseBonusCalculator` implementa la regla Webzen adoptada como axioma
+parcial `EVD-0053`, `DEF(n) = trunc(base × (1 + 0,05·n))` con un único
+truncamiento hacia cero en la salida, y `EquipItemResult` expone `Defense`
+(base) y `DefenseAtLevel` (derivada). `item-dragon-armor` sube a `1.1.0` con
+`defense` 37 (`EVD-0048`); Kris y Albatross Bow sólo actualizan `schemaVersion`
+a `1.1.0` y no declaran `defense` (armas). El JOL (`+5 STR` por opción),
+`requiredLevel`, la progresión de `requiredStats`, los sockets y los ATK por
+nivel de armas quedan diferidos o excluidos; el dataset avanza a
+`2026-09-20.1`.
+
+El catálogo acotado de skills quedó materializado para el axioma del propietario
+(`RES-0004`, `EVD-0045`): ocho `SkillDefinition` `PUBLISHED` `VERIFIED` en
+`packages/rulesets/mu-s4-global-reference/v1/skills/`
+(`skill-impale`, `skill-twisting-slash`, `skill-swell-life`, `skill-death-stab`,
+`skill-rageful-blow`, `skill-strike-of-destruction`, `skill-penetration` y
+`skill-multi-shot`), validados contra `skill.schema.json` y registrados como
+`("skill","skills")` en el validador (inventario canónico 119 → 127). El mapeo
+`kind` aprobado asigna `ATK`/`Non-ATK`/`Debuff` → `ACTIVE` y `Buff` → `BUFF`;
+`requiredLevel` es el `Character Level` publicado y `allowedEvolutionIds` son las
+tres evoluciones de cada familia. El dataset avanza a `2026-09-17.1`. Quedan
+fuera del axioma cualquier otra skill o buff, los prerrequisitos por
+stat/quest/equipo y el `buffRef`; su ampliación exige nueva evidencia o una
+nueva decisión del propietario. La decisión completa está en
+`../04-domain/skills-factual-gate-design.md` y el registro factual en
+`../05-research/registers/RES-0004-skills-buffs.md`.

@@ -37,6 +37,7 @@ internal static class BuildDraftCalculation
         ArgumentNullException.ThrowIfNull(context.Catalog);
         ArgumentNullException.ThrowIfNull(context.Ruleset);
         ArgumentNullException.ThrowIfNull(context.Dataset);
+        ArgumentNullException.ThrowIfNull(context.ItemCatalog);
         ArgumentException.ThrowIfNullOrWhiteSpace(context.Ruleset.Id);
         ArgumentException.ThrowIfNullOrWhiteSpace(context.Ruleset.Version);
         ArgumentException.ThrowIfNullOrWhiteSpace(context.Dataset.Version);

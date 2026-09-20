@@ -1,0 +1,71 @@
+{
+    "schemaVersion":  "1.0.0",
+    "id":  "skill-hp-buff-swell-life-dark-knight-integer-step",
+    "rulesetId":  "mu-s4-global-reference",
+    "formulaRef":  {
+                       "id":  "formula-skill-hp-buff-swell-life-dark-knight",
+                       "version":  "1.0.0"
+                   },
+    "context":  {
+                    "characterClassId":  "class-dark-knight",
+                    "evolutionId":  "evolution-dark-knight"
+                },
+    "inputs":  {
+                   "energy":  40,
+                   "vitality":  100
+               },
+    "expectedTrace":  {
+                          "schemaVersion":  "1.0.0",
+                          "id":  "trace-skill-hp-buff-swell-life-dark-knight-integer-step",
+                          "rulesetId":  "mu-s4-global-reference",
+                          "formulaRef":  {
+                                             "id":  "formula-skill-hp-buff-swell-life-dark-knight",
+                                             "version":  "1.0.0"
+                                         },
+                          "context":  {
+                                          "characterClassId":  "class-dark-knight",
+                                          "evolutionId":  "evolution-dark-knight"
+                                      },
+                          "inputs":  {
+                                         "energy":  40,
+                                         "vitality":  100
+                                     },
+                          "steps":  [
+                                        {
+                                            "stepId":  "energy-term",
+                                            "value":  2
+                                        },
+                                        {
+                                            "stepId":  "vitality-term",
+                                            "value":  1
+                                        },
+                                        {
+                                            "stepId":  "raw-hp-buff",
+                                            "value":  15
+                                        },
+                                        {
+                                            "stepId":  "visible-hp-buff",
+                                            "value":  15
+                                        }
+                                    ],
+                          "rounding":  {
+                                           "mode":  "TRUNCATE",
+                                           "stage":  "visible-hp-buff",
+                                           "decimalPlaces":  0
+                                       },
+                          "rawOutput":  15,
+                          "visibleOutput":  15,
+                          "evidenceRefs":  [
+                                               "evd-0021",
+                                               "evd-0041",
+                                               "evd-0045",
+                                               "evd-0046"
+                                           ],
+                          "conflictIds":  [
+                                              "dsp-0008",
+                                              "dsp-0009",
+                                              "dsp-0010",
+                                              "dsp-0011"
+                                          ]
+                      }
+}

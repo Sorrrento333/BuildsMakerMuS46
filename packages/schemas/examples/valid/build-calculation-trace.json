@@ -1,0 +1,73 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "build-calculation-trace-synthetic-001",
+  "rulesetId": "ruleset-synthetic",
+  "context": {
+    "characterClassId": "class-synthetic",
+    "evolutionId": "evolution-synthetic"
+  },
+  "sequence": [
+    {
+      "position": 0,
+      "formulaRef": {
+        "id": "formula-synthetic-001",
+        "version": "0.1.0"
+      },
+      "outputId": "output-synthetic-001",
+      "outputUnit": "stat-point",
+      "rawOutput": 2,
+      "visibleOutput": 2,
+      "dependencies": []
+    },
+    {
+      "position": 1,
+      "formulaRef": {
+        "id": "formula-synthetic-002",
+        "version": "0.1.0"
+      },
+      "outputId": "output-synthetic-002",
+      "outputUnit": "percent",
+      "rawOutput": 40,
+      "visibleOutput": 40,
+      "dependencies": [
+        {
+          "inputId": "input-synthetic-value",
+          "sourceFormulaRef": {
+            "id": "formula-synthetic-001",
+            "version": "0.1.0"
+          },
+          "outputStage": "RAW"
+        }
+      ]
+    },
+    {
+      "position": 2,
+      "formulaRef": {
+        "id": "formula-synthetic-003",
+        "version": "0.1.0"
+      },
+      "outputId": "output-synthetic-003",
+      "outputUnit": "hp-point",
+      "rawOutput": 120,
+      "visibleOutput": 120,
+      "dependencies": [
+        {
+          "inputId": "input-synthetic-base",
+          "sourceFormulaRef": {
+            "id": "formula-synthetic-001",
+            "version": "0.1.0"
+          },
+          "outputStage": "VISIBLE"
+        },
+        {
+          "inputId": "input-synthetic-rate",
+          "sourceFormulaRef": {
+            "id": "formula-synthetic-002",
+            "version": "0.1.0"
+          },
+          "outputStage": "VISIBLE"
+        }
+      ]
+    }
+  ]
+}

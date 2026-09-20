@@ -14,6 +14,13 @@
 
 ## Completado
 
+- Progresión defensiva de armadura por nivel de ítem implementada (2026-09-20):
+  schema item `1.1.0` con `defense` opcional, `item-dragon-armor` `1.1.0` con
+  `defense` 37 (`EVD-0048`), `JsonItemCatalogSnapshotReader` `1.1.0`,
+  `ItemDefenseBonusCalculator` (`DEF(n) = trunc(base × (1 + 0,05·n))`, axioma
+  `EVD-0053`), `EquipItemResult` con `Defense`/`DefenseAtLevel`, WPF y smoke a
+  +7 (49) y kris sin defensa; dataset `2026-09-20.1`, JOL diferido.
+
 - Diseño documental v1.0: visión, alcance, requisitos, roadmap, arquitectura,
   dominio, estrategia de datos, investigación, pruebas, seguridad y continuidad.
 - Spikes equivalentes de TypeScript/Node.js 24 y C#/.NET 10 para cálculo
@@ -1403,6 +1410,13 @@
 
 ## Completado
 
+- Progresión defensiva de armadura por nivel de ítem implementada (2026-09-20):
+  schema item `1.1.0` con `defense` opcional, `item-dragon-armor` `1.1.0` con
+  `defense` 37 (`EVD-0048`), `JsonItemCatalogSnapshotReader` `1.1.0`,
+  `ItemDefenseBonusCalculator` (`DEF(n) = trunc(base × (1 + 0,05·n))`, axioma
+  `EVD-0053`), `EquipItemResult` con `Defense`/`DefenseAtLevel`, WPF y smoke a
+  +7 (49) y kris sin defensa; dataset `2026-09-20.1`, JOL diferido.
+
 - Diseño documental v1.0: visión, alcance, requisitos, roadmap, arquitectura,
   dominio, estrategia de datos, investigación, pruebas, seguridad y continuidad.
 - Spikes equivalentes de TypeScript/Node.js 24 y C#/.NET 10 para cálculo
@@ -2328,9 +2342,9 @@
   pruebas: `ruleset` (reglaset con contenido habilitado, fórmulas y fuentes),
   `quest-rule` (series, etapas, prerrequisitos, elegibilidad y casos de prueba),
   `item` (definición canónica con módulos de opciones y sockets), `skill`
-  (definiciones activas/pasivas/buffs) y `scenario` (modalidad, objetivo, mapas
-  y buffs externos). El inventario pasa de once a dieciséis contratos y de
-  veintidós a treinta y dos fixtures, sin añadir datos factuales al ruleset.
+(definiciones activas/pasivas/buffs) y `scenario` (modalidad, objetivo, mapas
+   y buffs externos). El inventario pasa de once a diecisiete contratos y de
+   veintidós a treinta y cuatro fixtures, sin añadir datos factuales al ruleset.
 - El contrato `item` se define como `ItemDefinition` canónico; la instancia con
   nivel, opciones y sockets elegidos permanece como dato del usuario en
   `build.schema.json`.
@@ -2355,35 +2369,428 @@
   verifica el lote sobre el personaje sintético con 19 fórmulas agrupadas. No
   se incorporan JSON factuales: ruleset `1.0.0`, motor `0.2.0` y dataset
   `2026-07-30.3` permanecen sin cambios.
+- Persistencia de build completa cerrada: `SaveBuildUseCase` promueve un
+  borrador a `CharacterBuild` (schema `1.0.0`) con clase, evolución, nivel,
+  stats finales, quests y resets; `LoadBuildUseCase` recarga y revalida la
+  build contra el contexto exacto y rechaza con códigos estables la ausencia, el
+  schema no soportado, la dependencia indisponible, la identidad incoherente, la
+  evolución no ofrecida, los stats no alcanzables o ajenos a la clase. Data
+  implementa `SqliteBuildRepository` con la migración 2 `create_builds`,
+  reemplazo atómico por ID y contención de escritura con código estable. WPF
+compone el flujo de guardado/carga por ID. No se incorporan JSON factuales ni
+   se reutiliza la caché como verdad: ruleset `1.0.0`, motor `0.2.0` y dataset
+   `2026-07-30.3` permanecen sin cambios.
+- Traza de cálculo de alto nivel cerrada: `build-calculation-trace.schema.json`
+  `1.0.0` con fixtures sintéticos y gate semántico (posiciones contiguas,
+  fuentes dentro de la secuencia y aristas únicas); `BuildCalculationTrace`/
+  `BuildCalculationTraceFactory` en Application emiten el documento desde
+  `CharacterBuildEvaluation` con orden determinista, salidas y dependencias
+  directas. WPF muestra la sección "Traza de cálculo de alto nivel"; el smoke lo
+  verifica en ambas fases. El inventario pasa de dieciséis a diecisiete contratos
+  y de treinta y dos a treinta y cuatro fixtures, sin añadir datos factuales.
+- Instancia equipada sin bonificaciones cerrada: `build-draft.schema.json` y
+  `build.schema.json` avanzan a `1.2.0` con el array `equipment` de
+  `{ itemId, itemVersion, level }`. `BuildEquipmentEntry`/
+  `BuildEquipmentValidator` y los códigos `equipment-*` de
+  `BuildErrorCodes`/`BuildDraftErrorCodes` validan en
+  `SaveBuildDraftUseCase` y revalidan en `LoadBuildDraftUseCase` y
+  `LoadBuildUseCase` contra el catálogo publicado; `SaveBuildUseCase` promueve el
+  equipo del draft; `EquipItemRequest/Result` ganan `Level`/`MaxItemLevel`
+  (`item-equip-level-out-of-range`). WPF añade la sección "Equipo" y el smoke
+  verifica el household equipado (`item-kris` nivel 15). La migración de carga
+  conserva `1.1.0+1.1.0` y legacy `1.0.0+1.0.0`; `BuildDraftStatDistribution`
+  permanece en `1.1.0`. Diseño en
+  `docs/04-domain/equipped-instance-design.md`. No incorpora datos factuales
+  nuevos: ruleset `1.0.0`, motor `0.2.0` y dataset `2026-09-17.1` sin cambios.
 
 ## No iniciado
 
-- Builds completas y flujos de UI posteriores al presupuesto ganado, los
-  borradores locales y la evaluación en lote: master buys, persistencia de la
-  build completa y pantallas restantes del flujo.
+- Master buys y pantallas restantes del flujo de la Calculadora, pendientes de
+  sus contratos factuales; no pueden inventarse.
+- Ampliación de UC-04 (bonificaciones ATK/DEF, `requiredLevel`, progresión de
+  `requiredStats`, sockets): requiere nueva evidencia Season
+  4 o una nueva decisión del propietario; no puede inferirse.
+- Consumo de skills y contrato de buff (`buffRef`): pendientes de verticales
+  futuras tras la materialización del catálogo acotado.
 
 ## Decisiones abiertas
 
 - El canal público de actualización y firma continúa como decisión posterior de
   distribución.
 
-## Verificación más reciente — 2026-09-11 (evaluación de build en lote)
+## Verificación más reciente — 2026-09-20 (cierre de ciclo, sin vertical nueva)
 
-- Cierre de la evaluación de build en lote: restauración y build Release
-  aprobados con 0 advertencias/0 errores; 761/761 pruebas pasan: 40 validator,
-  58 motor, 645 Application y 18 Data. Seis pruebas de integración de
-  Application fijan cobertura exacta por clase×evolución, paridad
-  lote/individual, traza anidada compartida, orden determinista y fallos
-  cerrados por nivel inválido, asignación negativa y ausencia de fórmula
-  aplicable.
-- Smoke WPF `win-x64`: PASS con SQLite `3.53.3`, 1300 archivos,
-  150.038.168 bytes, 10 avisos legales, 877 JSON del ruleset, dataset
-  `2026-07-30.3` (hash
-  `sha256:ef6fd756c2a69245906019d4c4cf01c3a7baba460067bbfffc4c4906361b0f18`)
-  y los nuevos reportes `PublishedBuildEvaluationVerified`/
-  `PublishedBuildFormulaCount` aprobados; el lote reproducido sobre el
-  personaje sintético (cinco stats y 201 gastados, resets `2 × 100 = 200`)
-  agrupa 19 fórmulas con paridad por fórmula contra el camino individual.
+- El mantenedor decidió el 2026-09-20 no abrir ninguna vertical nueva: el ciclo
+  se cierra con actualización de documentación y limpieza de artefactos
+  obsoletos (ver «Próximas acciones», sección «Cierre de ciclo — 2026-09-20»).
+- Estado estable re-verificado: build Release `0/0`; `dotnet test` Release
+  858/858 pruebas (43 validator, 58 motor, 730 Application, 27 Data); CI verde
+  sobre el head `bd9632c` (`build-and-test` id `106011392709` success y
+  `wpf-publication-smoke` id `106011392751` success, run `35485648642`);
+  PR #7 `MERGED`; sin PR abierto; `git status` limpio salvo la limpieza y
+  documentación de este cierre.
+- Los candidatos restantes (ampliar UC-04 con bonificaciones/`requiredLevel`/
+  `requiredStats` por nivel/sockets, y master buys + pantallas restantes del
+  flujo) permanecen como «Alternativa documentada» en «Próximas acciones»:
+  ambos exigen nueva evidencia Season 4 o una nueva decisión del propietario.
+
+## Verificación anterior — 2026-09-19 (instancia equipada sin bonificaciones)
+
+- `BuildEquipmentEntry` (`{ itemId, itemVersion, level }`) serializa como
+  `equipment` en `CharacterBuild`/`BuildDraft` `1.2.0` (`CurrentSchemaVersion`
+  actualizado, `PreviousSchemaVersion` `1.1.0`); `BuildDraftRuntimeContext` gana
+  `ItemCatalog` y `BuildDraftStatDistribution` permanece en `1.1.0`.
+- `BuildEquipmentValidator` valida contra `ItemCatalog` (definición `PUBLISHED`
+  única, `itemVersion` exacta, `allowedClassIds`, `0 <= level <= MaxItemLevel`,
+  sin duplicados y `requiredStats` +0 sobre stats finales, que exigen base stats)
+  y lanza `BuildEquipmentValidationException`; los use cases mapean al prefijo
+  `build-equipment-*`/`build-draft-equipment-*`.
+- Guardado: `SaveBuildDraftUseCase` acepta `Equipment?` y valida sólo cuando hay
+  equipo; `SaveBuildUseCase` promueve `draft.Equipment` con guard `is null`.
+  Carga: `LoadBuildDraftUseCase`/`LoadBuildUseCase` revalidan contra el snapshot
+  y normatizan `1.1.0+1.1.0` → `Equipment = []` y legacy `1.0.0+1.0.0` con
+  defaults. `CharacterBuild`/`BuildDraft` protegidos con `Equipment ?? []`.
+- WPF: sección central "Equipo" (nivel, «Equipar/Desequipar seleccionado`,
+  `EquippedItemsListBox` e indicador de estado); `_equippedItems` se limpia al
+  cambiar clase y se rellena en `ApplyLoadedDraft`/`ApplyLoadedBuild`; el save
+  pasa `_equippedItems.ToArray()`.
+- Smoke: `publication-smoke-equip-draft`/`publication-smoke-equip-build` con
+  `class-dark-knight` nivel 7 (EB 30, agility 7 → 27 final, restante 23) y
+  `item-kris` `1.0.0` nivel 15; `PersistedBuildCount` pasa a 2; el informe gana
+  `EquippedBuild{Draft,Build}PersistenceVerified`,
+  `EquippedBuildDraftId`, `EquippedBuildItem{Verified,Id,Version,Level}`.
+- Verificación PASS: build Release 0/0; 858/858 pruebas (43 validator, 58 motor,
+  730 Application, 27 Data); `Test-SchemaStructure` 17/34; smoke WPF `win-x64`
+  PASS (SQLite `3.53.3`, 1369 archivos, 150.666.306 bytes, 946 archivos del
+  ruleset, 456 casos contextuales, 3 ítems con equipado verificado
+  (`item-kris` nivel 15), 2 builds listados, dataset `2026-09-17.1`). Sin datos
+  factuales nuevos.
+
+## Verificación anterior — 2026-09-19 (traza de cálculo de alto nivel)
+
+- Contrato nuevo `build-calculation-trace` `1.0.0` en
+  `packages/schemas/v1/build-calculation-trace.schema.json`: documento de nivel
+  build con `context`, `sequence` ordenada (posición, `formulaRef` `id@version`,
+  `outputId`/`outputUnit`, crudo y visible) y aristas `dependencies` directas
+  entre fórmulas (`inputId`, `sourceFormulaRef`, `outputStage` `RAW`
+  o `VISIBLE`). Fixtures sintéticos válido e inválido en
+  `packages/schemas/examples/{valid,invalid}`.
+- Gate semántico `MatchesBuildCalculationTraceSemantics`: posiciones contiguas
+  `0..n-1`, toda `sourceFormulaRef` dentro de la secuencia y aristas únicas
+  `(inputId, sourceFormulaRef)` por entrada.
+- `BuildCalculationTrace`/`BuildCalculationTraceFactory` (Application) serializan
+  la macro-traza desde `CharacterBuildEvaluation` con JSON determinista que
+  respeta el contrato; las dependencias son los inputs declarados de cada
+  fórmula con origen `FORMULA_OUTPUT`. WPF la muestra como "Traza de cálculo de
+  alto nivel" (orden, salidas y dependencias directas).
+- Registro y conteos actualizados: validador 16 → 17 contratos y 32 → 34
+  fixtures (`AllVersionedFixturesMatchTheirExpectedValidity`),
+  `Test-SchemaStructure` 17/34 y harness fuente 2 × 34/34; nuevos shapes
+  rechazados de la traza (`non-contiguous-positions`,
+  `missing-dependency-source`, `duplicate-dependency-edge`).
+- El smoke WPF verifica la macro-traza en ambas fases (19 fórmulas, 3 aristas;
+  `TraceVerified` con paridad de orden, salidas y dependencias) y PS1 asevera la
+  verificación; el informe gana `PublishedBuildCalculationTrace{Verified,
+  FormulaCount, DependencyCount}`.
+- Verificación PASS: build Release 0/0; 847/847 pruebas (43 validator, 58 motor,
+  719 Application, 27 Data); `Test-SchemaStructure` 17/34; fuente 2 × 34/34;
+  smoke WPF `win-x64` (SQLite `3.53.3`, 1369 archivos, 150.638.938 bytes, 946
+  archivos del ruleset, 456 casos, dataset `2026-09-17.1`). Sin datos factuales
+  nuevos: ruleset `1.0.0`, motor `0.2.0` y dataset sin cambios.
+
+## Verificación anterior — 2026-09-19 (skills como modificador de cálculo)
+
+- Vertical "skill como modificador de cálculo" implementada por axioma acotado
+  del propietario (`EVD-0046`, "Approve as drafted"), sin `buffRef` ni UI de
+  skills, respetando `docs/DECISIONES-PRODUCTO.md`.
+- Siete fórmulas `PUBLISHED` `VERIFIED` (`schemaVersion` `2.1.0`) nacen en
+  `packages/rulesets/mu-s4-global-reference/v1/formulas/`, siguiendo el patrón de
+  `formula-damage-buff-fairy-elf`:
+  `formula-skill-damage-impale-dark-knight` (`15 + trunc(STR/35)`),
+  `...-twisting-slash-dark-knight` (`15 + trunc(STR/40)`),
+  `...-death-stab-dark-knight` (`70 + trunc(STR/150)`),
+  `...-rageful-blow-dark-knight` (`60 + trunc(STR/150)`),
+  `formula-skill-hp-buff-swell-life-dark-knight`
+  (`12 + trunc(ENE/20) + trunc(VIT/100)`, un único truncamiento del total con
+  `STA Level` → Vitality),
+  `formula-skill-damage-penetration-fairy-elf` (`70 + trunc(AGI/200)`) y
+  `formula-skill-damage-multi-shot-fairy-elf` (`40 + trunc(AGI/200)`).
+  Strike of Destruction queda fuera (Fanz no publica Skill DMG).
+- Se añadieron 28 casos válidos (`4` por fórmula: `base`, `fraction-step`,
+  `integer-step` y `blade-master-step`/`high-elf-step`) y 15 controles negativos
+  (`formula-stat-below-base` / `formula-not-applicable`) en
+  `reference-cases/formulas/{valid,invalid}`, con trazas decimales exactas del
+  motor (`CHECKED_DECIMAL_V1`, `TRUNCATE` a 0 decimales).
+- Inventario canónico de fórmulas 108 → 115 archivos (107 → 114 ejecutables);
+  casos válidos 432 → 460 (aprobados 428 → 456). Se actualizaron el allow-list y
+  los conteos de `FormulaApplicationIntegrationTests.cs`, los conteos de
+  `SchemaContractValidatorTests.cs` y la lista/conteos del smoke PS1.
+- `RES-0004` incorpora `SKL-CLM-010` y la evidencia `EVD-0046`; el diseño
+  `docs/04-domain/skills-consumption-design.md` queda `IMPLEMENTED`.
+- Verificación PASS: build Release 0/0; 840/840 pruebas (40 validator, 58 motor,
+  715 Application, 27 Data); `Test-SchemaStructure` 16/32; smoke WPF `win-x64`
+  (SQLite `3.53.3`, 1369 archivos, 150.618.678 bytes, 946 archivos del ruleset,
+  456 casos contextuales, dataset `2026-09-17.1`).
+
+## Verificación anterior — 2026-09-19 (alineación con la regla inviolable de skills)
+
+- `docs/DECISIONES-PRODUCTO.md` (añadido por el propietario en `5a69fa5`) fija
+  que una skill sólo puede ser modificador de cálculo (dmg/buff): sin catálogo
+  ni UI en el cliente y sin pruebas del catálogo.
+- Se retiró la vertical de consumo de catálogo de skills que contradecía la
+  regla: la sección "Aprendizaje de skills" de `MainWindow` (selectores
+  `SkillComboBox`/`SkillResultTextBox`), `SkillApplicationIntegrationTests.cs`,
+  la verificación de catálogo en el smoke (`SkillCatalogVerified`,
+  `SkillCatalogSkillCount`, `SkillCatalogSkillReferences`,
+  `SyntheticSkillLearnVerified`) y las aserciones/dirs de skills del script PS1.
+- Se eliminaron los fixtures `reference-cases/skills/{valid,invalid}`.
+- Se conserva el backend mínimo sin uso desde la app: `Domain.Skills`
+  (`SkillDefinition`) y `Application.Skills` (`SkillCatalog`, reader,
+  `LearnSkillUseCase` y excepciones); los ocho `skills/*.json` y su registro en
+  `SchemaContractValidator` no cambian.
+- `PublishedProgressionRuleset` vuelve a no exponer
+  `Skills`/`CreateLearnSkillUseCase`.
+- Verificación PASS: build Release 0/0; 797/797 pruebas (40 validator, 58 motor,
+  672 Application, 27 Data); `Test-SchemaStructure` 16/32; smoke WPF `win-x64`
+  (SQLite `3.53.3`, 1319 archivos, 150.461.069 bytes, 896 archivos del ruleset,
+  dataset `2026-09-17.1`) con el catálogo de 3 ítems y sin sección de skills.
+- Dirección vigente: sumar la skill como modificador dentro de las fórmulas
+  derivadas; requiere datos de efecto autorizados (`buffRef` sigue omitido).
+
+## Verificación anterior — 2026-09-19 (consumo acotado del catálogo de skills)
+
+- `SkillDefinition` (Domain) y `SkillCatalog`/`JsonSkillCatalogSnapshotReader`
+  (Application) leen `skills/*.json` exigiendo schema `1.0.0`, IDs únicos, un
+  único ruleset, `requiredLevel >= 1`, `allowedEvolutionIds` no vacíos y sin
+  duplicados y `status` `PUBLISHED` (fail-closed; un directorio vacío es
+  `SnapshotInvalid`).
+- `LearnSkillUseCase` valida la elegibilidad de aprendizaje (evolución +
+  `requiredLevel`) con códigos estables `skill-learn-skill-not-found`,
+  `skill-learn-evolution-not-allowed` y `skill-learn-requirements-not-met`;
+  `FinalLevel` es el nivel ya validado por el presupuesto y no se aplican
+  reducciones. El `buffRef` de `kind BUFF` queda diferido y no se interpreta.
+- Reference cases `reference-cases/skills/{valid,invalid}` y 12 pruebas
+  (`SkillApplicationIntegrationTests`) reproducen 3 casos aprobados y 3 rechazos
+  y fallan en cerrado ante skill no publicada, ruleset mixto, directorio
+  ausente, `requiredLevel` no positivo y `allowedEvolutionIds` vacío.
+- Se corrigió el caso válido `skill-swell-life-dark-knight-eligible.json`
+  (antes `skill-swell-life-dark-wizard-eligible`), inconsistente con la familia
+  publicada (Dark Knight) de `skill-swell-life`: queda con `evolutionId`
+  `evolution-dark-knight` y `finalLevel` 122.
+- WPF añade un selector de skill por evolución y resultado de aprendizaje; el
+  smoke WPF exige el catálogo de 8 skills y una evaluación de aprendizaje
+  resuelta (`skill-impale`/`evolution-dark-knight`/28).
+- Verificación PASS: build Release 0/0; 809/809 pruebas (40 validator, 58 motor,
+  684 Application, 27 Data); `Test-SchemaStructure` 16/32; smoke WPF `win-x64`
+  (SQLite `3.53.3`, 1325 archivos, 150.475.382 bytes, 902 archivos del ruleset,
+  dataset `2026-09-17.1`).
+- Diseño en `docs/04-domain/skills-consumption-design.md`; ruleset `1.0.0`,
+  motor `0.2.0` y dataset `2026-09-17.1` sin cambios; `buffRef` sigue diferido.
+
+## Verificación anterior — 2026-09-17 (catálogo acotado de skills materializado)
+
+- Ocho `SkillDefinition` `PUBLISHED` `VERIFIED` en
+  `packages/rulesets/mu-s4-global-reference/v1/skills/` (`skill-impale`,
+  `skill-twisting-slash`, `skill-swell-life`, `skill-death-stab`,
+  `skill-rageful-blow`, `skill-strike-of-destruction`, `skill-penetration`,
+  `skill-multi-shot`), validados contra `skill.schema.json`.
+- `SchemaContractValidator.ValidateRulesetRecords` registra `("skill","skills")`;
+  el inventario canónico sube de 119 a 127 registros de ruleset. El smoke WPF
+  exige ahora el directorio `skills`.
+- `kind` del mapeo aprobado (`EVD-0045`); `requiredLevel` = `Character Level`
+  publicado (28, 80, 120, 160, 170, 220, 130, 220); `allowedEvolutionIds` = las
+  tres evoluciones de la familia; `prerequisiteSkillIds` vacío; `buffRef`
+  omitido; `evidenceRefs` `evd-0041`–`evd-0045`; `conflictIds`
+  `dsp-0008`–`dsp-0011`.
+- El dataset avanza a `2026-09-17.1` y el hash se recalcula en tiempo de
+  ejecución.
+- Verificación PASS: build Release 0/0; 797/797 pruebas; `Test-SchemaStructure`
+  16/32; smoke WPF `win-x64` (SQLite `3.53.3`, 1319 archivos, 150.442.137
+  bytes, 896 archivos del ruleset, dataset `2026-09-17.1`).
+- Application todavía no consume el catálogo de skills; `buffRef` sigue diferido.
+
+## Verificación anterior — 2026-09-17 (gate factual de skills y buffs resuelto)
+
+- `RES-0004-skills-buffs` queda `VERIFIED`: nueve claims y cinco evidencias
+  (`EVD-0041`–`EVD-0045`); los conflictos `DSP-0008`, `DSP-0009`, `DSP-0010` y
+  `DSP-0011` quedan `RESOLVED` por `OWNER_DECISION`.
+- El propietario aceptó como axioma acotado del ruleset ocho skills con
+  `Character Level` publicado (Impale, Twisting Slash, Swell Life, Death Stab,
+  Rageful Blow y Strike of Destruction de Dark Knight; Penetration y Multi-Shot
+  de Fairy Elf), con mapeo `kind` (ATK/Non-ATK/Debuff→ACTIVE, Buff→BUFF,
+  Summon→SUMMON; `PASSIVE` no aceptado), `allowedEvolutionIds` = las tres
+  evoluciones de cada familia, `prerequisiteSkillIds` vacío y `buffRef` omitido.
+- Quedan fuera del axioma los prerrequisitos por stat/quest/equipo, las skills
+  nivel ≥400 y sistemas post-S4, las categorías `WIZ`/`Curse`, `PASSIVE` y los
+  buffs con valores incompletos (`?`).
+- `docs/04-domain/skills-factual-gate-design.md` queda `CLOSED`; la
+  materialización de las ocho `SkillDefinition` es la siguiente vertical.
+- No se incorporaron JSON factuales, fixtures, constantes ni código: ruleset
+  `1.0.0`, motor `0.2.0` y dataset `2026-09-16.1` permanecen sin cambios.
+- Verificación PASS: build Release 0/0; 797/797 pruebas; `Test-SchemaStructure`
+  16/32.
+
+## Verificación anterior — 2026-09-17 (gate factual de skills y buffs abierto)
+
+- Se abre `RES-0004-skills-buffs` con nueve claims `PARTIAL` y cuatro conflictos
+  `OPEN` (`DSP-0008` a `DSP-0011`); ningún claim se promueve a `VERIFIED`.
+- Cuatro evidencias nuevas (`EVD-0041`–`EVD-0044`) documentan las guías de
+  personaje de Fanz (Dark Knight, Fairy Elf, Summoner) y su índice de personajes:
+  categorías de skill (`ATK`/`Non-ATK`/`Buff`/`Debuff`/`Summon`), coste de Mana,
+  rango, requisitos por ítem de skill y umbral (`ENE Level`/`Character Level`) y
+  efectos numéricos de buffs concretos.
+- Hallazgo del gate: Fanz no declara Season 4 y mezcla sistemas posteriores
+  (`DSP-0008`); sus categorías no mapean a `kind` (`DSP-0009`); su modelo de
+  requisitos no mapea a `requiredLevel`/`prerequisiteSkillIds` (`DSP-0010`); y
+  algunos buffs tienen valores incompletos (`DSP-0011`).
+- Conclusión: la vertical de skills/buffs continúa bloqueada. El desbloqueo exige
+  una fuente Season 4 o una decisión de axioma acotada del propietario
+  (`docs/04-domain/skills-factual-gate-design.md`, `OPEN`).
+- No se incorporaron JSON factuales, fixtures, constantes ni código: ruleset
+  `1.0.0`, motor `0.2.0` y dataset `2026-09-16.1` permanecen sin cambios.
+
+## Verificación anterior — 2026-09-16 (consumo acotado del catálogo de ítems)
+
+- `ItemDefinition` (Domain) y `ItemCatalog`/`JsonItemCatalogSnapshotReader`
+  (Application) leen `items/*.json` exigiendo schema `1.0.0`, IDs únicos, un
+  único ruleset, `slots`/`allowedClassIds` no vacíos, `requiredStats` no
+  negativos y `status` `PUBLISHED` (fail-closed).
+- `EquipItemUseCase` valida elegibilidad de equipado (clase + `requiredStats`
+  en +0) con códigos estables `item-equip-not-found`,
+  `item-equip-class-not-allowed` y `item-equip-requirements-not-met`; no emite
+  bonificaciones ni modela una instancia equipada.
+- Reference cases `reference-cases/items/{valid,invalid}` y 12 pruebas
+  (`ItemApplicationIntegrationTests`) reproducen 4 casos aprobados y 4 rechazos
+  y fallan en cerrado ante ítem no publicado, ruleset mixto y directorio
+  ausente.
+- WPF añade selector de ranura/ítem y resultado de elegibilidad; el smoke exige
+  el catálogo de 3 ítems y una evaluación de equipado resuelta.
+- Verificación PASS: build Release 0/0; 797/797 pruebas (40 validator, 58 motor,
+  672 Application, 27 Data); `Test-SchemaStructure` 16/32; smoke WPF `win-x64`
+  (SQLite `3.53.3`, 1311 archivos, 150.436.499 bytes, 888 JSON del ruleset,
+  dataset `2026-09-16.1`).
+- Diseño en `docs/04-domain/items-consumption-design.md`; ruleset `1.0.0`,
+  motor `0.2.0` y dataset `2026-09-16.1` sin cambios.
+
+## Verificación anterior — 2026-09-16 (catálogo acotado de ítems materializado)
+
+- Tres `ItemDefinition` `PUBLISHED` `VERIFIED` (`item-kris`,
+  `item-dragon-armor` y `item-albatross-bow`) en
+  `packages/rulesets/mu-s4-global-reference/v1/items/`, validados contra
+  `item.schema.json`.
+- `SchemaContractValidator.ValidateRulesetRecords` registra `("item","items")`;
+  el inventario canónico sube de 116 a 119 registros de ruleset.
+- `slots`: `weapon` (Kris, Albatross Bow) y `armor` (Dragon Armor);
+  `requiredStats` en +0 con claves `strength`/`agility`; `maxItemLevel` 15;
+  `optionModules` NORMAL; `socketSlots` 0; `evidenceRefs` `evd-0037`–`evd-0040`;
+  `conflictIds` `dsp-0005`–`dsp-0007`.
+- El smoke WPF exige ahora el directorio `items`; el dataset avanza a
+  `2026-09-16.1` y el hash se recalcula en tiempo de ejecución.
+- Verificación PASS: build Release 0/0, 785/785 tests, `Test-SchemaStructure`
+  16/32 y smoke WPF `win-x64` con SQLite `3.53.3`, 1303 archivos,
+  150.400.240 bytes, 880 JSON del ruleset y dataset `2026-09-16.1`.
+- Application todavía no consume el catálogo.
+
+## Verificación anterior — 2026-09-16 (gate factual de ítems resuelto)
+
+- `RES-0003-items-equipment` queda `VERIFIED`: ocho claims y seis evidencias
+  (`EVD-0035`–`EVD-0040`); los conflictos `DSP-0005`, `DSP-0006` y `DSP-0007`
+  quedan `RESOLVED` por `OWNER_DECISION`.
+- El propietario aceptó como axioma acotado del ruleset tres ítems de grado
+  normal (Kris, Dragon Armor y Albatross Bow) con `displayName`, `slots`,
+  `allowedClassIds`, `requiredStats` en +0, `maxItemLevel` 15, `optionModules`
+  NORMAL y `socketSlots` 0. Mapeo aprobado: `All Classes` → las seis familias,
+  `DK` → `class-dark-knight`, `MG` → `class-magic-gladiator`, `ME` →
+  `class-fairy-elf`.
+- Quedan fuera del axioma `requiredLevel`, la progresión de `requiredStats`, los
+  sockets y cualquier otro ítem, ranura, campo o grado.
+- `docs/04-domain/items-factual-gate-design.md` queda `CLOSED`; el catálogo
+  acotado (`PUBLISHED` contra `item.schema.json`) es la siguiente vertical.
+- No se incorporaron JSON factuales, fixtures, constantes ni código: ruleset
+  `1.0.0`, motor `0.2.0` y dataset `2026-07-30.3` permanecen sin cambios.
+
+## Verificación anterior — 2026-09-16 (gate factual de ítems abierto)
+
+- Se abre `RES-0003-items-equipment` con ocho claims `PARTIAL` y tres conflictos
+  abiertos (`DSP-0005` a `DSP-0007`); ningún claim se promueve a `VERIFIED`.
+- Cinco evidencias nuevas (`EVD-0035`–`EVD-0039`) documentan el índice de Fanz,
+  su guía de combate y tres ítems de muestra (Kris, Dragon Armor, Albatross
+  Bow) con ranuras, grados, opciones, elegibilidad de clase y requisitos STR/AGI
+  en nivel +0.
+- Hallazgo del gate: Fanz expone la estructura necesaria pero no declara Season
+  4, mezcla sistemas y clases posteriores y usa códigos de clase (`DK`, `MG`,
+  `ME`, `All Classes`) que no mapean a `allowedClassIds`; `requiredStats` sólo
+  se publica en +0 sin progresión por nivel ni opciones.
+- Conclusión: el catálogo canónico de ítems continúa bloqueado. El desbloqueo
+  exige una fuente Season 4 o una decisión de axioma acotada del propietario
+  (`docs/04-domain/items-factual-gate-design.md`).
+- No se incorporaron JSON factuales, fixtures, constantes ni código: ruleset
+  `1.0.0`, motor `0.2.0` y dataset `2026-07-30.3` permanecen sin cambios.
+
+## Verificación anterior — 2026-09-16 (listado de builds guardadas)
+
+- Cierre del listado de builds guardadas: restauración y build Release
+  aprobados con 0 advertencias/0 errores; 785/785 pruebas pasan: 40 validator,
+  58 motor, 660 Application y 27 Data.
+- Application añade `CharacterBuildSummary` y `ListBuildsUseCase`, y amplía
+  `IBuildRepository` con `ListAsync` (orden ordinal de `Id` como autoridad).
+  Data implementa `SqliteBuildRepository.ListAsync` con
+  `SELECT payload_json FROM builds ORDER BY id;` sin columnas ni migraciones
+  nuevas: enumera, proyecta los campos exactos y no muta la base.
+- WPF añade un `ListBox` de builds guardadas, el botón «Cargar seleccionada» y
+  un recuento de estado; refresca el listado al abrir la ventana y tras cada
+  guardado, y la selección reutiliza `LoadBuildByIdAsync` → `LoadBuildUseCase` →
+  `ApplyLoadedBuild` con la traducción de errores existente.
+- Smoke WPF `win-x64`: PASS con SQLite `3.53.3`, 1300 archivos, 150.397.632
+  bytes y `Saved builds listed: 1`; el smoke exige que `publication-smoke-build`
+  aparezca en el listado con paridad exacta y añade `BuildListVerified` y
+  `PersistedBuildCount`.
+- No se incorporaron JSON factuales nuevos: ruleset `1.0.0`, motor `0.2.0` y
+  dataset `2026-07-30.3` permanecen sin cambios.
+
+## Verificación anterior — 2026-09-16 (reaplicación de build en la Calculadora)
+
+- Cierre de la reaplicación de build: restauración y build Release aprobados
+  con 0 advertencias/0 errores; 780/780 pruebas pasan: 40 validator, 58 motor,
+  658 Application y 24 Data. La promoción persiste `pointsPerReset` (build
+  `schemaVersion` `1.1.0`, `2 × 100 = 200`), la recarga conserva la paridad y un
+  test nuevo deriva las asignaciones de los stats (`4` y `3`), recalcula la
+  distribución (`ResetPoints 200`, `SpentPoints 7`, `Total = Spent + Remaining`)
+  y fija el nombre de propiedad `pointsPerReset` del modelo serializado.
+- `build.schema.json` avanza a `1.1.0` con `pointsPerReset` requerido y no
+  negativo; fixtures `valid`/`invalid` e inventario estructural
+  (16 contratos/32 fixtures) actualizados. No hay columnas SQLite nuevas.
+- WPF `ApplyLoadedBuild` devuelve la build cargada al formulario (clase,
+  evolución, nivel, estado de héroe, resets, asignaciones derivadas) y recalcula
+  presupuesto, distribución y atributos derivados.
+- Smoke WPF `win-x64`: PASS con SQLite `3.53.3`, 1300 archivos y
+  150.384.676 bytes; la build `publication-smoke-build` conserva
+  `PointsPerReset` y reproduce la distribución sintética antes del respaldo,
+  tras restaurar y tras el reemplazo de binarios.
+- No se incorporaron JSON factuales nuevos: ruleset `1.0.0`, motor `0.2.0` y
+  dataset `2026-07-30.3` permanecen sin cambios; el validador no registra
+  diferencias sobre las ciento siete fórmulas `PUBLISHED`.
+
+## Verificación anterior — 2026-09-15 (persistencia de build local)
+
+- Cierre de la persistencia de build completa: restauración y build Release
+  aprobados con 0 advertencias/0 errores; 779/779 pruebas pasan: 40 validator,
+  58 motor, 657 Application y 24 Data. Doce pruebas de integración de
+  Application fijan promoción y recarga revalidada con snapshot exacto,
+  reemplazo por ID, rechazos cerrados (ID inválido, borrador/build ausentes,
+  schema no soportado, dependencia indisponible, identidad incoherente,
+  evolución no ofrecida, stats por debajo de base o ajenos a la clase) y nombres
+  de propiedades exactos del modelo serializado. Seis pruebas de integración de
+  Data fijan payload y metadata exactos, reemplazo atómico, rollback ante fallo,
+  recarga tras reabrir, carga ausente sin mutación y contención con código
+  estable.
+- Smoke WPF `win-x64`: PASS con SQLite `3.53.3`, 1300 archivos y
+  150.382.040 bytes; el borrador sintético `publication-smoke-draft` se
+  promueve a la build `publication-smoke-build` (cinco stats, resets
+  `2 × 100 = 200`) y sobrevive a la copia de respaldo, a la restauración del
+  backup y al reemplazo simulado de binarios; el reporte amplía
+  `BuildPersistenceVerified`/`BuildId`/`BuildStatCount` y las aserciones del
+  script se aprueban.
 - No se incorporaron JSON factuales nuevos: ruleset `1.0.0`, motor `0.2.0` y
   dataset `2026-07-30.3` permanecen sin cambios; el validador no registra
   diferencias sobre las ciento siete fórmulas `PUBLISHED`.
@@ -2876,6 +3283,38 @@
   compilación propia MIT integrada demuestra hashes idénticos entre dos rutas
   fuente, 2 × 32/32 fixtures, formatos, SBOM, locks, auditoría y publicación
   inspeccionada. Corvus 4.6.7 se conserva como contingencia sin asumir paridad.
+
+## Gate de ampliación de UC-04 — resuelto (2026-09-20)
+
+- `RES-0005` queda `VERIFIED` con cinco claims y `DSP-0012` `RESOLVED` por
+  `OWNER_DECISION`; `EVD-0053` (2026-09-20) fija el axio-axioma parcial.
+- Evidencias `EVD-0047`–`EVD-0049`: re-captura 2026-09-20 de Kris, Dragon
+  Armor y Albatross Bow en Fanz, coincidente con `EVD-0037`–`EVD-0039` (+0) y
+  sin valores por nivel +1..+15 en el HTML estático ni `requiredLevel`.
+- Contraste `EVD-0050`–`EVD-0052` (Webzen, StrategyWiki, RaGEZONE,
+  ViciadosMU, muonline.net): sólo reglas genéricas sin alcance Season 4 ni
+  valores por ítem.
+- Alcance adoptado: regla Webzen de armadura (`+5% de defensa final por nivel
+  de ítem`) y regla JOL (`+5 STR` por nivel de opción) como axiomas del
+  ruleset para el subconjunto; se descartan `requiredLevel`, ATK por nivel de
+  armas, progresión de `requiredStats` por nivel y sockets (sin fuente).
+- El 2026-09-20 el propietario fijó la semántica: aditiva
+  `DEF(n) = trunc(base × (1 + 0,05·n))`, materializar `defense` +0 y diferir
+  JOL; el diseño de la vertical quedó en
+  `docs/04-domain/items-defense-level-bonus-design.md`.
+- El mismo día la vertical quedó `IMPLEMENTED`: `item.schema.json` avanza a
+  `1.1.0` con `defense` opcional, `item-dragon-armor` `1.1.0` declara
+  `defense` 37 (`EVD-0048`) y enlaza `evd-0048`/`evd-0053`; Kris y Albatross
+  Bow sólo actualizan `schemaVersion` a `1.1.0`. `ItemDefinition` gana
+  `Defense`; el lector acepta `1.1.0`; `ItemDefenseBonusCalculator` implementa
+  la regla con un único truncamiento hacia cero; `EquipItemResult` expone
+  `Defense`/`DefenseAtLevel`; WPF muestra DEF base/derivado y el smoke verifica
+  dragon armor a +7 (49) y kris sin defensa. Dataset `2026-09-20.1`, JOL
+  diferido.
+- No se incorporaron JSON factuales sustantivos fuera del subconjunto, ni
+  constantes del juego en Application: la regla es un coeficiente trazado a
+  `EVD-0050`/`EVD-0053`; ruleset `1.0.0` y motor `0.2.0` permanecen sin
+  cambios.
 
 ## Decisión del propietario — 2026-07-18
 

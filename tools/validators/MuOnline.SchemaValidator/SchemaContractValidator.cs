@@ -37,6 +37,7 @@ public static class SchemaContractValidator
         new("formula", "v1", "formula", "formula"),
         new("formula-v2", "v2", "formula", "formula-v2"),
         new("calculation-trace", "v1", "calculation-trace", "calculation-trace"),
+        new("build-calculation-trace", "v1", "build-calculation-trace", "build-calculation-trace"),
         new("formula-test-case", "v1", "formula-test-case", "formula-test-case"),
         new("character-class", "v1", "character-class", "character-class"),
         new("progression-rule", "v1", "progression-rule", "progression-rule"),
@@ -165,6 +166,8 @@ public static class SchemaContractValidator
             (ContractName: "character-class", DirectoryName: "character-classes"),
             (ContractName: "progression-rule", DirectoryName: "progression-rules"),
             (ContractName: "formula", DirectoryName: "formulas"),
+            (ContractName: "item", DirectoryName: "items"),
+            (ContractName: "skill", DirectoryName: "skills"),
         };
         var results = new List<RulesetRecordValidationResult>();
 
@@ -286,6 +289,11 @@ public static class SchemaContractValidator
         string contractName,
         JsonElement instance)
     {
+        if (contractName == "build-calculation-trace")
+        {
+            return MatchesBuildCalculationTraceSemantics(instance);
+        }
+
         if (contractName == "formula-v2")
         {
             return MatchesExecutableFormulaSemantics(instance);
@@ -309,6 +317,48 @@ public static class SchemaContractValidator
         return stepIds.Contains(rawOutputStepId, StringComparer.Ordinal) &&
                stepIds.Contains(visibleOutputStepId, StringComparer.Ordinal) &&
                stepIds[^1] == visibleOutputStepId;
+    }
+
+    private static bool MatchesBuildCalculationTraceSemantics(JsonElement instance)
+    {
+        var sequence = instance.GetProperty("sequence").EnumerateArray().ToArray();
+        for (var position = 0; position < sequence.Length; position++)
+        {
+            var declaredPosition = sequence[position].GetProperty("position").GetInt32();
+            if (declaredPosition != position)
+            {
+                return false;
+            }
+        }
+
+        var sequenceReferences = new HashSet<string>(StringComparer.Ordinal);
+        foreach (var entry in sequence)
+        {
+            var formulaRef = entry.GetProperty("formulaRef");
+            sequenceReferences.Add(
+                $"{formulaRef.GetProperty("id").GetString()}@" +
+                formulaRef.GetProperty("version").GetString());
+        }
+
+        foreach (var entry in sequence)
+        {
+            var dependencyKeys = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var dependency in entry.GetProperty("dependencies").EnumerateArray())
+            {
+                var sourceFormulaRef = dependency.GetProperty("sourceFormulaRef");
+                var sourceKey =
+                    $"{sourceFormulaRef.GetProperty("id").GetString()}@" +
+                    sourceFormulaRef.GetProperty("version").GetString();
+                if (!sequenceReferences.Contains(sourceKey) ||
+                    !dependencyKeys.Add(
+                        $"{dependency.GetProperty("inputId").GetString()}@{sourceKey}"))
+                {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 
     private static bool MatchesExecutableFormulaSemantics(JsonElement instance)
