@@ -252,9 +252,17 @@ nivel `+0..+15` sin exponer valores por nivel en el HTML estático y sin publica
   único en salida), la materialización de `defense` +0 y el aplazamiento de
   JOL hasta que `equipmentEntry` modele opciones. Diseño de la vertical:
   `docs/04-domain/items-defense-level-bonus-design.md`.
-- La implementación (schema item `1.1.0`, `ItemDefinition.Defense`,
+- La implementación defensiva (schema item `1.1.0`, `ItemDefinition.Defense`,
   `ItemDefenseBonusCalculator`, `EquipItemResult`/`UseCase`,
-  `item-dragon-armor` `1.1.0` con `defense` 37, dataset `2026-09-20.1`) queda
-  pendiente y se hará con PR a `main`.
+  `item-dragon-armor` `1.1.0` con `defense` 37, dataset `2026-09-20.1`) quedó
+  cerrada e integrada en `main` (PR #8, commit `14bdfba`).
+- La implementación JOL (schemas `build-draft`/`build` `1.3.0` con
+  `optionLevel` opcional, `ItemOptionBonusCalculator`
+  (`STR_efectivo = base + 5·n`, axioma `EVD-0053`), requisito efectivo en
+  `EquipItemUseCase`/`BuildEquipmentValidator`, WPF y smoke con kris JOL +1)
+  quedó cerrada el 2026-09-27. Sin cota máxima adoptada; `requiredLevel`, ATK
+  por nivel de armas, progresión de `requiredStats` por nivel y sockets siguen
+  excluidos. Diseño de la vertical:
+  `docs/04-domain/items-jol-option-design.md`.
 - Los sockets permanecen fuera del subconjunto (grado normal); cualquier
   evolución requiere su propia evidencia Season 4 o decisión del propietario.

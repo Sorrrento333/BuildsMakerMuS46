@@ -6,6 +6,7 @@ public static class ItemEquipErrorCodes
     public const string ClassNotAllowed = "item-equip-class-not-allowed";
     public const string RequirementsNotMet = "item-equip-requirements-not-met";
     public const string LevelOutOfRange = "item-equip-level-out-of-range";
+    public const string OptionLevelOutOfRange = "item-equip-option-level-out-of-range";
 }
 
 public sealed class ItemEquipException : Exception

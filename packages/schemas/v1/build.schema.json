@@ -6,7 +6,7 @@
   "additionalProperties": false,
   "required": ["schemaVersion", "id", "ruleset", "dataset", "engineVersion", "characterClassId", "evolutionId", "level", "stats", "questIds", "resetCount", "pointsPerReset"],
   "properties": {
-    "schemaVersion": { "const": "1.2.0" },
+    "schemaVersion": { "const": "1.3.0" },
     "id": { "$ref": "#/$defs/id" },
     "ruleset": { "$ref": "#/$defs/versionedRef" },
     "serverProfile": { "$ref": "#/$defs/versionedRef" },
@@ -42,7 +42,8 @@
       "properties": {
         "itemId": { "$ref": "#/$defs/id" },
         "itemVersion": { "$ref": "#/$defs/semver" },
-        "level": { "type": "integer", "minimum": 0 }
+        "level": { "type": "integer", "minimum": 0 },
+        "optionLevel": { "type": "integer", "minimum": 0, "default": 0 }
       }
     },
     "versionedRef": {

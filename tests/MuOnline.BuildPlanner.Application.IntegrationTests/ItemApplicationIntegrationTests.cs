@@ -181,6 +181,123 @@ public sealed class ItemApplicationIntegrationTests
             () => ItemDefenseBonusCalculator.Calculate(37, -1));
     }
 
+    [Theory]
+    [InlineData(27, 0, 27)]
+    [InlineData(27, 1, 32)]
+    [InlineData(27, 2, 37)]
+    [InlineData(232, 3, 247)]
+    public void OptionCalculatorBumpsOnlyStrengthByFivePerOptionLevel(
+        long baseStrength,
+        int optionLevel,
+        long expectedEffectiveStrength)
+    {
+        var baseRequirements = new Dictionary<string, long>(StringComparer.Ordinal)
+        {
+            ["strength"] = baseStrength,
+            ["agility"] = 27,
+        };
+
+        var effective = ItemOptionBonusCalculator.ApplyToRequiredStats(
+            baseRequirements,
+            optionLevel);
+
+        Assert.Equal(expectedEffectiveStrength, effective["strength"]);
+        Assert.Equal(27, effective["agility"]);
+    }
+
+    [Fact]
+    public void OptionCalculatorLeavesRequirementsUntouchedWithoutStrength()
+    {
+        var baseRequirements = new Dictionary<string, long>(StringComparer.Ordinal)
+        {
+            ["agility"] = 27,
+        };
+
+        var effective = ItemOptionBonusCalculator.ApplyToRequiredStats(
+            baseRequirements,
+            2);
+
+        Assert.Equal(baseRequirements, effective);
+    }
+
+    [Fact]
+    public void OptionCalculatorRejectsNegativeOptionLevel()
+    {
+        var baseRequirements = new Dictionary<string, long>(StringComparer.Ordinal)
+        {
+            ["strength"] = 27,
+        };
+
+        Assert.Throws<ArgumentOutOfRangeException>(
+            () => ItemOptionBonusCalculator.ApplyToRequiredStats(
+                baseRequirements,
+                -1));
+    }
+
+    [Fact]
+    public void UseCaseAppliesJewelOfLifeOptionToCanonicalKris()
+    {
+        var useCase = CreateUseCase(CanonicalSnapshotRoot);
+
+        var result = useCase.Execute(new EquipItemRequest(
+            "class-dark-knight",
+            new Dictionary<string, long>(StringComparer.Ordinal)
+            {
+                ["strength"] = 32,
+                ["agility"] = 27,
+                ["vitality"] = 25,
+                ["energy"] = 10,
+            },
+            "item-kris",
+            OptionLevel: 1));
+
+        Assert.Equal(1, result.OptionLevel);
+        Assert.Equal(27, result.RequiredStats["strength"]);
+        Assert.Equal(32, result.EffectiveRequiredStats["strength"]);
+    }
+
+    [Fact]
+    public void UseCaseRejectsCanonicalKrisWhenJewelOfLifeBumpIsUnmet()
+    {
+        var useCase = CreateUseCase(CanonicalSnapshotRoot);
+
+        var exception = Assert.Throws<ItemEquipException>(
+            () => useCase.Execute(new EquipItemRequest(
+                "class-dark-knight",
+                new Dictionary<string, long>(StringComparer.Ordinal)
+                {
+                    ["strength"] = 31,
+                    ["agility"] = 27,
+                    ["vitality"] = 25,
+                    ["energy"] = 10,
+                },
+                "item-kris",
+                OptionLevel: 1)));
+
+        Assert.Equal(ItemEquipErrorCodes.RequirementsNotMet, exception.Code);
+    }
+
+    [Fact]
+    public void UseCaseRejectsNegativeJewelOfLifeOptionLevel()
+    {
+        var useCase = CreateUseCase(CanonicalSnapshotRoot);
+
+        var exception = Assert.Throws<ItemEquipException>(
+            () => useCase.Execute(new EquipItemRequest(
+                "class-dark-knight",
+                new Dictionary<string, long>(StringComparer.Ordinal)
+                {
+                    ["strength"] = 27,
+                    ["agility"] = 27,
+                    ["vitality"] = 25,
+                    ["energy"] = 10,
+                },
+                "item-kris",
+                OptionLevel: -1)));
+
+        Assert.Equal(ItemEquipErrorCodes.OptionLevelOutOfRange, exception.Code);
+    }
+
     [Fact]
     public void ReaderFailsClosedWhenItemDirectoryIsMissing()
     {

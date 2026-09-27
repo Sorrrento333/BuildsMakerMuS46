@@ -61,7 +61,19 @@ internal static class BuildEquipmentValidator
                     $"but its published maximum is '{item.MaxItemLevel}'.");
             }
 
-            var unmetStats = item.RequiredStats
+            if (entry.OptionLevel < 0)
+            {
+                throw Error(
+                    EquipmentCode.OptionLevelOutOfRange,
+                    $"Item '{entry.ItemId}' declares Jewel of Life option level " +
+                    $"'{entry.OptionLevel}' but option levels cannot be negative.");
+            }
+
+            var effectiveRequirements =
+                ItemOptionBonusCalculator.ApplyToRequiredStats(
+                    item.RequiredStats,
+                    entry.OptionLevel);
+            var unmetStats = effectiveRequirements
                 .Where(requirement =>
                     !finalStats.TryGetValue(requirement.Key, out var finalValue) ||
                     finalValue < requirement.Value)
@@ -88,6 +100,7 @@ internal static class BuildEquipmentValidator
         public const string VersionMismatch = "version-mismatch";
         public const string ClassNotAllowed = "class-not-allowed";
         public const string LevelOutOfRange = "level-out-of-range";
+        public const string OptionLevelOutOfRange = "option-level-out-of-range";
         public const string Duplicate = "duplicate";
         public const string RequirementsNotMet = "requirements-not-met";
     }

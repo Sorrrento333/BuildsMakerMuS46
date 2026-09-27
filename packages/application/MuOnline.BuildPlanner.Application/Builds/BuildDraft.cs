@@ -15,8 +15,8 @@ public sealed record BuildDraft(
     [property: JsonPropertyName("equipment")] IReadOnlyList<BuildEquipmentEntry> Equipment,
     [property: JsonPropertyName("statDistribution")] BuildDraftStatDistribution StatDistribution)
 {
-    public const string CurrentSchemaVersion = "1.2.0";
-    public const string PreviousSchemaVersion = "1.1.0";
+    public const string CurrentSchemaVersion = "1.3.0";
+    public const string PreviousSchemaVersion = "1.2.0";
 }
 
 public sealed record BuildDraftVersionedReference(

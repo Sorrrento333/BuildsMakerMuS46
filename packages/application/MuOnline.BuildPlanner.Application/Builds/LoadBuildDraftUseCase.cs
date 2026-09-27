@@ -139,6 +139,19 @@ public sealed class LoadBuildDraftUseCase
             return stored with
             {
                 SchemaVersion = BuildDraft.CurrentSchemaVersion,
+                Equipment = (stored.Equipment ?? [])
+                    .Select(entry => entry with { OptionLevel = 0 })
+                    .ToArray(),
+            };
+        }
+
+        if (stored.SchemaVersion == "1.1.0" &&
+            stored.StatDistribution.SchemaVersion ==
+                BuildDraftStatDistribution.CurrentSchemaVersion)
+        {
+            return stored with
+            {
+                SchemaVersion = BuildDraft.CurrentSchemaVersion,
                 Equipment = [],
             };
         }
@@ -211,6 +224,7 @@ public sealed class LoadBuildDraftUseCase
         "version-mismatch" => BuildDraftErrorCodes.EquipmentVersionMismatch,
         "class-not-allowed" => BuildDraftErrorCodes.EquipmentClassNotAllowed,
         "level-out-of-range" => BuildDraftErrorCodes.EquipmentLevelOutOfRange,
+        "option-level-out-of-range" => BuildDraftErrorCodes.EquipmentOptionLevelOutOfRange,
         "duplicate" => BuildDraftErrorCodes.EquipmentDuplicate,
         _ => BuildDraftErrorCodes.EquipmentRequirementsNotMet,
     };

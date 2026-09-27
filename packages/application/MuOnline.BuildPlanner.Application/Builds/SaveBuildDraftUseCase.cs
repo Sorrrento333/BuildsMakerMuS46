@@ -93,6 +93,7 @@ public sealed class SaveBuildDraftUseCase
         "version-mismatch" => BuildDraftErrorCodes.EquipmentVersionMismatch,
         "class-not-allowed" => BuildDraftErrorCodes.EquipmentClassNotAllowed,
         "level-out-of-range" => BuildDraftErrorCodes.EquipmentLevelOutOfRange,
+        "option-level-out-of-range" => BuildDraftErrorCodes.EquipmentOptionLevelOutOfRange,
         "duplicate" => BuildDraftErrorCodes.EquipmentDuplicate,
         _ => BuildDraftErrorCodes.EquipmentRequirementsNotMet,
     };

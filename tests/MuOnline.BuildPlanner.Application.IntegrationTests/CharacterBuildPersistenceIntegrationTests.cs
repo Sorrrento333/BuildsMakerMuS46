@@ -339,6 +339,89 @@ public sealed class CharacterBuildPersistenceIntegrationTests
     }
 
     [Fact]
+    public async Task SavePromotesDraftEquipmentWithJewelOfLifeOption()
+    {
+        var context = CreateEquipmentContext();
+        var draftRepository = new InMemoryBuildDraftRepository();
+        var buildRepository = new InMemoryBuildRepository();
+        var loadDraft = new LoadBuildDraftUseCase(draftRepository, context);
+        await new SaveBuildDraftUseCase(draftRepository, context)
+            .ExecuteAsync(
+                CreateSaveDraftRequest("draft-jol-equipped") with
+                {
+                    Equipment =
+                    [
+                        new BuildEquipmentEntry("item-synthetic", "1.0.0", 3, OptionLevel: 2),
+                    ],
+                },
+                TestContext.Current.CancellationToken);
+
+        var saved = await new SaveBuildUseCase(buildRepository, loadDraft, context)
+            .ExecuteAsync(
+                new SaveBuildRequest("build-jol-equipped", "draft-jol-equipped"),
+                TestContext.Current.CancellationToken);
+
+        Assert.Equal(
+            [new BuildEquipmentEntry("item-synthetic", "1.0.0", 3, OptionLevel: 2)],
+            saved.Equipment);
+
+        var loaded = await new LoadBuildUseCase(buildRepository, context)
+            .ExecuteAsync(saved.Id, TestContext.Current.CancellationToken);
+
+        Assert.Equal(
+            [new BuildEquipmentEntry("item-synthetic", "1.0.0", 3, OptionLevel: 2)],
+            loaded.Equipment);
+    }
+
+    [Fact]
+    public async Task LoadRejectsBuildEquipmentWithNegativeOptionLevel()
+    {
+        var context = CreateEquipmentContext();
+        var buildRepository = new InMemoryBuildRepository();
+        var build = await CreateValidBuildWithEquipmentAsync(
+            buildRepository,
+            context,
+            TestContext.Current.CancellationToken);
+        await buildRepository.SaveAsync(
+            build with
+            {
+                Equipment =
+                [
+                    new BuildEquipmentEntry("item-synthetic", "1.0.0", 3, OptionLevel: -1),
+                ],
+            },
+            TestContext.Current.CancellationToken);
+
+        var exception = await Assert.ThrowsAsync<BuildException>(
+            () => new LoadBuildUseCase(buildRepository, context)
+                .ExecuteAsync(build.Id, TestContext.Current.CancellationToken));
+
+        Assert.Equal(BuildErrorCodes.EquipmentOptionLevelOutOfRange, exception.Code);
+    }
+
+    [Fact]
+    public async Task LoadMapsPreviousVersionBuildEquipmentWithoutDeclaredOptions()
+    {
+        var context = CreateEquipmentContext();
+        var buildRepository = new InMemoryBuildRepository();
+        var build = await CreateValidBuildWithEquipmentAsync(
+            buildRepository,
+            context,
+            TestContext.Current.CancellationToken);
+        await buildRepository.SaveAsync(
+            build with { SchemaVersion = CharacterBuild.PreviousSchemaVersion },
+            TestContext.Current.CancellationToken);
+
+        var loaded = await new LoadBuildUseCase(buildRepository, context)
+            .ExecuteAsync(build.Id, TestContext.Current.CancellationToken);
+
+        Assert.Equal(CharacterBuild.CurrentSchemaVersion, loaded.SchemaVersion);
+        Assert.Equal(
+            [new BuildEquipmentEntry("item-synthetic", "1.0.0", 3, OptionLevel: 0)],
+            loaded.Equipment);
+    }
+
+    [Fact]
     public async Task LoadRejectsUnavailableExactDependencyMetadata()
     {
         var repository = new InMemoryBuildRepository();

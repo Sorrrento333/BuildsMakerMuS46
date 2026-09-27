@@ -4,7 +4,7 @@
 
 Los primeros contratos están en `packages/schemas/v1`. Cinco
 permanecen en `1.0.0`; fórmula y distribución están en `1.1.0`; borrador y
-build están en `1.2.0` para la instancia equipada sin bonificaciones:
+build están en `1.3.0` para la instancia equipada con nivel y opción JOL:
 
 - `evidence.schema.json`
 - `formula.schema.json`
@@ -36,10 +36,11 @@ catálogo de clases y se declaran como invariantes semánticas en
 `docs/04-domain/stat-distribution-contract.md`; no se simulan con datos del
 juego dentro del schema.
 
-El contrato de borrador `1.2.0` conserva metadata exacto del ruleset, dataset y
+El contrato de borrador `1.3.0` conserva metadata exacto del ruleset, dataset y
 motor, las entradas de progresión/resets, un `StatDistribution` completo compuesto
 mediante `$ref` y el array `equipment` de instancias
-`{ itemId, itemVersion, level }` (sin `uniqueItems`, el rechazo de duplicados es
+`{ itemId, itemVersion, level }` con `optionLevel` opcional de Jewel of Life
+(sin `uniqueItems`, el rechazo de duplicados es
 semántico en Application). Se mantiene separado de `build.schema.json`: el borrador
 actual no trata asignaciones como stats finales. Sus totales
 calculados son una caché que Application recalcula y contrasta al cargar. Data
@@ -47,11 +48,14 @@ persiste payload y metadata atómicamente mediante la migración
 `1/create_build_drafts`, según
 `docs/06-data/build-draft-persistence-contract.md`.
 
-El contrato de build `1.2.0` añade el mismo array `equipment` a la snapshot
+El contrato de build `1.3.0` añade el mismo array `equipment` a la snapshot
 validada de stats finales. Ambas versiones conservan la migración de carga
-(preservando la anterior `1.1.0` y la legacy `1.0.0`) y revalidan `equipment`
-contra el catálogo publicado al cargar. El diseño completo está en
-`../04-domain/equipped-instance-design.md`.
+(`1.2.0` con `OptionLevel = 0`, preservando la anterior `1.1.0` y la legacy
+`1.0.0` con `Equipment = []`) y revalidan `equipment` contra el catálogo
+publicado al cargar, con el requisito efectivo de STR por opción JOL. El
+diseño completo está en
+`../04-domain/equipped-instance-design.md` y
+`../04-domain/items-jol-option-design.md`.
 
 Los registros canónicos viven en
 `packages/rulesets/mu-s4-global-reference/v1`: seis definiciones de clase, dos
@@ -151,10 +155,12 @@ fixtures.
 
 La definición canónica de item se materializa como `item.schema.json`; la
 instancia con nivel, opciones y sockets elegidos sigue siendo dato del usuario
-en `build.schema.json`. Desde `1.2.0`, la instancia guardada es acotada y sin
-bonificaciones: `equipment` de `{ itemId, itemVersion, level }`, donde el nivel
+en `build.schema.json`. Desde `1.2.0`, la instancia guardada es acotada:
+`equipment` de `{ itemId, itemVersion, level }`, donde el nivel
 es un entero 0..`maxItemLevel` declarado y la ranura, requisitos y atributos se
 derivan de la definición publicada del ítem (`../04-domain/equipped-instance-design.md`).
+Desde `1.3.0` añade `optionLevel` opcional de Jewel of Life con requisito
+efectivo de STR (`../04-domain/items-jol-option-design.md`).
 
 ## Plan restante
 
@@ -187,10 +193,18 @@ parcial `EVD-0053`, `DEF(n) = trunc(base × (1 + 0,05·n))` con un único
 truncamiento hacia cero en la salida, y `EquipItemResult` expone `Defense`
 (base) y `DefenseAtLevel` (derivada). `item-dragon-armor` sube a `1.1.0` con
 `defense` 37 (`EVD-0048`); Kris y Albatross Bow sólo actualizan `schemaVersion`
-a `1.1.0` y no declaran `defense` (armas). El JOL (`+5 STR` por opción),
-`requiredLevel`, la progresión de `requiredStats`, los sockets y los ATK por
-nivel de armas quedan diferidos o excluidos; el dataset avanza a
+a `1.1.0` y no declaran `defense` (armas). El dataset avanza a
 `2026-09-20.1`.
+
+La vertical `1.3.0` cierra la segunda mitad del axio-axioma parcial `EVD-0053`
+(`../04-domain/items-jol-option-design.md`): `build-draft.schema.json` y
+`build.schema.json` avanzan a `1.3.0` con `optionLevel` opcional en
+`equipmentEntry`; `ItemOptionBonusCalculator` aplica `STR_efectivo = base +
+5·n` sólo sobre `strength`; la elegibilidad y revalidación comparan contra el
+requisito efectivo con el código fail-closed `option-level-out-of-range`. Sin
+cota máxima adoptada y sin JSON factuales nuevos (dataset `2026-09-20.1`).
+`requiredLevel`, la progresión de `requiredStats` por nivel de ítem, los
+sockets y los ATK por nivel de armas siguen excluidos.
 
 El catálogo acotado de skills quedó materializado para el axioma del propietario
 (`RES-0004`, `EVD-0045`): ocho `SkillDefinition` `PUBLISHED` `VERIFIED` en
