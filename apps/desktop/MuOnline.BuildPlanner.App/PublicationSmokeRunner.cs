@@ -132,6 +132,7 @@ internal static class PublicationSmokeRunner
         var persistedBuildCount = VerifyBuild(buildDraftServices, progressionVerification);
         VerifyEquippedBuildDraft(buildDraftServices);
         VerifyEquippedBuild(buildDraftServices);
+        VerifyBuildComparison(buildDraftServices);
 
         return CreateSuccessfulReport(
             options,
@@ -171,6 +172,7 @@ internal static class PublicationSmokeRunner
         var persistedBuildCount = VerifyBuild(buildDraftServices, progressionVerification);
         VerifyEquippedBuildDraft(buildDraftServices);
         VerifyEquippedBuild(buildDraftServices);
+        VerifyBuildComparison(buildDraftServices);
 
         return CreateSuccessfulReport(
             options,
@@ -596,6 +598,69 @@ internal static class PublicationSmokeRunner
                 "The published bounded equip evaluation did not resolve the approved weapon item.");
         }
 
+        var jolResult = equipUseCase.Execute(new EquipItemRequest(
+            "class-dark-knight",
+            new Dictionary<string, long>(StringComparer.Ordinal)
+            {
+                ["strength"] = 32,
+                ["agility"] = 27,
+                ["vitality"] = 25,
+                ["energy"] = 10,
+            },
+            "item-kris",
+            OptionLevel: 1));
+        if (jolResult.OptionLevel != 1 ||
+            jolResult.RequiredStats["strength"] != 27 ||
+            jolResult.EffectiveRequiredStats["strength"] != 32)
+        {
+            throw new InvalidOperationException(
+                "The published Jewel of Life option rule did not resolve the approved +5 STR bump.");
+        }
+
+        try
+        {
+            _ = equipUseCase.Execute(new EquipItemRequest(
+                "class-dark-knight",
+                new Dictionary<string, long>(StringComparer.Ordinal)
+                {
+                    ["strength"] = 31,
+                    ["agility"] = 27,
+                    ["vitality"] = 25,
+                    ["energy"] = 10,
+                },
+                "item-kris",
+                OptionLevel: 1));
+            throw new InvalidOperationException(
+                "31 STR unexpectedly met the JOL-bumped 32 STR requirement.");
+        }
+        catch (ItemEquipException exception)
+            when (exception.Code == ItemEquipErrorCodes.RequirementsNotMet)
+        {
+            // Expected: 31 STR cannot meet the JOL-bumped 32 STR requirement.
+        }
+
+        try
+        {
+            _ = equipUseCase.Execute(new EquipItemRequest(
+                "class-dark-knight",
+                new Dictionary<string, long>(StringComparer.Ordinal)
+                {
+                    ["strength"] = 27,
+                    ["agility"] = 27,
+                    ["vitality"] = 25,
+                    ["energy"] = 10,
+                },
+                "item-kris",
+                OptionLevel: -1));
+            throw new InvalidOperationException(
+                "A negative JOL option level unexpectedly passed validation.");
+        }
+        catch (ItemEquipException exception)
+            when (exception.Code == ItemEquipErrorCodes.OptionLevelOutOfRange)
+        {
+            // Expected: negative JOL option levels fail closed.
+        }
+
         return new ItemVerification(
             CatalogVerified: true,
             ItemCount: catalog.Items.Count,
@@ -1011,6 +1076,137 @@ internal static class PublicationSmokeRunner
                 "The equipped full build did not survive persistence and Application revalidation.");
         }
     }
+
+    private static void VerifyBuildComparison(PublishedBuildDraftServices services)
+    {
+        var first = services.LoadBuildUseCase.ExecuteAsync(BuildId)
+            .GetAwaiter()
+            .GetResult();
+        var second = services.LoadBuildUseCase.ExecuteAsync(EquippedBuildId)
+            .GetAwaiter()
+            .GetResult();
+        var useCase = PublishedProgressionRuleset.CreateCompareBuildsUseCase();
+        var comparison = useCase.Execute(first, second);
+        VerifyComparisonAgainstLoadedBuilds(comparison, first, second);
+
+        var swapped = useCase.Execute(second, first);
+        if (swapped.FirstBuildId != second.Id ||
+            swapped.SecondBuildId != first.Id)
+        {
+            throw new InvalidOperationException(
+                "Swapping the compared builds did not swap the comparison identities.");
+        }
+
+        VerifyComparisonAgainstLoadedBuilds(swapped, second, first);
+        foreach (var pair in comparison.StatDifferences.Zip(swapped.StatDifferences))
+        {
+            if (!NullableEqual(pair.First.AbsoluteDifference, Negate(pair.Second.AbsoluteDifference)) ||
+                pair.First.StatId != pair.Second.StatId)
+            {
+                throw new InvalidOperationException(
+                    "Swapping the compared builds did not negate the stat differences.");
+            }
+        }
+
+        foreach (var pair in comparison.DerivedDifferences.Zip(swapped.DerivedDifferences))
+        {
+            if (pair.First.FormulaId != pair.Second.FormulaId ||
+                pair.First.FormulaVersion != pair.Second.FormulaVersion ||
+                pair.First.AbsoluteDifference != -pair.Second.AbsoluteDifference ||
+                pair.First.FirstVisible != pair.Second.SecondVisible ||
+                pair.First.SecondVisible != pair.Second.FirstVisible)
+            {
+                throw new InvalidOperationException(
+                    "Swapping the compared builds did not negate the derived differences.");
+            }
+        }
+
+        try
+        {
+            _ = useCase.Execute(first, first);
+            throw new InvalidOperationException(
+                "Comparing a build with itself unexpectedly passed validation.");
+        }
+        catch (BuildComparisonException exception)
+            when (exception.Code == BuildComparisonErrorCodes.SameBuild)
+        {
+            // Expected: a build cannot be compared with itself.
+        }
+    }
+
+    private static void VerifyComparisonAgainstLoadedBuilds(
+        BuildComparison comparison,
+        CharacterBuild first,
+        CharacterBuild second)
+    {
+        if (comparison.FirstBuildId != first.Id ||
+            comparison.SecondBuildId != second.Id)
+        {
+            throw new InvalidOperationException(
+                "The build comparison did not preserve the compared build identities.");
+        }
+
+        var expectedStatIds = first.Stats.Keys
+            .Concat(second.Stats.Keys)
+            .Distinct(StringComparer.Ordinal)
+            .Order(StringComparer.Ordinal)
+            .ToArray();
+        if (!comparison.StatDifferences.Select(item => item.StatId)
+                .SequenceEqual(expectedStatIds, StringComparer.Ordinal))
+        {
+            throw new InvalidOperationException(
+                "The build comparison did not cover exactly the union of final stat keys.");
+        }
+
+        foreach (var difference in comparison.StatDifferences)
+        {
+            var hasFirst = first.Stats.TryGetValue(difference.StatId, out var firstValue);
+            var hasSecond = second.Stats.TryGetValue(difference.StatId, out var secondValue);
+            if (difference.FirstValue != (hasFirst ? firstValue : null) ||
+                difference.SecondValue != (hasSecond ? secondValue : null) ||
+                difference.AbsoluteDifference !=
+                    (hasFirst && hasSecond ? checked(secondValue - firstValue) : null))
+            {
+                throw new InvalidOperationException(
+                    $"The '{difference.StatId}' stat difference did not reproduce the loaded finals.");
+            }
+        }
+
+        foreach (var difference in comparison.DerivedDifferences)
+        {
+            if (difference.AbsoluteDifference !=
+                    checked(difference.SecondVisible - difference.FirstVisible) ||
+                difference.PercentDifference !=
+                    (difference.FirstVisible == 0
+                        ? null
+                        : (decimal)difference.AbsoluteDifference /
+                            Math.Abs((decimal)difference.FirstVisible) * 100m))
+            {
+                throw new InvalidOperationException(
+                    $"The '{difference.FormulaId}' derived difference is internally incoherent.");
+            }
+        }
+
+        if (comparison.StatDifferences.Count == 0 ||
+            (comparison.DerivedDifferences.Count == 0 &&
+             comparison.OnlyInFirst.Count == 0 &&
+             comparison.OnlyInSecond.Count == 0))
+        {
+            throw new InvalidOperationException(
+                "The build comparison produced no comparable content.");
+        }
+    }
+
+    private static long? Negate(long? value) =>
+        value is null ? null : -value.Value;
+
+    private static bool NullableEqual(long? first, long? second) =>
+        (first, second) switch
+        {
+            (null, null) => true,
+            (not null, not null) => first.Value == second.Value,
+            _ => false,
+        };
 
     private static PublishedProgressionReferenceCase[] LoadReferenceCases(string directory)
     {

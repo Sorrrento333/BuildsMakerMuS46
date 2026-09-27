@@ -14,6 +14,26 @@
 
 ## Completado
 
+- Comparador de builds guardadas implementado (2026-09-27, primer tramo de
+  UC-06 sin escenario): `CompareBuildsUseCase` con diferencias de stats
+  finales, derivados compartidos por referencia exacta (absoluta +
+  porcentual) y listados «sólo en»; códigos `compare-same-build`,
+  `compare-unknown-class` y `compare-stats-mismatch`; sección «Comparador de
+  builds» en WPF y smoke cruzado con inversión de signo. Sin escenario,
+  breakpoints ni advertencias (sin contrato factual). Sin datos nuevos:
+  dataset `2026-09-20.1`. Verificación: build 0/0, 888/888 pruebas,
+  estructura 17/34, smoke WPF `win-x64` PASS.
+
+- Opción Jewel of Life en la instancia equipada implementada (2026-09-27):
+  schemas `build-draft`/`build` a `1.3.0` con `optionLevel` opcional,
+  `ItemOptionBonusCalculator` (`STR_efectivo = base + 5·n`, axioma parcial
+  `EVD-0053`, sólo clave `strength`, sin cota máxima adoptada), requisito
+  efectivo en `EquipItemUseCase`/`BuildEquipmentValidator` con código
+  fail-closed `option-level-out-of-range`, migración `1.2.0` → `1.3.0` con
+  `OptionLevel = 0`, WPF y smoke con kris JOL +1; dataset `2026-09-20.1`,
+  ruleset `1.0.0` y motor `0.2.0` sin cambios. Verificación: build 0/0,
+  882/882 pruebas, estructura 17/34, smoke WPF `win-x64` PASS.
+
 - Progresión defensiva de armadura por nivel de ítem implementada (2026-09-20):
   schema item `1.1.0` con `defense` opcional, `item-dragon-armor` `1.1.0` con
   `defense` 37 (`EVD-0048`), `JsonItemCatalogSnapshotReader` `1.1.0`,
@@ -1409,6 +1429,26 @@
   confianza y pruebas.
 
 ## Completado
+
+- Comparador de builds guardadas implementado (2026-09-27, primer tramo de
+  UC-06 sin escenario): `CompareBuildsUseCase` con diferencias de stats
+  finales, derivados compartidos por referencia exacta (absoluta +
+  porcentual) y listados «sólo en»; códigos `compare-same-build`,
+  `compare-unknown-class` y `compare-stats-mismatch`; sección «Comparador de
+  builds» en WPF y smoke cruzado con inversión de signo. Sin escenario,
+  breakpoints ni advertencias (sin contrato factual). Sin datos nuevos:
+  dataset `2026-09-20.1`. Verificación: build 0/0, 888/888 pruebas,
+  estructura 17/34, smoke WPF `win-x64` PASS.
+
+- Opción Jewel of Life en la instancia equipada implementada (2026-09-27):
+  schemas `build-draft`/`build` a `1.3.0` con `optionLevel` opcional,
+  `ItemOptionBonusCalculator` (`STR_efectivo = base + 5·n`, axioma parcial
+  `EVD-0053`, sólo clave `strength`, sin cota máxima adoptada), requisito
+  efectivo en `EquipItemUseCase`/`BuildEquipmentValidator` con código
+  fail-closed `option-level-out-of-range`, migración `1.2.0` → `1.3.0` con
+  `OptionLevel = 0`, WPF y smoke con kris JOL +1; dataset `2026-09-20.1`,
+  ruleset `1.0.0` y motor `0.2.0` sin cambios. Verificación: build 0/0,
+  882/882 pruebas, estructura 17/34, smoke WPF `win-x64` PASS.
 
 - Progresión defensiva de armadura por nivel de ítem implementada (2026-09-20):
   schema item `1.1.0` con `defense` opcional, `item-dragon-armor` `1.1.0` con

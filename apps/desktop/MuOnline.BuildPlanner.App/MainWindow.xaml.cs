@@ -25,6 +25,7 @@ public partial class MainWindow : Window
     private readonly SaveBuildUseCase _saveBuildUseCase;
     private readonly LoadBuildUseCase _loadBuildUseCase;
     private readonly ListBuildsUseCase _listBuildsUseCase;
+    private readonly CompareBuildsUseCase _compareBuildsUseCase;
     private readonly ItemCatalog _itemCatalog;
     private readonly EquipItemUseCase _equipItemUseCase;
     private readonly Dictionary<string, TextBox> _allocationInputs =
@@ -58,6 +59,8 @@ public partial class MainWindow : Window
         _saveBuildUseCase = buildDraftServices.SaveBuildUseCase;
         _loadBuildUseCase = buildDraftServices.LoadBuildUseCase;
         _listBuildsUseCase = buildDraftServices.ListBuildsUseCase;
+        _compareBuildsUseCase =
+            PublishedProgressionRuleset.CreateCompareBuildsUseCase();
         _itemCatalog = PublishedProgressionRuleset.ItemCatalog;
         _equipItemUseCase = PublishedProgressionRuleset.CreateEquipItemUseCase();
 
@@ -507,6 +510,14 @@ public partial class MainWindow : Window
         lines.AddRange(result.RequiredStats
             .OrderBy(item => item.Key, StringComparer.Ordinal)
             .Select(item => $"- {item.Key}: {item.Value}"));
+        if (result.OptionLevel > 0 &&
+            result.EffectiveRequiredStats.TryGetValue("strength", out var effectiveStrength))
+        {
+            lines.Add(
+                $"Opción JOL +{result.OptionLevel}: requisito efectivo de " +
+                $"strength {effectiveStrength} " +
+                $"({result.RequiredStats["strength"]} base + 5 por nivel, axioma parcial EVD-0053).");
+        }
         if (result.Defense is not null)
         {
             lines.Add(
@@ -530,6 +541,8 @@ public partial class MainWindow : Window
             "la clase seleccionada no puede equipar este ítem.",
         ItemEquipErrorCodes.RequirementsNotMet =>
             "los stats finales no alcanzan los requisitos publicados del ítem.",
+        ItemEquipErrorCodes.OptionLevelOutOfRange =>
+            "el nivel de opción JOL no puede ser negativo.",
         _ => "se produjo un error de equipado no reconocido.",
     };
 
@@ -555,6 +568,13 @@ public partial class MainWindow : Window
             return;
         }
 
+        if (!int.TryParse(EquipItemOptionLevelTextBox.Text, out var optionLevel))
+        {
+            EquipStatusTextBox.Text =
+                "El nivel de opción JOL debe ser un número entero.";
+            return;
+        }
+
         if (!TryBuildFinalStats(out var finalStats))
         {
             EquipStatusTextBox.Text =
@@ -575,12 +595,14 @@ public partial class MainWindow : Window
                     selectedClass.Id,
                     finalStats,
                     item.Id,
-                    level));
+                    level,
+                    optionLevel));
             _equippedItems.Add(
-                new BuildEquipmentEntry(item.Id, item.Version, level));
+                new BuildEquipmentEntry(item.Id, item.Version, level, optionLevel));
             RefreshEquippedItemsList();
             EquipStatusTextBox.Text =
-                $"Equipado: {eligibility.DisplayName} a nivel {eligibility.Level}.";
+                $"Equipado: {eligibility.DisplayName} a nivel {eligibility.Level} " +
+                $"con JOL +{eligibility.OptionLevel}.";
         }
         catch (ItemEquipException exception)
         {
@@ -1381,6 +1403,8 @@ public partial class MainWindow : Window
         {
             var builds = await _listBuildsUseCase.ExecuteAsync(CancellationToken.None);
             SavedBuildsListBox.ItemsSource = builds;
+            CompareFirstComboBox.ItemsSource = builds;
+            CompareSecondComboBox.ItemsSource = builds;
             SavedBuildsStatusTextBox.Text = builds.Count == 1
                 ? "1 build guardada."
                 : $"{builds.Count} builds guardadas.";
@@ -1392,6 +1416,121 @@ public partial class MainWindow : Window
                 TranslateBuildError(exception.Code);
         }
     }
+
+    private async void CompareBuildsButtonClick(object sender, RoutedEventArgs e)
+    {
+        if (CompareFirstComboBox.SelectedItem is not CharacterBuildSummary firstSummary ||
+            CompareSecondComboBox.SelectedItem is not CharacterBuildSummary secondSummary)
+        {
+            CompareResultTextBox.Text =
+                "Selecciona dos builds guardadas para compararlas.";
+            return;
+        }
+
+        try
+        {
+            var first = await _loadBuildUseCase.ExecuteAsync(
+                firstSummary.Id,
+                CancellationToken.None);
+            var second = await _loadBuildUseCase.ExecuteAsync(
+                secondSummary.Id,
+                CancellationToken.None);
+            var comparison = _compareBuildsUseCase.Execute(first, second);
+            CompareResultTextBox.Text = FormatComparison(comparison);
+        }
+        catch (BuildComparisonException exception)
+        {
+            CompareResultTextBox.Text =
+                $"No se pudo comparar ({exception.Code}): " +
+                TranslateComparisonError(exception.Code);
+        }
+        catch (BuildException exception)
+        {
+            CompareResultTextBox.Text =
+                $"No se pudo cargar ({exception.Code}): " +
+                TranslateBuildError(exception.Code);
+        }
+        catch (FormulaContextException exception)
+        {
+            CompareResultTextBox.Text =
+                $"No se pudo evaluar ({exception.Code}): " +
+                TranslateFormulaContextError(exception.Code);
+        }
+        catch (FormulaCalculationException exception)
+        {
+            CompareResultTextBox.Text =
+                $"No se pudo calcular ({exception.Code}): {exception.Message}";
+        }
+        catch (FormulaExecutionException exception)
+        {
+            CompareResultTextBox.Text =
+                $"No se pudo ejecutar ({exception.Code}): {exception.Message}";
+        }
+    }
+
+    private static string FormatComparison(BuildComparison comparison)
+    {
+        var lines = new List<string>
+        {
+            $"Comparación: {comparison.FirstBuildId} → {comparison.SecondBuildId}",
+            string.Empty,
+            "== Stats finales ==",
+        };
+        lines.AddRange(comparison.StatDifferences.Select(item =>
+            item.AbsoluteDifference is null
+                ? $"- {item.StatId}: " +
+                    $"{FormatNullableStat(item.FirstValue)} → " +
+                    $"{FormatNullableStat(item.SecondValue)} (sólo en un lado)"
+                : $"- {item.StatId}: {item.FirstValue} → {item.SecondValue} " +
+                    $"({FormatSigned(item.AbsoluteDifference.Value)})"));
+        lines.Add(string.Empty);
+        lines.Add("== Atributos derivados compartidos ==");
+        if (comparison.DerivedDifferences.Count == 0)
+        {
+            lines.Add("(sin fórmulas en común: clases distintas)");
+        }
+
+        lines.AddRange(comparison.DerivedDifferences.Select(item =>
+            $"- {item.OutputId} [{item.OutputUnit}]: " +
+            $"{item.FirstVisible} → {item.SecondVisible} " +
+            $"({FormatSigned(item.AbsoluteDifference)}" +
+            $"{(item.PercentDifference is null ? "; n/d" : $"; {FormatPercent(item.PercentDifference.Value)}")}) " +
+            $"[{item.FormulaId} v{item.FormulaVersion}]"));
+        lines.Add(string.Empty);
+        lines.Add($"== Sólo en {comparison.FirstBuildId} ==");
+        lines.AddRange(comparison.OnlyInFirst.Select(item =>
+            $"- {item.OutputId} [{item.OutputUnit}]: {item.VisibleValue} " +
+            $"[{item.FormulaId} v{item.FormulaVersion}]"));
+        lines.Add(string.Empty);
+        lines.Add($"== Sólo en {comparison.SecondBuildId} ==");
+        lines.AddRange(comparison.OnlyInSecond.Select(item =>
+            $"- {item.OutputId} [{item.OutputUnit}]: {item.VisibleValue} " +
+            $"[{item.FormulaId} v{item.FormulaVersion}]"));
+        return string.Join(Environment.NewLine, lines);
+    }
+
+    private static string FormatNullableStat(long? value) =>
+        value?.ToString(System.Globalization.CultureInfo.InvariantCulture) ?? "—";
+
+    private static string FormatSigned(long value) =>
+        (value >= 0 ? "+" : string.Empty) +
+        value.ToString(System.Globalization.CultureInfo.InvariantCulture);
+
+    private static string FormatPercent(decimal value) =>
+        (value >= 0 ? "+" : string.Empty) +
+        decimal.Round(value, 1).ToString(System.Globalization.CultureInfo.InvariantCulture) +
+        " %";
+
+    private static string TranslateComparisonError(string code) => code switch
+    {
+        BuildComparisonErrorCodes.SameBuild =>
+            "selecciona dos builds distintas para compararlas.",
+        BuildComparisonErrorCodes.UnknownClass =>
+            "una build referencia una clase que no está publicada.",
+        BuildComparisonErrorCodes.StatsMismatch =>
+            "los stats de una build no coinciden con su clase publicada.",
+        _ => "se produjo un error de comparación no reconocido.",
+    };
 
     private static string TranslateBuildDraftError(string code) => code switch
     {

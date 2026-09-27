@@ -38,8 +38,20 @@ La instrucción de ejecutar sólo la primera tarea pendiente continúa vigente.
    (`DEF(n) = trunc(base × (1 + 0,05·n))`, axioma parcial `EVD-0053`),
    `EquipItemResult` con `Defense`/`DefenseAtLevel`, `item-dragon-armor`
    `1.1.0` con `defense` 37 (`EVD-0048`), WPF y smoke con DEF a +7 (49) y kris
-   sin defensa. Dataset `2026-09-20.1`. JOL diferido (requiere opciones).
-7. Alternativa documentada: master buys y pantallas restantes del flujo, sin
+   sin defensa. Dataset `2026-09-20.1`. JOL cerrado en el punto 7.
+7. Opción Jewel of Life en la instancia equipada implementada (2026-09-27):
+   schemas `build-draft`/`build` a `1.3.0` con `optionLevel` opcional,
+   `ItemOptionBonusCalculator` (`STR_efectivo = base + 5·n`, axioma parcial
+   `EVD-0053`), requisito efectivo en elegibilidad y revalidación, WPF y
+   smoke con kris JOL +1 (STR 32/efectivo 32); sin cota máxima adoptada y sin
+   datos factuales nuevos (dataset `2026-09-20.1`).
+8. Comparador de builds guardadas implementado (2026-09-27, primer tramo de
+   UC-06 sin escenario): `CompareBuildsUseCase` con diferencias de stats,
+   derivados compartidos por referencia exacta y listados «sólo en»;
+   códigos `compare-*`; sección «Comparador de builds» en WPF y smoke
+   cruzado entre builds con inversión de signo. Sin datos nuevos
+   (dataset `2026-09-20.1`).
+9. Alternativa documentada: master buys y pantallas restantes del flujo, sin
    contrato factual todavía.
 
 ## Instancia equipada sin bonificaciones — implementado (2026-09-19)
@@ -313,6 +325,56 @@ nuevos datos factuales:
 - Dataset `2026-09-20.1`; ruleset `1.0.0` y motor `0.2.0` sin cambios.
   Verificación: build 0/0 (Debug y Release previsto), 858+ pruebas, validador
   CLI exit 0, `Test-SchemaStructure` 17/34, smoke WPF `win-x64` PASS.
+
+## Opción Jewel of Life en la instancia equipada — implementado (2026-09-27)
+
+- `build-draft.schema.json` y `build.schema.json` avanzan a `1.3.0` con la
+  propiedad opcional `optionLevel` (integer `>= 0`, default `0`) en
+  `equipmentEntry`; fixtures sintéticos y `Test-SchemaStructure` actualizados
+  (`1.3.0`, inventario 17/34 sin cambios).
+- `BuildEquipmentEntry` gana `OptionLevel` (default `0`);
+  `ItemOptionBonusCalculator` (Application, `Items/`) aplica
+  `STR_efectivo = base + 5·n` sólo sobre la clave `strength` con aritmética
+  comprobada (sin cota máxima adoptada: sin fuente para el subconjunto).
+- `EquipItemRequest` gana `OptionLevel`; `EquipItemResult` expone
+  `OptionLevel` y `EffectiveRequiredStats`; elegibilidad y
+  `BuildEquipmentValidator` comparan contra el requisito efectivo. Nuevo
+  código fail-closed `option-level-out-of-range` (familias `item-equip-*`,
+  `build-equipment-*`, `build-draft-equipment-*`).
+- Migración de carga `1.2.0` → `1.3.0` con `OptionLevel = 0`; ramas legacy
+  `1.1.0`/`1.0.0` conservadas con `Equipment = []`.
+- WPF: campo "Nivel de opción JOL", requisito efectivo visible y lista
+  `ItemId · vVersión · nivel · JOL`; el smoke verifica kris JOL +1 (STR 32
+  elegible/efectivo 32, STR 31 rechazado, JOL −1 fail-closed) sin alterar el
+  household ni los contadores.
+- Sin JSON factuales nuevos: ruleset `1.0.0`, motor `0.2.0` y dataset
+  `2026-09-20.1` sin cambios. Verificación: build 0/0, 882/882 pruebas,
+  estructura 17/34, smoke WPF `win-x64` PASS (1369 archivos, SQLite `3.53.3`).
+  Diseño en `docs/04-domain/items-jol-option-design.md`.
+
+## Comparador de builds guardadas — implementado (2026-09-27)
+
+- `CompareBuildsUseCase` (Application, `Builds/`, síncrono) recibe dos
+  `CharacterBuild` ya revalidados por `LoadBuildUseCase` (sin duplicar
+  validación), deriva asignaciones como `stat final − base` y evalúa ambos
+  con `CalculateCharacterBuildUseCase`; los errores de fórmula se propagan
+  con sus códigos existentes.
+- `StatDifference` sobre la unión ordinal de claves (`null` sin inventar
+  ceros); `DerivedDifference` por referencia exacta con absoluta y porcentual
+  exacta (`null` con base cero); listados `OnlyInFirst`/`OnlyInSecond`.
+  Códigos fail-closed `compare-same-build`, `compare-unknown-class` y
+  `compare-stats-mismatch`.
+- WPF: sección «Comparador de builds» (dos selectores del listado guardado +
+  resultado con formato absoluto/porcentual). El smoke compara
+  `publication-smoke-build` con `publication-smoke-equip-build` en ambas
+  fases, exige inversión de signo al intercambiar el orden y el rechazo
+  `compare-same-build`, sin campos nuevos de reporte.
+- Escenario, breakpoints y advertencias excluidos (sin contrato factual ni
+  reglas con evidencia). Sin datos nuevos: ruleset `1.0.0`, motor `0.2.0` y
+  dataset `2026-09-20.1` sin cambios. Verificación: build 0/0, 888/888
+  pruebas, estructura 17/34, smoke WPF `win-x64` PASS (1369 archivos,
+  SQLite `3.53.3`). Diseño en
+  `docs/04-domain/build-comparison-design.md`.
 
 ---
 

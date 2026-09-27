@@ -1,4 +1,5 @@
 using System.IO;
+using MuOnline.BuildPlanner.Application.Builds;
 using MuOnline.BuildPlanner.Application.Formulas;
 using MuOnline.BuildPlanner.Application.Items;
 using MuOnline.BuildPlanner.Application.Progression;
@@ -38,6 +39,9 @@ internal static class PublishedProgressionRuleset
         new(Catalog, FormulaCatalog);
 
     public static CalculateCharacterBuildUseCase CreateCharacterBuildUseCase() =>
+        new(Catalog, FormulaCatalog);
+
+    public static CompareBuildsUseCase CreateCompareBuildsUseCase() =>
         new(Catalog, FormulaCatalog);
 
     public static EquipItemUseCase CreateEquipItemUseCase() =>
