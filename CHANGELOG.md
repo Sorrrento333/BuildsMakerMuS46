@@ -21,6 +21,47 @@
 
 ### Added
 
+- Comparador de builds guardadas (primer tramo verificable de UC-06, sin
+  escenario). `CompareBuildsUseCase` (Application, `Builds/`) recibe dos
+  `CharacterBuild` ya revalidados por `LoadBuildUseCase`, deriva asignaciones
+  como `stat final − base` y evalúa ambos con `CalculateCharacterBuildUseCase`;
+  devuelve diferencias de stats finales (unión de claves, `null` sin inventar
+  ceros), diferencias de derivados compartidos por referencia exacta
+  (absoluta + porcentual exacta, `null` con base cero) y listados «sólo en»
+  por lado. Códigos fail-closed `compare-same-build`,
+  `compare-unknown-class` y `compare-stats-mismatch`. WPF añade la sección
+  «Comparador de builds» (dos selectores + resultado); el smoke compara
+  `publication-smoke-build` con `publication-smoke-equip-build`, exige
+  inversión de signo al intercambiar el orden y el rechazo `compare-same-build`.
+  Escenario, breakpoints y advertencias quedan excluidos (sin contrato factual
+  ni reglas con evidencia). Sin datos nuevos: ruleset `1.0.0`, motor `0.2.0` y
+  dataset `2026-09-20.1` sin cambios. Verificación: build Release 0/0,
+  888/888 pruebas, estructura 17/34, smoke WPF `win-x64` PASS. Diseño en
+  `docs/04-domain/build-comparison-design.md`.
+
+- Opción Jewel of Life en la instancia equipada (segunda mitad del
+  axio-axioma parcial `EVD-0053`). Los contratos `build-draft.schema.json` y
+  `build.schema.json` avanzan a `1.3.0` con la propiedad opcional
+  `optionLevel` (entero `>= 0`, default `0`) en `equipmentEntry`; la
+  migración de carga `1.2.0` → `1.3.0` conserva el equipo declarando
+  `OptionLevel = 0` (sin inventar opciones) y las ramas legacy `1.1.0`/`1.0.0`
+  se conservan con `Equipment = []`. `BuildEquipmentEntry` gana `OptionLevel`
+  y el nuevo `ItemOptionBonusCalculator` aplica `STR_efectivo = base + 5·n`
+  sólo sobre la clave `strength` con aritmética comprobada; `EquipItemRequest`
+  gana `OptionLevel`, `EquipItemResult` expone `OptionLevel` y
+  `EffectiveRequiredStats`, y la elegibilidad/revalidación comparan contra el
+  requisito efectivo. Nuevo código fail-closed `option-level-out-of-range`
+  (familias `item-equip-*`, `build-equipment-*`,
+  `build-draft-equipment-*`) para niveles negativos vía API. WPF añade el
+  campo "Nivel de opción JOL", muestra el requisito efectivo y la lista
+  `ItemId · vVersión · nivel · JOL`; el smoke verifica kris JOL +1 (STR 32
+  elegible/efectivo 32, STR 31 rechazado, JOL −1 fail-closed) sin alterar el
+  household ni los contadores. Sin cota máxima adoptada (sin fuente para el
+  subconjunto), sin JSON factuales nuevos: ruleset `1.0.0`, motor `0.2.0` y
+  dataset `2026-09-20.1` sin cambios. Verificación: build Release 0/0,
+  882/882 pruebas, estructura 17/34, smoke WPF `win-x64` PASS. Diseño en
+  `docs/04-domain/items-jol-option-design.md`.
+
 - Progresión defensiva de armadura por nivel de ítem (ampliación de UC-04,
   vertical del axio-axioma parcial `EVD-0053`). `item.schema.json` avanza a
   `1.1.0` con la propiedad opcional `defense` (integer `>= 0`); los tres

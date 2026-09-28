@@ -30,6 +30,7 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
@@ -247,6 +248,7 @@
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
 
                     <TextBlock VerticalAlignment="Center"
@@ -257,7 +259,17 @@
                              VerticalContentAlignment="Center"
                              Text="0" />
 
-                    <StackPanel Grid.Row="1"
+                    <TextBlock Grid.Row="1"
+                               VerticalAlignment="Center"
+                               Text="Nivel de opción JOL" />
+                    <TextBox x:Name="EquipItemOptionLevelTextBox"
+                             Grid.Row="1"
+                             Grid.Column="1"
+                             MinHeight="30"
+                             VerticalContentAlignment="Center"
+                             Text="0" />
+
+                    <StackPanel Grid.Row="2"
                                 Grid.Column="1"
                                 Margin="0,12,0,0"
                                 Orientation="Horizontal">
@@ -274,12 +286,12 @@
                                 AutomationProperties.Name="Desequipar el ítem equipado seleccionado de la lista" />
                     </StackPanel>
 
-                    <TextBlock Grid.Row="2"
+                    <TextBlock Grid.Row="3"
                                Margin="0,16,0,0"
                                VerticalAlignment="Center"
                                Text="Equipado" />
                     <ListBox x:Name="EquippedItemsListBox"
-                             Grid.Row="2"
+                             Grid.Row="3"
                              Grid.Column="1"
                              Margin="0,16,0,0"
                              MinHeight="72"
@@ -292,13 +304,15 @@
                                     <Run Text="{Binding ItemVersion}" />
                                     <Run Text=" · nivel " />
                                     <Run Text="{Binding Level}" />
+                                    <Run Text=" · JOL " />
+                                    <Run Text="{Binding OptionLevel}" />
                                 </TextBlock>
                             </DataTemplate>
                         </ListBox.ItemTemplate>
                     </ListBox>
 
                     <TextBlock x:Name="EquipStatusTextBox"
-                               Grid.Row="3"
+                               Grid.Row="4"
                                Grid.ColumnSpan="2"
                                Margin="0,12,0,0"
                                TextWrapping="Wrap" />
@@ -495,6 +509,64 @@
                      TextWrapping="Wrap"
                      VerticalScrollBarVisibility="Auto"
                      AutomationProperties.Name="Resultado de elegibilidad de equipado" />
+
+            <GroupBox Grid.Row="19"
+                      Grid.ColumnSpan="2"
+                      Margin="0,24,0,0"
+                      Header="Comparador de builds">
+                <Grid Margin="12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="180" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <TextBlock VerticalAlignment="Center"
+                               Text="Primera build" />
+                    <ComboBox x:Name="CompareFirstComboBox"
+                              Grid.Column="1"
+                              MinHeight="30"
+                              DisplayMemberPath="Id"
+                              AutomationProperties.Name="Primera build a comparar" />
+
+                    <TextBlock Grid.Row="1"
+                               Margin="0,12,0,0"
+                               VerticalAlignment="Center"
+                               Text="Segunda build" />
+                    <ComboBox x:Name="CompareSecondComboBox"
+                              Grid.Row="1"
+                              Grid.Column="1"
+                              Margin="0,12,0,0"
+                              MinHeight="30"
+                              DisplayMemberPath="Id"
+                              AutomationProperties.Name="Segunda build a comparar" />
+
+                    <Button Grid.Row="2"
+                            Grid.Column="1"
+                            Width="180"
+                            Margin="0,12,0,0"
+                            Padding="12,6"
+                            HorizontalAlignment="Left"
+                            Click="CompareBuildsButtonClick"
+                            Content="Comparar"
+                            AutomationProperties.Name="Comparar las builds seleccionadas" />
+                </Grid>
+            </GroupBox>
+
+            <TextBox x:Name="CompareResultTextBox"
+                     Grid.Row="20"
+                     Grid.ColumnSpan="2"
+                     Margin="0,16,0,0"
+                     Padding="12"
+                     MinHeight="120"
+                     IsReadOnly="True"
+                     TextWrapping="Wrap"
+                     VerticalScrollBarVisibility="Auto"
+                     AutomationProperties.Name="Resultado de la comparación de builds" />
         </Grid>
     </ScrollViewer>
 </Window>

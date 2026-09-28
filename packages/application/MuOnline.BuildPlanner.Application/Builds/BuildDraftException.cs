@@ -12,6 +12,7 @@ public static class BuildDraftErrorCodes
     public const string EquipmentVersionMismatch = "build-draft-equipment-version-mismatch";
     public const string EquipmentClassNotAllowed = "build-draft-equipment-class-not-allowed";
     public const string EquipmentLevelOutOfRange = "build-draft-equipment-level-out-of-range";
+    public const string EquipmentOptionLevelOutOfRange = "build-draft-equipment-option-level-out-of-range";
     public const string EquipmentDuplicate = "build-draft-equipment-duplicate";
     public const string EquipmentRequirementsNotMet = "build-draft-equipment-requirements-not-met";
 }

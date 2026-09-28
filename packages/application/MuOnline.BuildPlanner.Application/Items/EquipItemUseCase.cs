@@ -4,7 +4,8 @@ public sealed record EquipItemRequest(
     string CharacterClassId,
     IReadOnlyDictionary<string, long> FinalStats,
     string ItemId,
-    int Level = 0);
+    int Level = 0,
+    int OptionLevel = 0);
 
 public sealed record EquipItemResult(
     string ItemId,
@@ -14,6 +15,8 @@ public sealed record EquipItemResult(
     IReadOnlyDictionary<string, long> RequiredStats,
     int Level,
     int MaxItemLevel,
+    int OptionLevel,
+    IReadOnlyDictionary<string, long> EffectiveRequiredStats,
     long? Defense,
     long? DefenseAtLevel);
 
@@ -60,7 +63,19 @@ public sealed class EquipItemUseCase
                 $"when its published maximum is '{item.MaxItemLevel}'.");
         }
 
-        var unmetStats = item.RequiredStats
+        if (request.OptionLevel < 0)
+        {
+            throw Error(
+                ItemEquipErrorCodes.OptionLevelOutOfRange,
+                $"Item '{item.Id}' cannot be equipped at Jewel of Life option level " +
+                $"'{request.OptionLevel}' when option levels cannot be negative.");
+        }
+
+        var effectiveRequirements =
+            ItemOptionBonusCalculator.ApplyToRequiredStats(
+                item.RequiredStats,
+                request.OptionLevel);
+        var unmetStats = effectiveRequirements
             .Where(requirement =>
                 !request.FinalStats.TryGetValue(requirement.Key, out var finalValue) ||
                 finalValue < requirement.Value)
@@ -82,6 +97,8 @@ public sealed class EquipItemUseCase
             item.RequiredStats,
             request.Level,
             item.MaxItemLevel,
+            request.OptionLevel,
+            effectiveRequirements,
             item.Defense,
             ItemDefenseBonusCalculator.Calculate(item.Defense, request.Level));
     }

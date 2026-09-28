@@ -34,6 +34,16 @@ public sealed class LoadBuildUseCase
             stored = stored with
             {
                 SchemaVersion = CharacterBuild.CurrentSchemaVersion,
+                Equipment = (stored.Equipment ?? [])
+                    .Select(entry => entry with { OptionLevel = 0 })
+                    .ToArray(),
+            };
+        }
+        else if (stored.SchemaVersion == "1.1.0")
+        {
+            stored = stored with
+            {
+                SchemaVersion = CharacterBuild.CurrentSchemaVersion,
                 Equipment = [],
             };
         }
@@ -98,6 +108,7 @@ public sealed class LoadBuildUseCase
         "version-mismatch" => BuildErrorCodes.EquipmentVersionMismatch,
         "class-not-allowed" => BuildErrorCodes.EquipmentClassNotAllowed,
         "level-out-of-range" => BuildErrorCodes.EquipmentLevelOutOfRange,
+        "option-level-out-of-range" => BuildErrorCodes.EquipmentOptionLevelOutOfRange,
         "duplicate" => BuildErrorCodes.EquipmentDuplicate,
         _ => BuildErrorCodes.EquipmentRequirementsNotMet,
     };

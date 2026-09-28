@@ -17,6 +17,6 @@ public sealed record CharacterBuild(
     [property: JsonPropertyName("pointsPerReset")] long PointsPerReset,
     [property: JsonPropertyName("equipment")] IReadOnlyList<BuildEquipmentEntry> Equipment)
 {
-    public const string CurrentSchemaVersion = "1.2.0";
-    public const string PreviousSchemaVersion = "1.1.0";
+    public const string CurrentSchemaVersion = "1.3.0";
+    public const string PreviousSchemaVersion = "1.2.0";
 }

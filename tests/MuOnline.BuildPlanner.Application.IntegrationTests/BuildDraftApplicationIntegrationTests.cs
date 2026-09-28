@@ -385,6 +385,92 @@ public sealed class BuildDraftApplicationIntegrationTests
     }
 
     [Fact]
+    public async Task SaveAndLoadRoundTripsEquipmentWithJewelOfLifeOption()
+    {
+        var context = CreateEquipmentContext();
+        var repository = new InMemoryBuildDraftRepository();
+        var equipment = new[]
+        {
+            new BuildEquipmentEntry("item-synthetic", "1.0.0", 3, OptionLevel: 2),
+        };
+        var saved = await new SaveBuildDraftUseCase(repository, context)
+            .ExecuteAsync(
+                CreateSaveRequest("draft-jol-equipped") with { Equipment = equipment },
+                TestContext.Current.CancellationToken);
+
+        Assert.Equal(equipment, saved.Equipment);
+
+        var loaded = await new LoadBuildDraftUseCase(repository, context)
+            .ExecuteAsync(saved.Id, TestContext.Current.CancellationToken);
+
+        Assert.Equal(equipment, loaded.Equipment);
+    }
+
+    [Fact]
+    public async Task SaveRejectsEquipmentWithNegativeOptionLevel()
+    {
+        var context = CreateEquipmentContext();
+
+        var exception = await Assert.ThrowsAsync<BuildDraftException>(
+            () => new SaveBuildDraftUseCase(new InMemoryBuildDraftRepository(), context)
+                .ExecuteAsync(
+                    CreateSaveRequest("draft-bad-equipment") with
+                    {
+                        Equipment =
+                        [
+                            new BuildEquipmentEntry("item-synthetic", "1.0.0", 3, OptionLevel: -1),
+                        ],
+                    },
+                    TestContext.Current.CancellationToken));
+
+        Assert.Equal(BuildDraftErrorCodes.EquipmentOptionLevelOutOfRange, exception.Code);
+    }
+
+    [Fact]
+    public async Task LoadMapsPreviousVersionEquipmentWithoutDeclaredOptions()
+    {
+        var context = CreateEquipmentContext();
+        var repository = new InMemoryBuildDraftRepository();
+        var saved = await new SaveBuildDraftUseCase(repository, context)
+            .ExecuteAsync(
+                CreateSaveRequest("draft-jol-upgrade") with
+                {
+                    Equipment =
+                    [
+                        new BuildEquipmentEntry("item-synthetic", "1.0.0", 3),
+                    ],
+                },
+                TestContext.Current.CancellationToken);
+        await repository.SaveAsync(
+            saved with { SchemaVersion = BuildDraft.PreviousSchemaVersion },
+            TestContext.Current.CancellationToken);
+
+        var loaded = await new LoadBuildDraftUseCase(repository, context)
+            .ExecuteAsync(saved.Id, TestContext.Current.CancellationToken);
+
+        Assert.Equal(BuildDraft.CurrentSchemaVersion, loaded.SchemaVersion);
+        Assert.Equal(
+            [new BuildEquipmentEntry("item-synthetic", "1.0.0", 3, OptionLevel: 0)],
+            loaded.Equipment);
+    }
+
+    [Fact]
+    public void EquipmentEntrySerializesJewelOfLifeOptionLevelWithExactPropertyName()
+    {
+        var entry = new BuildEquipmentEntry("item-synthetic", "1.0.0", 3, OptionLevel: 2);
+
+        var json = JsonSerializer.Serialize(entry);
+        using var document = JsonDocument.Parse(json);
+
+        Assert.Equal(2, document.RootElement.GetProperty("optionLevel").GetInt32());
+
+        var withoutOption = JsonSerializer.Deserialize<BuildEquipmentEntry>(
+            """{"itemId":"item-synthetic","itemVersion":"1.0.0","level":3}""");
+        Assert.NotNull(withoutOption);
+        Assert.Equal(0, withoutOption.OptionLevel);
+    }
+
+    [Fact]
     public async Task SerializableModelUsesExactSchemaPropertyNames()
     {
         var draft = await CreateValidDraftAsync(TestContext.Current.CancellationToken);
