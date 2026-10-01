@@ -14,6 +14,20 @@
 
 ## Completado
 
+- Comparación bajo escenario, breakpoints y avisos implementada (2026-09-30,
+  cierre de UC-06 con autorización del propietario): `CompareBuildsUseCase`
+  con `Execute(first, second, options)`, escenario PVM/PVP/HYBRID sin efecto
+  numérico y foco mecánico `-pvm-`/`-pvp-`, objetivos `stat`/`derived` con
+  valor/cumplimiento/margen y semántica nula, requisitos de equipo contra
+  `requiredStats` +0 publicados, códigos `compare-unknown-breakpoint` y
+  `compare-invalid-scenario`, avisos `compare-warning-target-missed` y
+  `compare-warning-requirement-unmet` (buffs externos excluidos por la regla
+  inviolable de skills); WPF con modalidad, nombre y objetivos por línea, y
+  smoke con pasada PVM. Sin datos nuevos: dataset `2026-09-20.1`.
+  Verificación: build 0/0, 896/896 pruebas, estructura 17/34, smoke WPF
+  `win-x64` PASS. Diseño en
+  `docs/04-domain/build-comparison-scenario-design.md`.
+
 - Comparador de builds guardadas implementado (2026-09-27, primer tramo de
   UC-06 sin escenario): `CompareBuildsUseCase` con diferencias de stats
   finales, derivados compartidos por referencia exacta (absoluta +

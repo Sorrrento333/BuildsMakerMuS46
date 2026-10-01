@@ -1,5 +1,6 @@
 using MuOnline.BuildPlanner.Application.Builds;
 using MuOnline.BuildPlanner.Application.Formulas;
+using MuOnline.BuildPlanner.Application.Items;
 using MuOnline.BuildPlanner.Application.Progression;
 using Xunit;
 
@@ -167,6 +168,252 @@ public sealed class BuildComparisonApplicationIntegrationTests
             () => useCase.Execute(first, unknownClass));
         Assert.Equal(BuildComparisonErrorCodes.UnknownClass, unknownClassException.Code);
     }
+
+    private static CompareBuildsUseCase CreateUseCaseWithItems()
+    {
+        var progressionCatalog = CatalogForTest();
+        var formulaCatalog =
+            new JsonExecutableFormulaSnapshotReader().Read(CanonicalSnapshotRoot);
+        var itemCatalog =
+            new JsonItemCatalogSnapshotReader().Read(CanonicalSnapshotRoot);
+        return new CompareBuildsUseCase(progressionCatalog, formulaCatalog, itemCatalog);
+    }
+
+    [Fact]
+    public void EchoesScenarioAndFocusesModalityOutputs()
+    {
+        var useCase = CreateUseCase();
+        var first = CreateDarkKnightBuild("build-first", strengthBonus: 0, vitalityBonus: 0, energyBonus: 0);
+        var second = CreateDarkKnightBuild("build-second", strengthBonus: 2, vitalityBonus: 1, energyBonus: 20);
+
+        var hunting = useCase.Execute(
+            first,
+            second,
+            new BuildComparisonOptions(
+                new ComparisonScenario(ComparisonModality.Pvm, "Hunt", null, null),
+                []));
+        Assert.Equal(ComparisonModality.Pvm, hunting.Scenario!.Modality);
+        Assert.Equal("Hunt", hunting.Scenario.DisplayName);
+        Assert.NotEmpty(hunting.FocusedReferences);
+        Assert.All(
+            hunting.FocusedReferences,
+            item => Assert.Contains("-pvm-", item.Id, StringComparison.Ordinal));
+
+        var duel = useCase.Execute(
+            first,
+            second,
+            new BuildComparisonOptions(
+                new ComparisonScenario(ComparisonModality.Pvp, null, null, null),
+                []));
+        Assert.NotEmpty(duel.FocusedReferences);
+        Assert.All(
+            duel.FocusedReferences,
+            item => Assert.Contains("-pvp-", item.Id, StringComparison.Ordinal));
+
+        var hybrid = useCase.Execute(
+            first,
+            second,
+            new BuildComparisonOptions(
+                new ComparisonScenario(ComparisonModality.Hybrid, null, null, null),
+                []));
+        Assert.Empty(hybrid.FocusedReferences);
+
+        var plain = useCase.Execute(first, second);
+        Assert.Null(plain.Scenario);
+        Assert.Empty(plain.FocusedReferences);
+        Assert.Empty(plain.BreakpointResults);
+        Assert.Empty(plain.Warnings);
+    }
+
+    [Fact]
+    public void EvaluatesStatBreakpointWithMarginsAndWarnings()
+    {
+        var useCase = CreateUseCase();
+        var first = CreateDarkKnightBuild("build-first", strengthBonus: 0, vitalityBonus: 0, energyBonus: 0);
+        var second = CreateDarkKnightBuild("build-second", strengthBonus: 2, vitalityBonus: 1, energyBonus: 20);
+
+        var reachable = useCase.Execute(
+            first,
+            second,
+            new BuildComparisonOptions(
+                null,
+                [new BreakpointTarget(BreakpointKind.Stat, "strength", 28)]));
+        var reachableResult = Assert.Single(reachable.BreakpointResults);
+        Assert.Equal(28, reachableResult.FirstValue);
+        Assert.Equal(30, reachableResult.SecondValue);
+        Assert.True(reachableResult.MeetsFirst);
+        Assert.True(reachableResult.MeetsSecond);
+        Assert.Equal(0, reachableResult.FirstMargin);
+        Assert.Equal(2, reachableResult.SecondMargin);
+        Assert.Empty(reachable.Warnings);
+
+        var unreachable = useCase.Execute(
+            first,
+            second,
+            new BuildComparisonOptions(
+                null,
+                [new BreakpointTarget(BreakpointKind.Stat, "strength", long.MaxValue)]));
+        var missed = Assert.Single(unreachable.BreakpointResults);
+        Assert.False(missed.MeetsFirst);
+        Assert.False(missed.MeetsSecond);
+        Assert.Equal(
+            new[] { ComparisonSide.First, ComparisonSide.Second },
+            unreachable.Warnings
+                .Where(item => item.Code == ComparisonWarningCodes.TargetMissed)
+                .Select(item => item.Side)
+                .OrderBy(item => item)
+                .ToArray());
+    }
+
+    [Fact]
+    public void ResolvesDerivedBreakpointWithNullOnMissingSide()
+    {
+        var useCase = CreateUseCase();
+        var darkKnight = CreateDarkKnightBuild("build-dark-knight", strengthBonus: 0, vitalityBonus: 0, energyBonus: 0);
+        var fairyElf = CreateClassBuild("build-fairy-elf", "class-fairy-elf", "evolution-fairy-elf");
+
+        var comparison = useCase.Execute(
+            darkKnight,
+            fairyElf,
+            new BuildComparisonOptions(
+                null,
+                [new BreakpointTarget(BreakpointKind.Derived, "formula-hp-dark-knight@1.0.0", 120)]));
+        var result = Assert.Single(comparison.BreakpointResults);
+        Assert.Equal(120, result.FirstValue);
+        Assert.Null(result.SecondValue);
+        Assert.True(result.MeetsFirst);
+        Assert.Null(result.MeetsSecond);
+        Assert.DoesNotContain(
+            comparison.Warnings,
+            item => item.Side == ComparisonSide.Second);
+    }
+
+    [Fact]
+    public void RejectsUnknownBreakpointKeys()
+    {
+        var useCase = CreateUseCase();
+        var first = CreateDarkKnightBuild("build-first", strengthBonus: 0, vitalityBonus: 0, energyBonus: 0);
+        var second = CreateDarkKnightBuild("build-second", strengthBonus: 2, vitalityBonus: 1, energyBonus: 20);
+
+        foreach (var target in new[]
+                 {
+                     new BreakpointTarget(BreakpointKind.Stat, "missing-stat", 1),
+                     new BreakpointTarget(BreakpointKind.Derived, "not-a-reference", 1),
+                     new BreakpointTarget(BreakpointKind.Derived, "formula-missing@1.0.0", 1),
+                 })
+        {
+            var exception = Assert.Throws<BuildComparisonException>(
+                () => useCase.Execute(
+                    first,
+                    second,
+                    new BuildComparisonOptions(null, [target])));
+            Assert.Equal(BuildComparisonErrorCodes.UnknownBreakpoint, exception.Code);
+        }
+    }
+
+    [Fact]
+    public void RejectsInvalidScenario()
+    {
+        var useCase = CreateUseCase();
+        var first = CreateDarkKnightBuild("build-first", strengthBonus: 0, vitalityBonus: 0, energyBonus: 0);
+        var second = CreateDarkKnightBuild("build-second", strengthBonus: 2, vitalityBonus: 1, energyBonus: 20);
+
+        var blankName = Assert.Throws<BuildComparisonException>(
+            () => useCase.Execute(
+                first,
+                second,
+                new BuildComparisonOptions(
+                    new ComparisonScenario(ComparisonModality.Pvp, "  ", null, null),
+                    [])));
+        Assert.Equal(BuildComparisonErrorCodes.InvalidScenario, blankName.Code);
+
+        var unknownModality = Assert.Throws<BuildComparisonException>(
+            () => useCase.Execute(
+                first,
+                second,
+                new BuildComparisonOptions(
+                    new ComparisonScenario((ComparisonModality)99, null, null, null),
+                    [])));
+        Assert.Equal(BuildComparisonErrorCodes.InvalidScenario, unknownModality.Code);
+    }
+
+    [Fact]
+    public void WarnsOnUnmetItemRequirementsFromThePublishedCatalog()
+    {
+        var useCase = CreateUseCaseWithItems();
+        var first = CreateDarkKnightBuild("build-first", strengthBonus: 0, vitalityBonus: 0, energyBonus: 0);
+        var second = CreateDarkKnightBuild("build-second", strengthBonus: 2, vitalityBonus: 1, energyBonus: 20);
+
+        var comparison = useCase.Execute(
+            first,
+            second,
+            new BuildComparisonOptions(null, []));
+        var requirements = comparison.Warnings
+            .Where(item => item.Code == ComparisonWarningCodes.RequirementUnmet)
+            .ToArray();
+        Assert.Contains(
+            requirements,
+            item => item.Side == ComparisonSide.First &&
+                item.Detail.Contains("item-kris", StringComparison.Ordinal));
+        Assert.Contains(
+            requirements,
+            item => item.Side == ComparisonSide.First &&
+                item.Detail.Contains("item-dragon-armor", StringComparison.Ordinal));
+        Assert.Contains(
+            requirements,
+            item => item.Side == ComparisonSide.Second &&
+                item.Detail.Contains("item-kris", StringComparison.Ordinal));
+        Assert.DoesNotContain(
+            requirements,
+            item => item.Detail.Contains("item-albatross-bow", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void OmitsRequirementWarningsWithoutAnItemCatalog()
+    {
+        var useCase = CreateUseCase();
+        var first = CreateDarkKnightBuild("build-first", strengthBonus: 0, vitalityBonus: 0, energyBonus: 0);
+        var second = CreateDarkKnightBuild("build-second", strengthBonus: 2, vitalityBonus: 1, energyBonus: 20);
+
+        var comparison = useCase.Execute(
+            first,
+            second,
+            new BuildComparisonOptions(
+                null,
+                [new BreakpointTarget(BreakpointKind.Stat, "strength", long.MaxValue)]));
+        Assert.All(
+            comparison.Warnings,
+            item => Assert.Equal(ComparisonWarningCodes.TargetMissed, item.Code));
+    }
+
+    [Fact]
+    public void MirrorsWarningsWhenSwappingSidesWithOptions()
+    {
+        var useCase = CreateUseCaseWithItems();
+        var first = CreateDarkKnightBuild("build-first", strengthBonus: 0, vitalityBonus: 0, energyBonus: 0);
+        var second = CreateClassBuild("build-second", "class-fairy-elf", "evolution-fairy-elf");
+        var options = new BuildComparisonOptions(
+            new ComparisonScenario(ComparisonModality.Pvm, "Hunt", null, null),
+            [new BreakpointTarget(BreakpointKind.Stat, "strength", long.MaxValue)]);
+
+        var forward = useCase.Execute(first, second, options);
+        var swapped = useCase.Execute(second, first, options);
+
+        Assert.Equal(forward.Warnings.Count, swapped.Warnings.Count);
+        Assert.Equal(
+            WarningsOnSide(forward, ComparisonSide.First),
+            WarningsOnSide(swapped, ComparisonSide.Second));
+        Assert.Equal(
+            WarningsOnSide(forward, ComparisonSide.Second),
+            WarningsOnSide(swapped, ComparisonSide.First));
+    }
+
+    private static string[] WarningsOnSide(BuildComparison comparison, ComparisonSide side) =>
+        comparison.Warnings
+            .Where(item => item.Side == side)
+            .Select(item => $"{item.Code}|{item.Detail}")
+            .Order(StringComparer.Ordinal)
+            .ToArray();
 
     private static CharacterBuild CreateDarkKnightBuild(
         string id,

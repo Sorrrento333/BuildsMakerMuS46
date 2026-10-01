@@ -68,6 +68,14 @@ public partial class MainWindow : Window
             .OrderBy(item => item.DisplayName, StringComparer.CurrentCulture)
             .ToArray();
         ClassComboBox.SelectedIndex = 0;
+        CompareModalityComboBox.ItemsSource = new[]
+        {
+            "Sin escenario",
+            "PVM",
+            "PVP",
+            "Híbrido",
+        };
+        CompareModalityComboBox.SelectedIndex = 0;
     }
 
     private void ClassSelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -1435,7 +1443,8 @@ public partial class MainWindow : Window
             var second = await _loadBuildUseCase.ExecuteAsync(
                 secondSummary.Id,
                 CancellationToken.None);
-            var comparison = _compareBuildsUseCase.Execute(first, second);
+            var options = BuildComparisonOptionsFromControls();
+            var comparison = _compareBuildsUseCase.Execute(first, second, options);
             CompareResultTextBox.Text = FormatComparison(comparison);
         }
         catch (BuildComparisonException exception)
@@ -1468,14 +1477,102 @@ public partial class MainWindow : Window
         }
     }
 
+    private BuildComparisonOptions BuildComparisonOptionsFromControls()
+    {
+        ComparisonScenario? scenario = CompareModalityComboBox.SelectedIndex switch
+        {
+            1 => new ComparisonScenario(
+                ComparisonModality.Pvm,
+                NullIfWhiteSpace(CompareScenarioNameTextBox.Text),
+                null,
+                null),
+            2 => new ComparisonScenario(
+                ComparisonModality.Pvp,
+                NullIfWhiteSpace(CompareScenarioNameTextBox.Text),
+                null,
+                null),
+            3 => new ComparisonScenario(
+                ComparisonModality.Hybrid,
+                NullIfWhiteSpace(CompareScenarioNameTextBox.Text),
+                null,
+                null),
+            _ => null,
+        };
+        return new BuildComparisonOptions(scenario, ParseBreakpointTargets());
+    }
+
+    private static string? NullIfWhiteSpace(string value) =>
+        string.IsNullOrWhiteSpace(value) ? null : value.Trim();
+
+    private List<BreakpointTarget> ParseBreakpointTargets()
+    {
+        var targets = new List<BreakpointTarget>();
+        foreach (var line in CompareTargetsTextBox.Text.Split(
+                     ['\r', '\n'],
+                     StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+        {
+            var span = line.AsSpan();
+            var separator = span.IndexOf('=');
+            if (separator <= 0 || separator == span.Length - 1 ||
+                !long.TryParse(
+                    span.Slice(separator + 1),
+                    System.Globalization.NumberStyles.Integer,
+                    System.Globalization.CultureInfo.InvariantCulture,
+                    out var targetValue))
+            {
+                throw new BuildComparisonException(
+                    BuildComparisonErrorCodes.UnknownBreakpoint,
+                    $"The comparison declares the malformed breakpoint line '{line}'. " +
+                    "Expected 'stat:<statId>=<n>' or 'derived:<id>@<version>=<n>'.");
+            }
+
+            var key = span.Slice(0, separator);
+            if (key.StartsWith("stat:", StringComparison.Ordinal) && key.Length > 5)
+            {
+                targets.Add(new BreakpointTarget(
+                    BreakpointKind.Stat,
+                    key.Slice(5).ToString(),
+                    targetValue));
+            }
+            else if (key.StartsWith("derived:", StringComparison.Ordinal) && key.Length > 8)
+            {
+                targets.Add(new BreakpointTarget(
+                    BreakpointKind.Derived,
+                    key.Slice(8).ToString(),
+                    targetValue));
+            }
+            else
+            {
+                throw new BuildComparisonException(
+                    BuildComparisonErrorCodes.UnknownBreakpoint,
+                    $"The comparison declares the malformed breakpoint line '{line}'. " +
+                    "Expected 'stat:<statId>=<n>' or 'derived:<id>@<version>=<n>'.");
+            }
+        }
+
+        return targets;
+    }
+
     private static string FormatComparison(BuildComparison comparison)
     {
         var lines = new List<string>
         {
             $"Comparación: {comparison.FirstBuildId} → {comparison.SecondBuildId}",
-            string.Empty,
-            "== Stats finales ==",
         };
+        if (comparison.Scenario is not null)
+        {
+            lines.Add(
+                $"Escenario: {FormatModality(comparison.Scenario.Modality)}" +
+                (comparison.Scenario.DisplayName is null
+                    ? string.Empty
+                    : $" «{comparison.Scenario.DisplayName}»") +
+                (comparison.Scenario.Objective is null
+                    ? string.Empty
+                    : $" — {comparison.Scenario.Objective}"));
+        }
+
+        lines.Add(string.Empty);
+        lines.Add("== Stats finales ==");
         lines.AddRange(comparison.StatDifferences.Select(item =>
             item.AbsoluteDifference is null
                 ? $"- {item.StatId}: " +
@@ -1506,8 +1603,65 @@ public partial class MainWindow : Window
         lines.AddRange(comparison.OnlyInSecond.Select(item =>
             $"- {item.OutputId} [{item.OutputUnit}]: {item.VisibleValue} " +
             $"[{item.FormulaId} v{item.FormulaVersion}]"));
+        if (comparison.FocusedReferences.Count > 0)
+        {
+            lines.Add(string.Empty);
+            lines.Add(
+                $"== Foco de escenario ({FormatModality(comparison.Scenario!.Modality)}) ==");
+            lines.AddRange(comparison.FocusedReferences.Select(item =>
+                $"- {item.Id} v{item.Version}"));
+        }
+
+        if (comparison.BreakpointResults.Count > 0)
+        {
+            lines.Add(string.Empty);
+            lines.Add("== Objetivos ==");
+            lines.AddRange(comparison.BreakpointResults.Select(FormatBreakpointResult));
+        }
+
+        if (comparison.Warnings.Count > 0)
+        {
+            lines.Add(string.Empty);
+            lines.Add("== Avisos ==");
+            lines.AddRange(comparison.Warnings.Select(item =>
+                $"- [{(item.Side == ComparisonSide.First ? comparison.FirstBuildId : comparison.SecondBuildId)}] " +
+                $"{TranslateWarning(item.Code)}: {item.Detail}"));
+        }
+
         return string.Join(Environment.NewLine, lines);
     }
+
+    private static string FormatModality(ComparisonModality modality) => modality switch
+    {
+        ComparisonModality.Pvm => "PVM",
+        ComparisonModality.Pvp => "PVP",
+        _ => "Híbrido",
+    };
+
+    private static string FormatBreakpointResult(BreakpointResult item)
+    {
+        var label = item.Target.Kind == BreakpointKind.Stat
+            ? $"stat {item.Target.Key}"
+            : $"derived {item.Target.Key}";
+        return $"- {label} (objetivo {item.Target.Target}): " +
+            $"{FormatNullableStat(item.FirstValue)} → " +
+            $"{FormatNullableStat(item.SecondValue)} " +
+            $"[{FormatMeets(item.MeetsFirst)}/{FormatMeets(item.MeetsSecond)}]";
+    }
+
+    private static string FormatMeets(bool? meets) => meets switch
+    {
+        true => "cumple",
+        false => "no cumple",
+        _ => "n/d",
+    };
+
+    private static string TranslateWarning(string code) => code switch
+    {
+        ComparisonWarningCodes.TargetMissed => "objetivo incumplido",
+        ComparisonWarningCodes.RequirementUnmet => "requisito de ítem incumplido",
+        _ => "aviso no reconocido",
+    };
 
     private static string FormatNullableStat(long? value) =>
         value?.ToString(System.Globalization.CultureInfo.InvariantCulture) ?? "—";
@@ -1529,6 +1683,11 @@ public partial class MainWindow : Window
             "una build referencia una clase que no está publicada.",
         BuildComparisonErrorCodes.StatsMismatch =>
             "los stats de una build no coinciden con su clase publicada.",
+        BuildComparisonErrorCodes.UnknownBreakpoint =>
+            "un objetivo tiene una clave desconocida o un formato inválido " +
+            "(usa stat:<statId>=<n> o derived:<id>@<versión>=<n>).",
+        BuildComparisonErrorCodes.InvalidScenario =>
+            "el escenario de comparación no es válido.",
         _ => "se produjo un error de comparación no reconocido.",
     };
 

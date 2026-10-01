@@ -42,7 +42,7 @@ internal static class PublishedProgressionRuleset
         new(Catalog, FormulaCatalog);
 
     public static CompareBuildsUseCase CreateCompareBuildsUseCase() =>
-        new(Catalog, FormulaCatalog);
+        new(Catalog, FormulaCatalog, ItemCatalog);
 
     public static EquipItemUseCase CreateEquipItemUseCase() =>
         new(ItemCatalog);

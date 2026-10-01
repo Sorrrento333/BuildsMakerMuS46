@@ -1132,6 +1132,107 @@ internal static class PublicationSmokeRunner
         {
             // Expected: a build cannot be compared with itself.
         }
+
+        VerifyBuildComparisonWithScenario(useCase, first, second);
+    }
+
+    private static void VerifyBuildComparisonWithScenario(
+        CompareBuildsUseCase useCase,
+        CharacterBuild first,
+        CharacterBuild second)
+    {
+        var options = new BuildComparisonOptions(
+            new ComparisonScenario(ComparisonModality.Pvm, "Smoke PVM", null, null),
+            [new BreakpointTarget(BreakpointKind.Stat, "strength", long.MaxValue)]);
+        var comparison = useCase.Execute(first, second, options);
+        if (comparison.Scenario is null ||
+            comparison.Scenario.Modality != ComparisonModality.Pvm ||
+            comparison.Scenario.DisplayName != "Smoke PVM")
+        {
+            throw new InvalidOperationException(
+                "The scenario comparison did not echo the requested scenario.");
+        }
+
+        if (comparison.BreakpointResults.Count != 1)
+        {
+            throw new InvalidOperationException(
+                "The scenario comparison did not evaluate the requested breakpoint.");
+        }
+
+        var targetWarnings = comparison.Warnings
+            .Where(item => item.Code == ComparisonWarningCodes.TargetMissed)
+            .ToArray();
+        if (targetWarnings.Length != 2 ||
+            !targetWarnings.Any(item => item.Side == ComparisonSide.First) ||
+            !targetWarnings.Any(item => item.Side == ComparisonSide.Second))
+        {
+            throw new InvalidOperationException(
+                "The unreachable strength breakpoint did not warn on both sides.");
+        }
+
+        if (comparison.Warnings.Any(item =>
+                item.Code != ComparisonWarningCodes.TargetMissed &&
+                item.Code != ComparisonWarningCodes.RequirementUnmet))
+        {
+            throw new InvalidOperationException(
+                "The scenario comparison produced a warning with an unknown code.");
+        }
+
+        var swapped = useCase.Execute(second, first, options);
+        if (!WarningsOnSide(comparison, ComparisonSide.First)
+                .SequenceEqual(WarningsOnSide(swapped, ComparisonSide.Second)) ||
+            !WarningsOnSide(comparison, ComparisonSide.Second)
+                .SequenceEqual(WarningsOnSide(swapped, ComparisonSide.First)))
+        {
+            throw new InvalidOperationException(
+                "Swapping the compared builds did not mirror the scenario warnings.");
+        }
+
+        var hybrid = useCase.Execute(
+            first,
+            second,
+            new BuildComparisonOptions(
+                new ComparisonScenario(ComparisonModality.Hybrid, null, null, null),
+                []));
+        if (hybrid.FocusedReferences.Count != 0)
+        {
+            throw new InvalidOperationException(
+                "The hybrid scenario unexpectedly focused derived references.");
+        }
+
+        try
+        {
+            _ = useCase.Execute(
+                first,
+                second,
+                new BuildComparisonOptions(
+                    null,
+                    [new BreakpointTarget(BreakpointKind.Stat, "missing-stat", 1)]));
+            throw new InvalidOperationException(
+                "Comparing with an unknown breakpoint unexpectedly passed validation.");
+        }
+        catch (BuildComparisonException exception)
+            when (exception.Code == BuildComparisonErrorCodes.UnknownBreakpoint)
+        {
+            // Expected: unknown breakpoint keys fail closed.
+        }
+
+        try
+        {
+            _ = useCase.Execute(
+                first,
+                second,
+                new BuildComparisonOptions(
+                    new ComparisonScenario(ComparisonModality.Pvp, "  ", null, null),
+                    []));
+            throw new InvalidOperationException(
+                "Comparing with an invalid scenario unexpectedly passed validation.");
+        }
+        catch (BuildComparisonException exception)
+            when (exception.Code == BuildComparisonErrorCodes.InvalidScenario)
+        {
+            // Expected: an empty scenario display name fails closed.
+        }
     }
 
     private static void VerifyComparisonAgainstLoadedBuilds(
@@ -1196,6 +1297,15 @@ internal static class PublicationSmokeRunner
                 "The build comparison produced no comparable content.");
         }
     }
+
+    private static string[] WarningsOnSide(
+        BuildComparison comparison,
+        ComparisonSide side) =>
+        comparison.Warnings
+            .Where(item => item.Side == side)
+            .Select(item => $"{item.Code}|{item.Detail}")
+            .Order(StringComparer.Ordinal)
+            .ToArray();
 
     private static long? Negate(long? value) =>
         value is null ? null : -value.Value;
