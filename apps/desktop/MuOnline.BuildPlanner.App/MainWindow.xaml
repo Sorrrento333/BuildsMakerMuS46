@@ -523,6 +523,9 @@
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
 
                     <TextBlock VerticalAlignment="Center"
@@ -554,6 +557,42 @@
                             Click="CompareBuildsButtonClick"
                             Content="Comparar"
                             AutomationProperties.Name="Comparar las builds seleccionadas" />
+
+                    <TextBlock Grid.Row="3"
+                               Margin="0,12,0,0"
+                               VerticalAlignment="Center"
+                               Text="Escenario (modalidad)" />
+                    <ComboBox x:Name="CompareModalityComboBox"
+                              Grid.Row="3"
+                              Grid.Column="1"
+                              Margin="0,12,0,0"
+                              MinHeight="30"
+                              AutomationProperties.Name="Modalidad del escenario de comparación" />
+
+                    <TextBlock Grid.Row="4"
+                               Margin="0,12,0,0"
+                               VerticalAlignment="Center"
+                               Text="Nombre del escenario (opcional)" />
+                    <TextBox x:Name="CompareScenarioNameTextBox"
+                             Grid.Row="4"
+                             Grid.Column="1"
+                             Margin="0,12,0,0"
+                             MinHeight="30"
+                             AutomationProperties.Name="Nombre del escenario de comparación" />
+
+                    <TextBlock Grid.Row="5"
+                               Margin="0,12,0,0"
+                               VerticalAlignment="Top"
+                               Text="Objetivos (opcional)" />
+                    <TextBox x:Name="CompareTargetsTextBox"
+                             Grid.Row="5"
+                             Grid.Column="1"
+                             Margin="0,12,0,0"
+                             MinHeight="60"
+                             AcceptsReturn="True"
+                             TextWrapping="Wrap"
+                             VerticalScrollBarVisibility="Auto"
+                             AutomationProperties.Name="Objetivos de comparación, uno por línea" />
                 </Grid>
             </GroupBox>
 

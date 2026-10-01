@@ -45,12 +45,14 @@ La instrucción de ejecutar sólo la primera tarea pendiente continúa vigente.
    `EVD-0053`), requisito efectivo en elegibilidad y revalidación, WPF y
    smoke con kris JOL +1 (STR 32/efectivo 32); sin cota máxima adoptada y sin
    datos factuales nuevos (dataset `2026-09-20.1`).
-8. Comparador de builds guardadas implementado (2026-09-27, primer tramo de
-   UC-06 sin escenario): `CompareBuildsUseCase` con diferencias de stats,
-   derivados compartidos por referencia exacta y listados «sólo en»;
-   códigos `compare-*`; sección «Comparador de builds» en WPF y smoke
-   cruzado entre builds con inversión de signo. Sin datos nuevos
-   (dataset `2026-09-20.1`).
+8. Comparador de builds guardadas cerrado por completo (2026-09-30, UC-06):
+   `CompareBuildsUseCase` con diferencias de stats, derivados compartidos por
+   referencia exacta y listados «sólo en» (2026-09-27), más escenario de
+   usuario (PVM/PVP/HYBRID, sin efecto numérico), breakpoints de stat/derivado
+   y avisos de objetivo y de requisito de equipo (2026-09-30, autorización del
+   propietario; buffs externos excluidos por `docs/DECISIONES-PRODUCTO.md`).
+   Sección «Comparador de builds» en WPF y smoke con pasada de escenario.
+   Sin datos nuevos (dataset `2026-09-20.1`).
 9. Alternativa documentada: master buys y pantallas restantes del flujo, sin
    contrato factual todavía.
 
@@ -351,6 +353,34 @@ nuevos datos factuales:
   `2026-09-20.1` sin cambios. Verificación: build 0/0, 882/882 pruebas,
   estructura 17/34, smoke WPF `win-x64` PASS (1369 archivos, SQLite `3.53.3`).
   Diseño en `docs/04-domain/items-jol-option-design.md`.
+
+## Comparador bajo escenario, breakpoints y avisos — implementado (2026-09-30)
+
+- `CompareBuildsUseCase` gana `Execute(first, second, options)` con
+  `BuildComparisonOptions(Scenario?, BreakpointTargets[])`; el constructor
+  acepta el `ItemCatalog` opcional y `Execute(first, second)` conserva su
+  comportamiento. Escenario PVM/PVP/HYBRID con eco y foco mecánico `-pvm-`/
+  `-pvp-` (HYBRID o ausente = sin foco); objetivos `stat`/`derived` con
+  valor, cumplimiento y margen por build y semántica nula; requisitos de
+  equipo por build contra `requiredStats` +0 publicados. Códigos fail-closed
+  `compare-unknown-breakpoint` y `compare-invalid-scenario`; avisos
+  `compare-warning-target-missed` y `compare-warning-requirement-unmet`.
+  Buffs externos excluidos (regla inviolable de skills).
+- WPF: modalidad, nombre de escenario y objetivos `stat:<id>=<n>` /
+  `derived:<id>@<versión>=<n>` por línea, con traducción de los códigos
+  nuevos; el informe añade escenario, foco, objetivos y avisos.
+- Smoke: pasada PVM sobre `publication-smoke-build` vs
+  `publication-smoke-equip-build` (eco, avisos en ambos lados, espejo al
+  intercambiar, foco vacío en HYBRID, rechazos `compare-unknown-breakpoint`
+  y `compare-invalid-scenario`).
+- Ocho pruebas nuevas (`BuildComparisonApplicationIntegrationTests`):
+  escenario/foco, objetivos de stat con márgenes y avisos, derivado nulo en
+  un lado, claves desconocidas, escenario inválido, requisitos del catálogo,
+  omisión sin catálogo y espejo de avisos.
+- Sin datos nuevos: ruleset `1.0.0`, motor `0.2.0` y dataset `2026-09-20.1`
+  sin cambios. Verificación: build 0/0, 896/896 pruebas, estructura 17/34,
+  smoke WPF `win-x64` PASS (1369 archivos, SQLite `3.53.3`). Diseño en
+  `docs/04-domain/build-comparison-scenario-design.md`. UC-06 queda cerrado.
 
 ## Comparador de builds guardadas — implementado (2026-09-27)
 

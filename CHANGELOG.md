@@ -21,6 +21,28 @@
 
 ### Added
 
+- Comparación bajo escenario, breakpoints y avisos (cierre de UC-06,
+  autorización del propietario 2026-09-30, sin inventar reglas del juego).
+  `CompareBuildsUseCase` gana el overload `Execute(first, second, options)`
+  con `BuildComparisonOptions(Scenario?, BreakpointTargets[])`: el escenario
+  (`ComparisonModality` PVM/PVP/HYBRID del vocabulario del contrato, nombre,
+  objetivo y notas) se refleja en el informe sin alterar ningún número y
+  activa un foco de presentación mecánico sobre referencias `-pvm-`/`-pvp-`;
+  los objetivos de usuario (`stat:<id>` o `derived:<id>@<versión>`) informan
+  valor, cumplimiento y margen por build con semántica nula; los requisitos
+  de equipo se comprueban por build contra los `requiredStats` publicados en
+  +0 (catálogo opcional, baseline sin progresión). Nuevos códigos fail-closed
+  `compare-unknown-breakpoint` y `compare-invalid-scenario`, y avisos
+  `compare-warning-target-missed` / `compare-warning-requirement-unmet`
+  (buffs externos excluidos por `docs/DECISIONES-PRODUCTO.md`). WPF extiende
+  la sección «Comparador de builds» (modalidad, nombre, objetivos por línea)
+  y el smoke añade la pasada con escenario PVM (eco, avisos en ambos lados,
+  espejo al intercambiar, foco vacío en HYBRID, rechazos fail-closed). Sin
+  datos nuevos: ruleset `1.0.0`, motor `0.2.0` y dataset `2026-09-20.1` sin
+  cambios. Verificación: build Release 0/0, 896/896 pruebas, estructura
+  17/34, smoke WPF `win-x64` PASS. Diseño en
+  `docs/04-domain/build-comparison-scenario-design.md`.
+
 - Comparador de builds guardadas (primer tramo verificable de UC-06, sin
   escenario). `CompareBuildsUseCase` (Application, `Builds/`) recibe dos
   `CharacterBuild` ya revalidados por `LoadBuildUseCase`, deriva asignaciones
